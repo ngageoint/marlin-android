@@ -1,7 +1,7 @@
 package mil.nga.msi.datasource.asam
 
+import androidx.paging.PagingSource
 import androidx.room.*
-
 
 @Dao
 interface AsamDao {
@@ -16,6 +16,9 @@ interface AsamDao {
 
    @Query("SELECT * FROM asam")
    suspend fun asams(): List<Asam>
+
+   @Query("SELECT * FROM asam ORDER BY date DESC")
+   fun asamPagingSource(): PagingSource<Int, AsamListItem>
 
    @Query("SELECT * FROM asam ORDER BY date DESC LIMIT 1")
    suspend fun latestAsam(): Asam?

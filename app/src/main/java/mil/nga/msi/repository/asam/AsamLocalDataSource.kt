@@ -10,4 +10,5 @@ class AsamLocalDataSource @Inject constructor(
    suspend fun getAsams(): List<Asam> = asamDao.asams()
    suspend fun insert(asams: List<Asam>) = asamDao.insert(asams)
    suspend fun getLatestAsam() = asamDao.latestAsam()
+   fun getAsamPages() = asamDao.asamPagingSource()
 }
