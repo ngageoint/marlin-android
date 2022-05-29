@@ -3,6 +3,7 @@ package mil.nga.msi.datasource.asam
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.google.gson.annotations.SerializedName
 import java.util.*
 
 @Entity(tableName = "asam")
@@ -18,20 +19,19 @@ data class Asam(
    val latitude: Double,
 
    @ColumnInfo(name = "longitude")
-   val longitude: Double,
-
+   val longitude: Double
+) {
    @ColumnInfo(name = "position")
-   val position: String,
+   var position: String? = null
 
    @ColumnInfo(name = "navigation_area")
-   val navigationArea: String,
+   var navigationArea: String? = null
 
    @ColumnInfo(name = "subregion")
-   val subregion: String,
+   var subregion: String? = null
 
    @ColumnInfo(name = "description")
-   val description: String,
-) {
+   var description: String? = null
 
    @ColumnInfo(name = "hostility")
    var hostility: String? = null

@@ -3,13 +3,16 @@ package mil.nga.msi.datasource
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import mil.nga.msi.datasource.asam.Asam
 import mil.nga.msi.datasource.asam.AsamDao
 
 @Database(
    version = MsiDatabase.VERSION,
-   entities = []
+   entities = [
+      Asam::class,
+   ]
 )
-@TypeConverters
+@TypeConverters(DateTypeConverter::class)
 abstract class MsiDatabase : RoomDatabase() {
 
    companion object {
