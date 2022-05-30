@@ -16,7 +16,7 @@ class RefreshAsamWorker @AssistedInject constructor(
    private val asamRepository: AsamRepository,
 ) : CoroutineWorker(context, params) {
    override suspend fun doWork(): Result = try {
-      asamRepository.getAsams(true)
+      asamRepository.fetchAsams(true)
       Result.success()
    } catch (error: Throwable) {
       Result.failure()

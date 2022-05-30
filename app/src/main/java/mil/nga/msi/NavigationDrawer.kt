@@ -9,19 +9,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 sealed class DrawerScreen(val title: String, val route: String) {
+   object Map : DrawerScreen("Map", "MapFragment")
    object Asams : DrawerScreen("ASAMs", "asams")
    object Modus : DrawerScreen("MODUs", "modus")
    object Settings : DrawerScreen( "Settings", "settings")
 }
 
 private val screens = listOf(
+   DrawerScreen.Map,
    DrawerScreen.Asams,
    DrawerScreen.Modus,
    DrawerScreen.Settings
 )
 
 @Composable
-fun Drawer(
+fun NavigationDrawer(
    modifier: Modifier = Modifier,
    onDestinationClicked: (route: String) -> Unit
 ) {

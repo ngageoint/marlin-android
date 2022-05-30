@@ -10,6 +10,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.launch
 import mil.nga.msi.ui.asam.AsamsScreen
+import mil.nga.msi.ui.map.MapScreen
 
 @Composable
 fun MainScreen() {
@@ -26,7 +27,7 @@ fun MainScreen() {
          drawerState = drawerState,
          gesturesEnabled = drawerState.isOpen,
          drawerContent = {
-            Drawer(
+            NavigationDrawer(
                onDestinationClicked = { route ->
                   scope.launch {
                      drawerState.close()
@@ -43,8 +44,15 @@ fun MainScreen() {
       ) {
          NavHost(
             navController = navController,
-            startDestination = DrawerScreen.Asams.route
+            startDestination = DrawerScreen.Map.route
          ) {
+            composable(DrawerScreen.Map.route) {
+               MapScreen(
+                  openDrawer = {
+                     openDrawer()
+                  }
+               )
+            }
             composable(DrawerScreen.Asams.route) {
                AsamsScreen(
                   openDrawer = {

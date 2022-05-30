@@ -1,7 +1,9 @@
 package mil.nga.msi.repository.asam
 
 import androidx.work.*
+import kotlinx.coroutines.flow.Flow
 import mil.nga.msi.datasource.asam.Asam
+import mil.nga.msi.datasource.asam.AsamMapItem
 import mil.nga.msi.work.RefreshAsamWorker
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -11,7 +13,10 @@ class AsamRepository @Inject constructor(
    private val asamLocalDataSource: AsamLocalDataSource,
    private val asamRemoteDataSource: AsamRemoteDataSource
 ) {
-   suspend fun getAsams(refresh: Boolean = false): List<Asam> {
+   val asams: Flow<List<Asam>> = asamLocalDataSource.observeAsams()
+   val asamMapItems: Flow<List<AsamMapItem>> = asamLocalDataSource.observeAsamMapItems()
+
+   suspend fun fetchAsams(refresh: Boolean = false): List<Asam> {
       if (refresh) {
          val asams = asamRemoteDataSource.fetchAsams()
          asamLocalDataSource.insert(asams)

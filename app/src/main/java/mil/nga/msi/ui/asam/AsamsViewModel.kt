@@ -12,6 +12,6 @@ class AsamsViewModel @Inject constructor(
    private val localDataSource: AsamLocalDataSource
 ): ViewModel() {
    val asams = Pager(PagingConfig(pageSize = 20), null) {
-      localDataSource.getAsamPages()
+      localDataSource.observeAsamListItems()
    }.flow
 }

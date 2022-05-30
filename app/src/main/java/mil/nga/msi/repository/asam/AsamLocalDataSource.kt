@@ -7,8 +7,12 @@ import javax.inject.Inject
 class AsamLocalDataSource @Inject constructor(
    private val asamDao: AsamDao
 ) {
-   suspend fun getAsams(): List<Asam> = asamDao.asams()
+   fun observeAsams() = asamDao.observeAsams()
+   fun observeAsamMapItems() = asamDao.observeAsamMapItems()
+   fun observeAsamListItems() = asamDao.getAsamListItems()
+
+   suspend fun getAsams(): List<Asam> = asamDao.getAsams()
+   suspend fun getLatestAsam() = asamDao.getLatestAsam()
+
    suspend fun insert(asams: List<Asam>) = asamDao.insert(asams)
-   suspend fun getLatestAsam() = asamDao.latestAsam()
-   fun getAsamPages() = asamDao.asamPagingSource()
 }

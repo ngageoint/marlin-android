@@ -1,7 +1,10 @@
 package mil.nga.msi.datasource.asam
 
+import androidx.lifecycle.LiveData
 import androidx.paging.PagingSource
 import androidx.room.*
+import kotlinx.coroutines.flow.Flow
+import java.lang.ref.PhantomReference
 
 @Dao
 interface AsamDao {
@@ -15,11 +18,23 @@ interface AsamDao {
    suspend fun update(asam: Asam)
 
    @Query("SELECT * FROM asam")
-   suspend fun asams(): List<Asam>
+   fun observeAsams(): Flow<List<Asam>>
 
-   @Query("SELECT * FROM asam ORDER BY date DESC")
-   fun asamPagingSource(): PagingSource<Int, AsamListItem>
+   @Query("SELECT * FROM asam WHERE reference = :reference")
+   fun observeAsamByReference(reference: String): LiveData<Asam>
+
+   @Query("SELECT * FROM asam")
+   suspend fun getAsams(): List<Asam>
+
+   @Query("SELECT * FROM asam WHERE reference = :reference")
+   suspend fun getAsamByReference(reference: String): Asam?
 
    @Query("SELECT * FROM asam ORDER BY date DESC LIMIT 1")
-   suspend fun latestAsam(): Asam?
+   suspend fun getLatestAsam(): Asam?
+
+   @Query("SELECT * FROM asam ORDER BY date DESC")
+   fun getAsamListItems(): PagingSource<Int, AsamListItem>
+
+   @Query("SELECT * FROM asam")
+   fun observeAsamMapItems(): Flow<List<AsamMapItem>>
 }
