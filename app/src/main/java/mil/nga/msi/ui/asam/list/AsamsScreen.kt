@@ -1,4 +1,4 @@
-package mil.nga.msi.ui.asam
+package mil.nga.msi.ui.asam.list
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn

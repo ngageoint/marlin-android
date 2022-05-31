@@ -21,7 +21,7 @@ interface AsamDao {
    fun observeAsams(): Flow<List<Asam>>
 
    @Query("SELECT * FROM asam WHERE reference = :reference")
-   fun observeAsamByReference(reference: String): LiveData<Asam>
+   fun observeAsam(reference: String): LiveData<Asam>
 
    @Query("SELECT * FROM asam")
    suspend fun getAsams(): List<Asam>

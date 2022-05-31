@@ -1,8 +1,10 @@
 package mil.nga.msi.repository.asam
 
+import androidx.paging.Pager
 import androidx.work.*
 import kotlinx.coroutines.flow.Flow
 import mil.nga.msi.datasource.asam.Asam
+import mil.nga.msi.datasource.asam.AsamListItem
 import mil.nga.msi.datasource.asam.AsamMapItem
 import mil.nga.msi.work.RefreshAsamWorker
 import java.util.concurrent.TimeUnit
@@ -13,8 +15,11 @@ class AsamRepository @Inject constructor(
    private val asamLocalDataSource: AsamLocalDataSource,
    private val asamRemoteDataSource: AsamRemoteDataSource
 ) {
-   val asams: Flow<List<Asam>> = asamLocalDataSource.observeAsams()
-   val asamMapItems: Flow<List<AsamMapItem>> = asamLocalDataSource.observeAsamMapItems()
+   val asams = asamLocalDataSource.observeAsams()
+   val asamMapItems = asamLocalDataSource.observeAsamMapItems()
+   val asamListItems = asamLocalDataSource.observeAsamListItems()
+
+   fun observeAsam(id: String) = asamLocalDataSource.observeAsam(id)
 
    suspend fun fetchAsams(refresh: Boolean = false): List<Asam> {
       if (refresh) {

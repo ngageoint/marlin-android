@@ -8,6 +8,7 @@ class AsamLocalDataSource @Inject constructor(
    private val asamDao: AsamDao
 ) {
    fun observeAsams() = asamDao.observeAsams()
+   fun observeAsam(id: String) = asamDao.observeAsam(id)
    fun observeAsamMapItems() = asamDao.observeAsamMapItems()
    fun observeAsamListItems() = asamDao.getAsamListItems()
 

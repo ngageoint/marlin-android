@@ -27,6 +27,7 @@ import mil.nga.msi.datasource.asam.AsamMapItem
 
 @Composable
 fun MapScreen(
+   onAsam: (String) -> Unit,
    openDrawer: () -> Unit,
    viewModel: MapViewModel = hiltViewModel()
 ) {
@@ -37,24 +38,37 @@ fun MapScreen(
          buttonIcon = Icons.Filled.Menu,
          onButtonClicked = { openDrawer() }
       )
-      Map(asams)
+      Map(
+         asams,
+         onMarkerClick = { id ->
+            onAsam(id)
+         }
+      )
    }
 }
 
 @Composable
-fun Map(asams: List<AsamMapItem>?) {
+fun Map(
+   asams: List<AsamMapItem>?,
+   onMarkerClick: (String) -> Unit,
+) {
+   val scope = rememberCoroutineScope()
    val map = rememberMapViewWithLifecycle()
    var mapInitialized by remember(map) { mutableStateOf(false) }
-
    LaunchedEffect(map, mapInitialized) {
       if (!mapInitialized) {
          val googleMap = map.awaitMap()
          googleMap.uiSettings.isMapToolbarEnabled = false
+         googleMap.setOnMarkerClickListener { marker ->
+            val id = marker.tag as? String
+            id?.let { onMarkerClick(it) }
+            false
+         }
+
          mapInitialized = true
       }
    }
 
-   val scope = rememberCoroutineScope()
    AndroidView({ map }) { mapView ->
       scope.launch {
          val googleMap = mapView.awaitMap()
@@ -71,10 +85,11 @@ private fun addAsams(
 ) {
    asams?.forEach { asam ->
       val point = LatLng(asam.latitude, asam.longitude)
-      map.addMarker {
+      val marker = map.addMarker {
          position(point)
          icon(BitmapDescriptorFactory.fromResource(R.drawable.asam_map_marker_24dp ))
       }
+      marker?.tag = asam.id
    }
 }
 

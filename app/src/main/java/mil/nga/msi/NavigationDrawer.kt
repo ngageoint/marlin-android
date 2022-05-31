@@ -9,7 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 sealed class DrawerScreen(val title: String, val route: String) {
-   object Map : DrawerScreen("Map", "MapFragment")
+   object Map : DrawerScreen("Map", "map")
    object Asams : DrawerScreen("ASAMs", "asams")
    object Modus : DrawerScreen("MODUs", "modus")
    object Settings : DrawerScreen( "Settings", "settings")
