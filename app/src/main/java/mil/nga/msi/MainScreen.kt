@@ -13,6 +13,7 @@ import com.google.accompanist.navigation.material.ModalBottomSheetLayout
 import com.google.accompanist.navigation.material.bottomSheet
 import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
 import kotlinx.coroutines.launch
+import mil.nga.msi.ui.asam.detail.AsamDetailScreen
 import mil.nga.msi.ui.asam.list.AsamsScreen
 import mil.nga.msi.ui.asam.sheet.AsamSheetScreen
 import mil.nga.msi.ui.map.MapScreen
@@ -27,9 +28,7 @@ fun MainScreen() {
 
    ModalBottomSheetLayout(bottomSheetNavigator) {
       val openDrawer = {
-         scope.launch {
-            drawerState.open()
-         }
+         scope.launch { drawerState.open() }
       }
 
       Surface(color = MaterialTheme.colors.background) {
@@ -58,25 +57,32 @@ fun MainScreen() {
             ) {
                composable(DrawerScreen.Map.route) {
                   MapScreen(
-                     onAsam = { id ->
-                        navController.navigate(BottomSheet.Asam.route + "?id=$id")
+                     bottomSheetNavigator,
+                     onAsamClick = { id ->
+                        navController.navigate(Routes.Asam.Sheet.route + "?id=$id")
                      },
-                     openDrawer = {
-                        openDrawer()
-                     }
+                     openDrawer = { openDrawer() }
                   )
                }
                composable(DrawerScreen.Asams.route) {
                   AsamsScreen(
-                     openDrawer = {
-                        openDrawer()
+                     openDrawer = { openDrawer() },
+                     onAsamClick = { id ->
+                        navController.navigate(Routes.Asam.Details.route + "?id=$id")
                      }
                   )
                }
-               bottomSheet(BottomSheet.Asam.route + "?id={id}") { backstackEntry ->
+               composable("${Routes.Asam.Details.route}?id={id}") { backstackEntry ->
+                  backstackEntry.arguments?.getString("id")?.let { id ->
+                     AsamDetailScreen(id, close = {
+                        navController.popBackStack()
+                     })
+                  }
+               }
+               bottomSheet(Routes.Asam.Sheet.route + "?id={id}") { backstackEntry ->
                   backstackEntry.arguments?.getString("id")?.let { id ->
                      AsamSheetScreen(id, onDetails = {
-                        navController.navigate(BottomSheet.Asam.route + "?id=$id")
+                        navController.navigate(Routes.Asam.Details.route + "?id=$id")
                      })
                   }
                }

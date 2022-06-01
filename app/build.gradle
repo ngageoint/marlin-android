@@ -8,6 +8,11 @@ plugins {
 def googleMapsApiReleaseKey = hasProperty('MSI_RELEASE_MAPS_API_KEY') ? MSI_RELEASE_MAPS_API_KEY : ''
 def googleMapsApiDebugKey = hasProperty('MSI_DEBUG_MAPS_API_KEY') ? MSI_DEBUG_MAPS_API_KEY : ''
 
+def room_version = '2.4.2'
+def work_version = '2.7.1'
+def compose_version = '1.2.0-beta02'
+def retrofit_version = '2.9.0'
+
 android {
     compileSdk 32
 
@@ -17,6 +22,12 @@ android {
         targetSdk 32
         versionCode 1
         versionName "1.0"
+
+        kapt {
+            arguments {
+                arg("room.schemaLocation", "$projectDir/schemas")
+            }
+        }
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -48,10 +59,6 @@ android {
 }
 
 dependencies {
-    def room_version = '2.4.2'
-    def work_version = '2.7.1'
-    def retrofit_version = '2.9.0'
-
     implementation "com.google.dagger:hilt-android:$hilt_version"
     implementation 'androidx.hilt:hilt-navigation-compose:1.0.0'
     kapt "com.google.dagger:hilt-compiler:$hilt_version"

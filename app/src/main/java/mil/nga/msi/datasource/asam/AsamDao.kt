@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.paging.PagingSource
 import androidx.room.*
 import kotlinx.coroutines.flow.Flow
-import java.lang.ref.PhantomReference
 
 @Dao
 interface AsamDao {
@@ -33,8 +32,10 @@ interface AsamDao {
    suspend fun getLatestAsam(): Asam?
 
    @Query("SELECT * FROM asam ORDER BY date DESC")
+   @RewriteQueriesToDropUnusedColumns
    fun getAsamListItems(): PagingSource<Int, AsamListItem>
 
    @Query("SELECT * FROM asam")
+   @RewriteQueriesToDropUnusedColumns
    fun observeAsamMapItems(): Flow<List<AsamMapItem>>
 }

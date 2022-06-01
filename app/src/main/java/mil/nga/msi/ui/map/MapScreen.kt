@@ -1,8 +1,14 @@
 package mil.nga.msi.ui.map
 
+import android.animation.ValueAnimator
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.*
@@ -14,20 +20,30 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import com.google.accompanist.navigation.material.BottomSheetNavigator
+import com.google.accompanist.navigation.material.BottomSheetNavigatorSheetState
+import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.maps.android.ktx.addMarker
 import com.google.maps.android.ktx.awaitMap
 import kotlinx.coroutines.launch
 import mil.nga.msi.TopBar
 import mil.nga.msi.R
 import mil.nga.msi.datasource.asam.AsamMapItem
+import kotlin.math.roundToInt
 
+var markerAnimator: ValueAnimator? = null
+
+@OptIn(ExperimentalMaterialNavigationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun MapScreen(
-   onAsam: (String) -> Unit,
+   nav: BottomSheetNavigator,
+   onAsamClick: (String) -> Unit,
    openDrawer: () -> Unit,
    viewModel: MapViewModel = hiltViewModel()
 ) {
@@ -41,40 +57,65 @@ fun MapScreen(
       Map(
          asams,
          onMarkerClick = { id ->
-            onAsam(id)
+            onAsamClick(id)
          }
       )
+   }
+
+   if (nav.navigatorSheetState.currentValue == ModalBottomSheetValue.Hidden) {
+//      markerAnimator?.reverse()
+//      markerAnimator = null
    }
 }
 
 @Composable
-fun Map(
+private fun Map(
    asams: List<AsamMapItem>?,
    onMarkerClick: (String) -> Unit,
 ) {
+   val context = LocalContext.current
    val scope = rememberCoroutineScope()
-   val map = rememberMapViewWithLifecycle()
-   var mapInitialized by remember(map) { mutableStateOf(false) }
-   LaunchedEffect(map, mapInitialized) {
+   val mapView = rememberMapViewWithLifecycle()
+   var previousAsams by remember { mutableStateOf(asams)}
+   var mapInitialized by remember(mapView) { mutableStateOf(false) }
+   LaunchedEffect(mapView, mapInitialized) {
       if (!mapInitialized) {
-         val googleMap = map.awaitMap()
+         val googleMap = mapView.awaitMap()
          googleMap.uiSettings.isMapToolbarEnabled = false
          googleMap.setOnMarkerClickListener { marker ->
             val id = marker.tag as? String
             id?.let { onMarkerClick(it) }
-            false
+//            animateMarker(marker, context)
+//            animateMap(googleMap, marker.position)
+
+            true
          }
+
+         // TODO this really needs to happen when bottom sheet goes away
+//         googleMap.setOnMapClickListener {
+//            markerAnimator?.reverse()
+//            markerAnimator = null
+//         }
 
          mapInitialized = true
       }
+
+      if (asams != previousAsams) {
+         // TODO remove/add/leave based on previous list
+         val map = mapView.awaitMap()
+         addAsams(map, asams)
+         previousAsams = asams
+      }
    }
 
-   AndroidView({ map }) { mapView ->
+   AndroidView({ mapView }) { mapView ->
+      // TODO if anything changes here the entire map is recomposed
       scope.launch {
-         val googleMap = mapView.awaitMap()
-         googleMap.clear()
+//         val googleMap = mapView.awaitMap()
+//         googleMap.uiSettings.isMapToolbarEnabled = false
+//         googleMap.clear()
 
-         addAsams(googleMap, asams)
+//         addAsams(googleMap, asams)
       }
    }
 }
@@ -93,6 +134,29 @@ private fun addAsams(
    }
 }
 
+private fun animateMap(map: GoogleMap, latLng: LatLng) {
+//   val cameraUpdate = CameraUpdateFactory.newLatLng(latLng)
+//   map.animateCamera(cameraUpdate)
+}
+
+private fun animateMarker(marker: Marker, context: Context) {
+   val bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.asam_map_marker_24dp)
+
+   val animator = ValueAnimator.ofFloat(1f, 2f)
+   animator.duration = 500
+   animator.addUpdateListener { animation ->
+      val scale = animation.animatedValue as Float
+      val sizeX = (bitmap.width * scale).roundToInt()
+      val sizeY = (bitmap.height * scale).roundToInt()
+      val scaled =  Bitmap.createScaledBitmap(bitmap, sizeX, sizeY, false)
+
+      if (marker.tag != null) {
+         marker.setIcon(BitmapDescriptorFactory.fromBitmap(scaled))
+      }
+   }
+   animator.start()
+   markerAnimator = animator
+}
 @Composable
 fun rememberMapViewWithLifecycle(): MapView {
    val context = LocalContext.current

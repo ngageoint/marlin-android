@@ -1,6 +1,8 @@
 package mil.nga.msi.datasource.asam
 
 import androidx.room.ColumnInfo
+import com.google.android.gms.maps.model.LatLng
+import mil.nga.msi.coordinate.DMS
 import java.util.*
 
 data class AsamListItem(
@@ -11,4 +13,7 @@ data class AsamListItem(
    @ColumnInfo(name = "hostility") val hostility: String?,
    @ColumnInfo(name = "victim") val victim: String?,
    @ColumnInfo(name = "description") val description: String?
-)
+) {
+   @Transient
+   val dms = DMS.from(LatLng(latitude, longitude))
+}

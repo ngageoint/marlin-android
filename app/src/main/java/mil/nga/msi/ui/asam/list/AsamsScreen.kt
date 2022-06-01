@@ -1,5 +1,6 @@
 package mil.nga.msi.ui.asam.list
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.*
@@ -20,6 +21,8 @@ import mil.nga.msi.TopBar
 import mil.nga.msi.ui.theme.MsiTheme
 import androidx.paging.compose.items
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.google.android.gms.maps.model.LatLng
+import mil.nga.msi.coordinate.DMS
 import mil.nga.msi.datasource.asam.AsamListItem
 import java.text.SimpleDateFormat
 import java.util.*
@@ -27,6 +30,7 @@ import java.util.*
 @Composable
 fun AsamsScreen(
    openDrawer: () -> Unit,
+   onAsamClick: (String) -> Unit,
    viewModel: AsamsViewModel = hiltViewModel()
 ) {
    Column(modifier = Modifier.fillMaxSize()) {
@@ -35,12 +39,15 @@ fun AsamsScreen(
          buttonIcon = Icons.Filled.Menu,
          onButtonClicked = { openDrawer() }
       )
-      Asams(viewModel.asams)
+      Asams(viewModel.asams, onAsamClick)
    }
 }
 
 @Composable
-private fun Asams(pagingState: Flow<PagingData<AsamListItem>>) {
+private fun Asams(
+   pagingState: Flow<PagingData<AsamListItem>>,
+   onAsamClick: (String) -> Unit
+) {
    val lazyItems = pagingState.collectAsLazyPagingItems()
    MsiTheme {
       Surface(
@@ -52,7 +59,7 @@ private fun Asams(pagingState: Flow<PagingData<AsamListItem>>) {
             contentPadding = PaddingValues(top = 16.dp)
          ) {
             items(lazyItems) { item ->
-               AsamCard(item)
+               AsamCard(item, onAsamClick)
             }
          }
       }
@@ -60,12 +67,16 @@ private fun Asams(pagingState: Flow<PagingData<AsamListItem>>) {
 }
 
 @Composable
-private fun AsamCard(item: AsamListItem?) {
+private fun AsamCard(
+   item: AsamListItem?,
+   onAsamClick: (String) -> Unit
+) {
    if (item != null) {
       Card(
          Modifier
             .fillMaxWidth()
             .padding(bottom = 8.dp)
+            .clickable { onAsamClick(item.id) }
       ) {
          AsamContent(item)
       }
@@ -144,9 +155,8 @@ private fun AsamActions() {
 }
 
 @Composable
-private fun AsamLocation(item: AsamListItem) {
-   val dms = "24 42 00 N, 13 36 57 W"
+private fun AsamLocation(asam: AsamListItem) {
    TextButton(onClick = { /*TODO*/ }) {
-      Text(text = dms)
+      Text(text = asam.dms.format())
    }
 }
