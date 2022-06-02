@@ -1,4 +1,4 @@
-package mil.nga.msi.ui.asam.sheet
+package mil.nga.msi.ui.modu.sheet
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -13,33 +13,35 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import mil.nga.msi.datasource.asam.Asam
+import mil.nga.msi.datasource.modu.Modu
 import mil.nga.msi.ui.asam.AsamViewModel
+import mil.nga.msi.ui.modu.ModuViewModel
 import java.text.SimpleDateFormat
 import java.util.*
 
 @Composable
-fun AsamSheetScreen(
-   reference: String,
+fun ModuSheetScreen(
+   id: String,
    onDetails: () -> Unit,
-   viewModel: AsamViewModel = hiltViewModel()
+   viewModel: ModuViewModel = hiltViewModel()
 ) {
-   val asam by viewModel.getAsam(reference).observeAsState()
-   asam?.let {
-      AsamContent(asam = it) {
+   val modu by viewModel.getModu(id).observeAsState()
+   modu?.let {
+      ModuContent(modu = it) {
          onDetails()
       }
    }
 }
 
 @Composable
-private fun AsamContent(
-   asam: Asam,
+private fun ModuContent(
+   modu: Modu,
    onDetails: () -> Unit,
 ) {
    Column(modifier = Modifier.padding(bottom = 8.dp)) {
       Column(Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
          CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-            asam.date.let { date ->
+            modu.date.let { date ->
                val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
                Text(
                   text = dateFormat.format(date),
@@ -51,9 +53,8 @@ private fun AsamContent(
             }
          }
 
-         val header = listOfNotNull(asam.hostility, asam.victim).joinToString(": ")
          Text(
-            text = header,
+            text = modu.name,
             style = MaterialTheme.typography.h6,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
@@ -61,13 +62,17 @@ private fun AsamContent(
          )
 
          CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-            asam.description?.let {
+            modu.rigStatus?.let {
+               Text(
+                  text = it.name,
+                  style = MaterialTheme.typography.body2,
+                  modifier = Modifier.padding(top = 4.dp)
+               )
+            }
+            modu.specialStatus?.let {
                Text(
                   text = it,
-                  maxLines = 5,
-                  overflow = TextOverflow.Ellipsis,
-                  style = MaterialTheme.typography.body2,
-                  modifier = Modifier.padding(top = 8.dp)
+                  style = MaterialTheme.typography.body2
                )
             }
          }

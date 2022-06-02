@@ -16,9 +16,11 @@ import kotlinx.coroutines.launch
 import mil.nga.msi.ui.asam.detail.AsamDetailScreen
 import mil.nga.msi.ui.asam.list.AsamsScreen
 import mil.nga.msi.ui.asam.sheet.AsamSheetScreen
+import mil.nga.msi.ui.map.Annotation
 import mil.nga.msi.ui.map.MapScreen
 import mil.nga.msi.ui.modu.detail.ModuDetailScreen
 import mil.nga.msi.ui.modu.list.ModusScreen
+import mil.nga.msi.ui.modu.sheet.ModuSheetScreen
 
 @OptIn(ExperimentalMaterialNavigationApi::class)
 @Composable
@@ -59,8 +61,15 @@ fun MainScreen() {
             ) {
                composable(DrawerScreen.Map.route) {
                   MapScreen(
-                     onAsamClick = { id ->
-                        navController.navigate(Routes.Asam.Sheet.route + "?id=$id")
+                     onAnnotationClick = { annotation ->
+                        when (annotation.type) {
+                           Annotation.Type.ASAM ->  {
+                              navController.navigate(Routes.Asam.Sheet.route + "?reference=${annotation.id}")
+                           }
+                           Annotation.Type.MODU ->  {
+                              navController.navigate(Routes.Modu.Sheet.route + "?name=${annotation.id}")
+                           }
+                        }
                      },
                      openDrawer = { openDrawer() }
                   )
@@ -95,10 +104,17 @@ fun MainScreen() {
                      })
                   }
                }
-               bottomSheet(Routes.Asam.Sheet.route + "?id={id}") { backstackEntry ->
-                  backstackEntry.arguments?.getString("id")?.let { id ->
-                     AsamSheetScreen(id, onDetails = {
-                        navController.navigate(Routes.Asam.Details.route + "?id=$id")
+               bottomSheet(Routes.Asam.Sheet.route + "?reference={reference}") { backstackEntry ->
+                  backstackEntry.arguments?.getString("reference")?.let { reference ->
+                     AsamSheetScreen(reference, onDetails = {
+                        navController.navigate(Routes.Asam.Details.route + "?reference=$reference")
+                     })
+                  }
+               }
+               bottomSheet(Routes.Modu.Sheet.route + "?name={name}") { backstackEntry ->
+                  backstackEntry.arguments?.getString("name")?.let { name ->
+                     ModuSheetScreen(name, onDetails = {
+                        navController.navigate(Routes.Modu.Details.route + "?name=$name")
                      })
                   }
                }

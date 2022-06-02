@@ -7,8 +7,6 @@ import android.graphics.BitmapFactory
 import android.os.Bundle
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.*
@@ -20,10 +18,6 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
-import com.google.accompanist.navigation.material.BottomSheetNavigator
-import com.google.accompanist.navigation.material.BottomSheetNavigatorSheetState
-import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
-import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
@@ -35,18 +29,19 @@ import kotlinx.coroutines.launch
 import mil.nga.msi.TopBar
 import mil.nga.msi.R
 import mil.nga.msi.datasource.asam.AsamMapItem
+import mil.nga.msi.datasource.modu.ModuMapItem
 import kotlin.math.roundToInt
 
 var markerAnimator: ValueAnimator? = null
 
-@OptIn(ExperimentalMaterialNavigationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun MapScreen(
-   onAsamClick: (String) -> Unit,
+   onAnnotationClick: (Annotation) -> Unit,
    openDrawer: () -> Unit,
    viewModel: MapViewModel = hiltViewModel()
 ) {
    val asams by viewModel.asams.observeAsState()
+   val modus by viewModel.modus.observeAsState()
    Column(modifier = Modifier.fillMaxSize()) {
       TopBar(
          title = "Map",
@@ -55,8 +50,9 @@ fun MapScreen(
       )
       Map(
          asams,
-         onMarkerClick = { id ->
-            onAsamClick(id)
+         modus,
+         onAnnotationClick = { annotation ->
+            onAnnotationClick(annotation)
          }
       )
    }
@@ -70,7 +66,8 @@ fun MapScreen(
 @Composable
 private fun Map(
    asams: List<AsamMapItem>?,
-   onMarkerClick: (String) -> Unit,
+   modus: List<ModuMapItem>?,
+   onAnnotationClick: (Annotation) -> Unit,
 ) {
    val scope = rememberCoroutineScope()
    val mapView = rememberMapViewWithLifecycle()
@@ -81,8 +78,10 @@ private fun Map(
          val googleMap = mapView.awaitMap()
          googleMap.uiSettings.isMapToolbarEnabled = false
          googleMap.setOnMarkerClickListener { marker ->
-            val id = marker.tag as? String
-            id?.let { onMarkerClick(it) }
+            val annotation = marker.tag as? Annotation
+            annotation?.let {
+               onAnnotationClick(it)
+            }
 //            animateMarker(marker, context)
 //            animateMap(googleMap, marker.position)
 
@@ -107,6 +106,7 @@ private fun Map(
          googleMap.clear()
 
          addAsams(googleMap, asams)
+         addModus(googleMap, modus)
       }
    }
 }
@@ -121,7 +121,21 @@ private fun addAsams(
          position(point)
          icon(BitmapDescriptorFactory.fromResource(R.drawable.asam_map_marker_24dp ))
       }
-      marker?.tag = asam.id
+      marker?.tag = Annotation(Annotation.Type.ASAM, asam.reference)
+   }
+}
+
+private fun addModus(
+   map: GoogleMap,
+   modus: List<ModuMapItem>?
+) {
+   modus?.forEach { modu ->
+      val point = LatLng(modu.latitude, modu.longitude)
+      val marker = map.addMarker {
+         position(point)
+         icon(BitmapDescriptorFactory.fromResource(R.drawable.modu_map_marker_24dp ))
+      }
+      marker?.tag = Annotation(Annotation.Type.MODU, modu.name)
    }
 }
 

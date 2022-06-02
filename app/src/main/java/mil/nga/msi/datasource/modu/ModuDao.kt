@@ -37,5 +37,5 @@ interface ModuDao {
 
    @Query("SELECT * FROM modus")
    @RewriteQueriesToDropUnusedColumns
-   fun observeModuMapItems(): Flow<List<ModuListItem>>
+   fun observeModuMapItems(): Flow<List<ModuMapItem>>
 }
