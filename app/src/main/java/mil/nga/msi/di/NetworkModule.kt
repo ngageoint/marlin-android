@@ -11,8 +11,8 @@ import mil.nga.msi.datasource.asam.Asam
 import mil.nga.msi.datasource.modu.Modu
 import mil.nga.msi.network.asam.AsamsTypeAdapter
 import mil.nga.msi.network.modu.ModusTypeAdapter
-import mil.nga.msi.repository.asam.AsamService
-import mil.nga.msi.repository.modu.ModuService
+import mil.nga.msi.network.asam.AsamService
+import mil.nga.msi.network.modu.ModuService
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory

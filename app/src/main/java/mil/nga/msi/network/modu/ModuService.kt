@@ -1,4 +1,4 @@
-package mil.nga.msi.repository.modu
+package mil.nga.msi.network.modu
 
 import mil.nga.msi.datasource.modu.Modu
 import retrofit2.Response
@@ -10,7 +10,7 @@ interface ModuService {
    suspend fun getModus(
       @Query("sort") sort: String = "date",
       @Query("output") output: String = "json",
-      @Query("minOccurDate") minDate: String? = null,
-      @Query("maxOccurDate") maxDate: String? = null,
+      @Query("minSourceDate") minDate: String? = null,
+      @Query("maxSourceDate") maxDate: String? = null,
    ): Response<List<Modu>>
 }

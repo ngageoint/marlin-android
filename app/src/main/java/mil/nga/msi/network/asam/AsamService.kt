@@ -1,4 +1,4 @@
-package mil.nga.msi.repository.asam
+package mil.nga.msi.network.asam
 
 import mil.nga.msi.datasource.asam.Asam
 import retrofit2.Response

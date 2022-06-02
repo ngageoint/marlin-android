@@ -1,4 +1,4 @@
-package mil.nga.msi.ui.asam.detail
+package mil.nga.msi.ui.modu.detail
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -25,53 +25,55 @@ import com.google.maps.android.compose.*
 import mil.nga.msi.R
 import mil.nga.msi.TopBar
 import mil.nga.msi.coordinate.DMS
-import mil.nga.msi.datasource.asam.Asam
-import mil.nga.msi.ui.asam.AsamViewModel
+import mil.nga.msi.datasource.modu.Modu
+import mil.nga.msi.ui.modu.ModuViewModel
 import java.text.SimpleDateFormat
 import java.util.*
 
 @Composable
-fun AsamDetailScreen(
-   reference: String,
+fun ModuDetailScreen(
+   name: String,
    close: () -> Unit,
-   viewModel: AsamViewModel = hiltViewModel()
+   viewModel: ModuViewModel = hiltViewModel()
 ) {
-   val asam by viewModel.getAsam(reference).observeAsState()
+   val modu by viewModel.getModu(name).observeAsState()
    Column {
       TopBar(
-         title = "ASAM",
+         title = "MODU",
          buttonIcon = Icons.Default.ArrowBack,
          onButtonClicked = { close() }
       )
 
-      AsamDetailContent(asam)
+      ModuDetailContent(modu)
    }
 }
 
 @Composable
-private fun AsamDetailContent(
-   asam: Asam?
+private fun ModuDetailContent(
+   modu: Modu?
 ) {
-   if (asam != null) {
+   if (modu != null) {
       Column(
          Modifier
             .padding(all = 8.dp)
             .verticalScroll(rememberScrollState())
       ) {
-         AsamHeader(asam)
-         AsamDescription(asam.description)
-         AsamInformation(asam)
+         ModuHeader(modu)
+         ModuInformation(modu)
       }
    }
 }
 
 @Composable
-private fun AsamHeader(
-   asam: Asam
+private fun ModuHeader(
+   modu: Modu
 ) {
-   Card(elevation = 4.dp) {
+   Card(
+      elevation = 4.dp,
+      modifier = Modifier.padding(bottom = 16.dp)
+   ) {
       Column {
-         val latLng = LatLng(asam.latitude, asam.longitude)
+         val latLng = LatLng(modu.latitude, modu.longitude)
          val cameraPositionState = rememberCameraPositionState {
             position = CameraPosition.fromLatLngZoom(latLng, 16f)
          }
@@ -89,13 +91,13 @@ private fun AsamHeader(
          ) {
             Marker(
                state = MarkerState(position = latLng),
-               icon = BitmapDescriptorFactory.fromResource(R.drawable.asam_map_marker_24dp)
+               icon = BitmapDescriptorFactory.fromResource(R.drawable.modu_map_marker_24dp)
             )
          }
 
          Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
             CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-               asam.date.let { date ->
+               modu.date.let { date ->
                   val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
                   Text(
                      text = dateFormat.format(date),
@@ -107,34 +109,41 @@ private fun AsamHeader(
                }
             }
 
-            val header = listOfNotNull(asam.hostility, asam.victim).joinToString(": ")
             Text(
-               text = header,
+               text = modu.name,
                style = MaterialTheme.typography.h6,
                maxLines = 1,
                overflow = TextOverflow.Ellipsis,
                modifier = Modifier.padding(top = 16.dp)
             )
 
-            AsamFooter(asam)
+            ModuFooter(modu)
          }
       }
    }
 }
 
 @Composable
-private fun AsamFooter(asam: Asam) {
+private fun ModuFooter(modu: Modu) {
    Row(
       verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.SpaceBetween,
       modifier = Modifier.fillMaxWidth()
    ) {
-      AsamLocation(asam.dms)
-      AsamActions()
+      ModuLocation(modu.dms)
+      ModuActions()
    }
 }
+
 @Composable
-private fun AsamActions() {
+private fun ModuLocation(dms: DMS) {
+   TextButton(onClick = { /*TODO*/ }) {
+      Text(text = dms.format())
+   }
+}
+
+@Composable
+private fun ModuActions() {
    Row {
       IconButton(onClick = {  }) {
          Icon(Icons.Default.Share,
@@ -152,45 +161,8 @@ private fun AsamActions() {
 }
 
 @Composable
-private fun AsamLocation(dms: DMS) {
-   TextButton(onClick = { /*TODO*/ }) {
-      Text(text = dms.format())
-   }
-}
-
-@Composable
-private fun AsamDescription(
-   description: String?
-) {
-   Column(Modifier.padding(vertical = 16.dp)) {
-      CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-         Text(
-            text = "DESCRIPTION",
-            style = MaterialTheme.typography.subtitle1,
-            fontWeight = FontWeight.Medium
-         )
-      }
-
-      Card(
-         elevation = 4.dp,
-         modifier = Modifier.padding(vertical = 8.dp)
-      ) {
-         CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-            description?.let {
-               Text(
-                  text = it,
-                  style = MaterialTheme.typography.body1,
-                  modifier = Modifier.padding(all = 16.dp)
-               )
-            }
-         }
-      }
-   }
-}
-
-@Composable
-private fun AsamInformation(
-   asam: Asam
+private fun ModuInformation(
+   modu: Modu
 ) {
    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
       Text(
@@ -210,18 +182,19 @@ private fun AsamInformation(
             .padding(horizontal = 16.dp)
       ) {
          val dateFormat = SimpleDateFormat("yyyy-mm-dd", Locale.getDefault())
-         AsamProperty(title = "Reference Number", value = asam.reference)
-         AsamProperty(title = "Position", value = asam.position)
-         AsamProperty(title = "Navigation Area", value = asam.navigationArea)
-         AsamProperty(title = "Subregion", value = asam.subregion)
-         AsamProperty(title = "Hostility", value = asam.hostility)
-         AsamProperty(title = "Victim", value = asam.victim)
+         ModuProperty(title = "Rig Status", value = modu.rigStatus.toString())
+         ModuProperty(title = "Special Status", value = modu.specialStatus)
+         ModuProperty(title = "Distance", value = modu.distance?.toString())
+         ModuProperty(title = "Position", value = modu.position)
+         ModuProperty(title = "Navigation Area", value = modu.navigationArea)
+         ModuProperty(title = "Region", value = modu.region)
+         ModuProperty(title = "Subregion", value = modu.subregion)
       }
    }
 }
 
 @Composable
-private fun AsamProperty(
+private fun ModuProperty(
    title: String,
    value: String?
 ) {

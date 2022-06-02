@@ -17,6 +17,7 @@ import mil.nga.msi.ui.asam.detail.AsamDetailScreen
 import mil.nga.msi.ui.asam.list.AsamsScreen
 import mil.nga.msi.ui.asam.sheet.AsamSheetScreen
 import mil.nga.msi.ui.map.MapScreen
+import mil.nga.msi.ui.modu.detail.ModuDetailScreen
 import mil.nga.msi.ui.modu.list.ModusScreen
 
 @OptIn(ExperimentalMaterialNavigationApi::class)
@@ -67,8 +68,8 @@ fun MainScreen() {
                composable(DrawerScreen.Asams.route) {
                   AsamsScreen(
                      openDrawer = { openDrawer() },
-                     onAsamClick = { id ->
-                        navController.navigate(Routes.Asam.Details.route + "?id=$id")
+                     onAsamClick = { reference ->
+                        navController.navigate(Routes.Asam.Details.route + "?reference=$reference")
                      }
                   )
                }
@@ -76,13 +77,20 @@ fun MainScreen() {
                   ModusScreen(
                      openDrawer = { openDrawer() },
                      onModuClick = { name ->
-                        navController.navigate(Routes.Modu.Details.route + "?id=$name")
+                        navController.navigate(Routes.Modu.Details.route + "?name=$name")
                      }
                   )
                }
-               composable("${Routes.Asam.Details.route}?id={id}") { backstackEntry ->
-                  backstackEntry.arguments?.getString("id")?.let { id ->
-                     AsamDetailScreen(id, close = {
+               composable("${Routes.Asam.Details.route}?reference={reference}") { backstackEntry ->
+                  backstackEntry.arguments?.getString("reference")?.let { reference ->
+                     AsamDetailScreen(reference, close = {
+                        navController.popBackStack()
+                     })
+                  }
+               }
+               composable("${Routes.Modu.Details.route}?name={name}") { backstackEntry ->
+                  backstackEntry.arguments?.getString("name")?.let { name ->
+                     ModuDetailScreen(name, close = {
                         navController.popBackStack()
                      })
                   }
