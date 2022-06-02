@@ -8,6 +8,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mil.nga.msi.datasource.MsiDatabase
 import mil.nga.msi.datasource.asam.AsamDao
+import mil.nga.msi.datasource.modu.ModuDao
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
@@ -26,5 +27,11 @@ class RoomModule {
    @Singleton
    fun provideAsamDao(database: MsiDatabase): AsamDao {
       return database.asamDao()
+   }
+
+   @Provides
+   @Singleton
+   fun provideModuDao(database: MsiDatabase): ModuDao {
+      return database.moduDao()
    }
 }

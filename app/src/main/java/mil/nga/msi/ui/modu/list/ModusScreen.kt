@@ -1,4 +1,4 @@
-package mil.nga.msi.ui.asam.list
+package mil.nga.msi.ui.modu.list
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -21,30 +21,30 @@ import mil.nga.msi.TopBar
 import mil.nga.msi.ui.theme.MsiTheme
 import androidx.paging.compose.items
 import androidx.paging.compose.collectAsLazyPagingItems
-import mil.nga.msi.datasource.asam.AsamListItem
+import mil.nga.msi.datasource.modu.ModuListItem
 import java.text.SimpleDateFormat
 import java.util.*
 
 @Composable
-fun AsamsScreen(
+fun ModusScreen(
    openDrawer: () -> Unit,
-   onAsamClick: (String) -> Unit,
-   viewModel: AsamsViewModel = hiltViewModel()
+   onModuClick: (String) -> Unit,
+   viewModel: ModusViewModel = hiltViewModel()
 ) {
    Column(modifier = Modifier.fillMaxSize()) {
       TopBar(
-         title = "ASAMs",
+         title = "MODUs",
          buttonIcon = Icons.Filled.Menu,
          onButtonClicked = { openDrawer() }
       )
-      Asams(viewModel.asams, onAsamClick)
+      Modus(viewModel.modus, onModuClick)
    }
 }
 
 @Composable
-private fun Asams(
-   pagingState: Flow<PagingData<AsamListItem>>,
-   onAsamClick: (String) -> Unit
+private fun Modus(
+   pagingState: Flow<PagingData<ModuListItem>>,
+   onModuClick: (String) -> Unit
 ) {
    val lazyItems = pagingState.collectAsLazyPagingItems()
    MsiTheme {
@@ -57,7 +57,7 @@ private fun Asams(
             contentPadding = PaddingValues(top = 16.dp)
          ) {
             items(lazyItems) { item ->
-               AsamCard(item, onAsamClick)
+               ModuCard(item, onModuClick)
             }
          }
       }
@@ -65,24 +65,24 @@ private fun Asams(
 }
 
 @Composable
-private fun AsamCard(
-   item: AsamListItem?,
-   onAsamClick: (String) -> Unit
+private fun ModuCard(
+   item: ModuListItem?,
+   onModuClick: (String) -> Unit
 ) {
    if (item != null) {
       Card(
          Modifier
             .fillMaxWidth()
             .padding(bottom = 8.dp)
-            .clickable { onAsamClick(item.id) }
+            .clickable { onModuClick(item.name) }
       ) {
-         AsamContent(item)
+         ModuContent(item)
       }
    }
 }
 
 @Composable
-private fun AsamContent(item: AsamListItem) {
+private fun ModuContent(item: ModuListItem) {
    Column(Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
       CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
          item.date.let { date ->
@@ -97,9 +97,8 @@ private fun AsamContent(item: AsamListItem) {
          }
       }
 
-      val header = listOfNotNull(item.hostility, item.victim).joinToString(": ")
       Text(
-         text = header,
+         text = item.name,
          style = MaterialTheme.typography.h6,
          maxLines = 1,
          overflow = TextOverflow.Ellipsis,
@@ -107,21 +106,28 @@ private fun AsamContent(item: AsamListItem) {
       )
 
       CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-         item.description?.let {
+         item.rigStatus?.let {
             Text(
                text = it,
                style = MaterialTheme.typography.body2,
                modifier = Modifier.padding(top = 4.dp)
             )
          }
+
+         item.specialStatus?.let {
+            Text(
+               text = it,
+               style = MaterialTheme.typography.body2
+            )
+         }
       }
       
-      AsamFooter(item)
+      ModuFooter(item)
    }
 }
 
 @Composable
-private fun AsamFooter(item: AsamListItem) {
+private fun ModuFooter(item: ModuListItem) {
    Row(
       verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.SpaceBetween,
@@ -129,31 +135,32 @@ private fun AsamFooter(item: AsamListItem) {
          .fillMaxWidth()
          .padding(top = 8.dp)
    ) {
-      AsamLocation(item)
-      AsamActions()
+      ModuLocation(item)
+      ModuActions()
    }
 }
 
+
 @Composable
-private fun AsamLocation(asam: AsamListItem) {
+private fun ModuLocation(item: ModuListItem) {
    TextButton(onClick = { /*TODO*/ }) {
-      Text(text = asam.dms.format())
+      Text(text = item.dms.format())
    }
 }
 
 @Composable
-private fun AsamActions() {
+private fun ModuActions() {
    Row {
       IconButton(onClick = {  }) {
          Icon(Icons.Default.Share,
             tint = MaterialTheme.colors.primary,
-            contentDescription = "Share ASAM"
+            contentDescription = "Share MODU"
          )
       }
       IconButton(onClick = {  }) {
          Icon(Icons.Default.GpsFixed,
             tint = MaterialTheme.colors.primary,
-            contentDescription = "Zoom to ASAM"
+            contentDescription = "Zoom to MODU"
          )
       }
    }

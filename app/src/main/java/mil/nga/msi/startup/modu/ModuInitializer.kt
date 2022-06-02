@@ -1,22 +1,22 @@
-package mil.nga.msi.startup.asam
+package mil.nga.msi.startup.modu
 
 import android.content.Context
 import androidx.startup.Initializer
 import mil.nga.msi.di.AppInitializer
-import mil.nga.msi.repository.asam.AsamRepository
+import mil.nga.msi.repository.modu.ModuRepository
 import mil.nga.msi.startup.WorkManagerInitializer
 import javax.inject.Inject
 
-class AsamInitializer: Initializer<AsamRepository> {
+class ModuInitializer: Initializer<ModuRepository> {
    @Inject
-   lateinit var repository: AsamRepository
+   lateinit var repository: ModuRepository
 
-   override fun create(context: Context): AsamRepository {
+   override fun create(context: Context): ModuRepository {
       // Inject Hilt dependencies
       AppInitializer.resolve(context).inject(this)
 
-      repository.fetchAsams()
-      repository.fetchAsamsPeriodically()
+      repository.fetchModus()
+      repository.fetchModusPeriodically()
       return repository
    }
 

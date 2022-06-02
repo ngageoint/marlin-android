@@ -17,6 +17,7 @@ import mil.nga.msi.ui.asam.detail.AsamDetailScreen
 import mil.nga.msi.ui.asam.list.AsamsScreen
 import mil.nga.msi.ui.asam.sheet.AsamSheetScreen
 import mil.nga.msi.ui.map.MapScreen
+import mil.nga.msi.ui.modu.list.ModusScreen
 
 @OptIn(ExperimentalMaterialNavigationApi::class)
 @Composable
@@ -57,7 +58,6 @@ fun MainScreen() {
             ) {
                composable(DrawerScreen.Map.route) {
                   MapScreen(
-                     bottomSheetNavigator,
                      onAsamClick = { id ->
                         navController.navigate(Routes.Asam.Sheet.route + "?id=$id")
                      },
@@ -69,6 +69,14 @@ fun MainScreen() {
                      openDrawer = { openDrawer() },
                      onAsamClick = { id ->
                         navController.navigate(Routes.Asam.Details.route + "?id=$id")
+                     }
+                  )
+               }
+               composable(DrawerScreen.Modus.route) {
+                  ModusScreen(
+                     openDrawer = { openDrawer() },
+                     onModuClick = { name ->
+                        navController.navigate(Routes.Modu.Details.route + "?id=$name")
                      }
                   )
                }

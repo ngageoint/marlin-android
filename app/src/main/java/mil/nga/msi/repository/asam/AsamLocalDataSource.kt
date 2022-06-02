@@ -5,15 +5,15 @@ import mil.nga.msi.datasource.asam.AsamDao
 import javax.inject.Inject
 
 class AsamLocalDataSource @Inject constructor(
-   private val asamDao: AsamDao
+   private val dao: AsamDao
 ) {
-   fun observeAsams() = asamDao.observeAsams()
-   fun observeAsam(id: String) = asamDao.observeAsam(id)
-   fun observeAsamMapItems() = asamDao.observeAsamMapItems()
-   fun observeAsamListItems() = asamDao.getAsamListItems()
+   fun observeAsams() = dao.observeAsams()
+   fun observeAsam(reference: String) = dao.observeAsam(reference)
+   fun observeAsamMapItems() = dao.observeAsamMapItems()
+   fun observeAsamListItems() = dao.getAsamListItems()
 
-   suspend fun getAsams(): List<Asam> = asamDao.getAsams()
-   suspend fun getLatestAsam() = asamDao.getLatestAsam()
+   suspend fun getAsams(): List<Asam> = dao.getAsams()
+   suspend fun getLatestAsam() = dao.getLatestAsam()
 
-   suspend fun insert(asams: List<Asam>) = asamDao.insert(asams)
+   suspend fun insert(asams: List<Asam>) = dao.insert(asams)
 }

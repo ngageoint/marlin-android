@@ -6,7 +6,8 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
 import mil.nga.msi.startup.asam.AsamInitializer
-import mil.nga.msi.startup.asam.WorkManagerInitializer
+import mil.nga.msi.startup.WorkManagerInitializer
+import mil.nga.msi.startup.modu.ModuInitializer
 
 @EntryPoint
 @InstallIn(SingletonComponent::class)
@@ -25,4 +26,5 @@ interface AppInitializer {
 
    fun inject(workManagerInitializer: WorkManagerInitializer)
    fun inject(asamInitializer: AsamInitializer)
+   fun inject(moduInitializer: ModuInitializer)
 }

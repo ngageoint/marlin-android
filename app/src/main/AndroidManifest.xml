@@ -31,6 +31,10 @@
             <meta-data
                 android:name="mil.nga.msi.startup.asam.AsamInitializer"
                 android:value="androidx.startup" />
+
+            <meta-data
+                android:name="mil.nga.msi.startup.modu.ModuInitializer"
+                android:value="androidx.startup" />
         </provider>
 
         <activity

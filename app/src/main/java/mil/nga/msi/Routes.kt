@@ -1,10 +1,12 @@
 package mil.nga.msi
 
-sealed class Routes(val title: String, val route: String) {
-   sealed class Asam(val title: String, val route: String) {
-      object Details: Asam("ASAM", "asamDetails")
-      object Sheet: Asam("ASAM", "asamSheet")
+sealed class Routes {
+   sealed class Asam(val route: String) {
+      object Details: Asam("asamDetails")
+      object Sheet: Asam("asamSheet")
    }
-
-   object Modu : Routes("MODU", "moduSheet")
+   sealed class Modu(val route: String) {
+      object Details: Asam("moduDetails")
+      object Sheet: Asam("moduSheet")
+   }
 }

@@ -1,4 +1,4 @@
-package mil.nga.msi.network.asam
+package mil.nga.msi.network
 
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject

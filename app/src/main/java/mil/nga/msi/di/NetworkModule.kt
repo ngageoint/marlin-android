@@ -1,6 +1,5 @@
 package mil.nga.msi.di
 
-import android.app.Application
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
@@ -9,8 +8,11 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mil.nga.msi.datasource.asam.Asam
+import mil.nga.msi.datasource.modu.Modu
 import mil.nga.msi.network.asam.AsamsTypeAdapter
+import mil.nga.msi.network.modu.ModusTypeAdapter
 import mil.nga.msi.repository.asam.AsamService
+import mil.nga.msi.repository.modu.ModuService
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -27,9 +29,10 @@ class NetworkModule {
 
    @Provides
    @Singleton
-   fun provideGson(application: Application): Gson {
+   fun provideGson(): Gson {
       return GsonBuilder()
          .registerTypeAdapter(object : TypeToken<List<Asam>>() {}.type, AsamsTypeAdapter())
+         .registerTypeAdapter(object : TypeToken<List<Modu>>() {}.type, ModusTypeAdapter())
          .create()
    }
 
@@ -50,5 +53,11 @@ class NetworkModule {
    @Singleton
    fun provideAsamService(retrofit: Retrofit): AsamService {
       return retrofit.create(AsamService::class.java)
+   }
+
+   @Provides
+   @Singleton
+   fun provideModuService(retrofit: Retrofit): ModuService {
+      return retrofit.create(ModuService::class.java)
    }
 }

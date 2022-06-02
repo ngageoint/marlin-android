@@ -42,7 +42,6 @@ var markerAnimator: ValueAnimator? = null
 @OptIn(ExperimentalMaterialNavigationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun MapScreen(
-   nav: BottomSheetNavigator,
    onAsamClick: (String) -> Unit,
    openDrawer: () -> Unit,
    viewModel: MapViewModel = hiltViewModel()
@@ -62,10 +61,10 @@ fun MapScreen(
       )
    }
 
-   if (nav.navigatorSheetState.currentValue == ModalBottomSheetValue.Hidden) {
-//      markerAnimator?.reverse()
-//      markerAnimator = null
-   }
+//   if (nav.navigatorSheetState.currentValue == ModalBottomSheetValue.Hidden) {
+////      markerAnimator?.reverse()
+////      markerAnimator = null
+//   }
 }
 
 @Composable
@@ -73,10 +72,9 @@ private fun Map(
    asams: List<AsamMapItem>?,
    onMarkerClick: (String) -> Unit,
 ) {
-   val context = LocalContext.current
    val scope = rememberCoroutineScope()
    val mapView = rememberMapViewWithLifecycle()
-   var previousAsams by remember { mutableStateOf(asams)}
+//   var previousAsams by remember { mutableStateOf(asams)}
    var mapInitialized by remember(mapView) { mutableStateOf(false) }
    LaunchedEffect(mapView, mapInitialized) {
       if (!mapInitialized) {
@@ -99,23 +97,16 @@ private fun Map(
 
          mapInitialized = true
       }
-
-      if (asams != previousAsams) {
-         // TODO remove/add/leave based on previous list
-         val map = mapView.awaitMap()
-         addAsams(map, asams)
-         previousAsams = asams
-      }
    }
 
    AndroidView({ mapView }) { mapView ->
       // TODO if anything changes here the entire map is recomposed
       scope.launch {
-//         val googleMap = mapView.awaitMap()
-//         googleMap.uiSettings.isMapToolbarEnabled = false
-//         googleMap.clear()
+         val googleMap = mapView.awaitMap()
+         googleMap.uiSettings.isMapToolbarEnabled = false
+         googleMap.clear()
 
-//         addAsams(googleMap, asams)
+         addAsams(googleMap, asams)
       }
    }
 }

@@ -16,26 +16,26 @@ interface AsamDao {
    @Update(onConflict = OnConflictStrategy.REPLACE)
    suspend fun update(asam: Asam)
 
-   @Query("SELECT * FROM asam")
+   @Query("SELECT * FROM asams")
    fun observeAsams(): Flow<List<Asam>>
 
-   @Query("SELECT * FROM asam WHERE reference = :reference")
+   @Query("SELECT * FROM asams WHERE reference = :reference")
    fun observeAsam(reference: String): LiveData<Asam>
 
-   @Query("SELECT * FROM asam")
+   @Query("SELECT * FROM asams")
    suspend fun getAsams(): List<Asam>
 
-   @Query("SELECT * FROM asam WHERE reference = :reference")
-   suspend fun getAsamByReference(reference: String): Asam?
+   @Query("SELECT * FROM asams WHERE reference = :reference")
+   suspend fun getAsam(reference: String): Asam?
 
-   @Query("SELECT * FROM asam ORDER BY date DESC LIMIT 1")
+   @Query("SELECT * FROM asams ORDER BY date DESC LIMIT 1")
    suspend fun getLatestAsam(): Asam?
 
-   @Query("SELECT * FROM asam ORDER BY date DESC")
+   @Query("SELECT * FROM asams ORDER BY date DESC")
    @RewriteQueriesToDropUnusedColumns
    fun getAsamListItems(): PagingSource<Int, AsamListItem>
 
-   @Query("SELECT * FROM asam")
+   @Query("SELECT * FROM asams")
    @RewriteQueriesToDropUnusedColumns
    fun observeAsamMapItems(): Flow<List<AsamMapItem>>
 }

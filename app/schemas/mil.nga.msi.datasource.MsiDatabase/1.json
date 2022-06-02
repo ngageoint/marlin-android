@@ -2,14 +2,14 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "d2b76e60bbbea03b4ce42099813624fb",
+    "identityHash": "0837997245ef0c2c206f3446e5263562",
     "entities": [
       {
-        "tableName": "asam",
+        "tableName": "asams",
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`reference` TEXT NOT NULL, `date` INTEGER NOT NULL, `latitude` REAL NOT NULL, `longitude` REAL NOT NULL, `position` TEXT, `navigation_area` TEXT, `subregion` TEXT, `description` TEXT, `hostility` TEXT, `victim` TEXT, PRIMARY KEY(`reference`))",
         "fields": [
           {
-            "fieldPath": "id",
+            "fieldPath": "reference",
             "columnName": "reference",
             "affinity": "TEXT",
             "notNull": true
@@ -77,12 +77,92 @@
         },
         "indices": [],
         "foreignKeys": []
+      },
+      {
+        "tableName": "modus",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `date` INTEGER NOT NULL, `latitude` REAL NOT NULL, `longitude` REAL NOT NULL, `rig_status` TEXT, `special_status` TEXT, `distance` REAL, `position` TEXT, `navigation_area` TEXT, `region` TEXT, `subregion` TEXT, PRIMARY KEY(`name`))",
+        "fields": [
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "date",
+            "columnName": "date",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "latitude",
+            "columnName": "latitude",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "longitude",
+            "columnName": "longitude",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "rigStatus",
+            "columnName": "rig_status",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "specialStatus",
+            "columnName": "special_status",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "distance",
+            "columnName": "distance",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "position",
+            "columnName": "position",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "navigationArea",
+            "columnName": "navigation_area",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "region",
+            "columnName": "region",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "subregion",
+            "columnName": "subregion",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "name"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd2b76e60bbbea03b4ce42099813624fb')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '0837997245ef0c2c206f3446e5263562')"
     ]
   }
 }

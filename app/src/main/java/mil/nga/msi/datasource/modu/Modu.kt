@@ -1,4 +1,4 @@
-package mil.nga.msi.datasource.asam
+package mil.nga.msi.datasource.modu
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
@@ -7,11 +7,13 @@ import com.google.android.gms.maps.model.LatLng
 import mil.nga.msi.coordinate.DMS
 import java.util.*
 
-@Entity(tableName = "asams")
-data class Asam(
+enum class RigStatus { ACTIVE, INACTIVE }
+
+@Entity(tableName = "modus")
+data class Modu(
    @PrimaryKey
-   @ColumnInfo(name = "reference")
-   val reference: String,
+   @ColumnInfo(name = "name")
+   val name: String,
 
    @ColumnInfo(name = "date")
    val date: Date,
@@ -22,23 +24,26 @@ data class Asam(
    @ColumnInfo(name = "longitude")
    val longitude: Double
 ) {
+   @ColumnInfo(name = "rig_status")
+   var rigStatus: RigStatus? = null
+
+   @ColumnInfo(name = "special_status")
+   var specialStatus: String? = null
+
+   @ColumnInfo(name = "distance")
+   var distance: Double? = null
+
    @ColumnInfo(name = "position")
    var position: String? = null
 
    @ColumnInfo(name = "navigation_area")
    var navigationArea: String? = null
 
+   @ColumnInfo(name = "region")
+   var region: String? = null
+
    @ColumnInfo(name = "subregion")
    var subregion: String? = null
-
-   @ColumnInfo(name = "description")
-   var description: String? = null
-
-   @ColumnInfo(name = "hostility")
-   var hostility: String? = null
-
-   @ColumnInfo(name = "victim")
-   var victim: String? = null
 
    @Transient
    val dms = DMS.from(LatLng(latitude, longitude))

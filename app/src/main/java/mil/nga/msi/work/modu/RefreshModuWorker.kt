@@ -1,22 +1,21 @@
-package mil.nga.msi.work
+package mil.nga.msi.work.modu
 
 import android.content.Context
-import android.util.Log
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import mil.nga.msi.repository.asam.AsamRepository
+import mil.nga.msi.repository.modu.ModuRepository
 
 @HiltWorker
-class RefreshAsamWorker @AssistedInject constructor(
+class RefreshModuWorker @AssistedInject constructor(
    @Assisted context: Context,
    @Assisted params: WorkerParameters,
-   private val asamRepository: AsamRepository,
+   private val repository: ModuRepository,
 ) : CoroutineWorker(context, params) {
    override suspend fun doWork(): Result = try {
-      asamRepository.fetchAsams(true)
+      repository.fetchModus(true)
       Result.success()
    } catch (error: Throwable) {
       Result.failure()

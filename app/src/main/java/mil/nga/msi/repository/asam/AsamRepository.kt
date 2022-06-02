@@ -1,33 +1,29 @@
 package mil.nga.msi.repository.asam
 
-import androidx.paging.Pager
 import androidx.work.*
-import kotlinx.coroutines.flow.Flow
 import mil.nga.msi.datasource.asam.Asam
-import mil.nga.msi.datasource.asam.AsamListItem
-import mil.nga.msi.datasource.asam.AsamMapItem
-import mil.nga.msi.work.RefreshAsamWorker
+import mil.nga.msi.work.asam.RefreshAsamWorker
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class AsamRepository @Inject constructor(
    private val workManager: WorkManager,
-   private val asamLocalDataSource: AsamLocalDataSource,
-   private val asamRemoteDataSource: AsamRemoteDataSource
+   private val localDataSource: AsamLocalDataSource,
+   private val remoteDataSource: AsamRemoteDataSource
 ) {
-   val asams = asamLocalDataSource.observeAsams()
-   val asamMapItems = asamLocalDataSource.observeAsamMapItems()
-   val asamListItems = asamLocalDataSource.observeAsamListItems()
+   val asams = localDataSource.observeAsams()
+   val asamMapItems = localDataSource.observeAsamMapItems()
+   val asamListItems = localDataSource.observeAsamListItems()
 
-   fun observeAsam(id: String) = asamLocalDataSource.observeAsam(id)
+   fun observeAsam(reference: String) = localDataSource.observeAsam(reference)
 
    suspend fun fetchAsams(refresh: Boolean = false): List<Asam> {
       if (refresh) {
-         val asams = asamRemoteDataSource.fetchAsams()
-         asamLocalDataSource.insert(asams)
+         val asams = remoteDataSource.fetchAsams()
+         localDataSource.insert(asams)
       }
 
-      return asamLocalDataSource.getAsams()
+      return localDataSource.getAsams()
    }
 
    fun fetchAsams() {

@@ -18,9 +18,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
+import mil.nga.msi.R
 import mil.nga.msi.TopBar
 import mil.nga.msi.coordinate.DMS
 import mil.nga.msi.datasource.asam.Asam
@@ -86,7 +88,8 @@ private fun AsamHeader(
                .height(200.dp)
          ) {
             Marker(
-               state = MarkerState(position = latLng)
+               state = MarkerState(position = latLng),
+               icon = BitmapDescriptorFactory.fromResource(R.drawable.asam_map_marker_24dp)
             )
          }
 
@@ -207,7 +210,7 @@ private fun AsamInformation(
             .padding(horizontal = 16.dp)
       ) {
          val dateFormat = SimpleDateFormat("yyyy-mm-dd", Locale.getDefault())
-         AsamProperty(title = "Reference Number", value = asam.id)
+         AsamProperty(title = "Reference Number", value = asam.reference)
          AsamProperty(title = "Date", value = dateFormat.format(asam.date))
          AsamProperty(title = "Latitude", value = asam.latitude.toString())
          AsamProperty(title = "Longitude", value = asam.longitude.toString())

@@ -1,4 +1,4 @@
-package mil.nga.msi.startup.asam
+package mil.nga.msi.startup
 
 import android.content.Context
 import androidx.hilt.work.HiltWorkerFactory
