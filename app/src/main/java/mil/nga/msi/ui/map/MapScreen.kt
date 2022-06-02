@@ -18,21 +18,25 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.Marker
-import com.google.maps.android.ktx.addMarker
+import com.google.maps.android.clustering.ClusterManager
+import com.google.maps.android.clustering.algo.NonHierarchicalViewBasedAlgorithm
 import com.google.maps.android.ktx.awaitMap
 import kotlinx.coroutines.launch
-import mil.nga.msi.TopBar
 import mil.nga.msi.R
+import mil.nga.msi.TopBar
 import mil.nga.msi.datasource.asam.AsamMapItem
 import mil.nga.msi.datasource.modu.ModuMapItem
 import kotlin.math.roundToInt
 
 var markerAnimator: ValueAnimator? = null
+private lateinit var clusterManager: ClusterManager<AnnotationItem>
 
 @Composable
 fun MapScreen(
@@ -70,72 +74,67 @@ private fun Map(
    onAnnotationClick: (Annotation) -> Unit,
 ) {
    val scope = rememberCoroutineScope()
+   val context = LocalContext.current
    val mapView = rememberMapViewWithLifecycle()
-//   var previousAsams by remember { mutableStateOf(asams)}
    var mapInitialized by remember(mapView) { mutableStateOf(false) }
    LaunchedEffect(mapView, mapInitialized) {
       if (!mapInitialized) {
-         val googleMap = mapView.awaitMap()
-         googleMap.uiSettings.isMapToolbarEnabled = false
-         googleMap.setOnMarkerClickListener { marker ->
-            val annotation = marker.tag as? Annotation
-            annotation?.let {
-               onAnnotationClick(it)
-            }
-//            animateMarker(marker, context)
-//            animateMap(googleMap, marker.position)
-
+         val map = mapView.awaitMap()
+         val metrics = context.resources.displayMetrics
+         clusterManager = ClusterManager(context, map)
+         clusterManager.renderer = ClusterRenderer(context, map, clusterManager)
+         clusterManager.setAlgorithm(
+            NonHierarchicalViewBasedAlgorithm(metrics.widthPixels, metrics.heightPixels)
+         )
+         clusterManager.setOnClusterItemClickListener { item ->
+            onAnnotationClick(item.annotation)
             true
          }
-
-         // TODO this really needs to happen when bottom sheet goes away
-//         googleMap.setOnMapClickListener {
-//            markerAnimator?.reverse()
-//            markerAnimator = null
-//         }
-
+         clusterManager.setOnClusterClickListener { cluster ->
+            val builder = LatLngBounds.Builder()
+            cluster.items.forEach { builder.include(it.position) }
+            map.animateCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 20));
+            true
+         }
+         map.setOnCameraIdleListener(clusterManager)
+         map.setOnMarkerClickListener(clusterManager)
+         map.uiSettings.isMapToolbarEnabled = false
          mapInitialized = true
       }
    }
 
-   AndroidView({ mapView }) { mapView ->
-      // TODO if anything changes here the entire map is recomposed
-      scope.launch {
-         val googleMap = mapView.awaitMap()
-         googleMap.uiSettings.isMapToolbarEnabled = false
-         googleMap.clear()
+   if (mapInitialized) {
+      AndroidView({ mapView }) { mapView ->
+         // TODO if anything changes here the entire map is recomposed
+         scope.launch {
+            val googleMap = mapView.awaitMap()
+            googleMap.uiSettings.isMapToolbarEnabled = false
+            googleMap.clear()
 
-         addAsams(googleMap, asams)
-         addModus(googleMap, modus)
+            addAsams(asams)
+            addModus(modus)
+            clusterManager.cluster()
+         }
       }
    }
 }
 
 private fun addAsams(
-   map: GoogleMap,
    asams: List<AsamMapItem>?
 ) {
    asams?.forEach { asam ->
-      val point = LatLng(asam.latitude, asam.longitude)
-      val marker = map.addMarker {
-         position(point)
-         icon(BitmapDescriptorFactory.fromResource(R.drawable.asam_map_marker_24dp ))
-      }
-      marker?.tag = Annotation(Annotation.Type.ASAM, asam.reference)
+      val position = LatLng(asam.latitude, asam.longitude)
+      clusterManager.addItem(AnnotationItem(Annotation(Annotation.Type.ASAM, asam.reference), position))
    }
 }
 
 private fun addModus(
-   map: GoogleMap,
    modus: List<ModuMapItem>?
 ) {
    modus?.forEach { modu ->
-      val point = LatLng(modu.latitude, modu.longitude)
-      val marker = map.addMarker {
-         position(point)
-         icon(BitmapDescriptorFactory.fromResource(R.drawable.modu_map_marker_24dp ))
-      }
-      marker?.tag = Annotation(Annotation.Type.MODU, modu.name)
+      val position = LatLng(modu.latitude, modu.longitude)
+      val annotation = Annotation(Annotation.Type.MODU, modu.name)
+      clusterManager.addItem(AnnotationItem(annotation, position))
    }
 }
 
