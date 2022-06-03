@@ -11,16 +11,16 @@ import mil.nga.msi.R
 class ClusterRenderer(
    context: Context,
    map: GoogleMap,
-   clusterManager: ClusterManager<AnnotationItem>
-): DefaultClusterRenderer<AnnotationItem>(context, map, clusterManager) {
+   clusterManager: ClusterManager<MapAnnotationItem>
+): DefaultClusterRenderer<MapAnnotationItem>(context, map, clusterManager) {
    init {
       setAnimation(false)
    }
 
-   override fun onBeforeClusterItemRendered(item: AnnotationItem, markerOptions: MarkerOptions) {
-      val resource = when (item.annotation.type) {
-         Annotation.Type.ASAM -> R.drawable.asam_map_marker_24dp
-         Annotation.Type.MODU -> R.drawable.modu_map_marker_24dp
+   override fun onBeforeClusterItemRendered(item: MapAnnotationItem, markerOptions: MarkerOptions) {
+      val resource = when (item.mapAnnotation.type) {
+         MapAnnotation.Type.ASAM -> R.drawable.asam_map_marker_24dp
+         MapAnnotation.Type.MODU -> R.drawable.modu_map_marker_24dp
       }
       markerOptions.icon(BitmapDescriptorFactory.fromResource(resource))
    }

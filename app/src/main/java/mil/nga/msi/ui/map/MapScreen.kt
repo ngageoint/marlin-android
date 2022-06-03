@@ -36,11 +36,12 @@ import mil.nga.msi.datasource.modu.ModuMapItem
 import kotlin.math.roundToInt
 
 var markerAnimator: ValueAnimator? = null
-private lateinit var clusterManager: ClusterManager<AnnotationItem>
+private lateinit var clusterManager: ClusterManager<MapAnnotationItem>
 
 @Composable
 fun MapScreen(
-   onAnnotationClick: (Annotation) -> Unit,
+   onAnnotationClick: (MapAnnotation) -> Unit,
+   onAnnotationsClick: (List<MapAnnotation>) -> Unit,
    openDrawer: () -> Unit,
    viewModel: MapViewModel = hiltViewModel()
 ) {
@@ -55,9 +56,8 @@ fun MapScreen(
       Map(
          asams,
          modus,
-         onAnnotationClick = { annotation ->
-            onAnnotationClick(annotation)
-         }
+         onAnnotationClick =  onAnnotationClick,
+         onAnnotationsClick = onAnnotationsClick
       )
    }
 
@@ -71,7 +71,8 @@ fun MapScreen(
 private fun Map(
    asams: List<AsamMapItem>?,
    modus: List<ModuMapItem>?,
-   onAnnotationClick: (Annotation) -> Unit,
+   onAnnotationClick: (MapAnnotation) -> Unit,
+   onAnnotationsClick: (List<MapAnnotation>) -> Unit
 ) {
    val scope = rememberCoroutineScope()
    val context = LocalContext.current
@@ -87,13 +88,18 @@ private fun Map(
             NonHierarchicalViewBasedAlgorithm(metrics.widthPixels, metrics.heightPixels)
          )
          clusterManager.setOnClusterItemClickListener { item ->
-            onAnnotationClick(item.annotation)
+            onAnnotationClick(item.mapAnnotation)
             true
          }
          clusterManager.setOnClusterClickListener { cluster ->
-            val builder = LatLngBounds.Builder()
-            cluster.items.forEach { builder.include(it.position) }
-            map.animateCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 20));
+            if (map.maxZoomLevel == map.cameraPosition.zoom) {
+               val annotations = cluster.items.map { it.mapAnnotation }
+               onAnnotationsClick(annotations)
+            } else {
+               val builder = LatLngBounds.Builder()
+               cluster.items.forEach { builder.include(it.position) }
+               map.animateCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 20))
+            }
             true
          }
          map.setOnCameraIdleListener(clusterManager)
@@ -124,7 +130,7 @@ private fun addAsams(
 ) {
    asams?.forEach { asam ->
       val position = LatLng(asam.latitude, asam.longitude)
-      clusterManager.addItem(AnnotationItem(Annotation(Annotation.Type.ASAM, asam.reference), position))
+      clusterManager.addItem(MapAnnotationItem(MapAnnotation(MapAnnotation.Type.ASAM, asam.reference), position))
    }
 }
 
@@ -133,8 +139,8 @@ private fun addModus(
 ) {
    modus?.forEach { modu ->
       val position = LatLng(modu.latitude, modu.longitude)
-      val annotation = Annotation(Annotation.Type.MODU, modu.name)
-      clusterManager.addItem(AnnotationItem(annotation, position))
+      val mapAnnotation = MapAnnotation(MapAnnotation.Type.MODU, modu.name)
+      clusterManager.addItem(MapAnnotationItem(mapAnnotation, position))
    }
 }
 

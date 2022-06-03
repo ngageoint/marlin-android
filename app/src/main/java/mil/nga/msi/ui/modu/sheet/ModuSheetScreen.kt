@@ -22,13 +22,13 @@ import java.util.*
 @Composable
 fun ModuSheetScreen(
    id: String,
-   onDetails: () -> Unit,
+   onDetails: (() -> Unit)? = null,
    viewModel: ModuViewModel = hiltViewModel()
 ) {
    val modu by viewModel.getModu(id).observeAsState()
    modu?.let {
       ModuContent(modu = it) {
-         onDetails()
+         onDetails?.invoke()
       }
    }
 }

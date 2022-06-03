@@ -20,13 +20,13 @@ import java.util.*
 @Composable
 fun AsamSheetScreen(
    reference: String,
-   onDetails: () -> Unit,
+   onDetails: (() -> Unit)? = null,
    viewModel: AsamViewModel = hiltViewModel()
 ) {
    val asam by viewModel.getAsam(reference).observeAsState()
    asam?.let {
       AsamContent(asam = it) {
-         onDetails()
+         onDetails?.invoke()
       }
    }
 }
