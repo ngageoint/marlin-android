@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -17,7 +18,6 @@ import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import mil.nga.msi.ui.navigation.AnnotationsNavType
 import mil.nga.msi.ui.asam.detail.AsamDetailScreen
 import mil.nga.msi.ui.asam.list.AsamsScreen
 import mil.nga.msi.ui.asam.sheet.AsamSheetScreen
@@ -27,6 +27,7 @@ import mil.nga.msi.ui.modu.detail.ModuDetailScreen
 import mil.nga.msi.ui.modu.list.ModusScreen
 import mil.nga.msi.ui.modu.sheet.ModuSheetScreen
 import mil.nga.msi.ui.navigation.DrawerScreen
+import mil.nga.msi.ui.navigation.MapAnnotationsType
 import mil.nga.msi.ui.navigation.NavigationDrawer
 import mil.nga.msi.ui.navigation.Routes
 import mil.nga.msi.ui.sheet.PagingSheet
@@ -119,10 +120,10 @@ fun MainScreen() {
                }
                bottomSheet(
                   Routes.Pager.Sheet.route +"?annotations={annotations}",
-                  arguments = listOf(navArgument("annotations") { type = AnnotationsNavType() })
+                  arguments = listOf(navArgument("annotations") { type = NavType.MapAnnotationsType })
                ) { backstackEntry ->
                   backstackEntry.arguments?.getParcelableArray("annotations")?.let {
-                     it.toList() as List<MapAnnotation>
+                     it.toList() as? List<MapAnnotation>
                   }?.let {  annotations ->
                      PagingSheet(annotations)
                   }
