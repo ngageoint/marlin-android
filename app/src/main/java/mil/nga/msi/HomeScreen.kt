@@ -82,7 +82,7 @@ fun MainScreen() {
                         }
                      },
                      onAnnotationsClick = { annotations ->
-                        val encoded = Uri.encode(Json.encodeToString(annotations.toTypedArray()))
+                        val encoded = Uri.encode(Json.encodeToString(annotations))
                         navController.navigate(Routes.Pager.Sheet.route + "?annotations=${encoded}")
                      },
                      openDrawer = { openDrawer() }
@@ -125,7 +125,16 @@ fun MainScreen() {
                   backstackEntry.arguments?.getParcelableArray("annotations")?.let {
                      it.toList() as? List<MapAnnotation>
                   }?.let {  annotations ->
-                     PagingSheet(annotations)
+                     PagingSheet(annotations) { annotation ->
+                        when (annotation.type) {
+                           MapAnnotation.Type.ASAM -> {
+                              navController.navigate(Routes.Asam.Details.route + "?reference=${annotation.id}")
+                           }
+                           MapAnnotation.Type.MODU -> {
+                              navController.navigate(Routes.Modu.Details.route + "?name=${annotation.id}")
+                           }
+                        }
+                     }
                   }
                }
                bottomSheet(Routes.Asam.Sheet.route + "?reference={reference}") { backstackEntry ->
@@ -149,7 +158,7 @@ fun MainScreen() {
 }
 
 @Composable
-fun TopBar(title: String = "", buttonIcon: ImageVector, onButtonClicked: () -> Unit) {
+fun TopBar(title: String, buttonIcon: ImageVector, onButtonClicked: () -> Unit) {
    TopAppBar(
       title = {
          Text(

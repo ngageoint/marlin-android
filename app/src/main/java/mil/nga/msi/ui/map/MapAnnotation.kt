@@ -7,5 +7,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 @Parcelize
 data class MapAnnotation(val type: Type, val id: String) : Parcelable {
-   enum class Type {ASAM, MODU}
+   enum class Type { ASAM, MODU }
 }

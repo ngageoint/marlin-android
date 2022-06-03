@@ -4,6 +4,7 @@ plugins {
     id 'kotlin-kapt'
     id 'com.google.dagger.hilt.android'
     id 'kotlin-parcelize'
+    id 'kotlinx-serialization'
 }
 
 def googleMapsApiReleaseKey = hasProperty('MSI_RELEASE_MAPS_API_KEY') ? MSI_RELEASE_MAPS_API_KEY : ''

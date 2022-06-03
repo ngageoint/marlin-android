@@ -15,7 +15,8 @@ import mil.nga.msi.ui.modu.sheet.ModuSheetScreen
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun PagingSheet(
-   mapAnnotations: List<MapAnnotation>
+   mapAnnotations: List<MapAnnotation>,
+   onDetails: (MapAnnotation) -> Unit,
 ) {
    Column {
       val pagerState = rememberPagerState()
@@ -43,8 +44,8 @@ fun PagingSheet(
          Column(modifier = Modifier.fillMaxWidth()) {
             val annotation = mapAnnotations[page]
             when (annotation.type) {
-               MapAnnotation.Type.ASAM -> AsamPage(reference = annotation.id)
-               MapAnnotation.Type.MODU -> ModuPage(name = annotation.id)
+               MapAnnotation.Type.ASAM -> AsamPage(annotation.id) { onDetails.invoke(annotation) }
+               MapAnnotation.Type.MODU -> ModuPage(name = annotation.id) { onDetails.invoke(annotation) }
             }
          }
       }
@@ -52,11 +53,23 @@ fun PagingSheet(
 }
 
 @Composable
-private fun AsamPage(reference: String) {
-   AsamSheetScreen(reference)
+private fun AsamPage(
+   reference: String,
+   onDetails: () -> Unit,
+) {
+   AsamSheetScreen(
+      reference,
+      onDetails = { onDetails() }
+   )
 }
 
 @Composable
-private fun ModuPage(name: String) {
-   ModuSheetScreen(name)
+private fun ModuPage(
+   name: String,
+   onDetails: () -> Unit,
+) {
+   ModuSheetScreen(
+      name,
+      onDetails = { onDetails() }
+   )
 }
