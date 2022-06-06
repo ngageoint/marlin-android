@@ -43,9 +43,9 @@ fun PagingSheet(
       ) { page ->
          Column(modifier = Modifier.fillMaxWidth()) {
             val annotation = mapAnnotations[page]
-            when (annotation.type) {
-               MapAnnotation.Type.ASAM -> AsamPage(annotation.id) { onDetails.invoke(annotation) }
-               MapAnnotation.Type.MODU -> ModuPage(name = annotation.id) { onDetails.invoke(annotation) }
+            when (annotation.key.type) {
+               MapAnnotation.Type.ASAM -> AsamPage(annotation.key.id) { onDetails.invoke(annotation) }
+               MapAnnotation.Type.MODU -> ModuPage(name = annotation.key.id) { onDetails.invoke(annotation) }
             }
          }
       }

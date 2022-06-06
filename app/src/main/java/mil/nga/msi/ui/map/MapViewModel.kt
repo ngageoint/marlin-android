@@ -1,13 +1,9 @@
 package mil.nga.msi.ui.map
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
+import androidx.lifecycle.*
 import dagger.hilt.android.lifecycle.HiltViewModel
-import mil.nga.msi.datasource.asam.Asam
 import mil.nga.msi.datasource.asam.AsamMapItem
 import mil.nga.msi.datasource.modu.ModuMapItem
-import mil.nga.msi.repository.asam.AsamLocalDataSource
 import mil.nga.msi.repository.asam.AsamRepository
 import mil.nga.msi.repository.modu.ModuRepository
 import javax.inject.Inject
@@ -17,6 +13,15 @@ class MapViewModel @Inject constructor(
    asamRepository: AsamRepository,
    moduRepository: ModuRepository
 ): ViewModel() {
-   val asams: LiveData<List<AsamMapItem>> = asamRepository.asamMapItems.asLiveData()
-   val modus: LiveData<List<ModuMapItem>> = moduRepository.moduMapItems.asLiveData()
+   private val _mapAnnotations = mutableMapOf<MapAnnotation.Type, List<MapAnnotation>>()
+   val mapAnnotations = MediatorLiveData<List<MapAnnotation>>().apply {
+      addSource(asamRepository.asamMapItems.asLiveData()) { asams: List<AsamMapItem> ->
+         _mapAnnotations[MapAnnotation.Type.ASAM] = asams.map { MapAnnotation.fromAsam(it) }
+         value = _mapAnnotations.flatMap { entry ->  entry.value }
+      }
+      addSource(moduRepository.moduMapItems.asLiveData()) { modus: List<ModuMapItem> ->
+         _mapAnnotations[MapAnnotation.Type.MODU] = modus.map { MapAnnotation.fromModu(it) }
+         value = _mapAnnotations.flatMap { entry ->  entry.value }
+      }
+   }
 }

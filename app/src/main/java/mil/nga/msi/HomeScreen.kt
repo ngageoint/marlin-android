@@ -72,12 +72,12 @@ fun MainScreen() {
                composable(DrawerScreen.Map.route) {
                   MapScreen(
                      onAnnotationClick = { annotation ->
-                        when (annotation.type) {
+                        when (annotation.key.type) {
                            MapAnnotation.Type.ASAM ->  {
-                              navController.navigate(Routes.Asam.Sheet.route + "?reference=${annotation.id}")
+                              navController.navigate(Routes.Asam.Sheet.route + "?reference=${annotation.key.id}")
                            }
                            MapAnnotation.Type.MODU ->  {
-                              navController.navigate(Routes.Modu.Sheet.route + "?name=${annotation.id}")
+                              navController.navigate(Routes.Modu.Sheet.route + "?name=${annotation.key.id}")
                            }
                         }
                      },
@@ -126,12 +126,12 @@ fun MainScreen() {
                      it.toList() as? List<MapAnnotation>
                   }?.let {  annotations ->
                      PagingSheet(annotations) { annotation ->
-                        when (annotation.type) {
+                        when (annotation.key.type) {
                            MapAnnotation.Type.ASAM -> {
-                              navController.navigate(Routes.Asam.Details.route + "?reference=${annotation.id}")
+                              navController.navigate(Routes.Asam.Details.route + "?reference=${annotation.key}")
                            }
                            MapAnnotation.Type.MODU -> {
-                              navController.navigate(Routes.Modu.Details.route + "?name=${annotation.id}")
+                              navController.navigate(Routes.Modu.Details.route + "?name=${annotation.key}")
                            }
                         }
                      }
