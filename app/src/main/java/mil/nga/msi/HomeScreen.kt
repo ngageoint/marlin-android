@@ -23,6 +23,7 @@ import mil.nga.msi.ui.asam.list.AsamsScreen
 import mil.nga.msi.ui.asam.sheet.AsamSheetScreen
 import mil.nga.msi.ui.map.MapAnnotation
 import mil.nga.msi.ui.map.MapScreen
+import mil.nga.msi.ui.map.settings.MapSettingsScreen
 import mil.nga.msi.ui.modu.detail.ModuDetailScreen
 import mil.nga.msi.ui.modu.list.ModusScreen
 import mil.nga.msi.ui.modu.sheet.ModuSheetScreen
@@ -85,6 +86,9 @@ fun MainScreen() {
                         val encoded = Uri.encode(Json.encodeToString(annotations))
                         navController.navigate(Routes.Pager.Sheet.route + "?annotations=${encoded}")
                      },
+                     onMapSettings = {
+                        navController.navigate(Routes.Map.Settings.route)
+                     },
                      openDrawer = { openDrawer() }
                   )
                }
@@ -117,6 +121,11 @@ fun MainScreen() {
                         navController.popBackStack()
                      })
                   }
+               }
+               composable(Routes.Map.Settings.route) {
+                  MapSettingsScreen(onClose = {
+                     navController.popBackStack()
+                  })
                }
                bottomSheet(
                   Routes.Pager.Sheet.route +"?annotations={annotations}",

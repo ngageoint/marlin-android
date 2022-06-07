@@ -5,16 +5,18 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
-import android.util.Log
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.outlined.Map
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
@@ -22,13 +24,11 @@ import androidx.lifecycle.LifecycleEventObserver
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.LatLngBounds
-import com.google.android.gms.maps.model.Marker
+import com.google.android.gms.maps.model.*
 import com.google.maps.android.ktx.awaitMap
 import mil.nga.msi.R
 import mil.nga.msi.TopBar
+import mil.nga.msi.ui.map.overlay.OsmTileProvider
 import kotlin.math.roundToInt
 
 var markerAnimator: ValueAnimator? = null
@@ -37,9 +37,11 @@ var markerAnimator: ValueAnimator? = null
 fun MapScreen(
    onAnnotationClick: (MapAnnotation) -> Unit,
    onAnnotationsClick: (Collection<MapAnnotation>) -> Unit,
+   onMapSettings: () -> Unit,
    openDrawer: () -> Unit,
    viewModel: MapViewModel = hiltViewModel()
 ) {
+   val baseMap by viewModel.baseMap.observeAsState()
    val annotations by viewModel.mapAnnotations.observeAsState()
    Column(modifier = Modifier.fillMaxSize()) {
       TopBar(
@@ -48,13 +50,30 @@ fun MapScreen(
          onButtonClicked = { openDrawer() }
       )
 
-      annotations?.let { annotations ->
-         Map(
-            annotations,
-            onAnnotationClick = { onAnnotationClick.invoke(it) },
-            onAnnotationsClick = { onAnnotationsClick.invoke(it) }
-         )
+      Box(Modifier.fillMaxWidth()) {
+         annotations?.let { annotations ->
+            Map(
+               baseMap,
+               annotations,
+               onAnnotationClick = { onAnnotationClick.invoke(it) },
+               onAnnotationsClick = { onAnnotationsClick.invoke(it) }
+            )
+         }
+
+         FloatingActionButton(
+            onClick = { onMapSettings() },
+            backgroundColor = MaterialTheme.colors.background,
+            modifier = Modifier
+               .align(Alignment.TopEnd)
+               .padding(16.dp)
+         ) {
+            Icon(Icons.Outlined.Map,
+               tint = MaterialTheme.colors.secondary,
+               contentDescription = "Map Settings"
+            )
+         }
       }
+
    }
 
 //   if (nav.navigatorSheetState.currentValue == ModalBottomSheetValue.Hidden) {
@@ -65,6 +84,7 @@ fun MapScreen(
 
 @Composable
 private fun Map(
+   baseMap: BaseMapType?,
    annotations: List<MapAnnotation>,
    onAnnotationClick: (MapAnnotation) -> Unit,
    onAnnotationsClick: (Collection<MapAnnotation>) -> Unit
@@ -81,6 +101,10 @@ private fun Map(
       if (clusterManager == null) {
          val map = mapView.awaitMap().apply {
             uiSettings.isMapToolbarEnabled = false
+            mapType = baseMap?.value ?: BaseMapType.NORMAL.value
+            if (baseMap == BaseMapType.OSM) {
+               addTileOverlay(TileOverlayOptions().tileProvider(OsmTileProvider()))
+            }
          }
          clusterManager = getClusterManager(context, map, onAnnotationsClick, onAnnotationClick)
       }
@@ -167,7 +191,6 @@ private fun getClusterManager(
    onClusterClick: (Collection<MapAnnotation>) -> Unit,
    onClusterItemClick: (MapAnnotation) -> Unit
 ): ClusterManager {
-   Log.i("Billy", "initializing cluster manager")
    val clusterManager = ClusterManager(context, map)
    clusterManager.setOnClusterItemClickListener { item ->
       onClusterItemClick(item)

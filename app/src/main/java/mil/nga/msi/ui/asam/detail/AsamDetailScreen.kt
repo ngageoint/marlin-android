@@ -18,15 +18,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
-import com.google.maps.android.compose.*
 import mil.nga.msi.R
 import mil.nga.msi.TopBar
 import mil.nga.msi.coordinate.DMS
 import mil.nga.msi.datasource.asam.Asam
 import mil.nga.msi.ui.asam.AsamViewModel
+import mil.nga.msi.ui.map.BaseMapType
+import mil.nga.msi.ui.map.MapClip
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -36,6 +35,7 @@ fun AsamDetailScreen(
    close: () -> Unit,
    viewModel: AsamViewModel = hiltViewModel()
 ) {
+   val baseMap by viewModel.baseMap.observeAsState()
    val asam by viewModel.getAsam(reference).observeAsState()
    Column {
       TopBar(
@@ -44,13 +44,14 @@ fun AsamDetailScreen(
          onButtonClicked = { close() }
       )
 
-      AsamDetailContent(asam)
+      AsamDetailContent(asam, baseMap)
    }
 }
 
 @Composable
 private fun AsamDetailContent(
-   asam: Asam?
+   asam: Asam?,
+   baseMap: BaseMapType?
 ) {
    if (asam != null) {
       Column(
@@ -58,7 +59,7 @@ private fun AsamDetailContent(
             .padding(all = 8.dp)
             .verticalScroll(rememberScrollState())
       ) {
-         AsamHeader(asam)
+         AsamHeader(asam, baseMap)
          AsamDescription(asam.description)
          AsamInformation(asam)
       }
@@ -67,31 +68,16 @@ private fun AsamDetailContent(
 
 @Composable
 private fun AsamHeader(
-   asam: Asam
+   asam: Asam,
+   baseMap: BaseMapType?
 ) {
    Card(elevation = 4.dp) {
       Column {
-         val latLng = LatLng(asam.latitude, asam.longitude)
-         val cameraPositionState = rememberCameraPositionState {
-            position = CameraPosition.fromLatLngZoom(latLng, 16f)
-         }
-         val uiSettings = MapUiSettings(
-            zoomControlsEnabled = false,
-            zoomGesturesEnabled = false,
-            compassEnabled = false
+         MapClip(
+            latLng = LatLng(asam.latitude, asam.longitude),
+            icon = R.drawable.asam_map_marker_24dp,
+            baseMap = baseMap
          )
-         GoogleMap(
-            cameraPositionState = cameraPositionState,
-            uiSettings = uiSettings,
-            modifier = Modifier
-               .fillMaxWidth()
-               .height(200.dp)
-         ) {
-            Marker(
-               state = MarkerState(position = latLng),
-               icon = BitmapDescriptorFactory.fromResource(R.drawable.asam_map_marker_24dp)
-            )
-         }
 
          Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
             CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {

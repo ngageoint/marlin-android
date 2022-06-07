@@ -1,6 +1,10 @@
 package mil.nga.msi.ui.navigation
 
 sealed class Routes(val route: String) {
+   sealed class Map {
+      object Map: Routes("map")
+      object Settings: Routes("mapSettings")
+   }
    sealed class Pager {
       object Sheet: Routes("pagerSheet")
    }

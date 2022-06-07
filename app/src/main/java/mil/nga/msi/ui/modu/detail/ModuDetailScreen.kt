@@ -26,6 +26,8 @@ import mil.nga.msi.R
 import mil.nga.msi.TopBar
 import mil.nga.msi.coordinate.DMS
 import mil.nga.msi.datasource.modu.Modu
+import mil.nga.msi.ui.map.BaseMapType
+import mil.nga.msi.ui.map.MapClip
 import mil.nga.msi.ui.modu.ModuViewModel
 import java.text.SimpleDateFormat
 import java.util.*
@@ -37,6 +39,8 @@ fun ModuDetailScreen(
    viewModel: ModuViewModel = hiltViewModel()
 ) {
    val modu by viewModel.getModu(name).observeAsState()
+   val baseMap by viewModel.baseMap.observeAsState()
+
    Column {
       TopBar(
          title = "MODU",
@@ -44,13 +48,14 @@ fun ModuDetailScreen(
          onButtonClicked = { close() }
       )
 
-      ModuDetailContent(modu)
+      ModuDetailContent(modu, baseMap)
    }
 }
 
 @Composable
 private fun ModuDetailContent(
-   modu: Modu?
+   modu: Modu?,
+   baseMap: BaseMapType?
 ) {
    if (modu != null) {
       Column(
@@ -58,7 +63,7 @@ private fun ModuDetailContent(
             .padding(all = 8.dp)
             .verticalScroll(rememberScrollState())
       ) {
-         ModuHeader(modu)
+         ModuHeader(modu, baseMap)
          ModuInformation(modu)
       }
    }
@@ -66,34 +71,19 @@ private fun ModuDetailContent(
 
 @Composable
 private fun ModuHeader(
-   modu: Modu
+   modu: Modu,
+   baseMap: BaseMapType?
 ) {
    Card(
       elevation = 4.dp,
       modifier = Modifier.padding(bottom = 16.dp)
    ) {
       Column {
-         val latLng = LatLng(modu.latitude, modu.longitude)
-         val cameraPositionState = rememberCameraPositionState {
-            position = CameraPosition.fromLatLngZoom(latLng, 16f)
-         }
-         val uiSettings = MapUiSettings(
-            zoomControlsEnabled = false,
-            zoomGesturesEnabled = false,
-            compassEnabled = false
+         MapClip(
+            latLng = LatLng(modu.latitude, modu.longitude),
+            icon = R.drawable.modu_map_marker_24dp,
+            baseMap = baseMap
          )
-         GoogleMap(
-            cameraPositionState = cameraPositionState,
-            uiSettings = uiSettings,
-            modifier = Modifier
-               .fillMaxWidth()
-               .height(200.dp)
-         ) {
-            Marker(
-               state = MarkerState(position = latLng),
-               icon = BitmapDescriptorFactory.fromResource(R.drawable.modu_map_marker_24dp)
-            )
-         }
 
          Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
             CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
