@@ -20,10 +20,10 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.android.gms.maps.model.LatLng
 import mil.nga.msi.R
-import mil.nga.msi.TopBar
 import mil.nga.msi.coordinate.DMS
 import mil.nga.msi.datasource.asam.Asam
 import mil.nga.msi.ui.asam.AsamViewModel
+import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.BaseMapType
 import mil.nga.msi.ui.map.MapClip
 import java.text.SimpleDateFormat

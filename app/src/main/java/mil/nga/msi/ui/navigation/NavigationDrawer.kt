@@ -7,19 +7,14 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import mil.nga.msi.ui.asam.AsamRoute
+import mil.nga.msi.ui.map.MapRoute
+import mil.nga.msi.ui.modu.ModuRoute
 
-sealed class DrawerScreen(val title: String, val route: String) {
-   object Map : DrawerScreen("Map", "map")
-   object Asams : DrawerScreen("ASAMs", "asams")
-   object Modus : DrawerScreen("MODUs", "modus")
-   object Settings : DrawerScreen( "Settings", "settings")
-}
-
-private val screens = listOf(
-   DrawerScreen.Map,
-   DrawerScreen.Asams,
-   DrawerScreen.Modus,
-   DrawerScreen.Settings
+private val routes = listOf(
+   MapRoute.Map,
+   AsamRoute.List,
+   ModuRoute.List
 )
 
 @Composable
@@ -32,13 +27,13 @@ fun NavigationDrawer(
          .fillMaxSize()
          .padding(start = 24.dp, top = 48.dp)
    ) {
-      screens.forEach { screen ->
+      routes.forEach { route ->
          Spacer(Modifier.height(24.dp))
          Text(
-            text = screen.title,
+            text = route.title,
             style = MaterialTheme.typography.h4,
             modifier = Modifier.clickable {
-               onDestinationClicked(screen.route)
+               onDestinationClicked(route.name)
             }
          )
       }

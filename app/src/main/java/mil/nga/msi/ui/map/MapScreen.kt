@@ -27,7 +27,7 @@ import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.model.*
 import com.google.maps.android.ktx.awaitMap
 import mil.nga.msi.R
-import mil.nga.msi.TopBar
+import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.overlay.OsmTileProvider
 import kotlin.math.roundToInt
 

@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
-import mil.nga.msi.TopBar
+import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.BaseMapType
 
 @Composable

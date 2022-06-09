@@ -17,11 +17,12 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.PagingData
 import kotlinx.coroutines.flow.Flow
-import mil.nga.msi.TopBar
 import mil.nga.msi.ui.theme.MsiTheme
 import androidx.paging.compose.items
 import androidx.paging.compose.collectAsLazyPagingItems
 import mil.nga.msi.datasource.modu.ModuListItem
+import mil.nga.msi.ui.main.TopBar
+import mil.nga.msi.ui.modu.ModuRoute
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -33,7 +34,7 @@ fun ModusScreen(
 ) {
    Column(modifier = Modifier.fillMaxSize()) {
       TopBar(
-         title = "MODUs",
+         title = ModuRoute.List.title,
          buttonIcon = Icons.Filled.Menu,
          onButtonClicked = { openDrawer() }
       )
