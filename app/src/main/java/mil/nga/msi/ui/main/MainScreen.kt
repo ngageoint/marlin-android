@@ -1,6 +1,7 @@
 package mil.nga.msi.ui.main
 
 import androidx.compose.animation.*
+import androidx.compose.animation.core.AnimationConstants
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.padding
@@ -76,8 +77,8 @@ fun MainScreen() {
          bottomBar = {
             AnimatedVisibility(
                visible = bottomBarVisibility.value,
-               enter = fadeIn(animationSpec = tween(300, easing = FastOutSlowInEasing)),
-               exit = fadeOut(animationSpec = tween(300, easing = FastOutSlowInEasing)),
+               enter = fadeIn(animationSpec = tween()),
+               exit = fadeOut(animationSpec = tween()),
                content = {
                   BottomNavigation(
                      backgroundColor = MaterialTheme.colors.background
