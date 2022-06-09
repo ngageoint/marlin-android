@@ -1,6 +1,8 @@
 package mil.nga.msi.ui.map
 
 import android.net.Uri
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.navigation.*
 import androidx.navigation.compose.composable
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
@@ -26,9 +28,12 @@ sealed class MapRoute(
 @OptIn(ExperimentalMaterialNavigationApi::class)
 fun NavGraphBuilder.mapGraph(
    navController: NavController,
+   bottomBarVisibility: (Boolean) -> Unit,
    openNavigationDrawer: () -> Unit
 ) {
    composable(MapRoute.Map.name) {
+      bottomBarVisibility(true)
+
       MapScreen(
          onAnnotationClick = { annotation ->
             when (annotation.key.type) {
@@ -52,6 +57,8 @@ fun NavGraphBuilder.mapGraph(
    }
 
    composable(MapRoute.Settings.name) {
+      bottomBarVisibility(false)
+
       MapSettingsScreen(onClose = {
          navController.popBackStack()
       })

@@ -1,5 +1,7 @@
 package mil.nga.msi.ui.modu
 
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -24,6 +26,7 @@ sealed class ModuRoute(
 @OptIn(ExperimentalMaterialNavigationApi::class)
 fun NavGraphBuilder.moduGraph(
    navController: NavController,
+   bottomBarVisibility: (Boolean) -> Unit,
    openNavigationDrawer: () -> Unit
 ) {
    navigation(
@@ -31,6 +34,8 @@ fun NavGraphBuilder.moduGraph(
       startDestination = ModuRoute.List.name,
    ) {
       composable(ModuRoute.List.name) {
+         bottomBarVisibility(true)
+
          ModusScreen(
             openDrawer = { openNavigationDrawer() },
             onModuClick = { name ->
@@ -39,6 +44,8 @@ fun NavGraphBuilder.moduGraph(
          )
       }
       composable("${ModuRoute.Detail.name}?name={name}") { backstackEntry ->
+         bottomBarVisibility(false)
+
          backstackEntry.arguments?.getString("name")?.let { name ->
             ModuDetailScreen(name, close = {
                navController.popBackStack()

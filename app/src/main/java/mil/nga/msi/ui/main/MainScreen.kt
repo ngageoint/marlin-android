@@ -1,7 +1,13 @@
 package mil.nga.msi.ui.main
 
+import androidx.compose.animation.*
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -41,6 +47,7 @@ fun MainScreen() {
    val scaffoldState = rememberScaffoldState()
    val bottomSheetNavigator = rememberBottomSheetNavigator()
    val navController = rememberNavController(bottomSheetNavigator)
+   val bottomBarVisibility = rememberSaveable { (mutableStateOf(true)) }
 
    val openDrawer = {
       scope.launch { scaffoldState.drawerState.open() }
@@ -67,44 +74,64 @@ fun MainScreen() {
             )
          },
          bottomBar = {
-            BottomNavigation(
-               backgroundColor = MaterialTheme.colors.background
-            ) {
-               val navBackStackEntry by navController.currentBackStackEntryAsState()
-               val currentDestination = navBackStackEntry?.destination
-               tabs.forEach { tab ->
-                  BottomNavigationItem(
-                     icon = {
-                        Icon(
-                           imageVector = ImageVector.vectorResource(id = tab.icon),
-                           contentDescription = tab.route.title
-                        )
-                     },
-                     selectedContentColor = MaterialTheme.colors.primary,
-                     unselectedContentColor = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.disabled),
-                     label = { Text(tab.route.title) },
-                     selected = currentDestination?.hierarchy?.any { it.route == tab.route.name } == true,
-                     onClick = {
-                        navController.navigate(tab.route.name) {
-                           popUpTo(navController.graph.findStartDestination().id) {
-                              saveState = true
+            AnimatedVisibility(
+               visible = bottomBarVisibility.value,
+               enter = fadeIn(animationSpec = tween(300, easing = FastOutSlowInEasing)),
+               exit = fadeOut(animationSpec = tween(300, easing = FastOutSlowInEasing)),
+               content = {
+                  BottomNavigation(
+                     backgroundColor = MaterialTheme.colors.background
+                  ) {
+                     val navBackStackEntry by navController.currentBackStackEntryAsState()
+                     val currentDestination = navBackStackEntry?.destination
+                     tabs.forEach { tab ->
+                        BottomNavigationItem(
+                           icon = {
+                              Icon(
+                                 imageVector = ImageVector.vectorResource(id = tab.icon),
+                                 contentDescription = tab.route.title
+                              )
+                           },
+                           selectedContentColor = MaterialTheme.colors.primary,
+                           unselectedContentColor = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.disabled),
+                           label = { Text(tab.route.title) },
+                           selected = currentDestination?.hierarchy?.any { it.route == tab.route.name } == true,
+                           onClick = {
+                              navController.navigate(tab.route.name) {
+                                 popUpTo(navController.graph.findStartDestination().id) {
+                                    saveState = true
+                                 }
+                                 launchSingleTop = true
+                                 restoreState = true
+                              }
                            }
-                           launchSingleTop = true
-                           restoreState = true
-                        }
+                        )
                      }
-                  )
+                  }
                }
-            }
+            )
          }
-      ) {
+      ) { paddingValues ->
          NavHost(
             navController = navController,
-            startDestination = MapRoute.Map.name
+            startDestination = MapRoute.Map.name,
+            modifier = Modifier.padding(paddingValues)
          ) {
-            mapGraph(navController) { openDrawer() }
-            asamGraph(navController) { openDrawer() }
-            moduGraph(navController) { openDrawer() }
+            mapGraph(
+               navController = navController,
+               bottomBarVisibility = { bottomBarVisibility.value = it },
+               openNavigationDrawer = { openDrawer() }
+            )
+            asamGraph(
+               navController = navController,
+               bottomBarVisibility = { bottomBarVisibility.value = it },
+               openNavigationDrawer = { openDrawer() }
+            )
+            moduGraph(
+               navController = navController,
+               bottomBarVisibility = { bottomBarVisibility.value = it },
+               openNavigationDrawer = { openDrawer() }
+            )
          }
       }
    }

@@ -1,5 +1,7 @@
 package mil.nga.msi.ui.asam
 
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -24,6 +26,7 @@ sealed class AsamRoute(
 @OptIn(ExperimentalMaterialNavigationApi::class)
 fun NavGraphBuilder.asamGraph(
    navController: NavController,
+   bottomBarVisibility: (Boolean) -> Unit,
    openNavigationDrawer: () -> Unit
 ) {
    navigation(
@@ -31,6 +34,8 @@ fun NavGraphBuilder.asamGraph(
       startDestination = AsamRoute.List.name
    ) {
       composable(AsamRoute.List.name) {
+         bottomBarVisibility(true)
+
          AsamsScreen(
             openDrawer = { openNavigationDrawer() },
             onAsamClick = { reference ->
@@ -39,6 +44,8 @@ fun NavGraphBuilder.asamGraph(
          )
       }
       composable("${AsamRoute.Detail.name}?reference={reference}") { backstackEntry ->
+         bottomBarVisibility(false)
+
          backstackEntry.arguments?.getString("reference")?.let { reference ->
             AsamDetailScreen(reference, close = {
                navController.popBackStack()
