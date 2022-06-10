@@ -19,10 +19,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.android.gms.maps.model.LatLng
-import com.google.maps.android.compose.*
 import mil.nga.msi.R
 import mil.nga.msi.coordinate.DMS
 import mil.nga.msi.datasource.modu.Modu
+import mil.nga.msi.ui.location.LocationTextButton
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.BaseMapType
 import mil.nga.msi.ui.map.MapClip
@@ -34,6 +34,7 @@ import java.util.*
 fun ModuDetailScreen(
    name: String,
    close: () -> Unit,
+   onCopyLocation: (String) -> Unit,
    viewModel: ModuViewModel = hiltViewModel()
 ) {
    val modu by viewModel.getModu(name).observeAsState()
@@ -46,14 +47,15 @@ fun ModuDetailScreen(
          onButtonClicked = { close() }
       )
 
-      ModuDetailContent(modu, baseMap)
+      ModuDetailContent(modu, baseMap, onCopyLocation)
    }
 }
 
 @Composable
 private fun ModuDetailContent(
    modu: Modu?,
-   baseMap: BaseMapType?
+   baseMap: BaseMapType?,
+   onCopyLocation: (String) -> Unit,
 ) {
    if (modu != null) {
       Column(
@@ -61,7 +63,7 @@ private fun ModuDetailContent(
             .padding(all = 8.dp)
             .verticalScroll(rememberScrollState())
       ) {
-         ModuHeader(modu, baseMap)
+         ModuHeader(modu, baseMap, onCopyLocation)
          ModuInformation(modu)
       }
    }
@@ -70,7 +72,8 @@ private fun ModuDetailContent(
 @Composable
 private fun ModuHeader(
    modu: Modu,
-   baseMap: BaseMapType?
+   baseMap: BaseMapType?,
+   onCopyLocation: (String) -> Unit,
 ) {
    Card(
       elevation = 4.dp,
@@ -105,29 +108,36 @@ private fun ModuHeader(
                modifier = Modifier.padding(top = 16.dp)
             )
 
-            ModuFooter(modu)
+            ModuFooter(modu, onCopyLocation)
          }
       }
    }
 }
 
 @Composable
-private fun ModuFooter(modu: Modu) {
+private fun ModuFooter(
+   modu: Modu,
+   onCopyLocation: (String) -> Unit,
+) {
    Row(
       verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.SpaceBetween,
       modifier = Modifier.fillMaxWidth()
    ) {
-      ModuLocation(modu.dms)
+      ModuLocation(modu.dms, onCopyLocation)
       ModuActions()
    }
 }
 
 @Composable
-private fun ModuLocation(dms: DMS) {
-   TextButton(onClick = { /*TODO*/ }) {
-      Text(text = dms.format())
-   }
+private fun ModuLocation(
+   dms: DMS,
+   onCopyLocation: (String) -> Unit,
+) {
+   LocationTextButton(
+      dms = dms,
+      onCopiedToClipboard = { onCopyLocation(it) }
+   )
 }
 
 @Composable
@@ -169,7 +179,6 @@ private fun ModuInformation(
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
       ) {
-         val dateFormat = SimpleDateFormat("yyyy-mm-dd", Locale.getDefault())
          ModuProperty(title = "Rig Status", value = modu.rigStatus.toString())
          ModuProperty(title = "Special Status", value = modu.specialStatus)
          ModuProperty(title = "Distance", value = modu.distance?.toString())

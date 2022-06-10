@@ -1,7 +1,5 @@
 package mil.nga.msi.ui.modu
 
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -27,7 +25,8 @@ sealed class ModuRoute(
 fun NavGraphBuilder.moduGraph(
    navController: NavController,
    bottomBarVisibility: (Boolean) -> Unit,
-   openNavigationDrawer: () -> Unit
+   openNavigationDrawer: () -> Unit,
+   showSnackbar: (String) -> Unit
 ) {
    navigation(
       route = ModuRoute.Main.name,
@@ -40,6 +39,9 @@ fun NavGraphBuilder.moduGraph(
             openDrawer = { openNavigationDrawer() },
             onModuClick = { name ->
                navController.navigate( "${ModuRoute.Detail.name}?name=$name")
+            },
+            onCopyLocation = { location ->
+               showSnackbar("$location copied to clipboard")
             }
          )
       }
@@ -47,9 +49,15 @@ fun NavGraphBuilder.moduGraph(
          bottomBarVisibility(false)
 
          backstackEntry.arguments?.getString("name")?.let { name ->
-            ModuDetailScreen(name, close = {
-               navController.popBackStack()
-            })
+            ModuDetailScreen(
+               name,
+               close = {
+                  navController.popBackStack()
+               },
+               onCopyLocation = { location ->
+                  showSnackbar("$location copied to clipboard")
+               }
+            )
          }
       }
       bottomSheet("${ModuRoute.Sheet.name}?name={name}") { backstackEntry ->

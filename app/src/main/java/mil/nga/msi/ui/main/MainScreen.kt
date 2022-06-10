@@ -1,8 +1,6 @@
 package mil.nga.msi.ui.main
 
 import androidx.compose.animation.*
-import androidx.compose.animation.core.AnimationConstants
-import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
@@ -52,6 +50,12 @@ fun MainScreen() {
 
    val openDrawer = {
       scope.launch { scaffoldState.drawerState.open() }
+   }
+
+   val showSnackbar: (String) -> Unit = { message ->
+      scope.launch {
+         scaffoldState.snackbarHostState.showSnackbar(message)
+      }
    }
 
    ModalBottomSheetLayout(bottomSheetNavigator) {
@@ -126,12 +130,14 @@ fun MainScreen() {
             asamGraph(
                navController = navController,
                bottomBarVisibility = { bottomBarVisibility.value = it },
-               openNavigationDrawer = { openDrawer() }
+               openNavigationDrawer = { openDrawer() },
+               showSnackbar = { showSnackbar(it) }
             )
             moduGraph(
                navController = navController,
                bottomBarVisibility = { bottomBarVisibility.value = it },
-               openNavigationDrawer = { openDrawer() }
+               openNavigationDrawer = { openDrawer() },
+               showSnackbar = { showSnackbar(it) }
             )
          }
       }

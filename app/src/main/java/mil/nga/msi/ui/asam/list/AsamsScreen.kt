@@ -20,8 +20,10 @@ import kotlinx.coroutines.flow.Flow
 import mil.nga.msi.ui.theme.MsiTheme
 import androidx.paging.compose.items
 import androidx.paging.compose.collectAsLazyPagingItems
+import mil.nga.msi.coordinate.DMS
 import mil.nga.msi.datasource.asam.AsamListItem
 import mil.nga.msi.ui.asam.AsamRoute
+import mil.nga.msi.ui.location.LocationTextButton
 import mil.nga.msi.ui.main.TopBar
 import java.text.SimpleDateFormat
 import java.util.*
@@ -30,6 +32,7 @@ import java.util.*
 fun AsamsScreen(
    openDrawer: () -> Unit,
    onAsamClick: (String) -> Unit,
+   onCopyLocation: (String) -> Unit,
    viewModel: AsamsViewModel = hiltViewModel()
 ) {
    Column(modifier = Modifier.fillMaxSize()) {
@@ -39,14 +42,15 @@ fun AsamsScreen(
          onButtonClicked = { openDrawer() }
       )
 
-      Asams(viewModel.asams, onAsamClick)
+      Asams(viewModel.asams, onAsamClick, onCopyLocation)
    }
 }
 
 @Composable
 private fun Asams(
    pagingState: Flow<PagingData<AsamListItem>>,
-   onAsamClick: (String) -> Unit
+   onAsamClick: (String) -> Unit,
+   onCopyLocation: (String) -> Unit
 ) {
    val lazyItems = pagingState.collectAsLazyPagingItems()
    MsiTheme {
@@ -59,7 +63,7 @@ private fun Asams(
             contentPadding = PaddingValues(top = 16.dp)
          ) {
             items(lazyItems) { item ->
-               AsamCard(item, onAsamClick)
+               AsamCard(item, onAsamClick, onCopyLocation)
             }
          }
       }
@@ -69,7 +73,8 @@ private fun Asams(
 @Composable
 private fun AsamCard(
    item: AsamListItem?,
-   onAsamClick: (String) -> Unit
+   onAsamClick: (String) -> Unit,
+   onCopyLocation: (String) -> Unit
 ) {
    if (item != null) {
       Card(
@@ -78,13 +83,16 @@ private fun AsamCard(
             .padding(bottom = 8.dp)
             .clickable { onAsamClick(item.id) }
       ) {
-         AsamContent(item)
+         AsamContent(item, onCopyLocation)
       }
    }
 }
 
 @Composable
-private fun AsamContent(item: AsamListItem) {
+private fun AsamContent(
+   item: AsamListItem,
+   onCopyLocation: (String) -> Unit
+) {
    Column(Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
       CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
          item.date.let { date ->
@@ -118,12 +126,15 @@ private fun AsamContent(item: AsamListItem) {
          }
       }
       
-      AsamFooter(item)
+      AsamFooter(item, onCopyLocation)
    }
 }
 
 @Composable
-private fun AsamFooter(item: AsamListItem) {
+private fun AsamFooter(
+   item: AsamListItem,
+   onCopyLocation: (String) -> Unit
+) {
    Row(
       verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.SpaceBetween,
@@ -131,16 +142,20 @@ private fun AsamFooter(item: AsamListItem) {
          .fillMaxWidth()
          .padding(top = 8.dp)
    ) {
-      AsamLocation(item)
+      AsamLocation(item.dms, onCopyLocation)
       AsamActions()
    }
 }
 
 @Composable
-private fun AsamLocation(asam: AsamListItem) {
-   TextButton(onClick = { /*TODO*/ }) {
-      Text(text = asam.dms.format())
-   }
+private fun AsamLocation(
+   dms: DMS,
+   onCopyLocation: (String) -> Unit
+) {
+   LocationTextButton(
+      dms = dms,
+      onCopiedToClipboard = { onCopyLocation(it) }
+   )
 }
 
 @Composable

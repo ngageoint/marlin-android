@@ -1,7 +1,5 @@
 package mil.nga.msi.ui.asam
 
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -27,7 +25,8 @@ sealed class AsamRoute(
 fun NavGraphBuilder.asamGraph(
    navController: NavController,
    bottomBarVisibility: (Boolean) -> Unit,
-   openNavigationDrawer: () -> Unit
+   openNavigationDrawer: () -> Unit,
+   showSnackbar: (String) -> Unit
 ) {
    navigation(
       route = AsamRoute.Main.name,
@@ -40,6 +39,9 @@ fun NavGraphBuilder.asamGraph(
             openDrawer = { openNavigationDrawer() },
             onAsamClick = { reference ->
                navController.navigate("${AsamRoute.Detail.name}?reference=$reference")
+            },
+            onCopyLocation = { location ->
+               showSnackbar("$location copied to clipboard")
             }
          )
       }
@@ -47,9 +49,15 @@ fun NavGraphBuilder.asamGraph(
          bottomBarVisibility(false)
 
          backstackEntry.arguments?.getString("reference")?.let { reference ->
-            AsamDetailScreen(reference, close = {
-               navController.popBackStack()
-            })
+            AsamDetailScreen(
+               reference,
+               close = {
+                  navController.popBackStack()
+               },
+               onCopyLocation = { location ->
+                  showSnackbar("$location copied to clipboard")
+               }
+            )
          }
       }
       bottomSheet("${AsamRoute.Sheet.name}?reference={reference}") { backstackEntry ->

@@ -23,6 +23,7 @@ import mil.nga.msi.R
 import mil.nga.msi.coordinate.DMS
 import mil.nga.msi.datasource.asam.Asam
 import mil.nga.msi.ui.asam.AsamViewModel
+import mil.nga.msi.ui.location.LocationTextButton
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.BaseMapType
 import mil.nga.msi.ui.map.MapClip
@@ -33,6 +34,7 @@ import java.util.*
 fun AsamDetailScreen(
    reference: String,
    close: () -> Unit,
+   onCopyLocation: (String) -> Unit,
    viewModel: AsamViewModel = hiltViewModel()
 ) {
    val baseMap by viewModel.baseMap.observeAsState()
@@ -44,14 +46,15 @@ fun AsamDetailScreen(
          onButtonClicked = { close() }
       )
 
-      AsamDetailContent(asam, baseMap)
+      AsamDetailContent(asam, baseMap, onCopyLocation)
    }
 }
 
 @Composable
 private fun AsamDetailContent(
    asam: Asam?,
-   baseMap: BaseMapType?
+   baseMap: BaseMapType?,
+   onCopyLocation: (String) -> Unit
 ) {
    if (asam != null) {
       Column(
@@ -59,7 +62,7 @@ private fun AsamDetailContent(
             .padding(all = 8.dp)
             .verticalScroll(rememberScrollState())
       ) {
-         AsamHeader(asam, baseMap)
+         AsamHeader(asam, baseMap, onCopyLocation)
          AsamDescription(asam.description)
          AsamInformation(asam)
       }
@@ -69,7 +72,8 @@ private fun AsamDetailContent(
 @Composable
 private fun AsamHeader(
    asam: Asam,
-   baseMap: BaseMapType?
+   baseMap: BaseMapType?,
+   onCopyLocation: (String) -> Unit
 ) {
    Card(elevation = 4.dp) {
       Column {
@@ -102,20 +106,23 @@ private fun AsamHeader(
                modifier = Modifier.padding(top = 16.dp)
             )
 
-            AsamFooter(asam)
+            AsamFooter(asam, onCopyLocation)
          }
       }
    }
 }
 
 @Composable
-private fun AsamFooter(asam: Asam) {
+private fun AsamFooter(
+   asam: Asam,
+   onCopyLocation: (String) -> Unit
+) {
    Row(
       verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.SpaceBetween,
       modifier = Modifier.fillMaxWidth()
    ) {
-      AsamLocation(asam.dms)
+      AsamLocation(asam.dms, onCopyLocation)
       AsamActions()
    }
 }
@@ -138,10 +145,14 @@ private fun AsamActions() {
 }
 
 @Composable
-private fun AsamLocation(dms: DMS) {
-   TextButton(onClick = { /*TODO*/ }) {
-      Text(text = dms.format())
-   }
+private fun AsamLocation(
+   dms: DMS,
+   onCopyLocation: (String) -> Unit
+) {
+   LocationTextButton(
+      dms = dms,
+      onCopiedToClipboard = { onCopyLocation(it) }
+   )
 }
 
 @Composable

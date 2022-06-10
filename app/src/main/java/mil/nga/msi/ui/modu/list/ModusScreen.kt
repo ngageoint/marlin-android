@@ -20,7 +20,9 @@ import kotlinx.coroutines.flow.Flow
 import mil.nga.msi.ui.theme.MsiTheme
 import androidx.paging.compose.items
 import androidx.paging.compose.collectAsLazyPagingItems
+import mil.nga.msi.coordinate.DMS
 import mil.nga.msi.datasource.modu.ModuListItem
+import mil.nga.msi.ui.location.LocationTextButton
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.modu.ModuRoute
 import java.text.SimpleDateFormat
@@ -30,6 +32,7 @@ import java.util.*
 fun ModusScreen(
    openDrawer: () -> Unit,
    onModuClick: (String) -> Unit,
+   onCopyLocation: (String) -> Unit,
    viewModel: ModusViewModel = hiltViewModel()
 ) {
    Column(modifier = Modifier.fillMaxSize()) {
@@ -38,14 +41,15 @@ fun ModusScreen(
          buttonIcon = Icons.Filled.Menu,
          onButtonClicked = { openDrawer() }
       )
-      Modus(viewModel.modus, onModuClick)
+      Modus(viewModel.modus, onModuClick, onCopyLocation)
    }
 }
 
 @Composable
 private fun Modus(
    pagingState: Flow<PagingData<ModuListItem>>,
-   onModuClick: (String) -> Unit
+   onModuClick: (String) -> Unit,
+   onCopyLocation: (String) -> Unit
 ) {
    val lazyItems = pagingState.collectAsLazyPagingItems()
    MsiTheme {
@@ -58,7 +62,7 @@ private fun Modus(
             contentPadding = PaddingValues(top = 16.dp)
          ) {
             items(lazyItems) { item ->
-               ModuCard(item, onModuClick)
+               ModuCard(item, onModuClick, onCopyLocation)
             }
          }
       }
@@ -68,7 +72,8 @@ private fun Modus(
 @Composable
 private fun ModuCard(
    item: ModuListItem?,
-   onModuClick: (String) -> Unit
+   onModuClick: (String) -> Unit,
+   onCopyLocation: (String) -> Unit
 ) {
    if (item != null) {
       Card(
@@ -77,13 +82,16 @@ private fun ModuCard(
             .padding(bottom = 8.dp)
             .clickable { onModuClick(item.name) }
       ) {
-         ModuContent(item)
+         ModuContent(item, onCopyLocation)
       }
    }
 }
 
 @Composable
-private fun ModuContent(item: ModuListItem) {
+private fun ModuContent(
+   item: ModuListItem,
+   onCopyLocation: (String) -> Unit
+) {
    Column(Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
       CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
          item.date.let { date ->
@@ -123,12 +131,15 @@ private fun ModuContent(item: ModuListItem) {
          }
       }
       
-      ModuFooter(item)
+      ModuFooter(item, onCopyLocation)
    }
 }
 
 @Composable
-private fun ModuFooter(item: ModuListItem) {
+private fun ModuFooter(
+   item: ModuListItem,
+   onCopyLocation: (String) -> Unit
+) {
    Row(
       verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.SpaceBetween,
@@ -136,17 +147,21 @@ private fun ModuFooter(item: ModuListItem) {
          .fillMaxWidth()
          .padding(top = 8.dp)
    ) {
-      ModuLocation(item)
+      ModuLocation(item.dms, onCopyLocation)
       ModuActions()
    }
 }
 
 
 @Composable
-private fun ModuLocation(item: ModuListItem) {
-   TextButton(onClick = { /*TODO*/ }) {
-      Text(text = item.dms.format())
-   }
+private fun ModuLocation(
+   dms: DMS,
+   onCopyLocation: (String) -> Unit
+) {
+   LocationTextButton(
+      dms = dms,
+      onCopiedToClipboard = { onCopyLocation(it) }
+   )
 }
 
 @Composable
