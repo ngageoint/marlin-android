@@ -26,8 +26,13 @@ fun NavGraphBuilder.asamGraph(
    navController: NavController,
    bottomBarVisibility: (Boolean) -> Unit,
    openNavigationDrawer: () -> Unit,
+   share: (Pair<String, String>) -> Unit,
    showSnackbar: (String) -> Unit
 ) {
+   val shareAsam: (String) -> Unit = {
+      share(Pair("Share ASAM Information", it))
+   }
+
    navigation(
       route = AsamRoute.Main.name,
       startDestination = AsamRoute.List.name
@@ -40,6 +45,7 @@ fun NavGraphBuilder.asamGraph(
             onAsamClick = { reference ->
                navController.navigate("${AsamRoute.Detail.name}?reference=$reference")
             },
+            onShare = { shareAsam(it) },
             onCopyLocation = { location ->
                showSnackbar("$location copied to clipboard")
             }
@@ -51,9 +57,8 @@ fun NavGraphBuilder.asamGraph(
          backstackEntry.arguments?.getString("reference")?.let { reference ->
             AsamDetailScreen(
                reference,
-               close = {
-                  navController.popBackStack()
-               },
+               close = { navController.popBackStack() },
+               onShare = { shareAsam(it) },
                onCopyLocation = { location ->
                   showSnackbar("$location copied to clipboard")
                }

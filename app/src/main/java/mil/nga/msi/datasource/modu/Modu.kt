@@ -5,6 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.google.android.gms.maps.model.LatLng
 import mil.nga.msi.coordinate.DMS
+import java.text.SimpleDateFormat
 import java.util.*
 
 enum class RigStatus { ACTIVE, INACTIVE }
@@ -47,4 +48,20 @@ data class Modu(
 
    @Transient
    val dms = DMS.from(LatLng(latitude, longitude))
+
+   override fun toString(): String {
+      val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+      return "MODU\n\n" +
+              "Name: $name\n" +
+              "Date: ${dateFormat.format(date)}\n" +
+              "Latitude: $latitude\n" +
+              "Longitude: $longitude\n" +
+              "Position: $position\n" +
+              "Rig Status: $rigStatus\n" +
+              "Special Status: $specialStatus\n" +
+              "distance: $distance\n" +
+              "Navigation Area: $navigationArea\n" +
+              "Region: $region\n" +
+              "Sub Region: $subregion\n"
+   }
 }

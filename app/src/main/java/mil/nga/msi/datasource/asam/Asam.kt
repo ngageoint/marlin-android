@@ -5,6 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.google.android.gms.maps.model.LatLng
 import mil.nga.msi.coordinate.DMS
+import java.text.SimpleDateFormat
 import java.util.*
 
 @Entity(tableName = "asams")
@@ -42,4 +43,18 @@ data class Asam(
 
    @Transient
    val dms = DMS.from(LatLng(latitude, longitude))
+
+   override fun toString(): String {
+      val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+      return "ASAM\n\n" +
+              "Reference: $reference\n" +
+              "Date: ${dateFormat.format(date)}\n" +
+              "Latitude: $latitude\n" +
+              "Longitude: $longitude\n" +
+              "Navigate Area: $navigationArea\n" +
+              "Subregion: $subregion\n" +
+              "Description: $description\n" +
+              "Hostility: $hostility\n" +
+              "Victim: $victim\n"
+   }
 }

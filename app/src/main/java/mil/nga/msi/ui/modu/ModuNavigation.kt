@@ -26,8 +26,13 @@ fun NavGraphBuilder.moduGraph(
    navController: NavController,
    bottomBarVisibility: (Boolean) -> Unit,
    openNavigationDrawer: () -> Unit,
+   share: (Pair<String, String>) -> Unit,
    showSnackbar: (String) -> Unit
 ) {
+   val shareModu: (String) -> Unit = {
+      share(Pair("Share MODU Information", it))
+   }
+
    navigation(
       route = ModuRoute.Main.name,
       startDestination = ModuRoute.List.name,
@@ -40,6 +45,7 @@ fun NavGraphBuilder.moduGraph(
             onModuClick = { name ->
                navController.navigate( "${ModuRoute.Detail.name}?name=$name")
             },
+            onShare = { shareModu(it) },
             onCopyLocation = { location ->
                showSnackbar("$location copied to clipboard")
             }
@@ -51,9 +57,8 @@ fun NavGraphBuilder.moduGraph(
          backstackEntry.arguments?.getString("name")?.let { name ->
             ModuDetailScreen(
                name,
-               close = {
-                  navController.popBackStack()
-               },
+               close = { navController.popBackStack() },
+               onShare = { shareModu(it) },
                onCopyLocation = { location ->
                   showSnackbar("$location copied to clipboard")
                }

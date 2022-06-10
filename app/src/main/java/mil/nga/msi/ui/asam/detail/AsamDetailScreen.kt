@@ -34,6 +34,7 @@ import java.util.*
 fun AsamDetailScreen(
    reference: String,
    close: () -> Unit,
+   onShare: (String) -> Unit,
    onCopyLocation: (String) -> Unit,
    viewModel: AsamViewModel = hiltViewModel()
 ) {
@@ -46,7 +47,12 @@ fun AsamDetailScreen(
          onButtonClicked = { close() }
       )
 
-      AsamDetailContent(asam, baseMap, onCopyLocation)
+      AsamDetailContent(
+         asam = asam,
+         baseMap = baseMap,
+         onShare = { onShare(asam.toString()) },
+         onCopyLocation = onCopyLocation
+      )
    }
 }
 
@@ -54,6 +60,7 @@ fun AsamDetailScreen(
 private fun AsamDetailContent(
    asam: Asam?,
    baseMap: BaseMapType?,
+   onShare: () -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
    if (asam != null) {
@@ -62,7 +69,7 @@ private fun AsamDetailContent(
             .padding(all = 8.dp)
             .verticalScroll(rememberScrollState())
       ) {
-         AsamHeader(asam, baseMap, onCopyLocation)
+         AsamHeader(asam, baseMap, onShare, onCopyLocation)
          AsamDescription(asam.description)
          AsamInformation(asam)
       }
@@ -73,6 +80,7 @@ private fun AsamDetailContent(
 private fun AsamHeader(
    asam: Asam,
    baseMap: BaseMapType?,
+   onShare: () -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
    Card(elevation = 4.dp) {
@@ -106,7 +114,7 @@ private fun AsamHeader(
                modifier = Modifier.padding(top = 16.dp)
             )
 
-            AsamFooter(asam, onCopyLocation)
+            AsamFooter(asam, onShare, onCopyLocation)
          }
       }
    }
@@ -115,6 +123,7 @@ private fun AsamHeader(
 @Composable
 private fun AsamFooter(
    asam: Asam,
+   onShare: () -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
    Row(
@@ -123,13 +132,27 @@ private fun AsamFooter(
       modifier = Modifier.fillMaxWidth()
    ) {
       AsamLocation(asam.dms, onCopyLocation)
-      AsamActions()
+      AsamActions(onShare)
    }
 }
+
 @Composable
-private fun AsamActions() {
+private fun AsamLocation(
+   dms: DMS,
+   onCopyLocation: (String) -> Unit
+) {
+   LocationTextButton(
+      dms = dms,
+      onCopiedToClipboard = { onCopyLocation(it) }
+   )
+}
+
+@Composable
+private fun AsamActions(
+   onShare: () -> Unit
+) {
    Row {
-      IconButton(onClick = {  }) {
+      IconButton(onClick = { onShare() }) {
          Icon(Icons.Default.Share,
             tint = MaterialTheme.colors.primary,
             contentDescription = "Share ASAM"
@@ -144,16 +167,6 @@ private fun AsamActions() {
    }
 }
 
-@Composable
-private fun AsamLocation(
-   dms: DMS,
-   onCopyLocation: (String) -> Unit
-) {
-   LocationTextButton(
-      dms = dms,
-      onCopiedToClipboard = { onCopyLocation(it) }
-   )
-}
 
 @Composable
 private fun AsamDescription(
@@ -206,7 +219,6 @@ private fun AsamInformation(
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
       ) {
-         val dateFormat = SimpleDateFormat("yyyy-mm-dd", Locale.getDefault())
          AsamProperty(title = "Reference Number", value = asam.reference)
          AsamProperty(title = "Position", value = asam.position)
          AsamProperty(title = "Navigation Area", value = asam.navigationArea)

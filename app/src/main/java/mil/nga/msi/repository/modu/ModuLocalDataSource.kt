@@ -12,7 +12,8 @@ class ModuLocalDataSource @Inject constructor(
    fun observeModuMapItems() = dao.observeModuMapItems()
    fun observeModuListItems() = dao.getModuListItems()
 
-   suspend fun getModus(): List<Modu> = dao.getModus()
+   suspend fun getModu(name: String) = dao.getModu(name)
+   suspend fun getModus() = dao.getModus()
    suspend fun getLatestModu() = dao.getLatestModu()
 
    suspend fun insert(modus: List<Modu>) = dao.insert(modus)

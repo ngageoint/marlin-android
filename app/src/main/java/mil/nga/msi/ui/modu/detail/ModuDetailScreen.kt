@@ -34,6 +34,7 @@ import java.util.*
 fun ModuDetailScreen(
    name: String,
    close: () -> Unit,
+   onShare: (String) -> Unit,
    onCopyLocation: (String) -> Unit,
    viewModel: ModuViewModel = hiltViewModel()
 ) {
@@ -47,7 +48,12 @@ fun ModuDetailScreen(
          onButtonClicked = { close() }
       )
 
-      ModuDetailContent(modu, baseMap, onCopyLocation)
+      ModuDetailContent(
+         modu = modu,
+         baseMap = baseMap,
+         onShare = { onShare(modu.toString()) },
+         onCopyLocation = onCopyLocation
+      )
    }
 }
 
@@ -55,6 +61,7 @@ fun ModuDetailScreen(
 private fun ModuDetailContent(
    modu: Modu?,
    baseMap: BaseMapType?,
+   onShare: () -> Unit,
    onCopyLocation: (String) -> Unit,
 ) {
    if (modu != null) {
@@ -63,7 +70,7 @@ private fun ModuDetailContent(
             .padding(all = 8.dp)
             .verticalScroll(rememberScrollState())
       ) {
-         ModuHeader(modu, baseMap, onCopyLocation)
+         ModuHeader(modu, baseMap, onShare, onCopyLocation)
          ModuInformation(modu)
       }
    }
@@ -73,6 +80,7 @@ private fun ModuDetailContent(
 private fun ModuHeader(
    modu: Modu,
    baseMap: BaseMapType?,
+   onShare: () -> Unit,
    onCopyLocation: (String) -> Unit,
 ) {
    Card(
@@ -108,7 +116,7 @@ private fun ModuHeader(
                modifier = Modifier.padding(top = 16.dp)
             )
 
-            ModuFooter(modu, onCopyLocation)
+            ModuFooter(modu, onShare, onCopyLocation)
          }
       }
    }
@@ -117,6 +125,7 @@ private fun ModuHeader(
 @Composable
 private fun ModuFooter(
    modu: Modu,
+   onShare: () -> Unit,
    onCopyLocation: (String) -> Unit,
 ) {
    Row(
@@ -125,7 +134,7 @@ private fun ModuFooter(
       modifier = Modifier.fillMaxWidth()
    ) {
       ModuLocation(modu.dms, onCopyLocation)
-      ModuActions()
+      ModuActions(onShare)
    }
 }
 
@@ -141,9 +150,11 @@ private fun ModuLocation(
 }
 
 @Composable
-private fun ModuActions() {
+private fun ModuActions(
+   onShare: () -> Unit
+) {
    Row {
-      IconButton(onClick = {  }) {
+      IconButton(onClick = { onShare() }) {
          Icon(Icons.Default.Share,
             tint = MaterialTheme.colors.primary,
             contentDescription = "Share ASAM"

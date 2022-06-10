@@ -16,6 +16,7 @@ class ModuRepository @Inject constructor(
    val moduListItems = localDataSource.observeModuListItems()
 
    fun observeModu(name: String) = localDataSource.observeModu(name)
+   suspend fun getModu(name: String) = localDataSource.getModu(name)
 
    suspend fun fetchModus(refresh: Boolean = false): List<Modu> {
       if (refresh) {

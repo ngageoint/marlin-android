@@ -6,7 +6,7 @@ import mil.nga.msi.coordinate.DMS
 import java.util.*
 
 data class AsamListItem(
-   @ColumnInfo(name = "reference") val id: String,
+   @ColumnInfo(name = "reference") val reference: String,
    @ColumnInfo(name = "date") val date: Date,
    @ColumnInfo(name = "latitude") val latitude: Double,
    @ColumnInfo(name = "longitude") val longitude: Double,

@@ -8,6 +8,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -20,6 +21,7 @@ import kotlinx.coroutines.flow.Flow
 import mil.nga.msi.ui.theme.MsiTheme
 import androidx.paging.compose.items
 import androidx.paging.compose.collectAsLazyPagingItems
+import kotlinx.coroutines.launch
 import mil.nga.msi.coordinate.DMS
 import mil.nga.msi.datasource.asam.AsamListItem
 import mil.nga.msi.ui.asam.AsamRoute
@@ -32,9 +34,12 @@ import java.util.*
 fun AsamsScreen(
    openDrawer: () -> Unit,
    onAsamClick: (String) -> Unit,
+   onShare: (String) -> Unit,
    onCopyLocation: (String) -> Unit,
    viewModel: AsamsViewModel = hiltViewModel()
 ) {
+   val scope = rememberCoroutineScope()
+
    Column(modifier = Modifier.fillMaxSize()) {
       TopBar(
          title = AsamRoute.List.title,
@@ -42,7 +47,18 @@ fun AsamsScreen(
          onButtonClicked = { openDrawer() }
       )
 
-      Asams(viewModel.asams, onAsamClick, onCopyLocation)
+      Asams(
+         pagingState = viewModel.asams,
+         onAsamClick = onAsamClick,
+         onCopyLocation = onCopyLocation,
+         onShare = { reference ->
+            scope.launch {
+               viewModel.getAsam(reference)?.let { asam ->
+                  onShare(asam.toString())
+               }
+            }
+         }
+      )
    }
 }
 
@@ -50,6 +66,7 @@ fun AsamsScreen(
 private fun Asams(
    pagingState: Flow<PagingData<AsamListItem>>,
    onAsamClick: (String) -> Unit,
+   onShare: (String) -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
    val lazyItems = pagingState.collectAsLazyPagingItems()
@@ -63,7 +80,14 @@ private fun Asams(
             contentPadding = PaddingValues(top = 16.dp)
          ) {
             items(lazyItems) { item ->
-               AsamCard(item, onAsamClick, onCopyLocation)
+               AsamCard(
+                  item = item,
+                  onAsamClick = onAsamClick,
+                  onCopyLocation = onCopyLocation,
+                  onShare = {
+                     item?.reference?.let { onShare(it) }
+                  }
+               )
             }
          }
       }
@@ -74,6 +98,7 @@ private fun Asams(
 private fun AsamCard(
    item: AsamListItem?,
    onAsamClick: (String) -> Unit,
+   onShare: () -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
    if (item != null) {
@@ -81,9 +106,9 @@ private fun AsamCard(
          Modifier
             .fillMaxWidth()
             .padding(bottom = 8.dp)
-            .clickable { onAsamClick(item.id) }
+            .clickable { onAsamClick(item.reference) }
       ) {
-         AsamContent(item, onCopyLocation)
+         AsamContent(item, onShare, onCopyLocation)
       }
    }
 }
@@ -91,6 +116,7 @@ private fun AsamCard(
 @Composable
 private fun AsamContent(
    item: AsamListItem,
+   onShare: () -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
    Column(Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
@@ -126,13 +152,18 @@ private fun AsamContent(
          }
       }
       
-      AsamFooter(item, onCopyLocation)
+      AsamFooter(
+         item = item,
+         onShare = onShare,
+         onCopyLocation = onCopyLocation
+      )
    }
 }
 
 @Composable
 private fun AsamFooter(
    item: AsamListItem,
+   onShare: () -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
    Row(
@@ -143,7 +174,7 @@ private fun AsamFooter(
          .padding(top = 8.dp)
    ) {
       AsamLocation(item.dms, onCopyLocation)
-      AsamActions()
+      AsamActions(onShare)
    }
 }
 
@@ -159,9 +190,13 @@ private fun AsamLocation(
 }
 
 @Composable
-private fun AsamActions() {
+private fun AsamActions(
+   onShare: () -> Unit
+) {
    Row {
-      IconButton(onClick = {  }) {
+      IconButton(
+         onClick = { onShare() }
+      ) {
          Icon(Icons.Default.Share,
             tint = MaterialTheme.colors.primary,
             contentDescription = "Share ASAM"

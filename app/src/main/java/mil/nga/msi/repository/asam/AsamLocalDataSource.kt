@@ -12,6 +12,7 @@ class AsamLocalDataSource @Inject constructor(
    fun observeAsamMapItems() = dao.observeAsamMapItems()
    fun observeAsamListItems() = dao.getAsamListItems()
 
+   suspend fun getAsam(reference: String) = dao.getAsam(reference)
    suspend fun getAsams(): List<Asam> = dao.getAsams()
    suspend fun getLatestAsam() = dao.getLatestAsam()
 

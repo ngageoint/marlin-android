@@ -16,6 +16,7 @@ class AsamRepository @Inject constructor(
    val asamListItems = localDataSource.observeAsamListItems()
 
    fun observeAsam(reference: String) = localDataSource.observeAsam(reference)
+   suspend fun getAsam(reference: String) = localDataSource.getAsam(reference)
 
    suspend fun fetchAsams(refresh: Boolean = false): List<Asam> {
       if (refresh) {

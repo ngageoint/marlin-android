@@ -8,6 +8,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -20,6 +21,7 @@ import kotlinx.coroutines.flow.Flow
 import mil.nga.msi.ui.theme.MsiTheme
 import androidx.paging.compose.items
 import androidx.paging.compose.collectAsLazyPagingItems
+import kotlinx.coroutines.launch
 import mil.nga.msi.coordinate.DMS
 import mil.nga.msi.datasource.modu.ModuListItem
 import mil.nga.msi.ui.location.LocationTextButton
@@ -32,16 +34,30 @@ import java.util.*
 fun ModusScreen(
    openDrawer: () -> Unit,
    onModuClick: (String) -> Unit,
+   onShare: (String) -> Unit,
    onCopyLocation: (String) -> Unit,
    viewModel: ModusViewModel = hiltViewModel()
 ) {
+   val scope = rememberCoroutineScope()
+
    Column(modifier = Modifier.fillMaxSize()) {
       TopBar(
          title = ModuRoute.List.title,
          buttonIcon = Icons.Filled.Menu,
          onButtonClicked = { openDrawer() }
       )
-      Modus(viewModel.modus, onModuClick, onCopyLocation)
+      Modus(
+         viewModel.modus,
+         onModuClick,
+         onShare = { name ->
+            scope.launch {
+               viewModel.getModu(name)?.let { modu ->
+                  onShare(modu.toString())
+               }
+            }
+         },
+         onCopyLocation
+      )
    }
 }
 
@@ -49,6 +65,7 @@ fun ModusScreen(
 private fun Modus(
    pagingState: Flow<PagingData<ModuListItem>>,
    onModuClick: (String) -> Unit,
+   onShare: (String) -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
    val lazyItems = pagingState.collectAsLazyPagingItems()
@@ -62,7 +79,14 @@ private fun Modus(
             contentPadding = PaddingValues(top = 16.dp)
          ) {
             items(lazyItems) { item ->
-               ModuCard(item, onModuClick, onCopyLocation)
+               ModuCard(
+                  item = item,
+                  onModuClick = onModuClick,
+                  onShare = {
+                     item?.name?.let { onShare(it) }
+                  },
+                  onCopyLocation = onCopyLocation
+               )
             }
          }
       }
@@ -73,6 +97,7 @@ private fun Modus(
 private fun ModuCard(
    item: ModuListItem?,
    onModuClick: (String) -> Unit,
+   onShare: () -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
    if (item != null) {
@@ -82,7 +107,7 @@ private fun ModuCard(
             .padding(bottom = 8.dp)
             .clickable { onModuClick(item.name) }
       ) {
-         ModuContent(item, onCopyLocation)
+         ModuContent(item, onShare, onCopyLocation)
       }
    }
 }
@@ -90,6 +115,7 @@ private fun ModuCard(
 @Composable
 private fun ModuContent(
    item: ModuListItem,
+   onShare: () -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
    Column(Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
@@ -131,13 +157,14 @@ private fun ModuContent(
          }
       }
       
-      ModuFooter(item, onCopyLocation)
+      ModuFooter(item, onShare, onCopyLocation)
    }
 }
 
 @Composable
 private fun ModuFooter(
    item: ModuListItem,
+   onShare: () -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
    Row(
@@ -148,7 +175,7 @@ private fun ModuFooter(
          .padding(top = 8.dp)
    ) {
       ModuLocation(item.dms, onCopyLocation)
-      ModuActions()
+      ModuActions(onShare)
    }
 }
 
@@ -165,9 +192,11 @@ private fun ModuLocation(
 }
 
 @Composable
-private fun ModuActions() {
+private fun ModuActions(
+   onShare: () -> Unit
+) {
    Row {
-      IconButton(onClick = {  }) {
+      IconButton(onClick = { onShare() }) {
          Icon(Icons.Default.Share,
             tint = MaterialTheme.colors.primary,
             contentDescription = "Share MODU"

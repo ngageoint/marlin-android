@@ -13,6 +13,8 @@ import javax.inject.Inject
 class ModusViewModel @Inject constructor(
    private val repository: ModuRepository
 ): ViewModel() {
+   suspend fun getModu(name: String) = repository.getModu(name)
+
    val modus = Pager(PagingConfig(pageSize = 20), null) {
       repository.moduListItems
    }.flow
