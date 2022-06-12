@@ -26,7 +26,9 @@ import mil.nga.msi.ui.location.LocationTextButton
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.BaseMapType
 import mil.nga.msi.ui.map.MapClip
+import mil.nga.msi.ui.modu.ModuAction
 import mil.nga.msi.ui.modu.ModuViewModel
+import mil.nga.msi.ui.navigation.Point
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -34,8 +36,7 @@ import java.util.*
 fun ModuDetailScreen(
    name: String,
    close: () -> Unit,
-   onShare: (String) -> Unit,
-   onCopyLocation: (String) -> Unit,
+   onAction: (ModuAction) -> Unit,
    viewModel: ModuViewModel = hiltViewModel()
 ) {
    val modu by viewModel.getModu(name).observeAsState()
@@ -51,8 +52,9 @@ fun ModuDetailScreen(
       ModuDetailContent(
          modu = modu,
          baseMap = baseMap,
-         onShare = { onShare(modu.toString()) },
-         onCopyLocation = onCopyLocation
+         onZoom = { modu?.let { onAction(ModuAction.Zoom(Point(it.latitude, it.latitude))) } },
+         onShare = { onAction(ModuAction.Share(modu.toString())) },
+         onCopyLocation = { onAction(ModuAction.Location(it)) }
       )
    }
 }
@@ -61,6 +63,7 @@ fun ModuDetailScreen(
 private fun ModuDetailContent(
    modu: Modu?,
    baseMap: BaseMapType?,
+   onZoom: () -> Unit,
    onShare: () -> Unit,
    onCopyLocation: (String) -> Unit,
 ) {
@@ -70,7 +73,7 @@ private fun ModuDetailContent(
             .padding(all = 8.dp)
             .verticalScroll(rememberScrollState())
       ) {
-         ModuHeader(modu, baseMap, onShare, onCopyLocation)
+         ModuHeader(modu, baseMap, onZoom, onShare, onCopyLocation)
          ModuInformation(modu)
       }
    }
@@ -80,6 +83,7 @@ private fun ModuDetailContent(
 private fun ModuHeader(
    modu: Modu,
    baseMap: BaseMapType?,
+   onZoom: () -> Unit,
    onShare: () -> Unit,
    onCopyLocation: (String) -> Unit,
 ) {
@@ -116,7 +120,7 @@ private fun ModuHeader(
                modifier = Modifier.padding(top = 16.dp)
             )
 
-            ModuFooter(modu, onShare, onCopyLocation)
+            ModuFooter(modu, onZoom, onShare, onCopyLocation)
          }
       }
    }
@@ -125,6 +129,7 @@ private fun ModuHeader(
 @Composable
 private fun ModuFooter(
    modu: Modu,
+   onZoom: () -> Unit,
    onShare: () -> Unit,
    onCopyLocation: (String) -> Unit,
 ) {
@@ -134,7 +139,7 @@ private fun ModuFooter(
       modifier = Modifier.fillMaxWidth()
    ) {
       ModuLocation(modu.dms, onCopyLocation)
-      ModuActions(onShare)
+      ModuActions(onZoom, onShare)
    }
 }
 
@@ -151,6 +156,7 @@ private fun ModuLocation(
 
 @Composable
 private fun ModuActions(
+   onZoom: () -> Unit,
    onShare: () -> Unit
 ) {
    Row {
@@ -160,7 +166,7 @@ private fun ModuActions(
             contentDescription = "Share ASAM"
          )
       }
-      IconButton(onClick = {  }) {
+      IconButton(onClick = { onZoom() }) {
          Icon(Icons.Default.GpsFixed,
             tint = MaterialTheme.colors.primary,
             contentDescription = "Zoom to ASAM"

@@ -1,14 +1,20 @@
 package mil.nga.msi.ui.modu
 
+import android.net.Uri
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import com.google.accompanist.navigation.material.bottomSheet
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import mil.nga.msi.ui.asam.AsamAction
+import mil.nga.msi.ui.map.MapRoute
 import mil.nga.msi.ui.modu.detail.ModuDetailScreen
 import mil.nga.msi.ui.modu.list.ModusScreen
 import mil.nga.msi.ui.modu.sheet.ModuSheetScreen
+import mil.nga.msi.ui.navigation.Point
 import mil.nga.msi.ui.navigation.Route
 
 sealed class ModuRoute(
@@ -33,6 +39,11 @@ fun NavGraphBuilder.moduGraph(
       share(Pair("Share MODU Information", it))
    }
 
+   val zoomTo: (Point) -> Unit = { point ->
+      val encoded = Uri.encode(Json.encodeToString(point))
+      navController.navigate(MapRoute.Map.name + "?point=${encoded}")
+   }
+
    navigation(
       route = ModuRoute.Main.name,
       startDestination = ModuRoute.List.name,
@@ -45,9 +56,12 @@ fun NavGraphBuilder.moduGraph(
             onModuClick = { name ->
                navController.navigate( "${ModuRoute.Detail.name}?name=$name")
             },
-            onShare = { shareModu(it) },
-            onCopyLocation = { location ->
-               showSnackbar("$location copied to clipboard")
+            onAction = { action ->
+               when(action) {
+                  is ModuAction.Zoom -> zoomTo(action.point)
+                  is ModuAction.Share -> shareModu(action.text)
+                  is ModuAction.Location -> showSnackbar("${action.text} copied to clipboard")
+               }
             }
          )
       }
@@ -58,9 +72,12 @@ fun NavGraphBuilder.moduGraph(
             ModuDetailScreen(
                name,
                close = { navController.popBackStack() },
-               onShare = { shareModu(it) },
-               onCopyLocation = { location ->
-                  showSnackbar("$location copied to clipboard")
+               onAction = { action ->
+                  when(action) {
+                     is ModuAction.Zoom -> zoomTo(action.point)
+                     is ModuAction.Share -> shareModu(action.text)
+                     is ModuAction.Location -> showSnackbar("${action.text} copied to clipboard")
+                  }
                }
             )
          }

@@ -26,7 +26,9 @@ import mil.nga.msi.coordinate.DMS
 import mil.nga.msi.datasource.modu.ModuListItem
 import mil.nga.msi.ui.location.LocationTextButton
 import mil.nga.msi.ui.main.TopBar
+import mil.nga.msi.ui.modu.ModuAction
 import mil.nga.msi.ui.modu.ModuRoute
+import mil.nga.msi.ui.navigation.Point
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -34,8 +36,7 @@ import java.util.*
 fun ModusScreen(
    openDrawer: () -> Unit,
    onModuClick: (String) -> Unit,
-   onShare: (String) -> Unit,
-   onCopyLocation: (String) -> Unit,
+   onAction: (ModuAction) -> Unit,
    viewModel: ModusViewModel = hiltViewModel()
 ) {
    val scope = rememberCoroutineScope()
@@ -49,14 +50,15 @@ fun ModusScreen(
       Modus(
          viewModel.modus,
          onModuClick,
+         onCopyLocation = { onAction(ModuAction.Location(it)) },
+         onZoom = { onAction( ModuAction.Zoom(it)) },
          onShare = { name ->
             scope.launch {
                viewModel.getModu(name)?.let { modu ->
-                  onShare(modu.toString())
+                  onAction(ModuAction.Share(modu.toString()))
                }
             }
-         },
-         onCopyLocation
+         }
       )
    }
 }
@@ -65,6 +67,7 @@ fun ModusScreen(
 private fun Modus(
    pagingState: Flow<PagingData<ModuListItem>>,
    onModuClick: (String) -> Unit,
+   onZoom: (Point) -> Unit,
    onShare: (String) -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
@@ -82,9 +85,8 @@ private fun Modus(
                ModuCard(
                   item = item,
                   onModuClick = onModuClick,
-                  onShare = {
-                     item?.name?.let { onShare(it) }
-                  },
+                  onZoom = { item?.let { onZoom(Point(it.latitude, it.longitude)) } },
+                  onShare = { item?.name?.let { onShare(it) } },
                   onCopyLocation = onCopyLocation
                )
             }
@@ -97,6 +99,7 @@ private fun Modus(
 private fun ModuCard(
    item: ModuListItem?,
    onModuClick: (String) -> Unit,
+   onZoom: () -> Unit,
    onShare: () -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
@@ -107,7 +110,7 @@ private fun ModuCard(
             .padding(bottom = 8.dp)
             .clickable { onModuClick(item.name) }
       ) {
-         ModuContent(item, onShare, onCopyLocation)
+         ModuContent(item, onZoom, onShare, onCopyLocation)
       }
    }
 }
@@ -115,6 +118,7 @@ private fun ModuCard(
 @Composable
 private fun ModuContent(
    item: ModuListItem,
+   onZoom: () -> Unit,
    onShare: () -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
@@ -157,13 +161,14 @@ private fun ModuContent(
          }
       }
       
-      ModuFooter(item, onShare, onCopyLocation)
+      ModuFooter(item, onZoom, onShare, onCopyLocation)
    }
 }
 
 @Composable
 private fun ModuFooter(
    item: ModuListItem,
+   onZoom: () -> Unit,
    onShare: () -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
@@ -175,7 +180,7 @@ private fun ModuFooter(
          .padding(top = 8.dp)
    ) {
       ModuLocation(item.dms, onCopyLocation)
-      ModuActions(onShare)
+      ModuActions(onZoom, onShare)
    }
 }
 
@@ -193,6 +198,7 @@ private fun ModuLocation(
 
 @Composable
 private fun ModuActions(
+   onZoom: () -> Unit,
    onShare: () -> Unit
 ) {
    Row {
@@ -202,7 +208,7 @@ private fun ModuActions(
             contentDescription = "Share MODU"
          )
       }
-      IconButton(onClick = {  }) {
+      IconButton(onClick = { onZoom() }) {
          Icon(Icons.Default.GpsFixed,
             tint = MaterialTheme.colors.primary,
             contentDescription = "Zoom to MODU"

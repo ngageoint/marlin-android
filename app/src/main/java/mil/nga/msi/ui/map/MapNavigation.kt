@@ -1,8 +1,6 @@
 package mil.nga.msi.ui.map
 
 import android.net.Uri
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.navigation.*
 import androidx.navigation.compose.composable
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
@@ -10,8 +8,10 @@ import com.google.accompanist.navigation.material.bottomSheet
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import mil.nga.msi.ui.asam.AsamRoute
+import mil.nga.msi.ui.map.cluster.MapAnnotation
 import mil.nga.msi.ui.map.settings.MapSettingsScreen
 import mil.nga.msi.ui.modu.ModuRoute
+import mil.nga.msi.ui.navigation.Point
 import mil.nga.msi.ui.navigation.MapAnnotationsType
 import mil.nga.msi.ui.navigation.Route
 import mil.nga.msi.ui.sheet.PagingSheet
@@ -31,10 +31,19 @@ fun NavGraphBuilder.mapGraph(
    bottomBarVisibility: (Boolean) -> Unit,
    openNavigationDrawer: () -> Unit
 ) {
-   composable(MapRoute.Map.name) {
+   composable(
+      route = "${MapRoute.Map.name}?point={point}",
+      arguments = listOf(navArgument("point") {
+            defaultValue = null
+            type = NavType.Point
+            nullable = true
+         }
+      )
+   ) { backstackEntry ->
       bottomBarVisibility(true)
-
+      val latLng = backstackEntry.arguments?.getParcelable<Point?>("point")?.asLatLng()
       MapScreen(
+         location = latLng,
          onAnnotationClick = { annotation ->
             when (annotation.key.type) {
                MapAnnotation.Type.ASAM ->  {

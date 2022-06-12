@@ -9,7 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.pager.*
 import mil.nga.msi.ui.asam.sheet.AsamSheetScreen
-import mil.nga.msi.ui.map.MapAnnotation
+import mil.nga.msi.ui.map.cluster.MapAnnotation
 import mil.nga.msi.ui.modu.sheet.ModuSheetScreen
 
 @OptIn(ExperimentalPagerApi::class)

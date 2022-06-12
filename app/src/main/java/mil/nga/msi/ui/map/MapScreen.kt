@@ -28,6 +28,8 @@ import com.google.android.gms.maps.model.*
 import com.google.maps.android.ktx.awaitMap
 import mil.nga.msi.R
 import mil.nga.msi.ui.main.TopBar
+import mil.nga.msi.ui.map.cluster.ClusterManager
+import mil.nga.msi.ui.map.cluster.MapAnnotation
 import mil.nga.msi.ui.map.overlay.OsmTileProvider
 import kotlin.math.roundToInt
 
@@ -35,6 +37,7 @@ var markerAnimator: ValueAnimator? = null
 
 @Composable
 fun MapScreen(
+   location: LatLng? = null,
    onAnnotationClick: (MapAnnotation) -> Unit,
    onAnnotationsClick: (Collection<MapAnnotation>) -> Unit,
    onMapSettings: () -> Unit,
@@ -53,6 +56,7 @@ fun MapScreen(
       Box(Modifier.fillMaxWidth()) {
          annotations?.let { annotations ->
             Map(
+               location,
                baseMap,
                annotations,
                onAnnotationClick = { onAnnotationClick.invoke(it) },
@@ -84,6 +88,7 @@ fun MapScreen(
 
 @Composable
 private fun Map(
+   location: LatLng?,
    baseMap: BaseMapType?,
    annotations: List<MapAnnotation>,
    onAnnotationClick: (MapAnnotation) -> Unit,
@@ -107,6 +112,10 @@ private fun Map(
             }
          }
          clusterManager = getClusterManager(context, map, onAnnotationsClick, onAnnotationClick)
+
+         location?.let { latLng ->
+            map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16f))
+         }
       }
 
       var updateCluster = false

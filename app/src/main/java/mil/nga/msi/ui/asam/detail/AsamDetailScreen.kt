@@ -22,11 +22,13 @@ import com.google.android.gms.maps.model.LatLng
 import mil.nga.msi.R
 import mil.nga.msi.coordinate.DMS
 import mil.nga.msi.datasource.asam.Asam
+import mil.nga.msi.ui.asam.AsamAction
 import mil.nga.msi.ui.asam.AsamViewModel
 import mil.nga.msi.ui.location.LocationTextButton
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.BaseMapType
 import mil.nga.msi.ui.map.MapClip
+import mil.nga.msi.ui.navigation.Point
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -34,8 +36,7 @@ import java.util.*
 fun AsamDetailScreen(
    reference: String,
    close: () -> Unit,
-   onShare: (String) -> Unit,
-   onCopyLocation: (String) -> Unit,
+   onAction: (AsamAction) -> Unit,
    viewModel: AsamViewModel = hiltViewModel()
 ) {
    val baseMap by viewModel.baseMap.observeAsState()
@@ -50,8 +51,9 @@ fun AsamDetailScreen(
       AsamDetailContent(
          asam = asam,
          baseMap = baseMap,
-         onShare = { onShare(asam.toString()) },
-         onCopyLocation = onCopyLocation
+         onZoom = { onAction(AsamAction.Zoom(it)) },
+         onShare = { onAction(AsamAction.Share(asam.toString())) },
+         onCopyLocation = { onAction(AsamAction.Location(it)) }
       )
    }
 }
@@ -60,6 +62,7 @@ fun AsamDetailScreen(
 private fun AsamDetailContent(
    asam: Asam?,
    baseMap: BaseMapType?,
+   onZoom: (Point) -> Unit,
    onShare: () -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
@@ -69,7 +72,7 @@ private fun AsamDetailContent(
             .padding(all = 8.dp)
             .verticalScroll(rememberScrollState())
       ) {
-         AsamHeader(asam, baseMap, onShare, onCopyLocation)
+         AsamHeader(asam, baseMap, onZoom, onShare, onCopyLocation)
          AsamDescription(asam.description)
          AsamInformation(asam)
       }
@@ -80,6 +83,7 @@ private fun AsamDetailContent(
 private fun AsamHeader(
    asam: Asam,
    baseMap: BaseMapType?,
+   onZoom: (Point) -> Unit,
    onShare: () -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
@@ -114,7 +118,11 @@ private fun AsamHeader(
                modifier = Modifier.padding(top = 16.dp)
             )
 
-            AsamFooter(asam, onShare, onCopyLocation)
+            AsamFooter(
+               asam,
+               onZoom = { onZoom(Point(asam.latitude, asam.longitude))},
+               onShare,
+               onCopyLocation)
          }
       }
    }
@@ -123,6 +131,7 @@ private fun AsamHeader(
 @Composable
 private fun AsamFooter(
    asam: Asam,
+   onZoom: () -> Unit,
    onShare: () -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
@@ -132,7 +141,7 @@ private fun AsamFooter(
       modifier = Modifier.fillMaxWidth()
    ) {
       AsamLocation(asam.dms, onCopyLocation)
-      AsamActions(onShare)
+      AsamActions(onZoom, onShare)
    }
 }
 
@@ -149,6 +158,7 @@ private fun AsamLocation(
 
 @Composable
 private fun AsamActions(
+   onZoom: () -> Unit,
    onShare: () -> Unit
 ) {
    Row {
@@ -158,7 +168,7 @@ private fun AsamActions(
             contentDescription = "Share ASAM"
          )
       }
-      IconButton(onClick = {  }) {
+      IconButton(onClick = { onZoom() }) {
          Icon(Icons.Default.GpsFixed,
             tint = MaterialTheme.colors.primary,
             contentDescription = "Zoom to ASAM"

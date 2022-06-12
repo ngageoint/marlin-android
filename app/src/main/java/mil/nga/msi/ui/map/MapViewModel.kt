@@ -7,6 +7,7 @@ import mil.nga.msi.datasource.modu.ModuMapItem
 import mil.nga.msi.repository.asam.AsamRepository
 import mil.nga.msi.repository.modu.ModuRepository
 import mil.nga.msi.repository.preferences.UserPreferencesRepository
+import mil.nga.msi.ui.map.cluster.MapAnnotation
 import javax.inject.Inject
 
 @HiltViewModel

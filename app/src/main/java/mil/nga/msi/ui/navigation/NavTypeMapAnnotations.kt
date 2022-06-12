@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.navigation.NavType
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-import mil.nga.msi.ui.map.MapAnnotation
+import mil.nga.msi.ui.map.cluster.MapAnnotation
 
 val NavType.Companion.MapAnnotationsType: NavType<List<MapAnnotation>?>
    get() = mapAnnotationsType

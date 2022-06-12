@@ -1,10 +1,9 @@
-package mil.nga.msi
+package mil.nga.msi.ui.main
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import dagger.hilt.android.AndroidEntryPoint
-import mil.nga.msi.ui.main.MainScreen
 import mil.nga.msi.ui.theme.MsiTheme
 
 @AndroidEntryPoint

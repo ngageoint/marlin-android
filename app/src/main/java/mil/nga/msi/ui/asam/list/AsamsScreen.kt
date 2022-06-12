@@ -21,12 +21,15 @@ import kotlinx.coroutines.flow.Flow
 import mil.nga.msi.ui.theme.MsiTheme
 import androidx.paging.compose.items
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.launch
 import mil.nga.msi.coordinate.DMS
 import mil.nga.msi.datasource.asam.AsamListItem
+import mil.nga.msi.ui.asam.AsamAction
 import mil.nga.msi.ui.asam.AsamRoute
 import mil.nga.msi.ui.location.LocationTextButton
 import mil.nga.msi.ui.main.TopBar
+import mil.nga.msi.ui.navigation.Point
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -34,8 +37,7 @@ import java.util.*
 fun AsamsScreen(
    openDrawer: () -> Unit,
    onAsamClick: (String) -> Unit,
-   onShare: (String) -> Unit,
-   onCopyLocation: (String) -> Unit,
+   onAction: (AsamAction) -> Unit,
    viewModel: AsamsViewModel = hiltViewModel()
 ) {
    val scope = rememberCoroutineScope()
@@ -50,11 +52,12 @@ fun AsamsScreen(
       Asams(
          pagingState = viewModel.asams,
          onAsamClick = onAsamClick,
-         onCopyLocation = onCopyLocation,
+         onCopyLocation = { onAction(AsamAction.Location(it)) },
+         onZoom = { onAction(AsamAction.Zoom(it)) },
          onShare = { reference ->
             scope.launch {
                viewModel.getAsam(reference)?.let { asam ->
-                  onShare(asam.toString())
+                  onAction(AsamAction.Share(asam.toString()))
                }
             }
          }
@@ -66,6 +69,7 @@ fun AsamsScreen(
 private fun Asams(
    pagingState: Flow<PagingData<AsamListItem>>,
    onAsamClick: (String) -> Unit,
+   onZoom: (Point) -> Unit,
    onShare: (String) -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
@@ -83,10 +87,9 @@ private fun Asams(
                AsamCard(
                   item = item,
                   onAsamClick = onAsamClick,
-                  onCopyLocation = onCopyLocation,
-                  onShare = {
-                     item?.reference?.let { onShare(it) }
-                  }
+                  onCopyLocation = { onCopyLocation(it) },
+                  onZoom = { item?.let { onZoom(Point(it.latitude, it.longitude)) }  },
+                  onShare = { item?.reference?.let { onShare(it) } }
                )
             }
          }
@@ -99,6 +102,7 @@ private fun AsamCard(
    item: AsamListItem?,
    onAsamClick: (String) -> Unit,
    onShare: () -> Unit,
+   onZoom: () -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
    if (item != null) {
@@ -108,7 +112,7 @@ private fun AsamCard(
             .padding(bottom = 8.dp)
             .clickable { onAsamClick(item.reference) }
       ) {
-         AsamContent(item, onShare, onCopyLocation)
+         AsamContent(item, onShare, onZoom, onCopyLocation)
       }
    }
 }
@@ -117,6 +121,7 @@ private fun AsamCard(
 private fun AsamContent(
    item: AsamListItem,
    onShare: () -> Unit,
+   onZoom: () -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
    Column(Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
@@ -155,6 +160,7 @@ private fun AsamContent(
       AsamFooter(
          item = item,
          onShare = onShare,
+         onZoom = onZoom,
          onCopyLocation = onCopyLocation
       )
    }
@@ -164,6 +170,7 @@ private fun AsamContent(
 private fun AsamFooter(
    item: AsamListItem,
    onShare: () -> Unit,
+   onZoom: () -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
    Row(
@@ -174,7 +181,7 @@ private fun AsamFooter(
          .padding(top = 8.dp)
    ) {
       AsamLocation(item.dms, onCopyLocation)
-      AsamActions(onShare)
+      AsamActions(onShare, onZoom)
    }
 }
 
@@ -191,7 +198,8 @@ private fun AsamLocation(
 
 @Composable
 private fun AsamActions(
-   onShare: () -> Unit
+   onShare: () -> Unit,
+   onZoom: () -> Unit
 ) {
    Row {
       IconButton(
@@ -202,7 +210,7 @@ private fun AsamActions(
             contentDescription = "Share ASAM"
          )
       }
-      IconButton(onClick = {  }) {
+      IconButton(onClick = { onZoom() }) {
          Icon(Icons.Default.GpsFixed,
             tint = MaterialTheme.colors.primary,
             contentDescription = "Zoom to ASAM"

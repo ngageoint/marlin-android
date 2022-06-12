@@ -1,4 +1,4 @@
-package mil.nga.msi.ui.map
+package mil.nga.msi.ui.map.cluster
 
 import android.os.Parcelable
 import com.google.android.gms.maps.model.LatLng
