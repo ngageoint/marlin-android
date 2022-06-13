@@ -26,7 +26,9 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.model.*
 import com.google.maps.android.ktx.awaitMap
+import kotlinx.coroutines.launch
 import mil.nga.msi.R
+import mil.nga.msi.type.MapLocation
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.cluster.ClusterManager
 import mil.nga.msi.ui.map.cluster.MapAnnotation
@@ -37,14 +39,16 @@ var markerAnimator: ValueAnimator? = null
 
 @Composable
 fun MapScreen(
-   location: LatLng? = null,
+   mapDestination : MapLocation? = null,
    onAnnotationClick: (MapAnnotation) -> Unit,
    onAnnotationsClick: (Collection<MapAnnotation>) -> Unit,
    onMapSettings: () -> Unit,
    openDrawer: () -> Unit,
    viewModel: MapViewModel = hiltViewModel()
 ) {
+   val scope = rememberCoroutineScope()
    val baseMap by viewModel.baseMap.observeAsState()
+   val mapOrigin by viewModel.mapLocation.observeAsState()
    val annotations by viewModel.mapAnnotations.observeAsState()
    Column(modifier = Modifier.fillMaxSize()) {
       TopBar(
@@ -56,11 +60,17 @@ fun MapScreen(
       Box(Modifier.fillMaxWidth()) {
          annotations?.let { annotations ->
             Map(
-               location,
+               mapOrigin,
+               mapDestination,
                baseMap,
                annotations,
                onAnnotationClick = { onAnnotationClick.invoke(it) },
-               onAnnotationsClick = { onAnnotationsClick.invoke(it) }
+               onAnnotationsClick = { onAnnotationsClick.invoke(it) },
+               onMapMove = {
+                  scope.launch {
+                     viewModel.setMapLocation(it)
+                  }
+               }
             )
          }
 
@@ -77,7 +87,6 @@ fun MapScreen(
             )
          }
       }
-
    }
 
 //   if (nav.navigatorSheetState.currentValue == ModalBottomSheetValue.Hidden) {
@@ -88,9 +97,11 @@ fun MapScreen(
 
 @Composable
 private fun Map(
-   location: LatLng?,
+   mapOrigin: MapLocation?,
+   mapDestination: MapLocation?,
    baseMap: BaseMapType?,
    annotations: List<MapAnnotation>,
+   onMapMove: (MapLocation) -> Unit,
    onAnnotationClick: (MapAnnotation) -> Unit,
    onAnnotationsClick: (Collection<MapAnnotation>) -> Unit
 ) {
@@ -111,11 +122,25 @@ private fun Map(
                addTileOverlay(TileOverlayOptions().tileProvider(OsmTileProvider()))
             }
          }
-         clusterManager = getClusterManager(context, map, onAnnotationsClick, onAnnotationClick)
-
-         location?.let { latLng ->
-            map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16f))
+         mapOrigin?.let { location ->
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(location.latitude, location.longitude), location.zoom.toFloat()))
          }
+
+         mapDestination?.let { location ->
+            map.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(location.latitude, location.longitude), location.zoom.toFloat()))
+         }
+
+         map.setOnCameraMoveListener {
+            val position = map.cameraPosition
+            val mapLocation = MapLocation.getDefaultInstance().toBuilder()
+               .setLatitude(position.target.latitude)
+               .setLongitude(position.target.longitude)
+               .setZoom(position.zoom.toDouble())
+               .build()
+            onMapMove(mapLocation)
+         }
+
+         clusterManager = getClusterManager(context, map, onAnnotationsClick, onAnnotationClick)
       }
 
       var updateCluster = false

@@ -6,20 +6,34 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import mil.nga.msi.type.MapLocation
 import mil.nga.msi.ui.map.BaseMapType
 import javax.inject.Inject
 
 class UserPreferencesRepository @Inject constructor(
-   private val dataStore: DataStore<Preferences>
+   private val preferencesDataStore: DataStore<Preferences>,
+   private val mapLocationDataStore: DataStore<MapLocation>
 ) {
-   val baseMapType: Flow<BaseMapType> = dataStore.data.map { preferences ->
+   val baseMapType: Flow<BaseMapType> = preferencesDataStore.data.map { preferences ->
       val value = preferences[BASE_LAYER_KEY]
       BaseMapType.fromValue(value)
    }
 
    suspend fun setBaseMapType(baseMapType: BaseMapType) {
-      dataStore.edit { preferences ->
+      preferencesDataStore.edit { preferences ->
          preferences[BASE_LAYER_KEY] = baseMapType.value
+      }
+   }
+
+   val mapLocation = mapLocationDataStore.data
+
+   suspend fun setMapLocation(mapLocation: MapLocation) {
+      mapLocationDataStore.updateData {
+         it.toBuilder()
+            .setLatitude(mapLocation.latitude)
+            .setLongitude(mapLocation.longitude)
+            .setZoom(mapLocation.zoom)
+            .build()
       }
    }
 

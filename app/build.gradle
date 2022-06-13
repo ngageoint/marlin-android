@@ -5,6 +5,7 @@ plugins {
     id 'com.google.dagger.hilt.android'
     id 'kotlin-parcelize'
     id 'kotlinx-serialization'
+    id 'com.google.protobuf'
 }
 
 def googleMapsApiReleaseKey = hasProperty('MSI_RELEASE_MAPS_API_KEY') ? MSI_RELEASE_MAPS_API_KEY : ''
@@ -59,6 +60,25 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion compose_version
     }
+
+    protobuf {
+        protoc {
+            artifact = 'com.google.protobuf:protoc:3.14.0'
+        }
+
+        // Generates the java Protobuf-lite code for the Protobufs in this project. See
+        // https://github.com/google/protobuf-gradle-plugin#customizing-protobuf-compilation
+        // for more information.
+        generateProtoTasks {
+            all().each { task ->
+                task.builtins {
+                    java {
+                        option 'lite'
+                    }
+                }
+            }
+        }
+    }
 }
 
 dependencies {
@@ -104,6 +124,7 @@ dependencies {
     implementation 'androidx.navigation:navigation-fragment-ktx:2.4.2'
     implementation 'androidx.navigation:navigation-ui-ktx:2.4.2'
 
+    implementation  'com.google.protobuf:protobuf-javalite:3.18.0'
     implementation 'androidx.datastore:datastore-preferences:1.0.0'
 
     implementation 'com.google.maps.android:maps-compose:2.2.0'

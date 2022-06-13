@@ -41,9 +41,9 @@ fun NavGraphBuilder.mapGraph(
       )
    ) { backstackEntry ->
       bottomBarVisibility(true)
-      val latLng = backstackEntry.arguments?.getParcelable<Point?>("point")?.asLatLng()
+      val mapDestination = backstackEntry.arguments?.getParcelable<Point?>("point")?.asMapLocation(16f)
       MapScreen(
-         location = latLng,
+         mapDestination = mapDestination,
          onAnnotationClick = { annotation ->
             when (annotation.key.type) {
                MapAnnotation.Type.ASAM ->  {
