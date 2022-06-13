@@ -13,7 +13,7 @@ class ModuRepository @Inject constructor(
 ) {
    val modus = localDataSource.observeModus()
    val moduMapItems = localDataSource.observeModuMapItems()
-   val moduListItems = localDataSource.observeModuListItems()
+   fun getModuListItems() = localDataSource.observeModuListItems()
 
    fun observeModu(name: String) = localDataSource.observeModu(name)
    suspend fun getModu(name: String) = localDataSource.getModu(name)

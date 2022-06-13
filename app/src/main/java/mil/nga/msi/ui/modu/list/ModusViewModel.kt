@@ -16,6 +16,6 @@ class ModusViewModel @Inject constructor(
    suspend fun getModu(name: String) = repository.getModu(name)
 
    val modus = Pager(PagingConfig(pageSize = 20), null) {
-      repository.moduListItems
+      repository.getModuListItems()
    }.flow
 }

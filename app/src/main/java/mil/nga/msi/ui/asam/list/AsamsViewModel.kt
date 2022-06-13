@@ -17,6 +17,6 @@ class AsamsViewModel @Inject constructor(
    }
 
    val asams = Pager(PagingConfig(pageSize = 20), null) {
-      repository.asamListItems
+      repository.getAsamListItems()
    }.flow
 }

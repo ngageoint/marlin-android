@@ -13,7 +13,7 @@ class AsamRepository @Inject constructor(
 ) {
    val asams = localDataSource.observeAsams()
    val asamMapItems = localDataSource.observeAsamMapItems()
-   val asamListItems = localDataSource.observeAsamListItems()
+   fun getAsamListItems() = localDataSource.observeAsamListItems()
 
    fun observeAsam(reference: String) = localDataSource.observeAsam(reference)
    suspend fun getAsam(reference: String) = localDataSource.getAsam(reference)
