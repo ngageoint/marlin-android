@@ -42,10 +42,7 @@ data class MapAnnotation(
       }
 
       val idComparator = Comparator<MapAnnotation> { a, b ->
-         when (a.key) {
-            b.key -> 0
-            else -> -1
-         }
+         if (a.key == b.key) 0 else "${a.key.type}${a.key.id}".compareTo("${b.key.type}${b.key.id}")
       }
    }
 }
