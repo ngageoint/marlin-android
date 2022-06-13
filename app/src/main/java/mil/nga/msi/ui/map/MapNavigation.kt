@@ -83,10 +83,10 @@ fun NavGraphBuilder.mapGraph(
          PagingSheet(annotations) { annotation ->
             when (annotation.key.type) {
                MapAnnotation.Type.ASAM -> {
-                  navController.navigate(AsamRoute.Detail.name + "?reference=${annotation.key}")
+                  navController.navigate(AsamRoute.Detail.name + "?reference=${annotation.key.id}")
                }
                MapAnnotation.Type.MODU -> {
-                  navController.navigate(ModuRoute.Detail.name + "?name=${annotation.key}")
+                  navController.navigate(ModuRoute.Detail.name + "?name=${annotation.key.id}")
                }
             }
          }
