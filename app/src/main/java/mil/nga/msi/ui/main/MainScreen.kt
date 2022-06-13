@@ -116,12 +116,14 @@ fun MainScreen() {
                            label = { Text(tab.route.title) },
                            selected = currentDestination?.hierarchy?.any { it.route?.substringBefore("?") == tab.route.name } == true,
                            onClick = {
-                              navController.navigate(tab.route.name) {
-                                 popUpTo(navController.graph.findStartDestination().id) {
-                                    saveState = true
+                              if (currentDestination?.route?.substringBefore("?") != tab.route.name) {
+                                 navController.navigate(tab.route.name) {
+                                    popUpTo(navController.graph.findStartDestination().id) {
+                                       saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
                                  }
-                                 launchSingleTop = true
-                                 restoreState = true
                               }
                            }
                         )
