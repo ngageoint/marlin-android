@@ -1,10 +1,10 @@
 package mil.nga.msi.ui.map
 
 import android.animation.ValueAnimator
-import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -18,6 +18,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.animation.addListener
+import androidx.core.animation.doOnEnd
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -27,7 +29,6 @@ import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.model.*
 import com.google.maps.android.ktx.awaitMap
 import kotlinx.coroutines.launch
-import mil.nga.msi.R
 import mil.nga.msi.type.MapLocation
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.cluster.ClusterManager
@@ -35,10 +36,9 @@ import mil.nga.msi.ui.map.cluster.MapAnnotation
 import mil.nga.msi.ui.map.overlay.OsmTileProvider
 import kotlin.math.roundToInt
 
-var markerAnimator: ValueAnimator? = null
-
 @Composable
 fun MapScreen(
+   selectedAnnotation: MapAnnotation?,
    mapDestination : MapLocation? = null,
    onAnnotationClick: (MapAnnotation) -> Unit,
    onAnnotationsClick: (Collection<MapAnnotation>) -> Unit,
@@ -60,6 +60,7 @@ fun MapScreen(
       Box(Modifier.fillMaxWidth()) {
          annotations?.let { annotations ->
             Map(
+               selectedAnnotation,
                mapOrigin,
                mapDestination,
                baseMap,
@@ -97,6 +98,7 @@ fun MapScreen(
 
 @Composable
 private fun Map(
+   selectedAnnotation: MapAnnotation?,
    mapOrigin: MapLocation?,
    mapDestination: MapLocation?,
    baseMap: BaseMapType?,
@@ -110,8 +112,20 @@ private fun Map(
    var previousAnnotations by remember { mutableStateOf(listOf<MapAnnotation>()) }
    var clusterManager by remember { mutableStateOf<ClusterManager?>(null)}
 
+   var selectedMarker by remember { mutableStateOf<Marker?>(null) }
+   var selectedAnimator by remember { mutableStateOf<ValueAnimator?>(null) }
+
    AndroidView(factory = { mapView })
    MapLifecycle(mapView)
+
+   if (selectedAnnotation == null) {
+      selectedAnimator?.doOnEnd {
+         selectedMarker?.remove()
+         selectedMarker = null
+      }
+      selectedAnimator?.reverse()
+      selectedAnimator = null
+   }
 
    LaunchedEffect(mapView, annotations) {
       if (clusterManager == null) {
@@ -122,6 +136,7 @@ private fun Map(
                addTileOverlay(TileOverlayOptions().tileProvider(OsmTileProvider()))
             }
          }
+
          mapOrigin?.let { location ->
             map.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(location.latitude, location.longitude), location.zoom.toFloat()))
          }
@@ -132,7 +147,7 @@ private fun Map(
 
          map.setOnCameraMoveListener {
             val position = map.cameraPosition
-            val mapLocation = MapLocation.getDefaultInstance().toBuilder()
+            val mapLocation = MapLocation.newBuilder()
                .setLatitude(position.target.latitude)
                .setLongitude(position.target.longitude)
                .setZoom(position.zoom.toDouble())
@@ -140,7 +155,32 @@ private fun Map(
             onMapMove(mapLocation)
          }
 
-         clusterManager = getClusterManager(context, map, onAnnotationsClick, onAnnotationClick)
+         clusterManager = ClusterManager(context, map).apply {
+            setOnClusterItemClickListener { item ->
+               onAnnotationClick(item)
+               selectedAnimator = ValueAnimator.ofFloat(1f, 2f)
+               selectedMarker = map.addMarker(MarkerOptions().apply {
+                  icon(BitmapDescriptorFactory.fromResource(item.key.type.icon))
+                  position(item.position)
+               })
+               selectedMarker?.tag = item.key
+               val bitmap = BitmapFactory.decodeResource(context.resources, item.key.type.icon)
+               animateAnnotation(selectedMarker, selectedAnimator, bitmap)
+               animateMap(map, item.position)
+               true
+            }
+
+            setOnClusterClickListener { cluster ->
+               if (map.maxZoomLevel == map.cameraPosition.zoom) {
+                  onAnnotationsClick(cluster.items)
+               } else {
+                  val builder = LatLngBounds.Builder()
+                  cluster.items.forEach { builder.include(it.position) }
+                  map.animateCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 20))
+               }
+               true
+            }
+         }
       }
 
       var updateCluster = false
@@ -177,94 +217,30 @@ private fun Map(
          }
       }
    }
-
-//   LaunchedEffect(clusterManager, annotations) {
-//      var updateCluster = false
-//      val manager = clusterManager
-//      if (manager != null) {
-//         val annotationSet = sortedSetOf(MapAnnotation.idComparator, *annotations.toTypedArray())
-//         val previousAnnotationSet = sortedSetOf(MapAnnotation.idComparator, *previousAnnotations.toTypedArray())
-//         Log.i("Billy", "annotationSet size ${annotationSet.size}")
-//         Log.i("Billy", "previousAnnotations size ${previousAnnotationSet.size}")
-//
-//         // add new
-//         annotationSet.minus(previousAnnotationSet).forEach {
-//            manager.addItem(it)
-//            updateCluster = true
-//         }
-//
-//         // update existing
-//         annotationSet.intersect(previousAnnotationSet).forEach { annotation ->
-//            clusterManager?.getClusterItem(annotation.key)?.let {
-//               manager.removeItem(it)
-//               manager.addItem(annotation)
-//            }
-//
-//            updateCluster = true
-//         }
-//
-//         // remove old
-//         previousAnnotationSet.minus(annotationSet).forEach {
-//            manager.removeItem(it)
-//            updateCluster = true
-//         }
-//
-//         if (updateCluster) {
-//            Log.i("Billy", "cluster annotations: ${clusterManager?.algorithm?.items?.size}")
-//
-//            manager.cluster()
-//            previousAnnotations = annotations
-//         }
-//      }
-//   }
-}
-
-private fun getClusterManager(
-   context: Context,
-   map: GoogleMap,
-   onClusterClick: (Collection<MapAnnotation>) -> Unit,
-   onClusterItemClick: (MapAnnotation) -> Unit
-): ClusterManager {
-   val clusterManager = ClusterManager(context, map)
-   clusterManager.setOnClusterItemClickListener { item ->
-      onClusterItemClick(item)
-      true
-   }
-   clusterManager.setOnClusterClickListener { cluster ->
-      if (map.maxZoomLevel == map.cameraPosition.zoom) {
-         onClusterClick(cluster.items)
-      } else {
-         val builder = LatLngBounds.Builder()
-         cluster.items.forEach { builder.include(it.position) }
-         map.animateCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 20))
-      }
-      true
-   }
-   return clusterManager
 }
 
 private fun animateMap(map: GoogleMap, latLng: LatLng) {
-//   val cameraUpdate = CameraUpdateFactory.newLatLng(latLng)
-//   map.animateCamera(cameraUpdate)
+   val cameraUpdate = CameraUpdateFactory.newLatLng(latLng)
+   map.animateCamera(cameraUpdate)
 }
 
-private fun animateMarker(marker: Marker, context: Context) {
-   val bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.asam_map_marker_24dp)
-
-   val animator = ValueAnimator.ofFloat(1f, 2f)
-   animator.duration = 500
-   animator.addUpdateListener { animation ->
+private fun animateAnnotation(
+   marker: Marker?,
+   animator: ValueAnimator?,
+   bitmap: Bitmap
+) {
+   animator?.duration = 500
+   animator?.addUpdateListener { animation ->
       val scale = animation.animatedValue as Float
       val sizeX = (bitmap.width * scale).roundToInt()
       val sizeY = (bitmap.height * scale).roundToInt()
       val scaled =  Bitmap.createScaledBitmap(bitmap, sizeX, sizeY, false)
 
-      if (marker.tag != null) {
+      if (marker?.tag != null) {
          marker.setIcon(BitmapDescriptorFactory.fromBitmap(scaled))
       }
    }
-   animator.start()
-   markerAnimator = animator
+   animator?.start()
 }
 
 @Composable

@@ -18,10 +18,6 @@ class ClusterRenderer(
    }
 
    override fun onBeforeClusterItemRendered(annotation: MapAnnotation, markerOptions: MarkerOptions) {
-      val resource = when (annotation.key.type) {
-         MapAnnotation.Type.ASAM -> R.drawable.asam_map_marker_24dp
-         MapAnnotation.Type.MODU -> R.drawable.modu_map_marker_24dp
-      }
-      markerOptions.icon(BitmapDescriptorFactory.fromResource(resource))
+      markerOptions.icon(BitmapDescriptorFactory.fromResource(annotation.key.type.icon))
    }
 }

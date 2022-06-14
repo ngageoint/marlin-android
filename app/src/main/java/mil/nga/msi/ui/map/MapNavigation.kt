@@ -1,8 +1,11 @@
 package mil.nga.msi.ui.map
 
 import android.net.Uri
+import androidx.compose.runtime.*
+import androidx.lifecycle.Lifecycle
 import androidx.navigation.*
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import com.google.accompanist.navigation.material.bottomSheet
 import kotlinx.serialization.encodeToString
@@ -25,7 +28,7 @@ sealed class MapRoute(
    object PagerSheet: MapRoute("annotationPagerSheet", "Map")
 }
 
-@OptIn(ExperimentalMaterialNavigationApi::class)
+@OptIn(ExperimentalMaterialNavigationApi::class, NavControllerVisibleEntries::class)
 fun NavGraphBuilder.mapGraph(
    navController: NavController,
    bottomBarVisibility: (Boolean) -> Unit,
@@ -41,10 +44,21 @@ fun NavGraphBuilder.mapGraph(
       )
    ) { backstackEntry ->
       bottomBarVisibility(true)
+      var selectedAnnotation by remember { mutableStateOf<MapAnnotation?>(null) }
       val mapDestination = backstackEntry.arguments?.getParcelable<Point?>("point")?.asMapLocation(16f)
+
+      val navBackStackEntry by navController.currentBackStackEntryAsState()
+      val route = navBackStackEntry?.destination?.route
+      if (route?.startsWith(AsamRoute.Sheet.name) != true &&
+         route?.startsWith(ModuRoute.Sheet.name) != true) {
+         selectedAnnotation = null
+      }
+
       MapScreen(
+         selectedAnnotation = selectedAnnotation,
          mapDestination = mapDestination,
          onAnnotationClick = { annotation ->
+            selectedAnnotation = annotation
             when (annotation.key.type) {
                MapAnnotation.Type.ASAM ->  {
                   navController.navigate(AsamRoute.Sheet.name + "?reference=${annotation.key.id}")
