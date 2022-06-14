@@ -14,6 +14,15 @@ fun JsonReader.nextStringOrNull(): String? {
    }
 }
 
+fun JsonReader.nextIntOrNull(): Int? {
+   return if (peek() == JsonToken.NULL) {
+      nextNull()
+      null
+   } else {
+      nextInt()
+   }
+}
+
 fun JsonReader.nextLongOrNull(): Long? {
    return if (peek() == JsonToken.NULL) {
       nextNull()

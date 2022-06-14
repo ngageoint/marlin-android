@@ -9,10 +9,13 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mil.nga.msi.datasource.asam.Asam
 import mil.nga.msi.datasource.modu.Modu
+import mil.nga.msi.datasource.navigationwarning.NavigationalWarning
 import mil.nga.msi.network.asam.AsamsTypeAdapter
 import mil.nga.msi.network.modu.ModusTypeAdapter
 import mil.nga.msi.network.asam.AsamService
 import mil.nga.msi.network.modu.ModuService
+import mil.nga.msi.network.navigationalwarning.NavigationalWarningService
+import mil.nga.msi.network.navigationalwarning.NavigationalWarningsTypeAdapter
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -33,6 +36,7 @@ class NetworkModule {
       return GsonBuilder()
          .registerTypeAdapter(object : TypeToken<List<Asam>>() {}.type, AsamsTypeAdapter())
          .registerTypeAdapter(object : TypeToken<List<Modu>>() {}.type, ModusTypeAdapter())
+         .registerTypeAdapter(object : TypeToken<List<NavigationalWarning>>() {}.type, NavigationalWarningsTypeAdapter())
          .create()
    }
 
@@ -59,5 +63,11 @@ class NetworkModule {
    @Singleton
    fun provideModuService(retrofit: Retrofit): ModuService {
       return retrofit.create(ModuService::class.java)
+   }
+
+   @Provides
+   @Singleton
+   fun provideNavigationalWarningService(retrofit: Retrofit): NavigationalWarningService {
+      return retrofit.create(NavigationalWarningService::class.java)
    }
 }

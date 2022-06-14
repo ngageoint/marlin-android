@@ -46,7 +46,7 @@ class AsamRepository @Inject constructor(
    }
 
    fun fetchAsamsPeriodically() {
-      val fetchNewsRequest = PeriodicWorkRequestBuilder<RefreshAsamWorker>(
+      val fetchRequest = PeriodicWorkRequestBuilder<RefreshAsamWorker>(
          REFRESH_RATE_HOURS, TimeUnit.HOURS
       ).setConstraints(
          Constraints.Builder()
@@ -58,7 +58,7 @@ class AsamRepository @Inject constructor(
       workManager.enqueueUniquePeriodicWork(
          FETCH_LATEST_ASAMS_TASK,
          ExistingPeriodicWorkPolicy.KEEP,
-         fetchNewsRequest.build()
+         fetchRequest.build()
       )
    }
 

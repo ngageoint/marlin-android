@@ -46,7 +46,7 @@ class ModuRepository @Inject constructor(
    }
 
    fun fetchModusPeriodically() {
-      val fetchNewsRequest = PeriodicWorkRequestBuilder<RefreshModuWorker>(
+      val fetchRequest = PeriodicWorkRequestBuilder<RefreshModuWorker>(
          REFRESH_RATE_HOURS, TimeUnit.HOURS
       ).setConstraints(
          Constraints.Builder()
@@ -58,7 +58,7 @@ class ModuRepository @Inject constructor(
       workManager.enqueueUniquePeriodicWork(
          FETCH_LATEST_MODUS_TASK,
          ExistingPeriodicWorkPolicy.KEEP,
-         fetchNewsRequest.build()
+         fetchRequest.build()
       )
    }
 
