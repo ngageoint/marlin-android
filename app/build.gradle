@@ -33,6 +33,17 @@ android {
             }
         }
 
+        signingConfigs {
+            release {
+                if (project.hasProperty('KEYSTORE')) {
+                    storeFile file(KEYSTORE)
+                    storePassword KEYSTORE_PASSWORD
+                    keyAlias KEY_ALIAS
+                    keyPassword KEY_PASSWORD
+                }
+            }
+        }
+
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -42,6 +53,7 @@ android {
         }
         release {
             minifyEnabled false
+            signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             resValue "string", "GOOGLE_MAPS_ANDROID_API_KEY", googleMapsApiReleaseKey
         }
