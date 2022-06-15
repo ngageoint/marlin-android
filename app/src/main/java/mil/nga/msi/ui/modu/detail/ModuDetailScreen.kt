@@ -29,6 +29,7 @@ import mil.nga.msi.ui.map.MapClip
 import mil.nga.msi.ui.modu.ModuAction
 import mil.nga.msi.ui.modu.ModuViewModel
 import mil.nga.msi.ui.navigation.Point
+import mil.nga.msi.ui.theme.screenBackground
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -68,13 +69,18 @@ private fun ModuDetailContent(
    onCopyLocation: (String) -> Unit,
 ) {
    if (modu != null) {
-      Column(
-         Modifier
-            .padding(all = 8.dp)
-            .verticalScroll(rememberScrollState())
+      Surface(
+         color = MaterialTheme.colors.screenBackground,
+         modifier = Modifier.fillMaxHeight()
       ) {
-         ModuHeader(modu, baseMap, onZoom, onShare, onCopyLocation)
-         ModuInformation(modu)
+         Column(
+            Modifier
+               .padding(all = 8.dp)
+               .verticalScroll(rememberScrollState())
+         ) {
+            ModuHeader(modu, baseMap, onZoom, onShare, onCopyLocation)
+            ModuInformation(modu)
+         }
       }
    }
 }
@@ -88,7 +94,6 @@ private fun ModuHeader(
    onCopyLocation: (String) -> Unit,
 ) {
    Card(
-      elevation = 4.dp,
       modifier = Modifier.padding(bottom = 16.dp)
    ) {
       Column {
@@ -163,13 +168,13 @@ private fun ModuActions(
       IconButton(onClick = { onShare() }) {
          Icon(Icons.Default.Share,
             tint = MaterialTheme.colors.primary,
-            contentDescription = "Share ASAM"
+            contentDescription = "Share MODU"
          )
       }
       IconButton(onClick = { onZoom() }) {
          Icon(Icons.Default.GpsFixed,
             tint = MaterialTheme.colors.primary,
-            contentDescription = "Zoom to ASAM"
+            contentDescription = "Zoom to MODU"
          )
       }
    }
@@ -179,11 +184,10 @@ private fun ModuActions(
 private fun ModuInformation(
    modu: Modu
 ) {
-   CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+   CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
       Text(
          text = "ADDITIONAL INFORMATION",
-         style = MaterialTheme.typography.subtitle1,
-         fontWeight = FontWeight.Medium
+         style = MaterialTheme.typography.subtitle1
       )
    }
 

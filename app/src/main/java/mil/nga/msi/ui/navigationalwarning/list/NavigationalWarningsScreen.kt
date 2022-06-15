@@ -27,6 +27,7 @@ import mil.nga.msi.repository.navigationalwarning.NavigationalWarningKey
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.navigationalwarning.NavigationWarningRoute
 import mil.nga.msi.ui.navigationalwarning.NavigationalWarningAction
+import mil.nga.msi.ui.theme.screenBackground
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -67,22 +68,20 @@ private fun NavigationalWarnings(
    onShare: (NavigationalWarningKey) -> Unit
 ) {
    val lazyItems = pagingState.collectAsLazyPagingItems()
-   MsiTheme {
-      Surface(
-         color = Color(0x19000000),
-         modifier = Modifier.fillMaxHeight()
+   Surface(
+      color = MaterialTheme.colors.screenBackground,
+      modifier = Modifier.fillMaxHeight()
+   ) {
+      LazyColumn(
+         modifier = Modifier.padding(horizontal = 8.dp),
+         contentPadding = PaddingValues(top = 16.dp)
       ) {
-         LazyColumn(
-            modifier = Modifier.padding(horizontal = 8.dp),
-            contentPadding = PaddingValues(top = 16.dp)
-         ) {
-            items(lazyItems) { item ->
-               NavigationalWarningCard(
-                  item = item,
-                  onTap = onTap,
-                  onShare = { onShare(it) }
-               )
-            }
+         items(lazyItems) { item ->
+            NavigationalWarningCard(
+               item = item,
+               onTap = onTap,
+               onShare = { onShare(it) }
+            )
          }
       }
    }

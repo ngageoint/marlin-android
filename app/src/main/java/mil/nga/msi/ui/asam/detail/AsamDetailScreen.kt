@@ -14,6 +14,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -29,6 +30,7 @@ import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.BaseMapType
 import mil.nga.msi.ui.map.MapClip
 import mil.nga.msi.ui.navigation.Point
+import mil.nga.msi.ui.theme.screenBackground
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -67,14 +69,19 @@ private fun AsamDetailContent(
    onCopyLocation: (String) -> Unit
 ) {
    if (asam != null) {
-      Column(
-         Modifier
-            .padding(all = 8.dp)
-            .verticalScroll(rememberScrollState())
+      Surface(
+         color = MaterialTheme.colors.screenBackground,
+         modifier = Modifier.fillMaxHeight()
       ) {
-         AsamHeader(asam, baseMap, onZoom, onShare, onCopyLocation)
-         AsamDescription(asam.description)
-         AsamInformation(asam)
+         Column(
+            Modifier
+               .padding(all = 8.dp)
+               .verticalScroll(rememberScrollState())
+         ) {
+            AsamHeader(asam, baseMap, onZoom, onShare, onCopyLocation)
+            AsamDescription(asam.description)
+            AsamInformation(asam)
+         }
       }
    }
 }
@@ -87,7 +94,7 @@ private fun AsamHeader(
    onShare: () -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
-   Card(elevation = 4.dp) {
+   Card {
       Column {
          MapClip(
             latLng = LatLng(asam.latitude, asam.longitude),
@@ -183,11 +190,10 @@ private fun AsamDescription(
    description: String?
 ) {
    Column(Modifier.padding(vertical = 16.dp)) {
-      CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+      CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
          Text(
             text = "DESCRIPTION",
-            style = MaterialTheme.typography.subtitle1,
-            fontWeight = FontWeight.Medium
+            style = MaterialTheme.typography.subtitle1
          )
       }
 
@@ -199,7 +205,7 @@ private fun AsamDescription(
             description?.let {
                Text(
                   text = it,
-                  style = MaterialTheme.typography.body1,
+                  style = MaterialTheme.typography.body2,
                   modifier = Modifier.padding(all = 16.dp)
                )
             }
@@ -212,11 +218,10 @@ private fun AsamDescription(
 private fun AsamInformation(
    asam: Asam
 ) {
-   CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+   CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
       Text(
          text = "ADDITIONAL INFORMATION",
          style = MaterialTheme.typography.subtitle1,
-         fontWeight = FontWeight.Medium
       )
    }
 
@@ -229,12 +234,12 @@ private fun AsamInformation(
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
       ) {
+         AsamProperty(title = "Hostility", value = asam.hostility)
+         AsamProperty(title = "Victim", value = asam.victim)
          AsamProperty(title = "Reference Number", value = asam.reference)
          AsamProperty(title = "Position", value = asam.position)
          AsamProperty(title = "Navigation Area", value = asam.navigationArea)
          AsamProperty(title = "Subregion", value = asam.subregion)
-         AsamProperty(title = "Hostility", value = asam.hostility)
-         AsamProperty(title = "Victim", value = asam.victim)
       }
    }
 }

@@ -11,14 +11,12 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.PagingData
 import kotlinx.coroutines.flow.Flow
-import mil.nga.msi.ui.theme.MsiTheme
 import androidx.paging.compose.items
 import androidx.paging.compose.collectAsLazyPagingItems
 import kotlinx.coroutines.launch
@@ -29,6 +27,7 @@ import mil.nga.msi.ui.asam.AsamRoute
 import mil.nga.msi.ui.location.LocationTextButton
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.navigation.Point
+import mil.nga.msi.ui.theme.screenBackground
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -73,24 +72,22 @@ private fun Asams(
    onCopyLocation: (String) -> Unit
 ) {
    val lazyItems = pagingState.collectAsLazyPagingItems()
-   MsiTheme {
-      Surface(
-         color = Color(0x19000000),
-         modifier = Modifier.fillMaxHeight()
+   Surface(
+      color = MaterialTheme.colors.screenBackground,
+      modifier = Modifier.fillMaxHeight()
+   ) {
+      LazyColumn(
+         modifier = Modifier.padding(horizontal = 8.dp),
+         contentPadding = PaddingValues(top = 16.dp)
       ) {
-         LazyColumn(
-            modifier = Modifier.padding(horizontal = 8.dp),
-            contentPadding = PaddingValues(top = 16.dp)
-         ) {
-            items(lazyItems) { item ->
-               AsamCard(
-                  item = item,
-                  onTap = onTap,
-                  onCopyLocation = { onCopyLocation(it) },
-                  onZoom = { item?.let { onZoom(Point(it.latitude, it.longitude)) }  },
-                  onShare = { item?.reference?.let { onShare(it) } }
-               )
-            }
+         items(lazyItems) { item ->
+            AsamCard(
+               item = item,
+               onTap = onTap,
+               onCopyLocation = { onCopyLocation(it) },
+               onZoom = { item?.let { onZoom(Point(it.latitude, it.longitude)) }  },
+               onShare = { item?.reference?.let { onShare(it) } }
+            )
          }
       }
    }

@@ -22,6 +22,7 @@ import mil.nga.msi.repository.navigationalwarning.NavigationalWarningKey
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.navigationalwarning.NavigationalWarningAction
 import mil.nga.msi.ui.navigationalwarning.NavigationalWarningViewModel
+import mil.nga.msi.ui.theme.screenBackground
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -53,13 +54,18 @@ private fun NavigationalWarningDetailContent(
    onShare: () -> Unit
 ) {
    if (warning != null) {
-      Column(
-         Modifier
-            .padding(all = 8.dp)
-            .verticalScroll(rememberScrollState())
+      Surface(
+         color = MaterialTheme.colors.screenBackground,
+         modifier = Modifier.fillMaxHeight()
       ) {
-         NavigationalWarningHeader(warning, onShare)
-         NavigationalWarningText(warning.text)
+         Column(
+            Modifier
+               .padding(all = 8.dp)
+               .verticalScroll(rememberScrollState())
+         ) {
+            NavigationalWarningHeader(warning, onShare)
+            NavigationalWarningText(warning.text)
+         }
       }
    }
 }
@@ -71,7 +77,7 @@ private fun NavigationalWarningHeader(
 ) {
    val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.US)
 
-   Card(elevation = 4.dp) {
+   Card {
       Column {
          Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
             CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
@@ -133,15 +139,14 @@ private fun NavigationalWarningActions(
    }
 }
 
-
 @Composable
 private fun NavigationalWarningText(
    text: String?
 ) {
    Column(Modifier.padding(vertical = 16.dp)) {
-      CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+      CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
          Text(
-            text = "Warning",
+            text = "Text",
             style = MaterialTheme.typography.subtitle1,
             fontWeight = FontWeight.Medium
          )
@@ -155,7 +160,7 @@ private fun NavigationalWarningText(
             text?.let {
                Text(
                   text = it,
-                  style = MaterialTheme.typography.body1,
+                  style = MaterialTheme.typography.body2,
                   modifier = Modifier.padding(all = 16.dp)
                )
             }
