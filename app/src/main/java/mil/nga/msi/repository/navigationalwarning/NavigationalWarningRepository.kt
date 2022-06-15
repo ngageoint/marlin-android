@@ -13,6 +13,7 @@ class NavigationalWarningRepository @Inject constructor(
 ) {
    fun getNavigationalWarningListItems() = localDataSource.observeNavigationalWarningListItems()
 
+   fun observeNavigationalWarning(key: NavigationalWarningKey) = localDataSource.observeNavigationalWarning(key)
    suspend fun getNavigationalWarning(key: NavigationalWarningKey) = localDataSource.getNavigationalWarning(key)
 
    suspend fun fetchNavigationalWarnings(refresh: Boolean = false): List<NavigationalWarning> {

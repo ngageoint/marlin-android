@@ -130,7 +130,6 @@ private fun NavigationalWarningContent(
 
       val identifier = "${item.number}/${item.year}"
       val subregions = item.subregions?.joinToString(",")?.let { "($it)" }
-
       val header = listOfNotNull(item.navigationArea.title, identifier, subregions).joinToString(" ")
       Text(
          text = header,
@@ -181,7 +180,7 @@ private fun NavigationalWarningActions(
       ) {
          Icon(Icons.Default.Share,
             tint = MaterialTheme.colors.primary,
-            contentDescription = "Share ASAM"
+            contentDescription = "Share Navigational Warning"
          )
       }
    }
