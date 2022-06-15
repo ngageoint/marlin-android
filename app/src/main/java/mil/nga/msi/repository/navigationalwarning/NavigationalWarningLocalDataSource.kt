@@ -11,7 +11,7 @@ class NavigationalWarningLocalDataSource @Inject constructor(
 
    fun observeNavigationalWarningListItems() = dao.getNavigationalWarningListItems()
 
-   suspend fun getNavigationalWarning(number: Int) = dao.getNavigationalWarning(number)
+   suspend fun getNavigationalWarning(key: NavigationalWarningKey) = dao.getNavigationalWarning(key.number, key.year, key.navigationArea)
    suspend fun getNavigationalWarnings() = dao.getNavigationalWarnings()
-
+   suspend fun deleteNavigationalWarnings(numbers: List<Int>) = dao.deleteNavigationalWarnings(numbers)
 }

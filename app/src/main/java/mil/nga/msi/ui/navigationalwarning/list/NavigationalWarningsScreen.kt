@@ -23,6 +23,7 @@ import androidx.paging.compose.items
 import androidx.paging.compose.collectAsLazyPagingItems
 import kotlinx.coroutines.launch
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarningListItem
+import mil.nga.msi.repository.navigationalwarning.NavigationalWarningKey
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.navigationalwarning.NavigationWarningRoute
 import mil.nga.msi.ui.navigationalwarning.NavigationalWarningAction
@@ -32,7 +33,7 @@ import java.util.*
 @Composable
 fun NavigationalWarningsScreen(
    openDrawer: () -> Unit,
-   onTap: (Int) -> Unit,
+   onTap: (NavigationalWarningKey) -> Unit,
    onAction: (NavigationalWarningAction) -> Unit,
    viewModel: NavigationalWarningsViewModel = hiltViewModel()
 ) {
@@ -48,9 +49,9 @@ fun NavigationalWarningsScreen(
       NavigationalWarnings(
          pagingState = viewModel.navigationalWarnings,
          onTap = { onTap(it) },
-         onShare = { number ->
+         onShare = { key ->
             scope.launch {
-               viewModel.getNavigationalWarning(number)?.let { warning ->
+               viewModel.getNavigationalWarning(key)?.let { warning ->
                   onAction(NavigationalWarningAction.Share(warning.toString()))
                }
             }
@@ -62,8 +63,8 @@ fun NavigationalWarningsScreen(
 @Composable
 private fun NavigationalWarnings(
    pagingState: Flow<PagingData<NavigationalWarningListItem>>,
-   onTap: (Int) -> Unit,
-   onShare: (Int) -> Unit
+   onTap: (NavigationalWarningKey) -> Unit,
+   onShare: (NavigationalWarningKey) -> Unit
 ) {
    val lazyItems = pagingState.collectAsLazyPagingItems()
    MsiTheme {
@@ -79,7 +80,7 @@ private fun NavigationalWarnings(
                NavigationalWarningCard(
                   item = item,
                   onTap = onTap,
-                  onShare = { item?.number?.let { onShare(it) } }
+                  onShare = { onShare(it) }
                )
             }
          }
@@ -90,17 +91,20 @@ private fun NavigationalWarnings(
 @Composable
 private fun NavigationalWarningCard(
    item: NavigationalWarningListItem?,
-   onTap: (Int) -> Unit,
-   onShare: () -> Unit
+   onTap: (NavigationalWarningKey) -> Unit,
+   onShare: (NavigationalWarningKey) -> Unit
 ) {
    if (item != null) {
       Card(
          Modifier
             .fillMaxWidth()
             .padding(bottom = 8.dp)
-            .clickable { onTap(item.number) }
+            .clickable { onTap(NavigationalWarningKey.fromNavigationWarning(item)) }
       ) {
-         NavigationalWarningContent(item, onShare)
+         NavigationalWarningContent(
+            item,
+            onShare = { onShare(NavigationalWarningKey.fromNavigationWarning(item)) }
+         )
       }
    }
 }

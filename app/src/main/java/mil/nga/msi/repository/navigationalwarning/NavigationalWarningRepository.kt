@@ -13,12 +13,17 @@ class NavigationalWarningRepository @Inject constructor(
 ) {
    fun getNavigationalWarningListItems() = localDataSource.observeNavigationalWarningListItems()
 
-   suspend fun getNavigationalWarning(number: Int) = localDataSource.getNavigationalWarning(number)
+   suspend fun getNavigationalWarning(key: NavigationalWarningKey) = localDataSource.getNavigationalWarning(key)
 
    suspend fun fetchNavigationalWarnings(refresh: Boolean = false): List<NavigationalWarning> {
       if (refresh) {
-         val warnings = remoteDataSource.fetchNavigationalWarnings()
-         localDataSource.insert(warnings)
+         val remoteWarnings = remoteDataSource.fetchNavigationalWarnings()
+         localDataSource.insert(remoteWarnings)
+
+         val localSet = sortedSetOf(NavigationalWarning.numberComparator, *localDataSource.getNavigationalWarnings().toTypedArray())
+         val remoteSet = sortedSetOf(NavigationalWarning.numberComparator, *remoteWarnings.toTypedArray())
+         val numbersToRemove = localSet.minus(remoteSet).map { it.number }
+         localDataSource.deleteNavigationalWarnings(numbersToRemove)
       }
 
       return localDataSource.getNavigationalWarnings()

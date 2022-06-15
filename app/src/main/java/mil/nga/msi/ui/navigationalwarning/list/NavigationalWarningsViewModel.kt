@@ -5,6 +5,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import dagger.hilt.android.lifecycle.HiltViewModel
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarning
+import mil.nga.msi.repository.navigationalwarning.NavigationalWarningKey
 import mil.nga.msi.repository.navigationalwarning.NavigationalWarningRepository
 import javax.inject.Inject
 
@@ -12,8 +13,8 @@ import javax.inject.Inject
 class NavigationalWarningsViewModel @Inject constructor(
    private val repository: NavigationalWarningRepository
 ): ViewModel() {
-   suspend fun getNavigationalWarning(number: Int): NavigationalWarning? {
-      return repository.getNavigationalWarning(number)
+   suspend fun getNavigationalWarning(key: NavigationalWarningKey): NavigationalWarning? {
+      return repository.getNavigationalWarning(key)
    }
 
    val navigationalWarnings = Pager(PagingConfig(pageSize = 20), null) {

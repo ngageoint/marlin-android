@@ -142,8 +142,8 @@ class NavigationalWarningsTypeAdapter: TypeAdapter<List<NavigationalWarning>>() 
 
       `in`.endObject()
 
-      return if (number != null && year != null && issueDate != null && navigationArea != null) {
-         NavigationalWarning(number, year, issueDate, navigationArea).apply {
+      return if (number != null && year != null && navigationArea != null && issueDate != null) {
+         NavigationalWarning(number, year, navigationArea, issueDate).apply {
             this.subregions = subregions
             this.text = text
             this.status = status

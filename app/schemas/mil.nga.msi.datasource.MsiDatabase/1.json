@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "d2ced2b5ad876c8bac5eb224ac1b245f",
+    "identityHash": "914a59e9109274d148764f042a6039d4",
     "entities": [
       {
         "tableName": "asams",
@@ -160,7 +160,7 @@
       },
       {
         "tableName": "navigational_warnings",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`number` INTEGER NOT NULL, `year` INTEGER NOT NULL, `issue_date` INTEGER NOT NULL, `navigation_area` TEXT NOT NULL, `subregion` TEXT, `text` TEXT, `status` TEXT, `authority` TEXT, `cancelDate` INTEGER, `cancel_navigation_area` TEXT, `cancel_year` INTEGER, `cancel_number` INTEGER, PRIMARY KEY(`number`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`number` INTEGER NOT NULL, `year` INTEGER NOT NULL, `issue_date` INTEGER NOT NULL, `navigation_area` TEXT NOT NULL, `subregion` TEXT, `text` TEXT, `status` TEXT, `authority` TEXT, `cancel_number` INTEGER, `cancelDate` INTEGER, `cancel_navigation_area` TEXT, `cancel_year` INTEGER, PRIMARY KEY(`number`, `year`, `navigation_area`))",
         "fields": [
           {
             "fieldPath": "number",
@@ -211,6 +211,12 @@
             "notNull": false
           },
           {
+            "fieldPath": "cancelNumber",
+            "columnName": "cancel_number",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
             "fieldPath": "cancelDate",
             "columnName": "cancelDate",
             "affinity": "INTEGER",
@@ -227,17 +233,13 @@
             "columnName": "cancel_year",
             "affinity": "INTEGER",
             "notNull": false
-          },
-          {
-            "fieldPath": "cancelNumber",
-            "columnName": "cancel_number",
-            "affinity": "INTEGER",
-            "notNull": false
           }
         ],
         "primaryKey": {
           "columnNames": [
-            "number"
+            "number",
+            "year",
+            "navigation_area"
           ],
           "autoGenerate": false
         },
@@ -248,7 +250,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd2ced2b5ad876c8bac5eb224ac1b245f')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '914a59e9109274d148764f042a6039d4')"
     ]
   }
 }

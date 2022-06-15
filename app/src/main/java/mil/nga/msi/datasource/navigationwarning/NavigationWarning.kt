@@ -2,7 +2,6 @@ package mil.nga.msi.datasource.navigationwarning
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
-import androidx.room.PrimaryKey
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -21,20 +20,22 @@ enum class NavigationArea(val code: String, val title: String) {
    }
 }
 
-@Entity(tableName = "navigational_warnings")
+@Entity(
+   tableName = "navigational_warnings",
+   primaryKeys = ["number", "year", "navigation_area"]
+)
 data class NavigationalWarning(
-   @PrimaryKey
    @ColumnInfo(name = "number")
    val number: Int,
 
    @ColumnInfo(name = "year")
    val year: Int,
 
-   @ColumnInfo(name = "issue_date")
-   var issueDate: Date,
-
    @ColumnInfo(name = "navigation_area")
-   var navigationArea: NavigationArea
+   var navigationArea: NavigationArea,
+
+   @ColumnInfo(name = "issue_date")
+   var issueDate: Date
 ) {
    @ColumnInfo(name = "subregion")
    var subregions: List<String>? = emptyList()
@@ -71,5 +72,11 @@ data class NavigationalWarning(
               "Cancel Date: ${dateFormat.format(issueDate)}\n" +
               "Cancel Year: $cancelNumber\n" +
               "Cancel Year: $cancelYear\n"
+   }
+
+   companion object {
+      val numberComparator = Comparator<NavigationalWarning> { a, b ->
+         a.number.compareTo(b.number)
+      }
    }
 }
