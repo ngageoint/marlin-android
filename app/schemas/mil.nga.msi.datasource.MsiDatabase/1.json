@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "ac92a4f470fa7e46ba86ea426a328241",
+    "identityHash": "d2ced2b5ad876c8bac5eb224ac1b245f",
     "entities": [
       {
         "tableName": "asams",
@@ -160,7 +160,7 @@
       },
       {
         "tableName": "navigational_warnings",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`number` INTEGER NOT NULL, `year` INTEGER NOT NULL, `issueDate` INTEGER, `subregion` TEXT, `text` TEXT, `status` TEXT, `authority` TEXT, `cancelDate` INTEGER, `cancel_navigation_area` TEXT, `cancel_year` INTEGER, `cancel_number` INTEGER, PRIMARY KEY(`number`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`number` INTEGER NOT NULL, `year` INTEGER NOT NULL, `issue_date` INTEGER NOT NULL, `navigation_area` TEXT NOT NULL, `subregion` TEXT, `text` TEXT, `status` TEXT, `authority` TEXT, `cancelDate` INTEGER, `cancel_navigation_area` TEXT, `cancel_year` INTEGER, `cancel_number` INTEGER, PRIMARY KEY(`number`))",
         "fields": [
           {
             "fieldPath": "number",
@@ -176,12 +176,18 @@
           },
           {
             "fieldPath": "issueDate",
-            "columnName": "issueDate",
+            "columnName": "issue_date",
             "affinity": "INTEGER",
-            "notNull": false
+            "notNull": true
           },
           {
-            "fieldPath": "subregion",
+            "fieldPath": "navigationArea",
+            "columnName": "navigation_area",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "subregions",
             "columnName": "subregion",
             "affinity": "TEXT",
             "notNull": false
@@ -242,7 +248,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'ac92a4f470fa7e46ba86ea426a328241')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd2ced2b5ad876c8bac5eb224ac1b245f')"
     ]
   }
 }

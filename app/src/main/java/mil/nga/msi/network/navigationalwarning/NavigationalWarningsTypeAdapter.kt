@@ -5,11 +5,9 @@ import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
-import mil.nga.msi.datasource.modu.Modu
-import mil.nga.msi.datasource.modu.RigStatus
 import mil.nga.msi.datasource.modu.RigStatusConverter
+import mil.nga.msi.datasource.navigationwarning.NavigationArea
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarning
-import mil.nga.msi.network.nextDoubleOrNull
 import mil.nga.msi.network.nextIntOrNull
 import mil.nga.msi.network.nextStringOrNull
 import java.lang.UnsupportedOperationException
@@ -31,8 +29,7 @@ class NavigationalWarningsTypeAdapter: TypeAdapter<List<NavigationalWarning>>() 
 
       `in`.beginObject()
       while (`in`.hasNext()) {
-         val foo = `in`.nextName()
-         when(foo) {
+         when(`in`.nextName()) {
             "broadcast-warn" -> {
                warnings.addAll(readNavigationalWarnings(`in`))
             }
@@ -65,11 +62,11 @@ class NavigationalWarningsTypeAdapter: TypeAdapter<List<NavigationalWarning>>() 
 
    private fun readNavigationalWarning(`in`: JsonReader): NavigationalWarning? {
       val dateFormat = SimpleDateFormat("ddHHmm'Z' MMM yyyy", Locale.US)
-//      "issueDate": "120536Z JUN 2022",
 
       var number: Int? = null
       var year: Int? = null
       var issueDate: Date? = null
+      var navigationArea: NavigationArea? = null
       var subregions: List<String>? = null
       var text: String? = null
       var status: String? = null
@@ -113,10 +110,13 @@ class NavigationalWarningsTypeAdapter: TypeAdapter<List<NavigationalWarning>>() 
                   } catch (e: Exception) { null }
                }
             }
+            "navArea" -> {
+               navigationArea = `in`.nextStringOrNull()?.let {
+                  NavigationArea.fromCode(it)
+               }
+            }
             "subregion" -> {
-               subregions = `in`.nextStringOrNull()?.let {
-                  it.split(",")
-               } ?: emptyList()
+               subregions = `in`.nextStringOrNull()?.split(",") ?: emptyList()
             }
             "text" -> {
                text = `in`.nextStringOrNull()
@@ -142,8 +142,8 @@ class NavigationalWarningsTypeAdapter: TypeAdapter<List<NavigationalWarning>>() 
 
       `in`.endObject()
 
-      return if (number != null && year != null && issueDate != null) {
-         NavigationalWarning(number, year, issueDate).apply {
+      return if (number != null && year != null && issueDate != null && navigationArea != null) {
+         NavigationalWarning(number, year, issueDate, navigationArea).apply {
             this.subregions = subregions
             this.text = text
             this.status = status

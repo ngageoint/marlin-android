@@ -52,7 +52,7 @@ fun NavGraphBuilder.asamGraph(
 
          AsamsScreen(
             openDrawer = { openNavigationDrawer() },
-            onAsamClick = { reference ->
+            onTap = { reference ->
                navController.navigate("${AsamRoute.Detail.name}?reference=$reference")
             },
             onAction = { action ->

@@ -3,7 +3,23 @@ package mil.nga.msi.datasource.navigationwarning
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import java.text.SimpleDateFormat
 import java.util.*
+
+enum class NavigationArea(val code: String, val title: String) {
+   HYDROARC("C", "HYDROARC"),
+   HYDROLANT("A", "HYDROLANT"),
+   HYDROPAC("P", "HYDROPAC"),
+   NAVAREA_IV("4", "NAVAREA IV"),
+   NAVAREA_XII("12", "NAVAREA XII"),
+   SPECIAL_WARNING("S", "Special Warning");
+
+   companion object {
+      fun fromCode(code: String): NavigationArea? {
+         return values().find { it.code == code }
+      }
+   }
+}
 
 @Entity(tableName = "navigational_warnings")
 data class NavigationalWarning(
@@ -14,8 +30,11 @@ data class NavigationalWarning(
    @ColumnInfo(name = "year")
    val year: Int,
 
-   @ColumnInfo(name = "issueDate")
-   var issueDate: Date? = null
+   @ColumnInfo(name = "issue_date")
+   var issueDate: Date,
+
+   @ColumnInfo(name = "navigation_area")
+   var navigationArea: NavigationArea
 ) {
    @ColumnInfo(name = "subregion")
    var subregions: List<String>? = emptyList()
@@ -29,6 +48,9 @@ data class NavigationalWarning(
    @ColumnInfo(name = "authority")
    var authority: String? = null
 
+   @ColumnInfo(name = "cancel_number")
+   var cancelNumber: Int? = null
+
    @ColumnInfo(name = "cancelDate")
    var cancelDate: Date? = null
 
@@ -38,6 +60,16 @@ data class NavigationalWarning(
    @ColumnInfo(name = "cancel_year")
    var cancelYear: Int? = null
 
-   @ColumnInfo(name = "cancel_number")
-   var cancelNumber: Int? = null
+   override fun toString(): String {
+      val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.US)
+      return "Navigational Warning\n\n" +
+              "${dateFormat.format(issueDate)}\n\n" +
+              "$navigationArea $number/$year (${subregions?.joinToString(",")})\n\n" +
+              "$text\n\n" +
+              "Status: $status\n" +
+              "Authority: $authority\n" +
+              "Cancel Date: ${dateFormat.format(issueDate)}\n" +
+              "Cancel Year: $cancelNumber\n" +
+              "Cancel Year: $cancelYear\n"
+   }
 }

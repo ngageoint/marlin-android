@@ -53,7 +53,7 @@ fun NavGraphBuilder.moduGraph(
 
          ModusScreen(
             openDrawer = { openNavigationDrawer() },
-            onModuClick = { name ->
+            onTap = { name ->
                navController.navigate( "${ModuRoute.Detail.name}?name=$name")
             },
             onAction = { action ->

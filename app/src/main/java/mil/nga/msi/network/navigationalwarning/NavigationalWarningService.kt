@@ -8,7 +8,7 @@ import retrofit2.http.Query
 interface NavigationalWarningService {
    @GET("/api/publications/broadcast-warn")
    suspend fun getNavigationalWarnings(
-      @Query("status") status: String = "all",
+      @Query("status") status: String = "active",
       @Query("output") output: String = "json"
    ): Response<List<NavigationalWarning>>
 }

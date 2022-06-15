@@ -11,6 +11,10 @@ class NavigationalWarningRepository @Inject constructor(
    private val localDataSource: NavigationalWarningLocalDataSource,
    private val remoteDataSource: NavigationalWarningRemoteDataSource
 ) {
+   fun getNavigationalWarningListItems() = localDataSource.observeNavigationalWarningListItems()
+
+   suspend fun getNavigationalWarning(number: Int) = localDataSource.getNavigationalWarning(number)
+
    suspend fun fetchNavigationalWarnings(refresh: Boolean = false): List<NavigationalWarning> {
       if (refresh) {
          val warnings = remoteDataSource.fetchNavigationalWarnings()

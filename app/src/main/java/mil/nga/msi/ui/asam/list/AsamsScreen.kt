@@ -21,7 +21,6 @@ import kotlinx.coroutines.flow.Flow
 import mil.nga.msi.ui.theme.MsiTheme
 import androidx.paging.compose.items
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.launch
 import mil.nga.msi.coordinate.DMS
 import mil.nga.msi.datasource.asam.AsamListItem
@@ -36,7 +35,7 @@ import java.util.*
 @Composable
 fun AsamsScreen(
    openDrawer: () -> Unit,
-   onAsamClick: (String) -> Unit,
+   onTap: (String) -> Unit,
    onAction: (AsamAction) -> Unit,
    viewModel: AsamsViewModel = hiltViewModel()
 ) {
@@ -51,7 +50,7 @@ fun AsamsScreen(
 
       Asams(
          pagingState = viewModel.asams,
-         onAsamClick = onAsamClick,
+         onTap = onTap,
          onCopyLocation = { onAction(AsamAction.Location(it)) },
          onZoom = { onAction(AsamAction.Zoom(it)) },
          onShare = { reference ->
@@ -68,7 +67,7 @@ fun AsamsScreen(
 @Composable
 private fun Asams(
    pagingState: Flow<PagingData<AsamListItem>>,
-   onAsamClick: (String) -> Unit,
+   onTap: (String) -> Unit,
    onZoom: (Point) -> Unit,
    onShare: (String) -> Unit,
    onCopyLocation: (String) -> Unit
@@ -86,7 +85,7 @@ private fun Asams(
             items(lazyItems) { item ->
                AsamCard(
                   item = item,
-                  onAsamClick = onAsamClick,
+                  onTap = onTap,
                   onCopyLocation = { onCopyLocation(it) },
                   onZoom = { item?.let { onZoom(Point(it.latitude, it.longitude)) }  },
                   onShare = { item?.reference?.let { onShare(it) } }
@@ -100,7 +99,7 @@ private fun Asams(
 @Composable
 private fun AsamCard(
    item: AsamListItem?,
-   onAsamClick: (String) -> Unit,
+   onTap: (String) -> Unit,
    onShare: () -> Unit,
    onZoom: () -> Unit,
    onCopyLocation: (String) -> Unit
@@ -110,7 +109,7 @@ private fun AsamCard(
          Modifier
             .fillMaxWidth()
             .padding(bottom = 8.dp)
-            .clickable { onAsamClick(item.reference) }
+            .clickable { onTap(item.reference) }
       ) {
          AsamContent(item, onShare, onZoom, onCopyLocation)
       }

@@ -1,4 +1,4 @@
-package mil.nga.msi.ui.modu.list
+package mil.nga.msi.ui.navigationalwarning.list
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -22,40 +22,36 @@ import mil.nga.msi.ui.theme.MsiTheme
 import androidx.paging.compose.items
 import androidx.paging.compose.collectAsLazyPagingItems
 import kotlinx.coroutines.launch
-import mil.nga.msi.coordinate.DMS
-import mil.nga.msi.datasource.modu.ModuListItem
-import mil.nga.msi.ui.location.LocationTextButton
+import mil.nga.msi.datasource.navigationwarning.NavigationalWarningListItem
 import mil.nga.msi.ui.main.TopBar
-import mil.nga.msi.ui.modu.ModuAction
-import mil.nga.msi.ui.modu.ModuRoute
-import mil.nga.msi.ui.navigation.Point
+import mil.nga.msi.ui.navigationalwarning.NavigationWarningRoute
+import mil.nga.msi.ui.navigationalwarning.NavigationalWarningAction
 import java.text.SimpleDateFormat
 import java.util.*
 
 @Composable
-fun ModusScreen(
+fun NavigationalWarningsScreen(
    openDrawer: () -> Unit,
-   onTap: (String) -> Unit,
-   onAction: (ModuAction) -> Unit,
-   viewModel: ModusViewModel = hiltViewModel()
+   onTap: (Int) -> Unit,
+   onAction: (NavigationalWarningAction) -> Unit,
+   viewModel: NavigationalWarningsViewModel = hiltViewModel()
 ) {
    val scope = rememberCoroutineScope()
 
    Column(modifier = Modifier.fillMaxSize()) {
       TopBar(
-         title = ModuRoute.List.title,
+         title = NavigationWarningRoute.List.title,
          buttonIcon = Icons.Filled.Menu,
          onButtonClicked = { openDrawer() }
       )
-      Modus(
-         viewModel.modus,
-         onTap = onTap,
-         onCopyLocation = { onAction(ModuAction.Location(it)) },
-         onZoom = { onAction( ModuAction.Zoom(it)) },
-         onShare = { name ->
+
+      NavigationalWarnings(
+         pagingState = viewModel.navigationalWarnings,
+         onTap = { onTap(it) },
+         onShare = { number ->
             scope.launch {
-               viewModel.getModu(name)?.let { modu ->
-                  onAction(ModuAction.Share(modu.toString()))
+               viewModel.getNavigationalWarning(number)?.let { warning ->
+                  onAction(NavigationalWarningAction.Share(warning.toString()))
                }
             }
          }
@@ -64,12 +60,10 @@ fun ModusScreen(
 }
 
 @Composable
-private fun Modus(
-   pagingState: Flow<PagingData<ModuListItem>>,
-   onTap: (String) -> Unit,
-   onZoom: (Point) -> Unit,
-   onShare: (String) -> Unit,
-   onCopyLocation: (String) -> Unit
+private fun NavigationalWarnings(
+   pagingState: Flow<PagingData<NavigationalWarningListItem>>,
+   onTap: (Int) -> Unit,
+   onShare: (Int) -> Unit
 ) {
    val lazyItems = pagingState.collectAsLazyPagingItems()
    MsiTheme {
@@ -82,12 +76,10 @@ private fun Modus(
             contentPadding = PaddingValues(top = 16.dp)
          ) {
             items(lazyItems) { item ->
-               ModuCard(
+               NavigationalWarningCard(
                   item = item,
                   onTap = onTap,
-                  onZoom = { item?.let { onZoom(Point(it.latitude, it.longitude)) } },
-                  onShare = { item?.name?.let { onShare(it) } },
-                  onCopyLocation = onCopyLocation
+                  onShare = { item?.number?.let { onShare(it) } }
                )
             }
          }
@@ -96,36 +88,32 @@ private fun Modus(
 }
 
 @Composable
-private fun ModuCard(
-   item: ModuListItem?,
-   onTap: (String) -> Unit,
-   onZoom: () -> Unit,
-   onShare: () -> Unit,
-   onCopyLocation: (String) -> Unit
+private fun NavigationalWarningCard(
+   item: NavigationalWarningListItem?,
+   onTap: (Int) -> Unit,
+   onShare: () -> Unit
 ) {
    if (item != null) {
       Card(
          Modifier
             .fillMaxWidth()
             .padding(bottom = 8.dp)
-            .clickable { onTap(item.name) }
+            .clickable { onTap(item.number) }
       ) {
-         ModuContent(item, onZoom, onShare, onCopyLocation)
+         NavigationalWarningContent(item, onShare)
       }
    }
 }
 
 @Composable
-private fun ModuContent(
-   item: ModuListItem,
-   onZoom: () -> Unit,
-   onShare: () -> Unit,
-   onCopyLocation: (String) -> Unit
+private fun NavigationalWarningContent(
+   item: NavigationalWarningListItem,
+   onShare: () -> Unit
 ) {
    Column(Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
       CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-         item.date.let { date ->
-            val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+         item.issueDate.let { date ->
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.US)
             Text(
                text = dateFormat.format(date),
                fontWeight = FontWeight.SemiBold,
@@ -136,8 +124,12 @@ private fun ModuContent(
          }
       }
 
+      val identifier = "${item.number}/${item.year}"
+      val subregions = item.subregions?.joinToString(",")?.let { "($it)" }
+
+      val header = listOfNotNull(item.navigationArea.title, identifier, subregions).joinToString(" ")
       Text(
-         text = item.name,
+         text = header,
          style = MaterialTheme.typography.h6,
          maxLines = 1,
          overflow = TextOverflow.Ellipsis,
@@ -145,73 +137,47 @@ private fun ModuContent(
       )
 
       CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-         item.rigStatus?.let {
+         item.text?.let {
             Text(
                text = it,
                style = MaterialTheme.typography.body2,
+               maxLines = 8,
+               overflow = TextOverflow.Ellipsis,
                modifier = Modifier.padding(top = 4.dp)
             )
          }
-
-         item.specialStatus?.let {
-            Text(
-               text = it,
-               style = MaterialTheme.typography.body2
-            )
-         }
       }
-      
-      ModuFooter(item, onZoom, onShare, onCopyLocation)
+
+      NavigationalWarningFooter(onShare)
    }
 }
 
 @Composable
-private fun ModuFooter(
-   item: ModuListItem,
-   onZoom: () -> Unit,
-   onShare: () -> Unit,
-   onCopyLocation: (String) -> Unit
+private fun NavigationalWarningFooter(
+   onShare: () -> Unit
 ) {
    Row(
       verticalAlignment = Alignment.CenterVertically,
-      horizontalArrangement = Arrangement.SpaceBetween,
+      horizontalArrangement = Arrangement.End,
       modifier = Modifier
          .fillMaxWidth()
          .padding(top = 8.dp)
    ) {
-      ModuLocation(item.dms, onCopyLocation)
-      ModuActions(onZoom, onShare)
+      NavigationalWarningActions(onShare)
    }
 }
 
-
 @Composable
-private fun ModuLocation(
-   dms: DMS,
-   onCopyLocation: (String) -> Unit
-) {
-   LocationTextButton(
-      dms = dms,
-      onCopiedToClipboard = { onCopyLocation(it) }
-   )
-}
-
-@Composable
-private fun ModuActions(
-   onZoom: () -> Unit,
+private fun NavigationalWarningActions(
    onShare: () -> Unit
 ) {
    Row {
-      IconButton(onClick = { onShare() }) {
+      IconButton(
+         onClick = { onShare() }
+      ) {
          Icon(Icons.Default.Share,
             tint = MaterialTheme.colors.primary,
-            contentDescription = "Share MODU"
-         )
-      }
-      IconButton(onClick = { onZoom() }) {
-         Icon(Icons.Default.GpsFixed,
-            tint = MaterialTheme.colors.primary,
-            contentDescription = "Zoom to MODU"
+            contentDescription = "Share ASAM"
          )
       }
    }

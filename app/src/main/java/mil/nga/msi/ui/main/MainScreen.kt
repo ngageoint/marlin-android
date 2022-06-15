@@ -28,11 +28,13 @@ import mil.nga.msi.ui.home.homeGraph
 import mil.nga.msi.ui.map.MapRoute
 import mil.nga.msi.ui.modu.ModuRoute
 import mil.nga.msi.ui.navigation.*
+import mil.nga.msi.ui.navigationalwarning.NavigationWarningRoute
 
-sealed class Tab(val route: Route, val icon: Int) {
-   object MapTab : Tab(MapRoute.Map, R.drawable.ic_outline_map_24)
-   object AsamsTab : Tab(AsamRoute.List, R.drawable.ic_asam_24dp)
-   object ModusTab : Tab(ModuRoute.List, R.drawable.ic_modu_24dp)
+sealed class Tab(val route: Route, val title: String, val icon: Int) {
+   object MapTab : Tab(MapRoute.Map, "Map", R.drawable.ic_outline_map_24)
+   object AsamsTab : Tab(AsamRoute.List, "ASAMs", R.drawable.ic_asam_24dp)
+   object ModusTab : Tab(ModuRoute.List, "MODUs", R.drawable.ic_modu_24dp)
+   object NavigationalWarningsTab: Tab(NavigationWarningRoute.List, "Warnings", R.drawable.ic_round_warning_24)
 }
 
 @OptIn(ExperimentalMaterialNavigationApi::class)
@@ -41,7 +43,8 @@ fun MainScreen() {
    val tabs = listOf(
       Tab.MapTab,
       Tab.AsamsTab,
-      Tab.ModusTab
+      Tab.ModusTab,
+      Tab.NavigationalWarningsTab
    )
 
    val context: Context = LocalContext.current
@@ -111,9 +114,9 @@ fun MainScreen() {
                                  contentDescription = tab.route.title
                               )
                            },
+                           label = { Text(tab.title) },
                            selectedContentColor = MaterialTheme.colors.primary,
                            unselectedContentColor = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.disabled),
-                           label = { Text(tab.route.title) },
                            selected = currentDestination?.hierarchy?.any { it.route?.substringBefore("?") == tab.route.name } == true,
                            onClick = {
                               if (currentDestination?.route?.substringBefore("?") != tab.route.name) {
