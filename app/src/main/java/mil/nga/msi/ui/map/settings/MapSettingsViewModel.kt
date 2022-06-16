@@ -14,10 +14,17 @@ class MapSettingsViewModel @Inject constructor(
    val repository: UserPreferencesRepository
 ): ViewModel() {
    val baseMap = repository.baseMapType.asLiveData()
-
    fun setBaseLayer(baseMapType: BaseMapType) {
       viewModelScope.launch {
          repository.setBaseMapType(baseMapType)
       }
    }
+
+   val mgrs = repository.mgrs.asLiveData()
+   fun setMGRS(enabled: Boolean) {
+      viewModelScope.launch {
+         repository.setMGRS(enabled)
+      }
+   }
+
 }

@@ -2,6 +2,7 @@ package mil.nga.msi.repository.preferences
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import kotlinx.coroutines.flow.Flow
@@ -25,6 +26,16 @@ class UserPreferencesRepository @Inject constructor(
       }
    }
 
+   val mgrs: Flow<Boolean> = preferencesDataStore.data.map { preferences ->
+      preferences[MGRS_KEY] == true
+   }
+
+   suspend fun setMGRS(enabled: Boolean) {
+      preferencesDataStore.edit { preferences ->
+         preferences[MGRS_KEY] = enabled
+      }
+   }
+
    val mapLocation = mapLocationDataStore.data
 
    suspend fun setMapLocation(mapLocation: MapLocation) {
@@ -39,5 +50,6 @@ class UserPreferencesRepository @Inject constructor(
 
    companion object {
       val BASE_LAYER_KEY = intPreferencesKey("mil.nga.msi.preference.baseLayer")
+      val MGRS_KEY = booleanPreferencesKey("mil.nga.msi.preference.mgrs")
    }
 }

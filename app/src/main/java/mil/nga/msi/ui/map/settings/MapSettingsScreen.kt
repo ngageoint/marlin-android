@@ -22,6 +22,7 @@ fun MapSettingsScreen(
    viewModel: MapSettingsViewModel = hiltViewModel()
 ) {
    val baseMap by viewModel.baseMap.observeAsState()
+   val mgrs by viewModel.mgrs.observeAsState()
 
    Column {
       TopBar(
@@ -31,15 +32,20 @@ fun MapSettingsScreen(
       )
 
       baseMap?.let {
-         MapLayers(it) {
+         BaseMapLayer(it) {
             viewModel.setBaseLayer(it)
          }
       }
+
+      GridLayers(
+         mgrs = mgrs == true,
+         onMgrsToggled = { viewModel.setMGRS(it) }
+      )
    }
 }
 
 @Composable
-private fun MapLayers(
+private fun BaseMapLayer(
    baseLayer: BaseMapType,
    onLayerSelected: (BaseMapType) -> Unit
 ) {
@@ -50,7 +56,7 @@ private fun MapLayers(
          text = "Map",
          color = MaterialTheme.colors.secondary,
          style= MaterialTheme.typography.subtitle1,
-         modifier = Modifier.padding(top = 32.dp, bottom = 16.dp)
+         modifier = Modifier.padding(top = 32.dp)
       )
    }
 
@@ -120,5 +126,48 @@ fun MapLayerDialog(
             }
          }
       }
+   }
+}
+
+@Composable
+private fun GridLayers(
+   mgrs: Boolean,
+   onMgrsToggled: (Boolean) -> Unit
+) {
+   Column(Modifier.padding(horizontal = 32.dp)) {
+      Text(
+         text = "Grids",
+         color = MaterialTheme.colors.secondary,
+         style= MaterialTheme.typography.subtitle1,
+         modifier = Modifier.padding(top = 16.dp)
+      )
+   }
+
+   Row(
+      horizontalArrangement = Arrangement.SpaceBetween,
+      verticalAlignment = Alignment.CenterVertically,
+      modifier = Modifier
+         .fillMaxWidth()
+         .clickable { onMgrsToggled(!mgrs) }
+         .padding(horizontal = 32.dp, vertical = 16.dp)
+   ) {
+      Column {
+         Text(
+            text = "MGRS",
+            style = MaterialTheme.typography.body1
+         )
+
+         CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+            Text(
+               text = "Military Grid Reference System",
+               style = MaterialTheme.typography.body2
+            )
+         }
+      }
+
+      Switch(
+         checked = mgrs,
+         onCheckedChange = null
+      )
    }
 }

@@ -29,6 +29,7 @@ import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.model.*
 import com.google.maps.android.ktx.awaitMap
 import kotlinx.coroutines.launch
+import mil.nga.mgrs.tile.MGRSTileProvider
 import mil.nga.msi.type.MapLocation
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.cluster.ClusterManager
@@ -47,6 +48,7 @@ fun MapScreen(
    viewModel: MapViewModel = hiltViewModel()
 ) {
    val scope = rememberCoroutineScope()
+   val mgrs by viewModel.mgrs.observeAsState()
    val baseMap by viewModel.baseMap.observeAsState()
    val mapOrigin by viewModel.mapLocation.observeAsState()
    val annotations by viewModel.mapAnnotations.observeAsState()
@@ -64,6 +66,7 @@ fun MapScreen(
                mapOrigin,
                mapDestination,
                baseMap,
+               mgrs == true,
                annotations,
                onAnnotationClick = { onAnnotationClick.invoke(it) },
                onAnnotationsClick = { onAnnotationsClick.invoke(it) },
@@ -102,6 +105,7 @@ private fun Map(
    mapOrigin: MapLocation?,
    mapDestination: MapLocation?,
    baseMap: BaseMapType?,
+   mgrs: Boolean,
    annotations: List<MapAnnotation>,
    onMapMove: (MapLocation) -> Unit,
    onAnnotationClick: (MapAnnotation) -> Unit,
@@ -134,6 +138,10 @@ private fun Map(
             mapType = baseMap?.value ?: BaseMapType.NORMAL.value
             if (baseMap == BaseMapType.OSM) {
                addTileOverlay(TileOverlayOptions().tileProvider(OsmTileProvider()))
+            }
+
+            if (mgrs) {
+                addTileOverlay(TileOverlayOptions().tileProvider(MGRSTileProvider.create(context)))
             }
          }
 

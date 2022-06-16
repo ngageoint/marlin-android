@@ -20,6 +20,7 @@ class MapViewModel @Inject constructor(
 
    val baseMap = userPreferencesRepository.baseMapType.asLiveData()
    val mapLocation = userPreferencesRepository.mapLocation.asLiveData()
+   val mgrs = userPreferencesRepository.mgrs.asLiveData()
 
    suspend fun setMapLocation(mapLocation: MapLocation) =userPreferencesRepository.setMapLocation(mapLocation)
 
