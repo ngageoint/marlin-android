@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.Flow
 import androidx.paging.compose.items
 import androidx.paging.compose.collectAsLazyPagingItems
 import kotlinx.coroutines.launch
+import mil.nga.msi.datasource.navigationwarning.NavigationArea
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarningListItem
 import mil.nga.msi.repository.navigationalwarning.NavigationalWarningKey
 import mil.nga.msi.ui.main.TopBar
@@ -31,22 +32,24 @@ import java.util.*
 
 @Composable
 fun NavigationalWarningsScreen(
-   openDrawer: () -> Unit,
+   navigationArea: NavigationArea,
+   close: () -> Unit,
    onTap: (NavigationalWarningKey) -> Unit,
    onAction: (NavigationalWarningAction) -> Unit,
    viewModel: NavigationalWarningsViewModel = hiltViewModel()
 ) {
    val scope = rememberCoroutineScope()
+   viewModel.setNavigationArea(navigationArea)
 
    Column(modifier = Modifier.fillMaxSize()) {
       TopBar(
          title = NavigationWarningRoute.List.title,
-         buttonIcon = Icons.Filled.Menu,
-         onButtonClicked = { openDrawer() }
+         buttonIcon = Icons.Default.ArrowBack,
+         onButtonClicked = { close() }
       )
 
       NavigationalWarnings(
-         pagingState = viewModel.navigationalWarnings,
+         pagingState = viewModel.navigationalWarningsByArea,
          onTap = { onTap(it) },
          onShare = { key ->
             scope.launch {

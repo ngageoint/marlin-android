@@ -34,7 +34,7 @@ sealed class Tab(val route: Route, val title: String, val icon: Int) {
    object MapTab : Tab(MapRoute.Map, "Map", R.drawable.ic_outline_map_24)
    object AsamsTab : Tab(AsamRoute.List, "ASAMs", R.drawable.ic_asam_24dp)
    object ModusTab : Tab(ModuRoute.List, "MODUs", R.drawable.ic_modu_24dp)
-   object NavigationalWarningsTab: Tab(NavigationWarningRoute.List, "Warnings", R.drawable.ic_round_warning_24)
+   object NavigationalWarningsTab: Tab(NavigationWarningRoute.Main, "Warnings", R.drawable.ic_round_warning_24)
 }
 
 @OptIn(ExperimentalMaterialNavigationApi::class)

@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="sea_green">#FF2999A0</color>
+
+    <color name="geopackage_land_light_theme">#FEE9BF</color>
 </resources>

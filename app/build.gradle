@@ -139,11 +139,14 @@ dependencies {
     implementation  'com.google.protobuf:protobuf-javalite:3.18.0'
     implementation 'androidx.datastore:datastore-preferences:1.0.0'
 
-    implementation 'com.google.maps.android:maps-compose:2.2.0'
+    implementation 'com.google.maps.android:maps-compose:2.2.1'
     implementation 'com.google.maps.android:maps-ktx:3.2.1'
     implementation 'com.google.maps.android:android-maps-utils:2.3.0'
     implementation 'com.google.android.gms:play-services-maps:18.0.2'
     implementation 'mil.nga.mgrs:mgrs-android:1.0.1'
+
+    implementation 'mil.nga.geopackage:geopackage-android:6.3.1'
+    implementation 'mil.nga.geopackage.map:geopackage-android-map:6.3.1'
 
     implementation "com.google.accompanist:accompanist-navigation-material:$accompanist_version"
     implementation "com.google.accompanist:accompanist-pager:$accompanist_version"

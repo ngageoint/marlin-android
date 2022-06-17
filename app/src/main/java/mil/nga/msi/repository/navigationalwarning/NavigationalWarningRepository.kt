@@ -1,6 +1,7 @@
 package mil.nga.msi.repository.navigationalwarning
 
 import androidx.work.*
+import mil.nga.msi.datasource.navigationwarning.NavigationArea
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarning
 import mil.nga.msi.work.navigationalwarning.RefreshNavigationalWarningWorker
 import java.util.concurrent.TimeUnit
@@ -11,7 +12,8 @@ class NavigationalWarningRepository @Inject constructor(
    private val localDataSource: NavigationalWarningLocalDataSource,
    private val remoteDataSource: NavigationalWarningRemoteDataSource
 ) {
-   fun getNavigationalWarningListItems() = localDataSource.observeNavigationalWarningListItems()
+   fun getNavigationalWarningsByArea(navigationArea: NavigationArea?) = localDataSource.observeNavigationalWarningsByArea(navigationArea)
+   fun getNavigationalWarningsGroupByArea() = localDataSource.observeNavigationalWarningsGroupByArea()
 
    fun observeNavigationalWarning(key: NavigationalWarningKey) = localDataSource.observeNavigationalWarning(key)
    suspend fun getNavigationalWarning(key: NavigationalWarningKey) = localDataSource.getNavigationalWarning(key)

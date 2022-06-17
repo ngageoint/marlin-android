@@ -5,6 +5,7 @@ import androidx.navigation.*
 import androidx.navigation.compose.composable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import mil.nga.msi.datasource.navigationwarning.NavigationArea
 import mil.nga.msi.repository.navigationalwarning.NavigationalWarningKey
 import mil.nga.msi.ui.navigation.NavigationalWarningKey
 import mil.nga.msi.ui.navigation.Route
@@ -16,8 +17,9 @@ sealed class NavigationWarningRoute(
    override val title: String,
 ): Route {
    object Main: NavigationWarningRoute("navigational_warnings", "Navigational Warnings")
-   object Detail: NavigationWarningRoute("navigational_warnings/detail", "Navigational Warning Details")
+   object Group: NavigationWarningRoute("navigational_warnings/group", "Navigational Warnings")
    object List: NavigationWarningRoute("navigational_warnings/list", "Navigational Warnings")
+   object Detail: NavigationWarningRoute("navigational_warnings/detail", "Navigational Warning Details")
 }
 
 fun NavGraphBuilder.navigationalWarningGraph(
@@ -32,25 +34,42 @@ fun NavGraphBuilder.navigationalWarningGraph(
 
    navigation(
       route = NavigationWarningRoute.Main.name,
-      startDestination = NavigationWarningRoute.List.name,
+      startDestination = NavigationWarningRoute.Group.name,
    ) {
-      composable(NavigationWarningRoute.List.name) {
+      composable(NavigationWarningRoute.Group.name) {
          bottomBarVisibility(true)
 
-         NavigationalWarningsScreen(
+         NavigationalWarningGroupScreen(
             openDrawer = { openNavigationDrawer() },
-            onTap = { key ->
-               val encoded = Uri.encode(Json.encodeToString(key))
-               navController.navigate( "${NavigationWarningRoute.Detail.name}?key=$encoded")
-            },
-            onAction = { action ->
-               when(action) {
-                  is NavigationalWarningAction.Share -> {
-                     shareNavigationalWarning(action.text)
-                  }
-               }
+            onGroupTap = { navigationArea ->
+               navController.navigate( "${NavigationWarningRoute.List.name}?navigationArea=${navigationArea.code}")
             }
          )
+      }
+      composable(
+         route = "${NavigationWarningRoute.List.name}?navigationArea={navigationAreaCode}",
+         arguments = listOf(navArgument("navigationAreaCode") { type = NavType.StringType })
+      ) { backstackEntry ->
+         bottomBarVisibility(true)
+
+         backstackEntry.arguments?.getString("navigationAreaCode")?.let { navigationAreaCode ->
+            val navigationArea = NavigationArea.fromCode(navigationAreaCode)!!
+            NavigationalWarningsScreen(
+               navigationArea,
+               close = { navController.popBackStack() },
+               onTap = { key ->
+                  val encoded = Uri.encode(Json.encodeToString(key))
+                  navController.navigate( "${NavigationWarningRoute.Detail.name}?key=$encoded")
+               },
+               onAction = { action ->
+                  when(action) {
+                     is NavigationalWarningAction.Share -> {
+                        shareNavigationalWarning(action.text)
+                     }
+                  }
+               }
+            )
+         }
       }
       composable(
          route = "${NavigationWarningRoute.Detail.name}?key={key}",
