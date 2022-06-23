@@ -7,13 +7,16 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import mil.nga.msi.datasource.navigationwarning.NavigationArea
+import mil.nga.msi.repository.navigationalwarning.NavigationalWarningKey
 import mil.nga.msi.type.MapLocation
+import mil.nga.msi.type.UserPreferences
 import mil.nga.msi.ui.map.BaseMapType
 import javax.inject.Inject
 
 class UserPreferencesRepository @Inject constructor(
+   private val userPreferencesDataStore: DataStore<UserPreferences>,
    private val preferencesDataStore: DataStore<Preferences>,
-   private val mapLocationDataStore: DataStore<MapLocation>
 ) {
    val baseMapType: Flow<BaseMapType> = preferencesDataStore.data.map { preferences ->
       val value = preferences[BASE_LAYER_KEY]
@@ -36,15 +39,33 @@ class UserPreferencesRepository @Inject constructor(
       }
    }
 
-   val mapLocation = mapLocationDataStore.data
+   val mapLocation = userPreferencesDataStore.data.map { it.mapLocation }
 
    suspend fun setMapLocation(mapLocation: MapLocation) {
-      mapLocationDataStore.updateData {
-         it.toBuilder()
+      userPreferencesDataStore.updateData {
+         val builder = it.toBuilder()
+         builder.mapLocation.toBuilder()
             .setLatitude(mapLocation.latitude)
             .setLongitude(mapLocation.longitude)
             .setZoom(mapLocation.zoom)
             .build()
+
+         builder.build()
+      }
+   }
+
+   val lastReadNavigationalWarnings = userPreferencesDataStore.data.map { it.lastReadNavigationWarningsMap }
+
+   suspend fun setLastReadNavigationalWarning(navigationArea: NavigationArea, key: NavigationalWarningKey) {
+      userPreferencesDataStore.updateData {
+         val preferenceKey = mil.nga.msi.type.NavigationalWarningKey.newBuilder()
+            .setNumber(key.number.toLong())
+            .setYear(key.year)
+            .build()
+
+         val builder = it.toBuilder()
+         builder.putLastReadNavigationWarnings(navigationArea.code, preferenceKey)
+         builder.build()
       }
    }
 

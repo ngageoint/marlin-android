@@ -1,26 +1,29 @@
 package mil.nga.msi.ui.navigationalwarning.list
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.paging.PagingData
-import kotlinx.coroutines.flow.Flow
-import androidx.paging.compose.items
-import androidx.paging.compose.collectAsLazyPagingItems
 import kotlinx.coroutines.launch
 import mil.nga.msi.datasource.navigationwarning.NavigationArea
+import mil.nga.msi.datasource.navigationwarning.NavigationalWarning
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarningListItem
 import mil.nga.msi.repository.navigationalwarning.NavigationalWarningKey
 import mil.nga.msi.ui.main.TopBar
@@ -40,6 +43,7 @@ fun NavigationalWarningsScreen(
 ) {
    val scope = rememberCoroutineScope()
    viewModel.setNavigationArea(navigationArea)
+   val lastViewed by viewModel.getLastViewedWarning().observeAsState()
 
    Column(modifier = Modifier.fillMaxSize()) {
       TopBar(
@@ -48,41 +52,119 @@ fun NavigationalWarningsScreen(
          onButtonClicked = { close() }
       )
 
-      NavigationalWarnings(
-         pagingState = viewModel.navigationalWarningsByArea,
-         onTap = { onTap(it) },
-         onShare = { key ->
-            scope.launch {
-               viewModel.getNavigationalWarning(key)?.let { warning ->
-                  onAction(NavigationalWarningAction.Share(warning.toString()))
+      val items by viewModel.navigationalWarningsByArea.observeAsState(emptyList())
+      if (items.isNotEmpty()) {
+         NavigationalWarnings(
+            items = items,
+            lastViewed = lastViewed,
+            onTap = { onTap(it) },
+            onShare = { key ->
+               scope.launch {
+                  viewModel.getNavigationalWarning(key)?.let { warning ->
+                     onAction(NavigationalWarningAction.Share(warning.toString()))
+                  }
                }
-            }
-         }
-      )
+            },
+            onItemViewed = { viewModel.setNavigationalWarningViewed(navigationArea, it) }
+         )
+      }
    }
 }
 
 @Composable
 private fun NavigationalWarnings(
-   pagingState: Flow<PagingData<NavigationalWarningListItem>>,
+   items: List<NavigationalWarningListItem>,
+   lastViewed: NavigationalWarning?,
    onTap: (NavigationalWarningKey) -> Unit,
-   onShare: (NavigationalWarningKey) -> Unit
+   onShare: (NavigationalWarningKey) -> Unit,
+   onItemViewed: (NavigationalWarningListItem) -> Unit
 ) {
-   val lazyItems = pagingState.collectAsLazyPagingItems()
+   val contentPadding = PaddingValues(vertical = 16.dp, horizontal = 8.dp)
+   val index = items.indexOfFirst {
+      it.number == lastViewed?.number && it.year == lastViewed.year
+   }.takeIf { index -> index >= 0 } ?: (items.size - 1)
+
+   val scope = rememberCoroutineScope()
+   val listState = rememberLazyListState(index, with(LocalDensity.current) { contentPadding.calculateTopPadding().roundToPx() })
+
+   val firstItemNotVisible by remember {
+      derivedStateOf {
+         val layoutInfo = listState.layoutInfo
+         val visibleItemsInfo = layoutInfo.visibleItemsInfo
+
+         if (listState.firstVisibleItemIndex == 0) {
+            visibleItemsInfo.firstOrNull()?.let {
+               it.offset != 0
+            } ?: false
+         } else true
+      }
+   }
+
    Surface(
-      color = MaterialTheme.colors.screenBackground,
-      modifier = Modifier.fillMaxHeight()
+      color = MaterialTheme.colors.screenBackground
    ) {
-      LazyColumn(
-         modifier = Modifier.padding(horizontal = 8.dp),
-         contentPadding = PaddingValues(top = 16.dp)
-      ) {
-         items(lazyItems) { item ->
-            NavigationalWarningCard(
-               item = item,
-               onTap = onTap,
-               onShare = { onShare(it) }
-            )
+      Box {
+         LazyColumn(
+            state = listState,
+            contentPadding = contentPadding,
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+         ) {
+            itemsIndexed(
+               items = items,
+               key = { _, item ->
+                  NavigationalWarningKey.fromNavigationWarning(item)
+               }
+            ) { i, item ->
+               NavigationalWarningCard(
+                  state = listState,
+                  item = item,
+                  onTap = onTap,
+                  onShare = { onShare(it) },
+                  onItemViewed = {
+                     if (i < index) {
+                        onItemViewed(it)
+                     }
+                  }
+               )
+            }
+         }
+
+         if (index != 0 && firstItemNotVisible) {
+            Box(
+               contentAlignment = Alignment.Center,
+               modifier = Modifier
+                  .fillMaxWidth()
+                  .padding(top = 8.dp)
+            ) {
+               Row(
+                  verticalAlignment = Alignment.CenterVertically,
+                  modifier = Modifier
+                     .height(40.dp)
+                     .clip(RoundedCornerShape(20.dp))
+                     .background(MaterialTheme.colors.primary)
+                     .clickable {
+                        scope.launch {
+                           listState.animateScrollToItem(0)
+                        }
+                     }
+                     .padding(horizontal = 16.dp)
+               ) {
+                  Icon(Icons.Default.ArrowUpward,
+                     contentDescription = "Scroll to new warnings",
+                     tint = MaterialTheme.colors.contentColorFor(MaterialTheme.colors.primary),
+                     modifier = Modifier
+                        .padding(end = 4.dp)
+                        .height(16.dp)
+                        .width(16.dp)
+                  )
+
+                  Text(
+                     text = "$index Unread ${if (index == 1) "Warning" else "Warnings"}",
+                     style = MaterialTheme.typography.body2,
+                     color = MaterialTheme.colors.contentColorFor(MaterialTheme.colors.primary)
+                  )
+               }
+            }
          }
       }
    }
@@ -90,22 +172,44 @@ private fun NavigationalWarnings(
 
 @Composable
 private fun NavigationalWarningCard(
-   item: NavigationalWarningListItem?,
+   state: LazyListState,
+   item: NavigationalWarningListItem,
    onTap: (NavigationalWarningKey) -> Unit,
-   onShare: (NavigationalWarningKey) -> Unit
+   onShare: (NavigationalWarningKey) -> Unit,
+   onItemViewed: (NavigationalWarningListItem) -> Unit
 ) {
-   if (item != null) {
-      Card(
-         Modifier
-            .fillMaxWidth()
-            .padding(bottom = 8.dp)
-            .clickable { onTap(NavigationalWarningKey.fromNavigationWarning(item)) }
-      ) {
-         NavigationalWarningContent(
-            item,
-            onShare = { onShare(NavigationalWarningKey.fromNavigationWarning(item)) }
-         )
+   val isItemWithKeyInView by remember {
+      derivedStateOf {
+         val visibleItemsInfo = state.layoutInfo.visibleItemsInfo
+         if (visibleItemsInfo.isEmpty()) {
+            false
+         } else {
+            val firstItem = visibleItemsInfo.first()
+            if (NavigationalWarningKey.fromNavigationWarning(item) == firstItem.key) {
+               val offset = firstItem.offset - state.layoutInfo.viewportStartOffset
+               offset >= 0
+            } else {
+               state.layoutInfo
+                  .visibleItemsInfo
+                  .any { it.key == NavigationalWarningKey.fromNavigationWarning(item) }
+            }
+         }
       }
+   }
+
+   if (isItemWithKeyInView) {
+      LaunchedEffect(Unit) { onItemViewed(item) }
+   }
+
+   Card(
+      Modifier
+         .fillMaxWidth()
+         .clickable { onTap(NavigationalWarningKey.fromNavigationWarning(item)) }
+   ) {
+      NavigationalWarningContent(
+         item,
+         onShare = { onShare(NavigationalWarningKey.fromNavigationWarning(item)) }
+      )
    }
 }
 

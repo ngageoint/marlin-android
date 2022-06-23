@@ -1,0 +1,38 @@
+package mil.nga.msi.ui.navigationalwarning
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.flatMapLatest
+import mil.nga.msi.datasource.navigationwarning.NavigationArea
+import mil.nga.msi.repository.navigationalwarning.NavigationalWarningKey
+import mil.nga.msi.repository.navigationalwarning.NavigationalWarningRepository
+import mil.nga.msi.repository.preferences.UserPreferencesRepository
+import mil.nga.msi.ui.map.overlay.GeoPackageTileProvider
+import java.util.*
+import javax.inject.Inject
+import javax.inject.Named
+
+@HiltViewModel
+class NavigationalWarningAreasViewModel @Inject constructor(
+   val repository: NavigationalWarningRepository,
+   val userPreferencesRepository: UserPreferencesRepository,
+   @Named("lowResolution") val naturalEarthTileProvider: GeoPackageTileProvider
+): ViewModel() {
+
+   val navigationalWarningsByArea = userPreferencesRepository.lastReadNavigationalWarnings.flatMapLatest {
+      repository.getNavigationalWarningsByNavigationArea(
+         getNavigationalWarning(it[NavigationArea.HYDROARC.code]!!, NavigationArea.HYDROARC),
+         getNavigationalWarning(it[NavigationArea.HYDROLANT.code]!!, NavigationArea.HYDROLANT),
+         getNavigationalWarning(it[NavigationArea.HYDROPAC.code]!!, NavigationArea.HYDROPAC),
+         getNavigationalWarning(it[NavigationArea.NAVAREA_IV.code]!!, NavigationArea.NAVAREA_IV),
+         getNavigationalWarning(it[NavigationArea.NAVAREA_XII.code]!!, NavigationArea.NAVAREA_XII),
+         getNavigationalWarning(it[NavigationArea.SPECIAL_WARNING.code]!!, NavigationArea.SPECIAL_WARNING),
+      )
+   }.asLiveData()
+
+   private suspend fun getNavigationalWarning(preferenceKey: mil.nga.msi.type.NavigationalWarningKey, navigationArea: NavigationArea): Date {
+      val key = NavigationalWarningKey(preferenceKey.number.toInt(), preferenceKey.year, navigationArea)
+      return repository.getNavigationalWarning(key)?.issueDate ?: Date(0)
+   }
+}

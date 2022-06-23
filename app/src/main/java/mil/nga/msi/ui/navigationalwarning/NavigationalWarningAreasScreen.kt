@@ -11,30 +11,25 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.modifier.modifierLocalConsumer
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.google.android.gms.maps.model.TileProvider
 import com.google.maps.android.compose.*
-import com.google.maps.android.ktx.model.tileOverlayOptions
-import mil.nga.msi.R
 import mil.nga.msi.datasource.navigationwarning.NavigationArea
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarningGroup
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.overlay.GeoPackageTileProvider
 
-
 @Composable
 fun NavigationalWarningGroupScreen(
    openDrawer: () -> Unit,
    onGroupTap: (NavigationArea) -> Unit,
-   viewModel: NavigationalWarningsGroupViewModel = hiltViewModel()
+   viewModel: NavigationalWarningAreasViewModel = hiltViewModel()
 ) {
    val scrollState = rememberScrollState()
    val geoPackageTileProvider = viewModel.naturalEarthTileProvider
-   val warningsByArea by viewModel.navigationalWarningsByArea.observeAsState()
+   val warningsByArea by viewModel.navigationalWarningsByArea.observeAsState(emptyList())
 
    Column() {
       TopBar(
@@ -47,7 +42,7 @@ fun NavigationalWarningGroupScreen(
 
       // TODO sort by nav area you are in, then alphabetical
       Column(Modifier.verticalScroll(scrollState)) {
-         warningsByArea?.forEach { group ->
+         warningsByArea.forEach { group ->
             NavigationalWarnings(group) {
                onGroupTap(group.navigationArea)
             }
@@ -64,7 +59,7 @@ private fun NavigationAreaMap(
 ) {
    GoogleMap(
       modifier = Modifier
-         .height(230.dp)
+         .height(250.dp)
          .fillMaxWidth(),
       properties = MapProperties(
          mapType = MapType.NONE
@@ -83,13 +78,15 @@ private fun NavigationalWarnings(
    group: NavigationalWarningGroup,
    onGroupTap: () -> Unit
 ) {
-   // TODO create badge for unread
-   Row(modifier = Modifier
-      .fillMaxWidth()
-      .clickable { onGroupTap() }
-      .padding(vertical = 8.dp, horizontal = 16.dp)
+   Row(
+      horizontalArrangement = Arrangement.SpaceBetween,
+      verticalAlignment = Alignment.CenterVertically,
+      modifier = Modifier
+         .fillMaxWidth()
+         .clickable { onGroupTap() }
+         .padding(horizontal = 16.dp)
    ) {
-      Column(modifier = Modifier.padding(16.dp)) {
+      Column(modifier = Modifier.padding(vertical = 16.dp)) {
          Text(
             text = group.navigationArea.title,
             style = MaterialTheme.typography.subtitle2
@@ -97,8 +94,22 @@ private fun NavigationalWarnings(
 
          CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
             Text(
-               text = "${group.count} Active",
+               text = "${group.total} Active",
                style = MaterialTheme.typography.subtitle1
+            )
+         }
+      }
+
+      if (group.unread > 0) {
+         Badge(
+            backgroundColor = MaterialTheme.colors.error.copy(alpha = .87f),
+            contentColor = MaterialTheme.colors.contentColorFor(MaterialTheme.colors.error),
+            modifier = Modifier.padding(end = 8.dp)
+         ) {
+            Text(
+               text = "${group.unread}",
+               style = MaterialTheme.typography.body2,
+               modifier = Modifier.padding(2.dp)
             )
          }
       }

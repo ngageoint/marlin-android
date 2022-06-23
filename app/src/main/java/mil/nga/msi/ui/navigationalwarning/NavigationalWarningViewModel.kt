@@ -2,6 +2,7 @@ package mil.nga.msi.ui.navigationalwarning
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarning
 import mil.nga.msi.repository.navigationalwarning.NavigationalWarningKey
@@ -12,7 +13,7 @@ import javax.inject.Inject
 class NavigationalWarningViewModel @Inject constructor(
    private val repository: NavigationalWarningRepository
 ): ViewModel() {
-   fun getNavigationalWarning(key: NavigationalWarningKey): LiveData<NavigationalWarning> {
-      return repository.observeNavigationalWarning(key)
+   fun getNavigationalWarning(key: NavigationalWarningKey): LiveData<NavigationalWarning?> {
+      return repository.observeNavigationalWarning(key).asLiveData()
    }
 }
