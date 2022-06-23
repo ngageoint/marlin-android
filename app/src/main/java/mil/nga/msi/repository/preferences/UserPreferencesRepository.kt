@@ -1,10 +1,6 @@
 package mil.nga.msi.repository.preferences
 
 import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.intPreferencesKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import mil.nga.msi.datasource.navigationwarning.NavigationArea
@@ -15,34 +11,36 @@ import mil.nga.msi.ui.map.BaseMapType
 import javax.inject.Inject
 
 class UserPreferencesRepository @Inject constructor(
-   private val userPreferencesDataStore: DataStore<UserPreferences>,
-   private val preferencesDataStore: DataStore<Preferences>,
+   private val preferencesDataStore: DataStore<UserPreferences>,
 ) {
-   val baseMapType: Flow<BaseMapType> = preferencesDataStore.data.map { preferences ->
-      val value = preferences[BASE_LAYER_KEY]
-      BaseMapType.fromValue(value)
+   val baseMapType: Flow<BaseMapType> = preferencesDataStore.data.map {
+      BaseMapType.fromValue(it.mapLayer)
    }
 
    suspend fun setBaseMapType(baseMapType: BaseMapType) {
-      preferencesDataStore.edit { preferences ->
-         preferences[BASE_LAYER_KEY] = baseMapType.value
+      preferencesDataStore.updateData {
+         it.toBuilder()
+            .setMapLayer(baseMapType.value)
+            .build()
       }
    }
 
-   val mgrs: Flow<Boolean> = preferencesDataStore.data.map { preferences ->
-      preferences[MGRS_KEY] == true
+   val mgrs: Flow<Boolean> = preferencesDataStore.data.map {
+      it.mgrs
    }
 
    suspend fun setMGRS(enabled: Boolean) {
-      preferencesDataStore.edit { preferences ->
-         preferences[MGRS_KEY] = enabled
+      preferencesDataStore.updateData {
+         it.toBuilder()
+            .setMgrs(enabled)
+            .build()
       }
    }
 
-   val mapLocation = userPreferencesDataStore.data.map { it.mapLocation }
+   val mapLocation = preferencesDataStore.data.map { it.mapLocation }
 
    suspend fun setMapLocation(mapLocation: MapLocation) {
-      userPreferencesDataStore.updateData {
+      preferencesDataStore.updateData {
          val builder = it.toBuilder()
          builder.mapLocation.toBuilder()
             .setLatitude(mapLocation.latitude)
@@ -54,10 +52,10 @@ class UserPreferencesRepository @Inject constructor(
       }
    }
 
-   val lastReadNavigationalWarnings = userPreferencesDataStore.data.map { it.lastReadNavigationWarningsMap }
+   val lastReadNavigationalWarnings = preferencesDataStore.data.map { it.lastReadNavigationWarningsMap }
 
    suspend fun setLastReadNavigationalWarning(navigationArea: NavigationArea, key: NavigationalWarningKey) {
-      userPreferencesDataStore.updateData {
+      preferencesDataStore.updateData {
          val preferenceKey = mil.nga.msi.type.NavigationalWarningKey.newBuilder()
             .setNumber(key.number.toLong())
             .setYear(key.year)
@@ -67,10 +65,5 @@ class UserPreferencesRepository @Inject constructor(
          builder.putLastReadNavigationWarnings(navigationArea.code, preferenceKey)
          builder.build()
       }
-   }
-
-   companion object {
-      val BASE_LAYER_KEY = intPreferencesKey("mil.nga.msi.preference.baseLayer")
-      val MGRS_KEY = booleanPreferencesKey("mil.nga.msi.preference.mgrs")
    }
 }
