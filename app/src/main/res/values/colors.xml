@@ -2,5 +2,7 @@
 <resources>
     <color name="sea_green">#FF2999A0</color>
 
-    <color name="geopackage_land_light_theme">#FEE9BF</color>
+<!--    <color name="geopackage_land_light_theme">#FEE9BF</color>-->
+    <color name="geopackage_land_light_theme">#8B572A</color>
+
 </resources>
