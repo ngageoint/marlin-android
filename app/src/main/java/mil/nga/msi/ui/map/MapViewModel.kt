@@ -4,6 +4,7 @@ import androidx.lifecycle.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import mil.nga.msi.datasource.asam.AsamMapItem
 import mil.nga.msi.datasource.modu.ModuMapItem
+import mil.nga.msi.location.LocationPolicy
 import mil.nga.msi.repository.asam.AsamRepository
 import mil.nga.msi.repository.modu.ModuRepository
 import mil.nga.msi.repository.preferences.UserPreferencesRepository
@@ -15,6 +16,7 @@ import javax.inject.Inject
 class MapViewModel @Inject constructor(
    asamRepository: AsamRepository,
    moduRepository: ModuRepository,
+   val locationPolicy: LocationPolicy,
    val userPreferencesRepository: UserPreferencesRepository
 ): ViewModel() {
 
@@ -22,7 +24,7 @@ class MapViewModel @Inject constructor(
    val mapLocation = userPreferencesRepository.mapLocation.asLiveData()
    val mgrs = userPreferencesRepository.mgrs.asLiveData()
 
-   suspend fun setMapLocation(mapLocation: MapLocation) =userPreferencesRepository.setMapLocation(mapLocation)
+   suspend fun setMapLocation(mapLocation: MapLocation) = userPreferencesRepository.setMapLocation(mapLocation)
 
    private val _mapAnnotations = mutableMapOf<MapAnnotation.Type, List<MapAnnotation>>()
    val mapAnnotations = MediatorLiveData<List<MapAnnotation>>().apply {

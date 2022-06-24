@@ -1,5 +1,6 @@
 package mil.nga.msi.repository.preferences
 
+import android.util.Log
 import androidx.datastore.core.DataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -42,7 +43,7 @@ class UserPreferencesRepository @Inject constructor(
    suspend fun setMapLocation(mapLocation: MapLocation) {
       preferencesDataStore.updateData {
          val builder = it.toBuilder()
-         builder.mapLocation.toBuilder()
+         builder.mapLocation = builder.mapLocation.toBuilder()
             .setLatitude(mapLocation.latitude)
             .setLongitude(mapLocation.longitude)
             .setZoom(mapLocation.zoom)
