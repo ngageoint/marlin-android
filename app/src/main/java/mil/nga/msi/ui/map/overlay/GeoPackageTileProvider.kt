@@ -33,8 +33,8 @@ class GeoPackageTileProvider(
       featureTiles.setPolygonFillPaint(Paint().apply { color = polygonFillColor })
    }
 
-   override fun getTile(x: Int, y: Int, z: Int): Tile {
+   override fun getTile(x: Int, y: Int, z: Int): Tile? {
       val bytes = featureTiles.drawTileBytes(x, y, z)
-      return Tile(256, 256, bytes)
+      return bytes?.let { Tile(256, 256, it) }
    }
 }

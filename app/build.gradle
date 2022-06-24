@@ -13,9 +13,9 @@ def googleMapsApiDebugKey = hasProperty('MSI_DEBUG_MAPS_API_KEY') ? MSI_DEBUG_MA
 
 def room_version = '2.4.2'
 def work_version = '2.7.1'
-def compose_version = '1.2.0-rc01'
+def compose_version = '1.2.0-rc02'
 def retrofit_version = '2.9.0'
-def accompanist_version = '0.23.1'
+def accompanist_version = '0.24.12-rc'
 
 android {
     compileSdk 32
@@ -139,11 +139,13 @@ dependencies {
     implementation  'com.google.protobuf:protobuf-javalite:3.18.0'
     implementation 'androidx.datastore:datastore-preferences:1.0.0'
 
-    implementation 'com.google.maps.android:maps-compose:2.2.1'
+    implementation 'com.google.maps.android:maps-compose:2.3.0'
     implementation 'com.google.maps.android:maps-ktx:3.2.1'
     implementation 'com.google.maps.android:android-maps-utils:2.3.0'
     implementation 'com.google.android.gms:play-services-maps:18.0.2'
     implementation 'mil.nga.mgrs:mgrs-android:1.0.1'
+
+    implementation 'com.google.android.gms:play-services-location:20.0.0'
 
     implementation 'mil.nga.geopackage:geopackage-android:6.3.1'
     implementation 'mil.nga.geopackage.map:geopackage-android-map:6.3.1'
@@ -151,6 +153,7 @@ dependencies {
     implementation "com.google.accompanist:accompanist-navigation-material:$accompanist_version"
     implementation "com.google.accompanist:accompanist-pager:$accompanist_version"
     implementation "com.google.accompanist:accompanist-pager-indicators:$accompanist_version"
+    implementation "com.google.accompanist:accompanist-permissions:$accompanist_version"
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'

@@ -5,6 +5,7 @@ import androidx.lifecycle.asLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.flatMapLatest
 import mil.nga.msi.datasource.navigationwarning.NavigationArea
+import mil.nga.msi.location.LocationPolicy
 import mil.nga.msi.repository.navigationalwarning.NavigationalWarningKey
 import mil.nga.msi.repository.navigationalwarning.NavigationalWarningRepository
 import mil.nga.msi.repository.preferences.UserPreferencesRepository
@@ -15,10 +16,19 @@ import javax.inject.Named
 
 @HiltViewModel
 class NavigationalWarningAreasViewModel @Inject constructor(
+   private val locationPolicy: LocationPolicy,
    val repository: NavigationalWarningRepository,
    val userPreferencesRepository: UserPreferencesRepository,
    @Named("lowResolution") val naturalEarthTileProvider: GeoPackageTileProvider
 ): ViewModel() {
+
+   val locationProvider = locationPolicy.bestLocationProvider
+
+   fun setLocationEnabled(enabled: Boolean) {
+      if (enabled) {
+         locationPolicy.requestLocationUpdates()
+      }
+   }
 
    val navigationalWarningsByArea = userPreferencesRepository.lastReadNavigationalWarnings.flatMapLatest {
       repository.getNavigationalWarningsByNavigationArea(

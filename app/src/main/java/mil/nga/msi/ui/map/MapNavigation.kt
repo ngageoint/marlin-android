@@ -2,7 +2,6 @@ package mil.nga.msi.ui.map
 
 import android.net.Uri
 import androidx.compose.runtime.*
-import androidx.lifecycle.Lifecycle
 import androidx.navigation.*
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -28,7 +27,7 @@ sealed class MapRoute(
    object PagerSheet: MapRoute("annotationPagerSheet", "Map")
 }
 
-@OptIn(ExperimentalMaterialNavigationApi::class, NavControllerVisibleEntries::class)
+@OptIn(ExperimentalMaterialNavigationApi::class)
 fun NavGraphBuilder.mapGraph(
    navController: NavController,
    bottomBarVisibility: (Boolean) -> Unit,
