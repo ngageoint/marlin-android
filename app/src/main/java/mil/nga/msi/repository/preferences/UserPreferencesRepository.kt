@@ -1,6 +1,5 @@
 package mil.nga.msi.repository.preferences
 
-import android.util.Log
 import androidx.datastore.core.DataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
