@@ -111,6 +111,7 @@ private fun NavigationAreaMap(
       cameraPositionState = cameraPositionState,
       properties = MapProperties(
          mapType = MapType.NONE,
+         minZoomPreference = 0f,
          isMyLocationEnabled = locationPermissionState.status.isGranted
       ),
       uiSettings = MapUiSettings(
