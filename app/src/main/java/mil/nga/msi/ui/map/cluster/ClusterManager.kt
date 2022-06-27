@@ -24,7 +24,7 @@ class ClusterManager(
       return super.addItem(annotation)
    }
 
-   override fun addItems(annotations: MutableCollection<MapAnnotation>): Boolean {
+   override fun addItems(annotations: Collection<MapAnnotation>): Boolean {
       annotationMap.putAll(annotations.associateBy { it.key })
       return super.addItems(annotations)
    }

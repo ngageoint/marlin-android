@@ -3,7 +3,6 @@ package mil.nga.msi.ui.map
 import android.animation.ValueAnimator
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.os.Bundle
 import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -15,19 +14,13 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.animation.addListener
 import androidx.core.animation.doOnEnd
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.model.*
-import com.google.maps.android.ktx.awaitMap
+import com.google.maps.android.compose.*
 import kotlinx.coroutines.launch
 import mil.nga.mgrs.tile.MGRSTileProvider
 import mil.nga.msi.type.MapLocation
@@ -84,6 +77,7 @@ fun MapScreen(
             modifier = Modifier
                .align(Alignment.TopEnd)
                .padding(16.dp)
+               .size(40.dp)
          ) {
             Icon(Icons.Outlined.Map,
                tint = MaterialTheme.colors.secondary,
@@ -92,13 +86,9 @@ fun MapScreen(
          }
       }
    }
-
-//   if (nav.navigatorSheetState.currentValue == ModalBottomSheetValue.Hidden) {
-////      markerAnimator?.reverse()
-////      markerAnimator = null
-//   }
 }
 
+@OptIn(MapsComposeExperimentalApi::class)
 @Composable
 private fun Map(
    selectedAnnotation: MapAnnotation?,
@@ -111,16 +101,16 @@ private fun Map(
    onAnnotationClick: (MapAnnotation) -> Unit,
    onAnnotationsClick: (Collection<MapAnnotation>) -> Unit
 ) {
-   val context = LocalContext.current
-   val mapView = remember { MapView(context) }
+   val cameraPositionState: CameraPositionState = rememberCameraPositionState {
+      mapOrigin?.let {
+         position = CameraPosition.fromLatLngZoom(LatLng(it.latitude, it.longitude), it.zoom.toFloat())
+      }
+   }
+
    var previousAnnotations by remember { mutableStateOf(listOf<MapAnnotation>()) }
-   var clusterManager by remember { mutableStateOf<ClusterManager?>(null)}
 
    var selectedMarker by remember { mutableStateOf<Marker?>(null) }
    var selectedAnimator by remember { mutableStateOf<ValueAnimator?>(null) }
-
-   AndroidView(factory = { mapView })
-   MapLifecycle(mapView)
 
    if (selectedAnnotation == null) {
       selectedAnimator?.doOnEnd {
@@ -131,28 +121,31 @@ private fun Map(
       selectedAnimator = null
    }
 
-   LaunchedEffect(mapView, annotations) {
-      if (clusterManager == null) {
-         val map = mapView.awaitMap().apply {
-            uiSettings.isMapToolbarEnabled = false
-            mapType = baseMap?.value ?: BaseMapType.NORMAL.value
-            if (baseMap == BaseMapType.OSM) {
-               addTileOverlay(TileOverlayOptions().tileProvider(OsmTileProvider()))
-            }
+   GoogleMap(
+      cameraPositionState = cameraPositionState,
+      properties = MapProperties(
+         minZoomPreference = 0f,
+         mapType = baseMap?.asMapType() ?: BaseMapType.NORMAL.asMapType(),
+      ),
+      uiSettings = MapUiSettings(
+         mapToolbarEnabled = false,
+         compassEnabled = false,
+         zoomControlsEnabled = false,
+         myLocationButtonEnabled = false
+      )
+   ) {
+      val context = LocalContext.current
+      var clusterManager by remember { mutableStateOf<ClusterManager?>(null)}
 
-            if (mgrs) {
-                addTileOverlay(TileOverlayOptions().tileProvider(MGRSTileProvider.create(context)))
-            }
-         }
+      if (baseMap == BaseMapType.OSM) {
+         TileOverlay(tileProvider = OsmTileProvider())
+      }
 
-         mapOrigin?.let { location ->
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(location.latitude, location.longitude), location.zoom.toFloat()))
-         }
+      if (mgrs) {
+         TileOverlay(tileProvider = MGRSTileProvider.create(context))
+      }
 
-         mapDestination?.let { location ->
-            map.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(location.latitude, location.longitude), location.zoom.toFloat()))
-         }
-
+      MapEffect(null) { map ->
          map.setOnCameraMoveListener {
             val position = map.cameraPosition
             val mapLocation = MapLocation.newBuilder()
@@ -162,66 +155,69 @@ private fun Map(
                .build()
             onMapMove(mapLocation)
          }
-
-         clusterManager = ClusterManager(context, map).apply {
-            setOnClusterItemClickListener { item ->
-               onAnnotationClick(item)
-               selectedAnimator = ValueAnimator.ofFloat(1f, 2f)
-               selectedMarker = map.addMarker(MarkerOptions().apply {
-                  icon(BitmapDescriptorFactory.fromResource(item.key.type.icon))
-                  position(item.position)
-               })
-               selectedMarker?.tag = item.key
-               val bitmap = BitmapFactory.decodeResource(context.resources, item.key.type.icon)
-               animateAnnotation(selectedMarker, selectedAnimator, bitmap)
-               animateMap(map, item.position)
-               true
-            }
-
-            setOnClusterClickListener { cluster ->
-               if (map.maxZoomLevel == map.cameraPosition.zoom) {
-                  onAnnotationsClick(cluster.items)
-               } else {
-                  val builder = LatLngBounds.Builder()
-                  cluster.items.forEach { builder.include(it.position) }
-                  map.animateCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 20))
-               }
-               true
-            }
-         }
       }
 
-      var updateCluster = false
-      val manager = clusterManager
-      if (manager != null) {
-         val annotationSet = sortedSetOf(MapAnnotation.idComparator, *annotations.toTypedArray())
-         val previousAnnotationSet = sortedSetOf(MapAnnotation.idComparator, *previousAnnotations.toTypedArray())
+      MapEffect(annotations) { map ->
+         if (clusterManager == null) {
+            clusterManager = ClusterManager(context, map).apply {
+               setOnClusterItemClickListener { item ->
+                  onAnnotationClick(item)
+                  selectedAnimator = ValueAnimator.ofFloat(1f, 2f)
+                  selectedMarker = map.addMarker(MarkerOptions().apply {
+                     icon(BitmapDescriptorFactory.fromResource(item.key.type.icon))
+                     position(item.position)
+                  })
+                  selectedMarker?.tag = item.key
+                  val bitmap = BitmapFactory.decodeResource(context.resources, item.key.type.icon)
+                  animateAnnotation(selectedMarker, selectedAnimator, bitmap)
+                  animateMap(map, item.position)
+                  true
+               }
 
-         // add new
-         annotationSet.minus(previousAnnotationSet).forEach {
-            manager.addItem(it)
-            updateCluster = true
+               setOnClusterClickListener { cluster ->
+                  if (map.maxZoomLevel == map.cameraPosition.zoom) {
+                     onAnnotationsClick(cluster.items)
+                  } else {
+                     val builder = LatLngBounds.Builder()
+                     cluster.items.forEach { builder.include(it.position) }
+                     map.animateCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 20))
+                  }
+                  true
+               }
+            }
          }
 
-         // update existing
-         annotationSet.intersect(previousAnnotationSet).forEach { annotation ->
-            clusterManager?.getClusterItem(annotation.key)?.let {
-               manager.removeItem(it)
-               manager.addItem(annotation)
+         var updateCluster = false
+         clusterManager?.let { manager ->
+            val annotationSet = sortedSetOf(MapAnnotation.idComparator, *annotations.toTypedArray())
+            val previousAnnotationSet = sortedSetOf(MapAnnotation.idComparator, *previousAnnotations.toTypedArray())
+
+            // add new
+            annotationSet.minus(previousAnnotationSet).forEach {
+               manager.addItem(it)
+               updateCluster = true
             }
 
-            updateCluster = true
-         }
+            // update existing
+            annotationSet.intersect(previousAnnotationSet).forEach { annotation ->
+               clusterManager?.getClusterItem(annotation.key)?.let {
+                  manager.removeItem(it)
+                  manager.addItem(annotation)
+               }
 
-         // remove old
-         previousAnnotationSet.minus(annotationSet).forEach {
-            manager.removeItem(it)
-            updateCluster = true
-         }
+               updateCluster = true
+            }
 
-         if (updateCluster) {
-            manager.cluster()
-            previousAnnotations = annotations
+            // remove old
+            previousAnnotationSet.minus(annotationSet).forEach {
+               manager.removeItem(it)
+               updateCluster = true
+            }
+
+            if (updateCluster) {
+               manager.cluster()
+               previousAnnotations = annotations
+            }
          }
       }
    }
@@ -250,29 +246,3 @@ private fun animateAnnotation(
    }
    animator?.start()
 }
-
-@Composable
-private fun MapLifecycle(mapView: MapView) {
-   val context = LocalContext.current
-   val lifecycle = LocalLifecycleOwner.current.lifecycle
-   DisposableEffect(context, lifecycle, mapView) {
-      val mapLifecycleObserver = mapView.lifecycleObserver()
-      lifecycle.addObserver(mapLifecycleObserver)
-      onDispose {
-         lifecycle.removeObserver(mapLifecycleObserver)
-      }
-   }
-}
-
-private fun MapView.lifecycleObserver(): LifecycleEventObserver =
-   LifecycleEventObserver { _, event ->
-      when (event) {
-         Lifecycle.Event.ON_CREATE -> this.onCreate(Bundle())
-         Lifecycle.Event.ON_START -> this.onStart()
-         Lifecycle.Event.ON_RESUME -> this.onResume()
-         Lifecycle.Event.ON_PAUSE -> this.onPause()
-         Lifecycle.Event.ON_STOP -> this.onStop()
-         Lifecycle.Event.ON_DESTROY -> this.onDestroy()
-         else -> throw IllegalStateException()
-      }
-   }
