@@ -1,5 +1,6 @@
 package mil.nga.msi.ui.map
 
+import android.Manifest
 import android.animation.ValueAnimator
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -8,7 +9,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.outlined.LocationSearching
 import androidx.compose.material.icons.outlined.Map
+import androidx.compose.material.icons.outlined.MyLocation
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -17,19 +20,23 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.animation.doOnEnd
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.google.accompanist.permissions.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.LocationSource
 import com.google.android.gms.maps.model.*
 import com.google.maps.android.compose.*
 import kotlinx.coroutines.launch
 import mil.nga.mgrs.tile.MGRSTileProvider
 import mil.nga.msi.type.MapLocation
+import mil.nga.msi.ui.location.LocationPermission
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.cluster.ClusterManager
 import mil.nga.msi.ui.map.cluster.MapAnnotation
 import mil.nga.msi.ui.map.overlay.OsmTileProvider
 import kotlin.math.roundToInt
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun MapScreen(
    selectedAnnotation: MapAnnotation?,
@@ -44,7 +51,34 @@ fun MapScreen(
    val mgrs by viewModel.mgrs.observeAsState()
    val baseMap by viewModel.baseMap.observeAsState()
    val mapOrigin by viewModel.mapLocation.observeAsState()
+   var destination by remember { mutableStateOf(mapDestination) }
    val annotations by viewModel.mapAnnotations.observeAsState()
+   val location by viewModel.locationPolicy.bestLocationProvider.observeAsState()
+   var located by remember { mutableStateOf(false) }
+
+   val locationPermissionState: PermissionState = rememberPermissionState(
+      Manifest.permission.ACCESS_FINE_LOCATION
+   )
+
+   LocationPermission(locationPermissionState)
+
+   if (locationPermissionState.status.isGranted) {
+      viewModel.locationPolicy.requestLocationUpdates()
+   }
+
+   var origin by remember { mutableStateOf(mapOrigin) }
+   if (origin == null) {
+      origin = mapOrigin
+   }
+
+   val locationSource = object : LocationSource {
+      override fun activate(listener: LocationSource.OnLocationChangedListener) {
+         location?.let { listener.onLocationChanged(it) }
+      }
+
+      override fun deactivate() {}
+   }
+
    Column(modifier = Modifier.fillMaxSize()) {
       TopBar(
          title = "Map",
@@ -56,16 +90,22 @@ fun MapScreen(
          annotations?.let { annotations ->
             Map(
                selectedAnnotation,
-               mapOrigin,
-               mapDestination,
+               origin,
+               destination,
                baseMap,
+               locationSource,
+               locationPermissionState.status.isGranted,
                mgrs == true,
                annotations,
                onAnnotationClick = { onAnnotationClick.invoke(it) },
                onAnnotationsClick = { onAnnotationsClick.invoke(it) },
-               onMapMove = {
+               onMapMove = { location, reason ->
+                  if (reason == GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE) {
+                     located = false
+                     destination = null
+                  }
                   scope.launch {
-                     viewModel.setMapLocation(it)
+                     viewModel.setMapLocation(location)
                   }
                }
             )
@@ -84,6 +124,39 @@ fun MapScreen(
                contentDescription = "Map Settings"
             )
          }
+
+         if (locationPermissionState.status.isGranted) {
+            FloatingActionButton(
+               onClick = {
+                  location?.let {
+                     located = true
+                     scope.launch {
+                        destination = MapLocation.newBuilder()
+                           .setLatitude(it.latitude)
+                           .setLongitude(it.longitude)
+                           .setZoom(17.0)
+                           .build()
+                     }
+                  }
+               },
+               backgroundColor = MaterialTheme.colors.background,
+               modifier = Modifier
+                  .align(Alignment.BottomEnd)
+                  .padding(16.dp)
+            ) {
+               var icon = Icons.Outlined.LocationSearching
+               var tint =  MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.disabled)
+               if (located) {
+                  icon = Icons.Outlined.MyLocation
+                  tint = MaterialTheme.colors.secondary
+               }
+               Icon(
+                  imageVector = icon,
+                  tint = tint,
+                  contentDescription = "Zoom to location"
+               )
+            }
+         }
       }
    }
 }
@@ -92,18 +165,37 @@ fun MapScreen(
 @Composable
 private fun Map(
    selectedAnnotation: MapAnnotation?,
-   mapOrigin: MapLocation?,
-   mapDestination: MapLocation?,
+   origin: MapLocation?,
+   destination: MapLocation?,
    baseMap: BaseMapType?,
+   locationSource: LocationSource,
+   locationEnabled: Boolean,
    mgrs: Boolean,
    annotations: List<MapAnnotation>,
-   onMapMove: (MapLocation) -> Unit,
+   onMapMove: (MapLocation, Int) -> Unit,
    onAnnotationClick: (MapAnnotation) -> Unit,
    onAnnotationsClick: (Collection<MapAnnotation>) -> Unit
 ) {
-   val cameraPositionState: CameraPositionState = rememberCameraPositionState {
-      mapOrigin?.let {
-         position = CameraPosition.fromLatLngZoom(LatLng(it.latitude, it.longitude), it.zoom.toFloat())
+   val scope = rememberCoroutineScope()
+
+   var isMapLoaded by remember { mutableStateOf(false) }
+   val cameraPositionState: CameraPositionState = rememberCameraPositionState {}
+   var cameraMoveReason by remember { mutableStateOf(0) }
+
+   LaunchedEffect(origin) {
+      origin?.let { origin ->
+         cameraPositionState.position = CameraPosition.fromLatLngZoom(LatLng(origin.latitude, origin.longitude), origin.zoom.toFloat())
+      }
+   }
+
+   if (isMapLoaded) {
+      LaunchedEffect(destination) {
+         destination?.let { destination ->
+            scope.launch {
+               val update = CameraUpdateFactory.newLatLngZoom(LatLng(destination.latitude, destination.longitude), destination.zoom.toFloat())
+               cameraPositionState.animate(update)
+            }
+         }
       }
    }
 
@@ -123,16 +215,19 @@ private fun Map(
 
    GoogleMap(
       cameraPositionState = cameraPositionState,
+      onMapLoaded = { isMapLoaded = true },
       properties = MapProperties(
          minZoomPreference = 0f,
          mapType = baseMap?.asMapType() ?: BaseMapType.NORMAL.asMapType(),
+         isMyLocationEnabled = locationEnabled
       ),
       uiSettings = MapUiSettings(
          mapToolbarEnabled = false,
          compassEnabled = false,
          zoomControlsEnabled = false,
          myLocationButtonEnabled = false
-      )
+      ),
+      locationSource = locationSource
    ) {
       val context = LocalContext.current
       var clusterManager by remember { mutableStateOf<ClusterManager?>(null)}
@@ -146,6 +241,10 @@ private fun Map(
       }
 
       MapEffect(null) { map ->
+         map.setOnCameraMoveStartedListener { reason ->
+            cameraMoveReason = reason
+         }
+
          map.setOnCameraMoveListener {
             val position = map.cameraPosition
             val mapLocation = MapLocation.newBuilder()
@@ -153,7 +252,9 @@ private fun Map(
                .setLongitude(position.target.longitude)
                .setZoom(position.zoom.toDouble())
                .build()
-            onMapMove(mapLocation)
+            Log.i("Billy", "On Map moved; ${mapLocation.latitude}/${mapLocation.longitude}/${mapLocation.zoom}")
+
+            onMapMove(mapLocation, cameraMoveReason)
          }
       }
 
