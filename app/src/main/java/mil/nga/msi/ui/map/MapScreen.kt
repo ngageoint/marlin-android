@@ -4,7 +4,6 @@ import android.Manifest
 import android.animation.ValueAnimator
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -252,7 +251,6 @@ private fun Map(
                .setLongitude(position.target.longitude)
                .setZoom(position.zoom.toDouble())
                .build()
-            Log.i("Billy", "On Map moved; ${mapLocation.latitude}/${mapLocation.longitude}/${mapLocation.zoom}")
 
             onMapMove(mapLocation, cameraMoveReason)
          }

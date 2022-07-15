@@ -1,6 +1,7 @@
 package mil.nga.msi.ui.navigationalwarning
 
 import android.location.Location
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -12,11 +13,8 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
 import com.google.accompanist.permissions.*
 import com.google.android.gms.maps.LocationSource
 import com.google.android.gms.maps.model.CameraPosition
@@ -24,6 +22,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
 import mil.nga.msi.datasource.navigationwarning.NavigationArea
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarningGroup
+import mil.nga.msi.ui.location.LocationPermission
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.overlay.GeoPackageTileProvider
 
@@ -40,7 +39,7 @@ fun NavigationalWarningGroupScreen(
    val location by viewModel.locationProvider.observeAsState()
 
    val locationPermissionState: PermissionState = rememberPermissionState(
-      android.Manifest.permission.ACCESS_COARSE_LOCATION
+      android.Manifest.permission.ACCESS_FINE_LOCATION
    )
 
    LocationPermission(locationPermissionState)
@@ -85,7 +84,7 @@ private fun NavigationAreaMap(
 ) {
    val cameraPositionState = rememberCameraPositionState {}
 
-   var currentLocation by remember { mutableStateOf(location) }
+   var currentLocation by remember { mutableStateOf<Location?>(null) }
    LaunchedEffect(location) {
       if (currentLocation == null) {
          location?.let {
@@ -122,79 +121,6 @@ private fun NavigationAreaMap(
       locationSource = locationSource
    ) {
       TileOverlay(tileProvider)
-   }
-}
-
-@OptIn(ExperimentalPermissionsApi::class)
-@Composable
-private fun LocationPermission(
-   locationPermissionState: PermissionState
-) {
-   val shouldShowRationale by remember { mutableStateOf(locationPermissionState.status.shouldShowRationale) }
-
-   val lifecycleOwner = LocalLifecycleOwner.current
-   DisposableEffect(lifecycleOwner) {
-      val observer = LifecycleEventObserver { _, event ->
-         if (event == Lifecycle.Event.ON_START) {
-            if (!shouldShowRationale) {
-               locationPermissionState.launchPermissionRequest()
-            }
-         }
-      }
-      lifecycleOwner.lifecycle.addObserver(observer)
-
-      onDispose {
-         lifecycleOwner.lifecycle.removeObserver(observer)
-      }
-   }
-
-   when {
-      shouldShowRationale && locationPermissionState.status.shouldShowRationale -> {
-         LocationPermissionDeniedDialog(
-            permissionState = locationPermissionState
-         ) {
-            locationPermissionState.launchPermissionRequest()
-         }
-      }
-   }
-}
-
-@OptIn(ExperimentalPermissionsApi::class)
-@Composable
-private fun LocationPermissionDeniedDialog(
-   permissionState: PermissionState,
-   onConfirm: (() -> Unit)? = null
-) {
-   var openDialog by remember { mutableStateOf(!permissionState.status.isGranted) }
-
-   if (openDialog) {
-      AlertDialog(
-         onDismissRequest = { },
-         title = {
-            Text(
-               text = "Marlin Location Services",
-               style = MaterialTheme.typography.h6
-            )
-         },
-         text = {
-            Text(text = "Marlin will use your location to determine the navigation area you currently reside to show you the most relevant navigational warnings")
-         },
-         buttons = {
-            Row(
-               horizontalArrangement = Arrangement.End,
-               modifier = Modifier.fillMaxWidth()
-            ) {
-               TextButton(
-                  onClick = {
-                     openDialog = false
-                     onConfirm?.invoke()
-                  }
-               ) {
-                  Text("OK")
-               }
-            }
-         }
-      )
    }
 }
 
