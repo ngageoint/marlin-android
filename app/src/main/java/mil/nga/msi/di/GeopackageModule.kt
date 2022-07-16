@@ -1,20 +1,14 @@
 package mil.nga.msi.di
 
 import android.app.Application
-import android.graphics.Paint
-import androidx.compose.ui.platform.LocalContext
+import android.graphics.Color
 import androidx.core.content.ContextCompat
-import com.google.android.gms.maps.model.TileOverlayOptions
-import com.google.android.gms.maps.model.TileProvider
-import com.google.maps.android.ktx.model.tileOverlayOptions
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mil.nga.geopackage.GeoPackageFactory
 import mil.nga.geopackage.GeoPackageManager
-import mil.nga.geopackage.features.user.FeatureDao
-import mil.nga.geopackage.tiles.features.DefaultFeatureTiles
 import mil.nga.msi.R
 import mil.nga.msi.ui.map.overlay.GeoPackageTileProvider
 import javax.inject.Named
@@ -38,7 +32,7 @@ class GeopackageModule {
          context = application.applicationContext,
          resourceId = R.raw.natural_earth_1_100,
          name ="natural_earth_1_100",
-         polygonColor = ContextCompat.getColor(application, R.color.geopackage_land_light_theme),
+         polygonLineColor = ContextCompat.getColor(application, R.color.geopackage_land_light_theme),
          polygonFillColor = ContextCompat.getColor(application, R.color.geopackage_land_light_theme)
       )
    }
@@ -49,4 +43,14 @@ class GeopackageModule {
 //   fun provideNaturalEarthHighResTileProvider(application: Application): TileProvider {
 //      return TileOverlayOptions().tileProvider(GeoPackageTileProvider(application, R.raw.natural_earth_1_10)).tileProvider!!
 //   }
+
+   @Singleton
+   @Provides
+   fun provideNavigationAreaTileProvider(application: Application): GeoPackageTileProvider {
+      return GeoPackageTileProvider(
+         context = application.applicationContext,
+         resourceId = R.raw.navigation_areas,
+         name ="navigation_areas"
+      )
+   }
 }

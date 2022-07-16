@@ -19,7 +19,8 @@ class NavigationalWarningAreasViewModel @Inject constructor(
    private val locationPolicy: LocationPolicy,
    val repository: NavigationalWarningRepository,
    val userPreferencesRepository: UserPreferencesRepository,
-   @Named("lowResolution") val naturalEarthTileProvider: GeoPackageTileProvider
+   @Named("lowResolution") val naturalEarthTileProvider: GeoPackageTileProvider,
+   val navigationAreaTileProvider: GeoPackageTileProvider
 ): ViewModel() {
 
    val locationProvider = locationPolicy.bestLocationProvider

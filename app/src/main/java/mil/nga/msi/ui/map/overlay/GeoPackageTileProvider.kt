@@ -13,8 +13,8 @@ class GeoPackageTileProvider(
    context: Context,
    resourceId: Int,
    name: String,
-   polygonColor: Int = android.R.color.black,
-   polygonFillColor: Int = android.R.color.black
+   polygonLineColor: Int? = null,
+   polygonFillColor: Int? = null
 ): TileProvider {
 
    private var featureTiles: FeatureTiles
@@ -28,9 +28,16 @@ class GeoPackageTileProvider(
       val features: List<String> = geopackage.featureTables
       val featureTable: String = features[0]
       val featureDao: FeatureDao = geopackage.getFeatureDao(featureTable)
-      featureTiles = DefaultFeatureTiles(context, featureDao, context.resources.displayMetrics.density)
-      featureTiles.setPolygonPaint(Paint().apply { color = polygonColor })
-      featureTiles.setPolygonFillPaint(Paint().apply { color = polygonFillColor })
+      featureTiles = DefaultFeatureTiles(context, geopackage, featureDao)
+
+      polygonLineColor?.let {
+         featureTiles.setLinePaint(Paint().apply { color = it })
+      }
+
+      polygonFillColor?.let {
+         featureTiles.isFillPolygon = true
+         featureTiles.setPolygonFillPaint(Paint().apply { color = it })
+      }
    }
 
    override fun getTile(x: Int, y: Int, z: Int): Tile? {
