@@ -26,6 +26,7 @@ import com.google.android.gms.maps.LocationSource
 import com.google.android.gms.maps.model.*
 import com.google.maps.android.compose.*
 import kotlinx.coroutines.launch
+import mil.nga.gars.tile.GARSTileProvider
 import mil.nga.mgrs.tile.MGRSTileProvider
 import mil.nga.msi.type.MapLocation
 import mil.nga.msi.ui.location.LocationPermission
@@ -47,6 +48,7 @@ fun MapScreen(
    viewModel: MapViewModel = hiltViewModel()
 ) {
    val scope = rememberCoroutineScope()
+   val gars by viewModel.gars.observeAsState()
    val mgrs by viewModel.mgrs.observeAsState()
    val baseMap by viewModel.baseMap.observeAsState()
    val mapOrigin by viewModel.mapLocation.observeAsState()
@@ -94,6 +96,7 @@ fun MapScreen(
                baseMap,
                locationSource,
                locationPermissionState.status.isGranted,
+               gars == true,
                mgrs == true,
                annotations,
                onAnnotationClick = { onAnnotationClick.invoke(it) },
@@ -169,6 +172,7 @@ private fun Map(
    baseMap: BaseMapType?,
    locationSource: LocationSource,
    locationEnabled: Boolean,
+   gars: Boolean,
    mgrs: Boolean,
    annotations: List<MapAnnotation>,
    onMapMove: (MapLocation, Int) -> Unit,
@@ -233,6 +237,10 @@ private fun Map(
 
       if (baseMap == BaseMapType.OSM) {
          TileOverlay(tileProvider = OsmTileProvider())
+      }
+
+      if (gars) {
+         TileOverlay(tileProvider = GARSTileProvider.create(context))
       }
 
       if (mgrs) {

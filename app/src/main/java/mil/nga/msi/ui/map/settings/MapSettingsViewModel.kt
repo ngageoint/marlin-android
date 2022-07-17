@@ -20,6 +20,13 @@ class MapSettingsViewModel @Inject constructor(
       }
    }
 
+   val gars = repository.gars.asLiveData()
+   fun setGARS(enabled: Boolean) {
+      viewModelScope.launch {
+         repository.setGARS(enabled)
+      }
+   }
+
    val mgrs = repository.mgrs.asLiveData()
    fun setMGRS(enabled: Boolean) {
       viewModelScope.launch {

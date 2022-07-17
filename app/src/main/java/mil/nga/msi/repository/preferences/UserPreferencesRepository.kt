@@ -25,6 +25,18 @@ class UserPreferencesRepository @Inject constructor(
       }
    }
 
+   val gars: Flow<Boolean> = preferencesDataStore.data.map {
+      it.gars
+   }
+
+   suspend fun setGARS(enabled: Boolean) {
+      preferencesDataStore.updateData {
+         it.toBuilder()
+            .setGars(enabled)
+            .build()
+      }
+   }
+
    val mgrs: Flow<Boolean> = preferencesDataStore.data.map {
       it.mgrs
    }

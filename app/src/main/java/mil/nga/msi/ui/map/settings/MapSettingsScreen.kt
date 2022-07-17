@@ -22,6 +22,7 @@ fun MapSettingsScreen(
    viewModel: MapSettingsViewModel = hiltViewModel()
 ) {
    val baseMap by viewModel.baseMap.observeAsState()
+   val gars by viewModel.gars.observeAsState()
    val mgrs by viewModel.mgrs.observeAsState()
 
    Column {
@@ -38,7 +39,9 @@ fun MapSettingsScreen(
       }
 
       GridLayers(
+         gars = gars == true,
          mgrs = mgrs == true,
+         onGarsToggled = { viewModel.setGARS(it) },
          onMgrsToggled = { viewModel.setMGRS(it) }
       )
    }
@@ -131,7 +134,9 @@ fun MapLayerDialog(
 
 @Composable
 private fun GridLayers(
+   gars: Boolean,
    mgrs: Boolean,
+   onGarsToggled: (Boolean) -> Unit,
    onMgrsToggled: (Boolean) -> Unit
 ) {
    Column(Modifier.padding(horizontal = 32.dp)) {
@@ -140,6 +145,34 @@ private fun GridLayers(
          color = MaterialTheme.colors.secondary,
          style= MaterialTheme.typography.subtitle1,
          modifier = Modifier.padding(top = 16.dp)
+      )
+   }
+
+   Row(
+      horizontalArrangement = Arrangement.SpaceBetween,
+      verticalAlignment = Alignment.CenterVertically,
+      modifier = Modifier
+         .fillMaxWidth()
+         .clickable { onGarsToggled(!gars) }
+         .padding(horizontal = 32.dp, vertical = 16.dp)
+   ) {
+      Column {
+         Text(
+            text = "GARS",
+            style = MaterialTheme.typography.body1
+         )
+
+         CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+            Text(
+               text = "Global Area Reference System",
+               style = MaterialTheme.typography.body2
+            )
+         }
+      }
+
+      Switch(
+         checked = gars,
+         onCheckedChange = null
       )
    }
 

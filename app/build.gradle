@@ -143,6 +143,7 @@ dependencies {
     implementation 'com.google.maps.android:maps-ktx:3.2.1'
     implementation 'com.google.maps.android:android-maps-utils:2.3.0'
     implementation 'com.google.android.gms:play-services-maps:18.0.2'
+    implementation 'mil.nga.gars:gars-android:1.1.0'
     implementation 'mil.nga.mgrs:mgrs-android:2.1.0'
 
     implementation 'com.google.android.gms:play-services-location:20.0.0'
