@@ -24,6 +24,8 @@ import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
 import mil.nga.geopackage.GeoPackageFactory
+import mil.nga.geopackage.extension.nga.index.FeatureTableIndex
+import mil.nga.geopackage.extension.rtree.RTreeIndexExtension
 import mil.nga.geopackage.features.user.FeatureDao
 import mil.nga.msi.R
 import mil.nga.msi.datasource.navigationwarning.NavigationArea
@@ -218,20 +220,14 @@ private fun getNavigationArea(
    val features: List<String> = geopackage.featureTables
    val featureTable: String = features[0]
    val featureDao: FeatureDao = geopackage.getFeatureDao(featureTable)
-   featureDao.queryForAll().use { cursor ->
-      for (row in cursor) {
-         val geometryData = row.geometry
-         if (geometryData != null && !geometryData.isEmpty) {
-            val point = Point(location.longitude, location.latitude)
-            if (geometryData.geometry.envelope.contains(point.envelope)) {
-               val codeColumnIndex = row.getColumnIndex("code")
-               val code = row.getValue(codeColumnIndex) as? String
-               if (code != null) {
-                  navigationArea = NavigationArea.fromCode(code)
-               }
-               break
-            }
-         }
+   val rtree = RTreeIndexExtension(geopackage)
+   val rtreeDao = rtree.getTableDao(featureDao)
+   val point = Point(location.longitude, location.latitude)
+   rtreeDao.queryFeatures(point.envelope).first()?.let { row ->
+      val codeColumnIndex = row.getColumnIndex("code")
+      val code = row.getValue(codeColumnIndex) as? String
+      if (code != null) {
+         navigationArea = NavigationArea.fromCode(code)
       }
    }
 

@@ -246,7 +246,7 @@ private fun Map(
             TileOverlay(tileProvider = MGRSTileProvider.create(context))
          }
       }
-      
+
       MapEffect(null) { map ->
          map.setOnCameraMoveStartedListener { reason ->
             cameraMoveReason = reason
