@@ -1,7 +1,6 @@
 package mil.nga.msi.di
 
 import android.app.Application
-import android.graphics.Color
 import androidx.core.content.ContextCompat
 import dagger.Module
 import dagger.Provides
@@ -29,6 +28,7 @@ class GeopackageModule {
    @Named("lowResolution")
    fun provideNaturalEarthLowResTileProvider(application: Application, geoPackageManager: GeoPackageManager): GeoPackageTileProvider {
       return GeoPackageTileProvider(
+         geopackageManager = geoPackageManager,
          context = application.applicationContext,
          resourceId = R.raw.natural_earth_1_100,
          name ="natural_earth_1_100",
@@ -46,8 +46,9 @@ class GeopackageModule {
 
    @Singleton
    @Provides
-   fun provideNavigationAreaTileProvider(application: Application): GeoPackageTileProvider {
+   fun provideNavigationAreaTileProvider(application: Application, geoPackageManager: GeoPackageManager): GeoPackageTileProvider {
       return GeoPackageTileProvider(
+         geopackageManager = geoPackageManager,
          context = application.applicationContext,
          resourceId = R.raw.navigation_areas,
          name ="navigation_areas"

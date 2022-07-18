@@ -4,12 +4,13 @@ import android.content.Context
 import android.graphics.Paint
 import com.google.android.gms.maps.model.Tile
 import com.google.android.gms.maps.model.TileProvider
-import mil.nga.geopackage.GeoPackageFactory
+import mil.nga.geopackage.GeoPackageManager
 import mil.nga.geopackage.features.user.FeatureDao
 import mil.nga.geopackage.tiles.features.DefaultFeatureTiles
 import mil.nga.geopackage.tiles.features.FeatureTiles
 
 class GeoPackageTileProvider(
+   geopackageManager: GeoPackageManager,
    context: Context,
    resourceId: Int,
    name: String,
@@ -20,7 +21,6 @@ class GeoPackageTileProvider(
    private var featureTiles: FeatureTiles
 
    init {
-      val geopackageManager = GeoPackageFactory.getManager(context)
       val resource = context.resources.openRawResource(resourceId)
       try { geopackageManager.importGeoPackage(name, resource) } catch (e: Exception) { }
       val database = geopackageManager.databasesLike(name).firstOrNull()
