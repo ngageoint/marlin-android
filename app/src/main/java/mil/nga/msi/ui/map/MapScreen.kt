@@ -191,17 +191,6 @@ private fun Map(
       }
    }
 
-   if (isMapLoaded) {
-      LaunchedEffect(destination) {
-         destination?.let { destination ->
-            scope.launch {
-               val update = CameraUpdateFactory.newLatLngZoom(LatLng(destination.latitude, destination.longitude), destination.zoom.toFloat())
-               cameraPositionState.animate(update)
-            }
-         }
-      }
-   }
-
    var previousAnnotations by remember { mutableStateOf(listOf<MapAnnotation>()) }
 
    var selectedMarker by remember { mutableStateOf<Marker?>(null) }
@@ -235,18 +224,29 @@ private fun Map(
       val context = LocalContext.current
       var clusterManager by remember { mutableStateOf<ClusterManager?>(null)}
 
-      if (baseMap == BaseMapType.OSM) {
-         TileOverlay(tileProvider = OsmTileProvider())
-      }
+      if (isMapLoaded) {
+         LaunchedEffect(destination) {
+            destination?.let { destination ->
+               scope.launch {
+                  val update = CameraUpdateFactory.newLatLngZoom(LatLng(destination.latitude, destination.longitude), destination.zoom.toFloat())
+                  cameraPositionState.animate(update)
+               }
+            }
+         }
 
-      if (gars) {
-         TileOverlay(tileProvider = GARSTileProvider.create(context))
-      }
+         if (baseMap == BaseMapType.OSM) {
+            TileOverlay(tileProvider = OsmTileProvider())
+         }
 
-      if (mgrs) {
-         TileOverlay(tileProvider = MGRSTileProvider.create(context))
-      }
+         if (gars) {
+            TileOverlay(tileProvider = GARSTileProvider.create(context))
+         }
 
+         if (mgrs) {
+            TileOverlay(tileProvider = MGRSTileProvider.create(context))
+         }
+      }
+      
       MapEffect(null) { map ->
          map.setOnCameraMoveStartedListener { reason ->
             cameraMoveReason = reason
