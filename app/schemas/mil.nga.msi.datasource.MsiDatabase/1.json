@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "914a59e9109274d148764f042a6039d4",
+    "identityHash": "d3e0d0750ec733ccffcb1e9bb07913df",
     "entities": [
       {
         "tableName": "asams",
@@ -160,7 +160,7 @@
       },
       {
         "tableName": "navigational_warnings",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`number` INTEGER NOT NULL, `year` INTEGER NOT NULL, `issue_date` INTEGER NOT NULL, `navigation_area` TEXT NOT NULL, `subregion` TEXT, `text` TEXT, `status` TEXT, `authority` TEXT, `cancel_number` INTEGER, `cancelDate` INTEGER, `cancel_navigation_area` TEXT, `cancel_year` INTEGER, PRIMARY KEY(`number`, `year`, `navigation_area`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`number` INTEGER NOT NULL, `year` INTEGER NOT NULL, `navigation_area` TEXT NOT NULL, `issue_date` INTEGER NOT NULL, `subregion` TEXT, `text` TEXT, `status` TEXT, `authority` TEXT, `cancel_number` INTEGER, `cancelDate` INTEGER, `cancel_navigation_area` TEXT, `cancel_year` INTEGER, PRIMARY KEY(`number`, `year`, `navigation_area`))",
         "fields": [
           {
             "fieldPath": "number",
@@ -175,15 +175,15 @@
             "notNull": true
           },
           {
-            "fieldPath": "issueDate",
-            "columnName": "issue_date",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
             "fieldPath": "navigationArea",
             "columnName": "navigation_area",
             "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "issueDate",
+            "columnName": "issue_date",
+            "affinity": "INTEGER",
             "notNull": true
           },
           {
@@ -245,12 +245,190 @@
         },
         "indices": [],
         "foreignKeys": []
+      },
+      {
+        "tableName": "lights",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`volume_number` TEXT NOT NULL, `feature_number` TEXT NOT NULL, `characteristic_number` INTEGER NOT NULL, `latitude` REAL NOT NULL, `longitude` REAL NOT NULL, `international_feature` TEXT, `aid_type` TEXT, `geopolitical_heading` TEXT, `region_heading` TEXT, `subregion_heading` TEXT, `local_heading` TEXT, `preceding_note` TEXT, `name` TEXT, `position` TEXT, `characteristic` TEXT, `height_feet` REAL, `height_meters` REAL, `range` TEXT, `structure` TEXT, `remarks` TEXT, `post_note` TEXT, `notice_number` INTEGER, `remove_from_list` TEXT, `delete_flag` TEXT, `notice_week` TEXT, `notice_year` TEXT, `section_header` TEXT, PRIMARY KEY(`volume_number`, `feature_number`, `characteristic_number`))",
+        "fields": [
+          {
+            "fieldPath": "volumeNumber",
+            "columnName": "volume_number",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "featureNumber",
+            "columnName": "feature_number",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "characteristicNumber",
+            "columnName": "characteristic_number",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "latitude",
+            "columnName": "latitude",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "longitude",
+            "columnName": "longitude",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "internationalFeature",
+            "columnName": "international_feature",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "aidType",
+            "columnName": "aid_type",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "geopoliticalHeading",
+            "columnName": "geopolitical_heading",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "regionHeading",
+            "columnName": "region_heading",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "subregionHeading",
+            "columnName": "subregion_heading",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "localHeading",
+            "columnName": "local_heading",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "precedingNote",
+            "columnName": "preceding_note",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "position",
+            "columnName": "position",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "characteristic",
+            "columnName": "characteristic",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "heightFeet",
+            "columnName": "height_feet",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "heightMeters",
+            "columnName": "height_meters",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "range",
+            "columnName": "range",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "structure",
+            "columnName": "structure",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "remarks",
+            "columnName": "remarks",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "postNote",
+            "columnName": "post_note",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "noticeNumber",
+            "columnName": "notice_number",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "removeFromList",
+            "columnName": "remove_from_list",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "deleteFlag",
+            "columnName": "delete_flag",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "noticeWeek",
+            "columnName": "notice_week",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "noticeYear",
+            "columnName": "notice_year",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "sectionHeader",
+            "columnName": "section_header",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "volume_number",
+            "feature_number",
+            "characteristic_number"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '914a59e9109274d148764f042a6039d4')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd3e0d0750ec733ccffcb1e9bb07913df')"
     ]
   }
 }

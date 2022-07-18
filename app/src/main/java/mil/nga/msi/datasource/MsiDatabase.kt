@@ -5,6 +5,8 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import mil.nga.msi.datasource.asam.Asam
 import mil.nga.msi.datasource.asam.AsamDao
+import mil.nga.msi.datasource.light.Light
+import mil.nga.msi.datasource.light.LightDao
 import mil.nga.msi.datasource.modu.Modu
 import mil.nga.msi.datasource.modu.ModuDao
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarning
@@ -15,7 +17,8 @@ import mil.nga.msi.datasource.navigationwarning.NavigationalWarningDao
    entities = [
       Asam::class,
       Modu::class,
-      NavigationalWarning::class
+      NavigationalWarning::class,
+      Light::class
    ]
 )
 @TypeConverters(
@@ -31,4 +34,5 @@ abstract class MsiDatabase : RoomDatabase() {
    abstract fun asamDao(): AsamDao
    abstract fun moduDao(): ModuDao
    abstract fun navigationalWarning(): NavigationalWarningDao
+   abstract fun lightDao(): LightDao
 }

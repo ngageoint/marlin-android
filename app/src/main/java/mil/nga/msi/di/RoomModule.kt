@@ -8,6 +8,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mil.nga.msi.datasource.MsiDatabase
 import mil.nga.msi.datasource.asam.AsamDao
+import mil.nga.msi.datasource.light.LightDao
 import mil.nga.msi.datasource.modu.ModuDao
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarningDao
 import javax.inject.Singleton
@@ -40,5 +41,11 @@ class RoomModule {
    @Singleton
    fun provideNavigationalWarningDao(database: MsiDatabase): NavigationalWarningDao {
       return database.navigationalWarning()
+   }
+
+   @Provides
+   @Singleton
+   fun provideLightDao(database: MsiDatabase): LightDao {
+      return database.lightDao()
    }
 }
