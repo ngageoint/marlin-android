@@ -8,10 +8,13 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mil.nga.msi.datasource.asam.Asam
+import mil.nga.msi.datasource.light.Light
 import mil.nga.msi.datasource.modu.Modu
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarning
 import mil.nga.msi.network.asam.AsamService
 import mil.nga.msi.network.asam.AsamsTypeAdapter
+import mil.nga.msi.network.light.LightService
+import mil.nga.msi.network.light.LightsTypeAdapter
 import mil.nga.msi.network.modu.ModuService
 import mil.nga.msi.network.modu.ModusTypeAdapter
 import mil.nga.msi.network.navigationalwarning.NavigationalWarningService
@@ -37,6 +40,7 @@ class NetworkModule {
          .registerTypeAdapter(object : TypeToken<List<Asam>>() {}.type, AsamsTypeAdapter())
          .registerTypeAdapter(object : TypeToken<List<Modu>>() {}.type, ModusTypeAdapter())
          .registerTypeAdapter(object : TypeToken<List<NavigationalWarning>>() {}.type, NavigationalWarningsTypeAdapter())
+         .registerTypeAdapter(object : TypeToken<List<Light>>() {}.type, LightsTypeAdapter())
          .create()
    }
 
@@ -69,5 +73,11 @@ class NetworkModule {
    @Singleton
    fun provideNavigationalWarningService(retrofit: Retrofit): NavigationalWarningService {
       return retrofit.create(NavigationalWarningService::class.java)
+   }
+
+   @Provides
+   @Singleton
+   fun provideLightService(retrofit: Retrofit): LightService {
+      return retrofit.create(LightService::class.java)
    }
 }

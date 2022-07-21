@@ -97,7 +97,6 @@ class NavigationalWarningsTypeAdapter: TypeAdapter<List<NavigationalWarning>>() 
                   issueDate = try {
                      dateFormat.parse(dateString)
                   } catch (e: Exception) {
-                     Log.i("foo", "bar")
                      null
                   }
                }

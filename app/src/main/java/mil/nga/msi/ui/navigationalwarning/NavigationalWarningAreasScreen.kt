@@ -22,9 +22,9 @@ import com.google.accompanist.permissions.*
 import com.google.android.gms.maps.LocationSource
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.TileProvider
 import com.google.maps.android.compose.*
 import mil.nga.geopackage.GeoPackageFactory
-import mil.nga.geopackage.extension.nga.index.FeatureTableIndex
 import mil.nga.geopackage.extension.rtree.RTreeIndexExtension
 import mil.nga.geopackage.features.user.FeatureDao
 import mil.nga.msi.R
@@ -32,7 +32,6 @@ import mil.nga.msi.datasource.navigationwarning.NavigationArea
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarningGroup
 import mil.nga.msi.ui.location.LocationPermission
 import mil.nga.msi.ui.main.TopBar
-import mil.nga.msi.ui.map.overlay.GeoPackageTileProvider
 import mil.nga.sf.Point
 
 @OptIn(ExperimentalPermissionsApi::class)
@@ -97,8 +96,8 @@ fun NavigationalWarningGroupScreen(
 private fun NavigationAreaMap(
    location: Location?,
    locationPermissionState: PermissionState,
-   naturalEarthTileProvider: GeoPackageTileProvider,
-   navigationAreaTileProvider: GeoPackageTileProvider
+   naturalEarthTileProvider: TileProvider,
+   navigationAreaTileProvider: TileProvider
 ) {
    val cameraPositionState = rememberCameraPositionState {}
 

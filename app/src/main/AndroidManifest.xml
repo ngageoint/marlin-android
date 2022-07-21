@@ -42,6 +42,10 @@
             <meta-data
                 android:name="mil.nga.msi.startup.navigationalwarning.NavigationalWarningInitializer"
                 android:value="androidx.startup" />
+
+            <meta-data
+                android:name="mil.nga.msi.startup.light.LightInitializer"
+                android:value="androidx.startup" />
         </provider>
 
         <activity

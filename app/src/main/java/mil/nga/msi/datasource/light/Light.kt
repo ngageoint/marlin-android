@@ -19,6 +19,12 @@ data class Light(
    @ColumnInfo(name = "characteristic_number")
    val characteristicNumber: Int,
 
+   @ColumnInfo(name = "notice_week")
+   var noticeWeek: String,
+
+   @ColumnInfo(name = "notice_year")
+   var noticeYear: String,
+
    @ColumnInfo(name = "latitude")
    val latitude: Double,
 
@@ -81,12 +87,6 @@ data class Light(
 
    @ColumnInfo(name = "delete_flag")
    var deleteFlag: String? = null
-
-   @ColumnInfo(name = "notice_week")
-   var noticeWeek: String? = null
-
-   @ColumnInfo(name = "notice_year")
-   var noticeYear: String? = null
 
    @ColumnInfo(name = "section_header")
    var sectionHeader: String? = null

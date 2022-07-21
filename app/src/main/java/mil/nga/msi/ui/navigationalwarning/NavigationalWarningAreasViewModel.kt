@@ -2,6 +2,7 @@ package mil.nga.msi.ui.navigationalwarning
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
+import com.google.android.gms.maps.model.TileProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.flatMapLatest
 import mil.nga.msi.datasource.navigationwarning.NavigationArea
@@ -9,7 +10,6 @@ import mil.nga.msi.location.LocationPolicy
 import mil.nga.msi.repository.navigationalwarning.NavigationalWarningKey
 import mil.nga.msi.repository.navigationalwarning.NavigationalWarningRepository
 import mil.nga.msi.repository.preferences.UserPreferencesRepository
-import mil.nga.msi.ui.map.overlay.GeoPackageTileProvider
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Named
@@ -19,8 +19,8 @@ class NavigationalWarningAreasViewModel @Inject constructor(
    private val locationPolicy: LocationPolicy,
    val repository: NavigationalWarningRepository,
    val userPreferencesRepository: UserPreferencesRepository,
-   @Named("lowResolution") val naturalEarthTileProvider: GeoPackageTileProvider,
-   val navigationAreaTileProvider: GeoPackageTileProvider
+   @Named("naturalEarth_1_100") val naturalEarthTileProvider: TileProvider,
+   @Named("navigationAreas") val navigationAreaTileProvider: TileProvider
 ): ViewModel() {
 
    val locationProvider = locationPolicy.bestLocationProvider

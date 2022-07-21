@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "d3e0d0750ec733ccffcb1e9bb07913df",
+    "identityHash": "e6318d77eca65c260581677028e04bbc",
     "entities": [
       {
         "tableName": "asams",
@@ -248,7 +248,7 @@
       },
       {
         "tableName": "lights",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`volume_number` TEXT NOT NULL, `feature_number` TEXT NOT NULL, `characteristic_number` INTEGER NOT NULL, `latitude` REAL NOT NULL, `longitude` REAL NOT NULL, `international_feature` TEXT, `aid_type` TEXT, `geopolitical_heading` TEXT, `region_heading` TEXT, `subregion_heading` TEXT, `local_heading` TEXT, `preceding_note` TEXT, `name` TEXT, `position` TEXT, `characteristic` TEXT, `height_feet` REAL, `height_meters` REAL, `range` TEXT, `structure` TEXT, `remarks` TEXT, `post_note` TEXT, `notice_number` INTEGER, `remove_from_list` TEXT, `delete_flag` TEXT, `notice_week` TEXT, `notice_year` TEXT, `section_header` TEXT, PRIMARY KEY(`volume_number`, `feature_number`, `characteristic_number`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`volume_number` TEXT NOT NULL, `feature_number` TEXT NOT NULL, `characteristic_number` INTEGER NOT NULL, `notice_week` TEXT NOT NULL, `notice_year` TEXT NOT NULL, `latitude` REAL NOT NULL, `longitude` REAL NOT NULL, `international_feature` TEXT, `aid_type` TEXT, `geopolitical_heading` TEXT, `region_heading` TEXT, `subregion_heading` TEXT, `local_heading` TEXT, `preceding_note` TEXT, `name` TEXT, `position` TEXT, `characteristic` TEXT, `height_feet` REAL, `height_meters` REAL, `range` TEXT, `structure` TEXT, `remarks` TEXT, `post_note` TEXT, `notice_number` INTEGER, `remove_from_list` TEXT, `delete_flag` TEXT, `section_header` TEXT, PRIMARY KEY(`volume_number`, `feature_number`, `characteristic_number`))",
         "fields": [
           {
             "fieldPath": "volumeNumber",
@@ -266,6 +266,18 @@
             "fieldPath": "characteristicNumber",
             "columnName": "characteristic_number",
             "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "noticeWeek",
+            "columnName": "notice_week",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "noticeYear",
+            "columnName": "notice_year",
+            "affinity": "TEXT",
             "notNull": true
           },
           {
@@ -395,18 +407,6 @@
             "notNull": false
           },
           {
-            "fieldPath": "noticeWeek",
-            "columnName": "notice_week",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
-            "fieldPath": "noticeYear",
-            "columnName": "notice_year",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
             "fieldPath": "sectionHeader",
             "columnName": "section_header",
             "affinity": "TEXT",
@@ -428,7 +428,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd3e0d0750ec733ccffcb1e9bb07913df')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'e6318d77eca65c260581677028e04bbc')"
     ]
   }
 }

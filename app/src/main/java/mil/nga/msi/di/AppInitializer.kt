@@ -7,6 +7,7 @@ import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
 import mil.nga.msi.startup.asam.AsamInitializer
 import mil.nga.msi.startup.WorkManagerInitializer
+import mil.nga.msi.startup.light.LightInitializer
 import mil.nga.msi.startup.modu.ModuInitializer
 import mil.nga.msi.startup.navigationalwarning.NavigationalWarningInitializer
 
@@ -29,4 +30,5 @@ interface AppInitializer {
    fun inject(asamInitializer: AsamInitializer)
    fun inject(moduInitializer: ModuInitializer)
    fun inject(navigationalWarningInitializer: NavigationalWarningInitializer)
+   fun inject(lightInitializer: LightInitializer)
 }
