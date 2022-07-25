@@ -89,7 +89,7 @@ data class Light(
    var deleteFlag: String? = null
 
    @ColumnInfo(name = "section_header")
-   var sectionHeader: String? = null
+   var sectionHeader: String = ""
 
    @Transient
    val dms = DMS.from(LatLng(latitude, longitude))

@@ -1,6 +1,5 @@
 package mil.nga.msi.repository.light
 
-import android.util.Log
 import androidx.work.*
 import mil.nga.msi.datasource.light.Light
 import mil.nga.msi.datasource.light.LightVolume
@@ -15,21 +14,20 @@ class LightRepository @Inject constructor(
 ) {
 //   val asams = localDataSource.observeAsams()
 //   val asamMapItems = localDataSource.observeAsamMapItems()
-//   fun getAsamListItems() = localDataSource.observeAsamListItems()
+   fun getLightListItems() = localDataSource.observeLightListItems()
 
 //   fun observeAsam(reference: String) = localDataSource.observeAsam(reference)
-//   suspend fun getAsam(reference: String) = localDataSource.getAsam(reference)
+   suspend fun getLight(
+      volumeNumber: String,
+      featureNumber: String,
+      characteristicNumber: Int
+   ) = localDataSource.getLight(volumeNumber, featureNumber, characteristicNumber)
 
    suspend fun fetchLights(refresh: Boolean = false): List<Light> {
       if (refresh) {
          LightVolume.values().forEach { lightVolume ->
-            Log.i("Billy", "Fetching lights for volume $lightVolume")
             val lights = remoteDataSource.fetchLights(lightVolume)
-            Log.i("Billy", "Done fetching lights for volume $lightVolume")
-
             localDataSource.insert(lights)
-            Log.i("Billy", "Done inserting lights for volume $lightVolume")
-
          }
       }
 

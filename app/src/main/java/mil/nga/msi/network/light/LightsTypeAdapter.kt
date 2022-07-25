@@ -52,6 +52,11 @@ class LightsTypeAdapter: TypeAdapter<List<Light>>() {
       var previousLocalHeading: String? = null
       while (`in`.hasNext()) {
          readLight(`in`)?.let {
+            it.regionHeading = it.regionHeading ?: previousRegionHeading
+            it.subregionHeading = it.subregionHeading ?: previousSubregionHeading
+            it.localHeading = it.localHeading ?: previousLocalHeading
+            it.sectionHeader = "${it.geopoliticalHeading ?: ""}${it.regionHeading ?: ""})"
+
             if (previousRegionHeading != it.regionHeading) {
                previousRegionHeading = it.regionHeading
                previousSubregionHeading = null
@@ -223,7 +228,6 @@ class LightsTypeAdapter: TypeAdapter<List<Light>>() {
             this.deleteFlag = deleteFlag
             this.noticeWeek = noticeWeek
             this.noticeYear = noticeYear
-            this.sectionHeader = "${geopoliticalHeading ?: ""}${regionHeading ?: ""})"
          }
       } else null
    }

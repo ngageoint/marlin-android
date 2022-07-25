@@ -25,6 +25,7 @@ import kotlinx.coroutines.launch
 import mil.nga.msi.R
 import mil.nga.msi.ui.asam.AsamRoute
 import mil.nga.msi.ui.home.homeGraph
+import mil.nga.msi.ui.light.LightRoute
 import mil.nga.msi.ui.map.MapRoute
 import mil.nga.msi.ui.modu.ModuRoute
 import mil.nga.msi.ui.navigation.*
@@ -35,6 +36,7 @@ sealed class Tab(val route: Route, val title: String, val icon: Int) {
    object AsamsTab : Tab(AsamRoute.List, "ASAMs", R.drawable.ic_asam_24dp)
    object ModusTab : Tab(ModuRoute.List, "MODUs", R.drawable.ic_modu_24dp)
    object NavigationalWarningsTab: Tab(NavigationWarningRoute.Main, "Warnings", R.drawable.ic_round_warning_24)
+   object LightsTab : Tab(LightRoute.List, "Lights", R.drawable.ic_baseline_lightbulb_24)
 }
 
 @OptIn(ExperimentalMaterialNavigationApi::class)
@@ -44,7 +46,8 @@ fun MainScreen() {
       Tab.MapTab,
       Tab.AsamsTab,
       Tab.ModusTab,
-      Tab.NavigationalWarningsTab
+      Tab.NavigationalWarningsTab,
+      Tab.LightsTab
    )
 
    val context: Context = LocalContext.current
