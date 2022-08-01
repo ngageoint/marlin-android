@@ -1,6 +1,7 @@
 package mil.nga.msi.ui.light.list
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import mil.nga.msi.datasource.light.Light
 import mil.nga.msi.repository.light.LightRepository
@@ -18,5 +19,5 @@ class LightsViewModel @Inject constructor(
       return repository.getLight(volumeNumber, featureNumber, characteristicNumber)
    }
 
-   val lights = repository.getLightListItems()
+   val lights = repository.getLightListItems().asLiveData()
 }

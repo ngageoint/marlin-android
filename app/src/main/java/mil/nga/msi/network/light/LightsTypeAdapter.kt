@@ -1,5 +1,6 @@
 package mil.nga.msi.network.light
 
+import android.util.Log
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
@@ -163,7 +164,7 @@ class LightsTypeAdapter: TypeAdapter<List<Light>>() {
             }
             "heightFeetMeters" -> {
                `in`.nextStringOrNull()?.let { heightFeetMeters ->
-                  val values = heightFeetMeters.split("\n").filterIsInstance<Number>()
+                  val values = heightFeetMeters.split("\n").mapNotNull { it.toFloatOrNull() }
                   heightFeet = values.getOrNull(0)?.toFloat()
                   heightMeters = values.getOrNull(1)?.toFloat()
                }

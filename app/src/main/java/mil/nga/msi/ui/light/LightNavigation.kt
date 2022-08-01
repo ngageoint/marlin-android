@@ -1,28 +1,32 @@
 package mil.nga.msi.ui.light
 
 import android.net.Uri
-import androidx.navigation.NavController
-import androidx.navigation.NavGraphBuilder
+import androidx.navigation.*
 import androidx.navigation.compose.composable
-import androidx.navigation.navigation
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import com.google.accompanist.navigation.material.bottomSheet
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import mil.nga.msi.repository.light.LightKey
+import mil.nga.msi.repository.navigationalwarning.NavigationalWarningKey
 import mil.nga.msi.ui.asam.detail.AsamDetailScreen
 import mil.nga.msi.ui.asam.list.AsamsScreen
 import mil.nga.msi.ui.asam.sheet.AsamSheetScreen
+import mil.nga.msi.ui.light.detail.LightDetailScreen
 import mil.nga.msi.ui.light.list.LightsScreen
 import mil.nga.msi.ui.map.MapRoute
+import mil.nga.msi.ui.navigation.LightKey
+import mil.nga.msi.ui.navigation.NavigationalWarningKey
 import mil.nga.msi.ui.navigation.Point
 import mil.nga.msi.ui.navigation.Route
+import mil.nga.msi.ui.navigationalwarning.NavigationWarningRoute
 
 sealed class LightRoute(
    override val name: String,
    override val title: String,
 ): Route {
    object Main: LightRoute("lights", "Lights")
-//   object Detail: AsamRoute("asams/detail", "ASAM Details")
+   object Detail: LightRoute("lights/detail", "Light Details")
    object List: LightRoute("lights/list", "Lights")
 //   object Sheet: AsamRoute("asams/sheet", "ASAM Sheet")
 }
@@ -53,8 +57,9 @@ fun NavGraphBuilder.lightGraph(
 
          LightsScreen(
             openDrawer = { openNavigationDrawer() },
-            onTap = { reference ->
-//               navController.navigate("${LightRoute.Detail.name}?reference=$reference")
+            onTap = { light ->
+               val encoded = Uri.encode(Json.encodeToString(LightKey.fromLight(light)))
+               navController.navigate( "${LightRoute.Detail.name}?key=$encoded")
             },
             onAction = { action ->
                when(action) {
@@ -65,23 +70,26 @@ fun NavGraphBuilder.lightGraph(
             }
          )
       }
-//      composable("${AsamRoute.Detail.name}?reference={reference}") { backstackEntry ->
-//         bottomBarVisibility(false)
-//
-//         backstackEntry.arguments?.getString("reference")?.let { reference ->
-//            AsamDetailScreen(
-//               reference,
-//               close = { navController.popBackStack() },
-//               onAction = { action ->
-//                  when(action) {
-//                     is AsamAction.Zoom -> zoomTo(action.point)
-//                     is AsamAction.Share -> shareAsam(action.text)
-//                     is AsamAction.Location -> showSnackbar("${action.text} copied to clipboard")
-//                  }
-//               }
-//            )
-//         }
-//      }
+      composable(
+         route = "${LightRoute.Detail.name}?key={key}",
+         arguments = listOf(navArgument("key") { type = NavType.LightKey })
+      ) { backstackEntry ->
+         bottomBarVisibility(false)
+
+         backstackEntry.arguments?.getParcelable<LightKey>("key")?.let { key ->
+            LightDetailScreen(
+               key,
+               close = { navController.popBackStack() },
+               onAction = { action ->
+                  when(action) {
+                     is LightAction.Zoom -> zoomTo(action.point)
+                     is LightAction.Share -> shareLight(action.text)
+                     is LightAction.Location -> showSnackbar("${action.text} copied to clipboard")
+                  }
+               }
+            )
+         }
+      }
 //      bottomSheet("${AsamRoute.Sheet.name}?reference={reference}") { backstackEntry ->
 //         backstackEntry.arguments?.getString("reference")?.let { reference ->
 //            AsamSheetScreen(reference, onDetails = {

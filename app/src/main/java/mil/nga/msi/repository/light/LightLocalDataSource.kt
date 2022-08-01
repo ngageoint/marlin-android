@@ -8,9 +8,13 @@ class LightLocalDataSource @Inject constructor(
    private val dao: LightDao
 ) {
 //   fun observeAsams() = dao.observeAsams()
-//   fun observeAsam(reference: String) = dao.observeAsam(reference)
-//   fun observeAsamMapItems() = dao.observeAsamMapItems()
+   fun observeMapItems() = dao.observeMapItems()
    fun observeLightListItems() = dao.getLightListItems()
+
+   fun observeLight(
+      volumeNumber: String,
+      featureNumber: String
+   ) = dao.observeLight(volumeNumber, featureNumber)
 
    suspend fun getLight(
       volumeNumber: String,

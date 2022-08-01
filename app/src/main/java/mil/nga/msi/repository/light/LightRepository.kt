@@ -13,10 +13,14 @@ class LightRepository @Inject constructor(
    private val remoteDataSource: LightRemoteDataSource
 ) {
 //   val asams = localDataSource.observeAsams()
-//   val asamMapItems = localDataSource.observeAsamMapItems()
+   val mapItems = localDataSource.observeMapItems()
    fun getLightListItems() = localDataSource.observeLightListItems()
 
-//   fun observeAsam(reference: String) = localDataSource.observeAsam(reference)
+   fun observeLight(
+      volumeNumber: String,
+      featureNumber: String,
+   ) = localDataSource.observeLight(volumeNumber, featureNumber)
+
    suspend fun getLight(
       volumeNumber: String,
       featureNumber: String,

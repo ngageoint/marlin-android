@@ -84,7 +84,7 @@ private fun Lights(
                   text = section,
                   fontWeight = FontWeight.Medium,
                   style = MaterialTheme.typography.caption,
-                  modifier = Modifier.padding(top = 8.dp, bottom = 16.dp)
+                  modifier = Modifier.padding(vertical = 8.dp)
                )
             }
 
@@ -96,6 +96,10 @@ private fun Lights(
                   onZoom = { onZoom(Point(light.latitude, light.longitude)) },
                   onCopyLocation = onCopyLocation
                )
+            }
+
+            item {
+               Spacer(modifier = Modifier.padding(bottom = 8.dp))
             }
          }
       }
