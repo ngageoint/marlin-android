@@ -44,8 +44,6 @@ import mil.nga.msi.ui.map.BaseMapType
 import mil.nga.msi.ui.map.MapClip
 import mil.nga.msi.ui.navigation.Point
 import mil.nga.msi.ui.theme.screenBackground
-import kotlin.math.PI
-import kotlin.math.abs
 import kotlin.math.min
 
 @Composable
@@ -303,7 +301,7 @@ private fun RaconDetail(
 
                   CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
                      Text(
-                        text = remarks.trim(),
+                        text = remarks,
                         style = MaterialTheme.typography.body2
                      )
                   }
@@ -348,12 +346,11 @@ private fun LightDetail(
       ) {
 
          Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier
                .fillMaxWidth()
                .padding(vertical = 16.dp)
          ) {
-            Column {
+            Column(Modifier.weight(1f)) {
                light.name?.let { name ->
                   Text(
                      text = name,
@@ -376,6 +373,7 @@ private fun LightDetail(
 
             val lightSectors = light.lightSectors()
             if (lightSectors.isNotEmpty()) {
+
                LightImage(
                   lightSectors,
                   height = 100,
@@ -405,22 +403,22 @@ private fun LightDetail(
                }
             }
 
-            Column {
-               Text(
-                  text = "Remarks",
-                  style = MaterialTheme.typography.body1
-               )
-               CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
+            light.remarks?.trim()?.let { remarks ->
+               Column {
                   Text(
-                     text = light.remarks ?: "",
-                     style = MaterialTheme.typography.body2
+                     text = "Remarks",
+                     style = MaterialTheme.typography.body1
                   )
+                  CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
+                     Text(
+                        text = remarks,
+                        style = MaterialTheme.typography.body2
+                     )
+                  }
                }
             }
          }
       }
-
-      // TODO light color image
    }
 }
 
