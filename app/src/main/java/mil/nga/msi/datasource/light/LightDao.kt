@@ -1,5 +1,6 @@
 package mil.nga.msi.datasource.light
 
+import androidx.paging.PagingSource
 import androidx.room.*
 import kotlinx.coroutines.flow.Flow
 
@@ -26,11 +27,12 @@ interface LightDao {
    @Query("SELECT * FROM lights WHERE volume_number = :volumeNumber AND feature_number = :featureNumber ORDER BY characteristic_number")
    fun observeLight(volumeNumber: String, featureNumber: String): Flow<List<Light>>
 
-//   @Query("SELECT * FROM lights ORDER BY section_header ASC, feature_number ASC")
+   @Query("SELECT * FROM lights ORDER BY section_header ASC, feature_number ASC")
 //   @Query("SELECT * FROM lights where feature_number = 16818 ORDER BY section_header ASC, feature_number ASC")  // 3 small sectors
-   @Query("SELECT * FROM lights where feature_number = 15520 ORDER BY section_header ASC, feature_number ASC")  // 2 named with 2 sectors
+//   @Query("SELECT * FROM lights where feature_number = 15520 ORDER BY section_header ASC, feature_number ASC")  // 2 named with 2 sectors
    @RewriteQueriesToDropUnusedColumns
-   fun getLightListItems(): Flow<List<Light>>
+//   fun getLightListItems(): Flow<List<Light>>
+   fun getLightListItems(): PagingSource<Int, LightListItem>
 
    @Query("SELECT * FROM lights")
    @RewriteQueriesToDropUnusedColumns

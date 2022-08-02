@@ -3,23 +3,15 @@ package mil.nga.msi.ui.light
 import android.net.Uri
 import androidx.navigation.*
 import androidx.navigation.compose.composable
-import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
-import com.google.accompanist.navigation.material.bottomSheet
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import mil.nga.msi.repository.light.LightKey
-import mil.nga.msi.repository.navigationalwarning.NavigationalWarningKey
-import mil.nga.msi.ui.asam.detail.AsamDetailScreen
-import mil.nga.msi.ui.asam.list.AsamsScreen
-import mil.nga.msi.ui.asam.sheet.AsamSheetScreen
 import mil.nga.msi.ui.light.detail.LightDetailScreen
 import mil.nga.msi.ui.light.list.LightsScreen
 import mil.nga.msi.ui.map.MapRoute
 import mil.nga.msi.ui.navigation.LightKey
-import mil.nga.msi.ui.navigation.NavigationalWarningKey
 import mil.nga.msi.ui.navigation.Point
 import mil.nga.msi.ui.navigation.Route
-import mil.nga.msi.ui.navigationalwarning.NavigationWarningRoute
 
 sealed class LightRoute(
    override val name: String,
@@ -31,7 +23,6 @@ sealed class LightRoute(
 //   object Sheet: AsamRoute("asams/sheet", "ASAM Sheet")
 }
 
-@OptIn(ExperimentalMaterialNavigationApi::class)
 fun NavGraphBuilder.lightGraph(
    navController: NavController,
    bottomBarVisibility: (Boolean) -> Unit,
@@ -57,8 +48,8 @@ fun NavGraphBuilder.lightGraph(
 
          LightsScreen(
             openDrawer = { openNavigationDrawer() },
-            onTap = { light ->
-               val encoded = Uri.encode(Json.encodeToString(LightKey.fromLight(light)))
+            onTap = { key ->
+               val encoded = Uri.encode(Json.encodeToString(key))
                navController.navigate( "${LightRoute.Detail.name}?key=$encoded")
             },
             onAction = { action ->

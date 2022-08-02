@@ -1,8 +1,6 @@
 package mil.nga.msi.ui.light.detail
 
 import android.graphics.Paint
-import android.graphics.Path
-import android.graphics.RectF
 import android.graphics.Typeface
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -20,14 +18,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.PaintingStyle.Companion.Stroke
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.drawscope.DrawStyle
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
@@ -458,7 +451,6 @@ private fun LightImage(
       modifier = Modifier
          .width(100.dp)
          .height(100.dp)
-//         .background(Color(0x33000000))
    ) {
       if (arcWidth != null) {
          Canvas(modifier = Modifier.fillMaxSize()) {
@@ -504,6 +496,7 @@ private fun LightImage(
                      dx = (sizeInPx / 2 - paint.measureText(sector.text) / 2),
                      dy = (sizeInPx + (paint.descent() + paint.ascent()) / 2)
                   )
+
                   it.nativeCanvas.rotate(
                      midPointAngle.toFloat(),
                      paint.measureText(sector.text) / 2,

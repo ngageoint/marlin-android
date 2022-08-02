@@ -4,6 +4,7 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 import mil.nga.msi.datasource.light.Light
+import mil.nga.msi.datasource.light.LightListItem
 
 @Serializable
 @Parcelize
@@ -15,6 +16,10 @@ data class LightKey(
    companion object {
       fun fromLight(light: Light): LightKey {
          return LightKey(light.volumeNumber, light.featureNumber, light.characteristicNumber)
+      }
+
+      fun fromLight(item: LightListItem): LightKey {
+         return LightKey(item.volumeNumber, item.featureNumber, item.characteristicNumber)
       }
    }
 }

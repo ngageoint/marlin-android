@@ -3,14 +3,11 @@ package mil.nga.msi.ui.light.list
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,9 +15,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.paging.PagingData
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.items
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import mil.nga.msi.coordinate.DMS
-import mil.nga.msi.datasource.light.Light
+import mil.nga.msi.datasource.light.LightListItem
+import mil.nga.msi.repository.light.LightKey
 import mil.nga.msi.ui.light.LightAction
 import mil.nga.msi.ui.light.LightRoute
 import mil.nga.msi.ui.location.LocationTextButton
@@ -31,12 +33,11 @@ import mil.nga.msi.ui.theme.screenBackground
 @Composable
 fun LightsScreen(
    openDrawer: () -> Unit,
-   onTap: (Light) -> Unit,
+   onTap: (LightKey) -> Unit,
    onAction: (LightAction) -> Unit,
    viewModel: LightsViewModel = hiltViewModel()
 ) {
    val scope = rememberCoroutineScope()
-   val lights by viewModel.lights.observeAsState(emptyList())
 
    Column(modifier = Modifier.fillMaxSize()) {
       TopBar(
@@ -46,8 +47,8 @@ fun LightsScreen(
       )
 
       Lights(
-         lights = lights,
-         onTap = onTap,
+         pagingState = viewModel.lights,
+         onTap = { onTap(LightKey.fromLight(it)) },
          onCopyLocation = { onAction(LightAction.Location(it)) },
          onZoom = { onAction(LightAction.Zoom(it)) },
          onShare = { light ->
@@ -63,43 +64,44 @@ fun LightsScreen(
 
 @Composable
 private fun Lights(
-   lights: List<Light>,
-   onTap: (Light) -> Unit,
+   pagingState: Flow<PagingData<LightItem>>,
+   onTap: (LightListItem) -> Unit,
    onZoom: (Point) -> Unit,
-   onShare: (Light) -> Unit,
+   onShare: (LightListItem) -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
-   val groupedItems = lights.groupBy { it.sectionHeader }
+   val lazyItems = pagingState.collectAsLazyPagingItems()
 
    Surface(
       color = MaterialTheme.colors.screenBackground,
       modifier = Modifier.fillMaxHeight()
    ) {
+
       LazyColumn(
-         contentPadding = PaddingValues(horizontal = 8.dp)
+         modifier = Modifier.padding(horizontal = 8.dp),
+         contentPadding = PaddingValues(top = 16.dp)
       ) {
-         groupedItems.forEach { (section, lights) ->
-            item {
-               Text(
-                  text = section,
-                  fontWeight = FontWeight.Medium,
-                  style = MaterialTheme.typography.caption,
-                  modifier = Modifier.padding(vertical = 8.dp)
-               )
-            }
 
-            items(lights) { light ->
-               LightCard(
-                  item = light,
-                  onTap = { onTap(light) },
-                  onShare = { onShare(light) },
-                  onZoom = { onZoom(Point(light.latitude, light.longitude)) },
-                  onCopyLocation = onCopyLocation
-               )
-            }
-
-            item {
-               Spacer(modifier = Modifier.padding(bottom = 8.dp))
+         items(lazyItems) { item ->
+            when (item) {
+               is LightItem.Header -> {
+                  Text(
+                     text = item.header,
+                     fontWeight = FontWeight.Medium,
+                     style = MaterialTheme.typography.caption,
+                     modifier = Modifier.padding(vertical = 8.dp)
+                  )
+               }
+               is LightItem.Light -> {
+                  LightCard(
+                     item = item.light,
+                     onTap = onTap,
+                     onCopyLocation = { onCopyLocation(it) },
+                     onZoom = { onZoom(Point(item.light.latitude, item.light.longitude)) },
+                     onShare = onShare
+                  )
+               }
+               else -> { /* TODO item is null, display placeholder */}
             }
          }
       }
@@ -108,9 +110,9 @@ private fun Lights(
 
 @Composable
 private fun LightCard(
-   item: Light?,
-   onTap: () -> Unit,
-   onShare: () -> Unit,
+   item: LightListItem?,
+   onTap: (LightListItem) -> Unit,
+   onShare: (LightListItem) -> Unit,
    onZoom: () -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
@@ -119,11 +121,11 @@ private fun LightCard(
          Modifier
             .fillMaxWidth()
             .padding(bottom = 8.dp)
-            .clickable { onTap() }
+            .clickable { onTap(item) }
       ) {
          LightContent(
             item,
-            onShare,
+            onShare = { onShare(item) },
             onZoom,
             onCopyLocation
          )
@@ -133,7 +135,7 @@ private fun LightCard(
 
 @Composable
 private fun LightContent(
-   item: Light,
+   item: LightListItem,
    onShare: () -> Unit,
    onZoom: () -> Unit,
    onCopyLocation: (String) -> Unit
@@ -180,7 +182,7 @@ private fun LightContent(
 
 @Composable
 private fun LightFooter(
-   item: Light,
+   item: LightListItem,
    onShare: () -> Unit,
    onZoom: () -> Unit,
    onCopyLocation: (String) -> Unit
