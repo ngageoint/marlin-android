@@ -18,6 +18,14 @@ interface LightDao {
    @Query("SELECT * FROM lights")
    suspend fun getLights(): List<Light>
 
+   @Query("SELECT * FROM lights WHERE latitude >= :minLatitude AND latitude <= :maxLatitude AND longitude >= :minLongitude AND longitude <= :maxLongitude")
+   fun getLights(
+      minLatitude: Double,
+      maxLatitude: Double,
+      minLongitude: Double,
+      maxLongitude: Double
+   ): List<Light>
+
    @Query("SELECT * FROM lights WHERE volume_number = :volumeNumber ORDER BY notice_number DESC LIMIT 1")
    suspend fun getLatestLight(volumeNumber: String): Light?
 
@@ -28,6 +36,7 @@ interface LightDao {
    fun observeLight(volumeNumber: String, featureNumber: String): Flow<List<Light>>
 
    @Query("SELECT * FROM lights ORDER BY section_header ASC, feature_number ASC")
+//   @Query("SELECT * FROM lights where feature_number = 24884 ORDER BY section_header ASC, feature_number ASC")  // 3 small sectors
 //   @Query("SELECT * FROM lights where feature_number = 16818 ORDER BY section_header ASC, feature_number ASC")  // 3 small sectors
 //   @Query("SELECT * FROM lights where feature_number = 15520 ORDER BY section_header ASC, feature_number ASC")  // 2 named with 2 sectors
    @RewriteQueriesToDropUnusedColumns

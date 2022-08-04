@@ -27,6 +27,13 @@ class LightRepository @Inject constructor(
       characteristicNumber: Int
    ) = localDataSource.getLight(volumeNumber, featureNumber, characteristicNumber)
 
+   fun getLights(
+      minLatitude: Double,
+      maxLatitude: Double,
+      minLongitude: Double,
+      maxLongitude: Double
+   ) = localDataSource.getLights(minLatitude, maxLatitude, minLongitude, maxLongitude)
+
    suspend fun fetchLights(refresh: Boolean = false): List<Light> {
       if (refresh) {
          LightVolume.values().forEach { lightVolume ->

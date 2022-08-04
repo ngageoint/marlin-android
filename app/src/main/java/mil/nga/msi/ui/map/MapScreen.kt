@@ -33,6 +33,7 @@ import mil.nga.msi.ui.location.LocationPermission
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.cluster.ClusterManager
 import mil.nga.msi.ui.map.cluster.MapAnnotation
+import mil.nga.msi.ui.map.overlay.LightTileProvider
 import mil.nga.msi.ui.map.overlay.OsmTileProvider
 import kotlin.math.roundToInt
 
@@ -98,6 +99,7 @@ fun MapScreen(
                locationPermissionState.status.isGranted,
                gars == true,
                mgrs == true,
+               viewModel.lightTileProvider,
                annotations,
                onAnnotationClick = { onAnnotationClick.invoke(it) },
                onAnnotationsClick = { onAnnotationsClick.invoke(it) },
@@ -174,6 +176,7 @@ private fun Map(
    locationEnabled: Boolean,
    gars: Boolean,
    mgrs: Boolean,
+   lightTileProvider: LightTileProvider,
    annotations: List<MapAnnotation>,
    onMapMove: (MapLocation, Int) -> Unit,
    onAnnotationClick: (MapAnnotation) -> Unit,
@@ -245,6 +248,8 @@ private fun Map(
          if (mgrs) {
             TileOverlay(tileProvider = MGRSTileProvider.create(context))
          }
+
+         TileOverlay(tileProvider = lightTileProvider)
       }
 
       MapEffect(null) { map ->

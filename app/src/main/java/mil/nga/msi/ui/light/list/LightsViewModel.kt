@@ -31,12 +31,12 @@ class LightsViewModel @Inject constructor(
       repository.getLightListItems()
    }.flow
       .map { pagingData ->
-         val mapped = pagingData.map { LightItem.Light(it) }
+         pagingData.map { LightItem.Light(it) }
 
-         mapped.insertSeparators { item1: LightItem.Light?, item2: LightItem.Light? ->
-            if (item1?.light?.sectionHeader != item2?.light?.sectionHeader) {
-               LightItem.Header(item2?.light?.sectionHeader!!)
-            } else null
-         }
+//         mapped.insertSeparators { item1: LightItem.Light?, item2: LightItem.Light? ->
+//            if (item1?.light?.sectionHeader != item2?.light?.sectionHeader) {
+//               LightItem.Header(item2?.light?.sectionHeader!!)
+//            } else null
+//         }
    }
 }

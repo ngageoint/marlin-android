@@ -10,6 +10,7 @@ import mil.nga.msi.repository.modu.ModuRepository
 import mil.nga.msi.repository.preferences.UserPreferencesRepository
 import mil.nga.msi.type.MapLocation
 import mil.nga.msi.ui.map.cluster.MapAnnotation
+import mil.nga.msi.ui.map.overlay.LightTileProvider
 import javax.inject.Inject
 
 @HiltViewModel
@@ -17,7 +18,8 @@ class MapViewModel @Inject constructor(
    asamRepository: AsamRepository,
    moduRepository: ModuRepository,
    val locationPolicy: LocationPolicy,
-   val userPreferencesRepository: UserPreferencesRepository
+   val userPreferencesRepository: UserPreferencesRepository,
+   val lightTileProvider: LightTileProvider
 ): ViewModel() {
 
    val baseMap = userPreferencesRepository.baseMapType.asLiveData()

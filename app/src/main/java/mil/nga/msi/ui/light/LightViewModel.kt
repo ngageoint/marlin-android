@@ -9,12 +9,14 @@ import mil.nga.msi.datasource.light.Light
 import mil.nga.msi.repository.asam.AsamRepository
 import mil.nga.msi.repository.light.LightRepository
 import mil.nga.msi.repository.preferences.UserPreferencesRepository
+import mil.nga.msi.ui.map.overlay.LightTileProvider
 import javax.inject.Inject
 
 @HiltViewModel
 class LightViewModel @Inject constructor(
    private val repository: LightRepository,
-   private val userPreferencesRepository: UserPreferencesRepository
+   private val userPreferencesRepository: UserPreferencesRepository,
+   val tileProvider: LightTileProvider
 ): ViewModel() {
    val baseMap = userPreferencesRepository.baseMapType.asLiveData()
 

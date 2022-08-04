@@ -22,6 +22,13 @@ class LightLocalDataSource @Inject constructor(
       characteristicNumber: Int
    ) = dao.getLight(volumeNumber, featureNumber, characteristicNumber)
 
+   fun getLights(
+      minLatitude: Double,
+      maxLatitude: Double,
+      minLongitude: Double,
+      maxLongitude: Double
+   ) = dao.getLights(minLatitude, maxLatitude, minLongitude, maxLongitude)
+
    suspend fun getLights(): List<Light> = dao.getLights()
    suspend fun getLatestLight(volumeNumber: String) = dao.getLatestLight(volumeNumber)
 

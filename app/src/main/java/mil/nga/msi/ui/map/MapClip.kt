@@ -8,13 +8,16 @@ import androidx.compose.ui.unit.dp
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.TileProvider
 import com.google.maps.android.compose.*
+import mil.nga.msi.ui.map.overlay.LightTileProvider
 
 @Composable
 fun MapClip(
    latLng: LatLng,
-   icon: Int,
-   baseMap: BaseMapType?
+   baseMap: BaseMapType?,
+   icon: Int? = null,
+   tileProvider: TileProvider? = null
 ) {
    val cameraPositionState = rememberCameraPositionState {
       position = CameraPosition.fromLatLngZoom(latLng, 16f)
@@ -37,9 +40,13 @@ fun MapClip(
          .fillMaxWidth()
          .height(200.dp)
    ) {
-      Marker(
-         state = MarkerState(position = latLng),
-         icon = BitmapDescriptorFactory.fromResource(icon)
-      )
+      icon?.let {
+         Marker(
+            state = MarkerState(position = latLng),
+            icon = BitmapDescriptorFactory.fromResource(it)
+         )
+      }
+
+      tileProvider?.let { TileOverlay(tileProvider = it) }
    }
 }

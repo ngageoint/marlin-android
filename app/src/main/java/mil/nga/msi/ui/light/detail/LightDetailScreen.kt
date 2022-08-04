@@ -30,7 +30,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.android.gms.maps.model.LatLng
-import mil.nga.msi.R
+import com.google.android.gms.maps.model.TileProvider
 import mil.nga.msi.coordinate.DMS
 import mil.nga.msi.datasource.light.Light
 import mil.nga.msi.datasource.light.LightSector
@@ -65,6 +65,7 @@ fun LightDetailScreen(
       LightDetailContent(
          lights = lights,
          baseMap = baseMap,
+         tileProvider = viewModel.tileProvider,
          onZoom = { onAction(LightAction.Zoom(it)) },
          onShare = { onAction(LightAction.Share(it.toString())) },
          onCopyLocation = { onAction(LightAction.Location(it)) }
@@ -76,6 +77,7 @@ fun LightDetailScreen(
 private fun LightDetailContent(
    lights: List<Light>,
    baseMap: BaseMapType?,
+   tileProvider: TileProvider,
    onZoom: (Point) -> Unit,
    onShare: (Light) -> Unit,
    onCopyLocation: (String) -> Unit
@@ -90,7 +92,7 @@ private fun LightDetailContent(
                .padding(all = 8.dp)
                .verticalScroll(rememberScrollState())
          ) {
-            LightHeader(lights.first(), baseMap, onZoom, onShare, onCopyLocation)
+            LightHeader(lights.first(), baseMap, tileProvider, onZoom, onShare, onCopyLocation)
             LightCharacteristics(lights.drop(0))
          }
       }
@@ -101,6 +103,7 @@ private fun LightDetailContent(
 private fun LightHeader(
    light: Light,
    baseMap: BaseMapType?,
+   lightTileProvider: TileProvider,
    onZoom: (Point) -> Unit,
    onShare: (Light) -> Unit,
    onCopyLocation: (String) -> Unit
@@ -109,8 +112,8 @@ private fun LightHeader(
       Column {
          MapClip(
             latLng = LatLng(light.latitude, light.longitude),
-            icon = R.drawable.asam_map_marker_24dp, // TODO update to light overlay
-            baseMap = baseMap
+            baseMap = baseMap,
+            tileProvider = lightTileProvider
          )
 
          Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
@@ -373,7 +376,6 @@ private fun LightDetail(
 
             val lightSectors = light.lightSectors()
             if (lightSectors.isNotEmpty()) {
-
                LightImage(
                   lightSectors,
                   height = 100,
@@ -465,7 +467,9 @@ private fun LightImage(
          val endAngle = sector.endDegrees + 90
          val sweepAngle = if (startAngle < endAngle ) {
             endAngle.toFloat() - startAngle.toFloat()
-         } else { endAngle.toFloat() }
+         } else {
+            (360 - startAngle.toFloat()) + endAngle.toFloat()
+         }
 
          Canvas(modifier = Modifier.fillMaxSize()) {
             drawArc(
