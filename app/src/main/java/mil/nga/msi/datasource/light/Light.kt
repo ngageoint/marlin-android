@@ -14,6 +14,7 @@ enum class LightColor(val color: Color) {
    BLUE(Color(0xFF0000FF)),
    VIOLET(Color(0xFFAF52DE)),
    ORANGE(Color(0xFFFF9500)),
+   BUOY(Color(0xFF87978b)),
    RACON(Color(0xFFB52BB5))
 }
 
@@ -105,6 +106,17 @@ data class Light(
 
    @Transient
    val dms = DMS.from(LatLng(latitude, longitude))
+
+   fun isFogSignal(): Boolean {
+      return name?.contains("fog signal", ignoreCase = true) ?: false
+   }
+
+   fun isBuoy(): Boolean {
+      return structure?.contains("pillar", ignoreCase = true) == true ||
+         structure?.contains("spar", ignoreCase = true) == true ||
+         structure?.contains("conical", ignoreCase = true) == true ||
+         structure?.contains("can", ignoreCase = true) == true
+   }
 
    fun lightColors(): List<Color>  {
       val lightColors = mutableListOf<Color>()
