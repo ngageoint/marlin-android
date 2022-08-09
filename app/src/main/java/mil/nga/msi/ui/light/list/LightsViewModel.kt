@@ -3,8 +3,10 @@ package mil.nga.msi.ui.light.list
 import androidx.lifecycle.ViewModel
 import androidx.paging.*
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 import mil.nga.msi.datasource.light.Light
 import mil.nga.msi.datasource.light.LightListItem
 import mil.nga.msi.repository.light.LightRepository
@@ -25,6 +27,15 @@ class LightsViewModel @Inject constructor(
       characteristicNumber: Int
    ): Light? {
       return repository.getLight(volumeNumber, featureNumber, characteristicNumber)
+   }
+
+   suspend fun getLights(
+      minLatitude: Double,
+      maxLatitude: Double,
+      minLongitude: Double,
+      maxLongitude: Double,
+   ) = withContext(Dispatchers.IO) {
+      repository.getLights(minLatitude, maxLatitude, minLongitude, maxLongitude, characteristicNumber = 1)
    }
 
    val lights: Flow<PagingData<LightItem>> = Pager(PagingConfig(pageSize = 20), null) {

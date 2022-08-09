@@ -9,7 +9,9 @@ import com.google.accompanist.navigation.material.ExperimentalMaterialNavigation
 import com.google.accompanist.navigation.material.bottomSheet
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import mil.nga.msi.repository.light.LightKey
 import mil.nga.msi.ui.asam.AsamRoute
+import mil.nga.msi.ui.light.LightRoute
 import mil.nga.msi.ui.map.cluster.MapAnnotation
 import mil.nga.msi.ui.map.settings.MapSettingsScreen
 import mil.nga.msi.ui.modu.ModuRoute
@@ -65,6 +67,11 @@ fun NavGraphBuilder.mapGraph(
                MapAnnotation.Type.MODU ->  {
                   navController.navigate(ModuRoute.Sheet.name + "?name=${annotation.key.id}")
                }
+               MapAnnotation.Type.LIGHT -> {
+                  val lightKey = LightKey.fromId(annotation.key.id)
+                  val encoded = Uri.encode(Json.encodeToString(lightKey))
+                  navController.navigate(LightRoute.Sheet.name + "?key=${encoded}")
+               }
             }
          },
          onAnnotationsClick = { annotations ->
@@ -100,6 +107,11 @@ fun NavGraphBuilder.mapGraph(
                }
                MapAnnotation.Type.MODU -> {
                   navController.navigate(ModuRoute.Detail.name + "?name=${annotation.key.id}")
+               }
+               MapAnnotation.Type.LIGHT -> {
+                  val key = LightKey.fromId(annotation.key.id)
+                  val encoded = Uri.encode(Json.encodeToString(key))
+                  navController.navigate(LightRoute.Detail.name + "?key=${encoded}")
                }
             }
          }

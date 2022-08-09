@@ -28,7 +28,10 @@ import com.google.maps.android.compose.*
 import kotlinx.coroutines.launch
 import mil.nga.gars.tile.GARSTileProvider
 import mil.nga.mgrs.tile.MGRSTileProvider
+import mil.nga.msi.datasource.light.Light
+import mil.nga.msi.repository.light.LightKey
 import mil.nga.msi.type.MapLocation
+import mil.nga.msi.ui.light.list.LightsViewModel
 import mil.nga.msi.ui.location.LocationPermission
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.cluster.ClusterManager
@@ -46,16 +49,17 @@ fun MapScreen(
    onAnnotationsClick: (Collection<MapAnnotation>) -> Unit,
    onMapSettings: () -> Unit,
    openDrawer: () -> Unit,
-   viewModel: MapViewModel = hiltViewModel()
+   mapViewModel: MapViewModel = hiltViewModel(),
+   lightsViewModel: LightsViewModel = hiltViewModel()
 ) {
    val scope = rememberCoroutineScope()
-   val gars by viewModel.gars.observeAsState()
-   val mgrs by viewModel.mgrs.observeAsState()
-   val baseMap by viewModel.baseMap.observeAsState()
-   val mapOrigin by viewModel.mapLocation.observeAsState()
+   val gars by mapViewModel.gars.observeAsState()
+   val mgrs by mapViewModel.mgrs.observeAsState()
+   val baseMap by mapViewModel.baseMap.observeAsState()
+   val mapOrigin by mapViewModel.mapLocation.observeAsState()
    var destination by remember { mutableStateOf(mapDestination) }
-   val annotations by viewModel.mapAnnotations.observeAsState()
-   val location by viewModel.locationPolicy.bestLocationProvider.observeAsState()
+   val annotations by mapViewModel.mapAnnotations.observeAsState()
+   val location by mapViewModel.locationPolicy.bestLocationProvider.observeAsState()
    var located by remember { mutableStateOf(false) }
 
    val locationPermissionState: PermissionState = rememberPermissionState(
@@ -65,7 +69,7 @@ fun MapScreen(
    LocationPermission(locationPermissionState)
 
    if (locationPermissionState.status.isGranted) {
-      viewModel.locationPolicy.requestLocationUpdates()
+      mapViewModel.locationPolicy.requestLocationUpdates()
    }
 
    var origin by remember { mutableStateOf(mapOrigin) }
@@ -99,7 +103,7 @@ fun MapScreen(
                locationPermissionState.status.isGranted,
                gars == true,
                mgrs == true,
-               viewModel.lightTileProvider,
+               mapViewModel.lightTileProvider,
                annotations,
                onAnnotationClick = { onAnnotationClick.invoke(it) },
                onAnnotationsClick = { onAnnotationsClick.invoke(it) },
@@ -109,7 +113,29 @@ fun MapScreen(
                      destination = null
                   }
                   scope.launch {
-                     viewModel.setMapLocation(location)
+                     mapViewModel.setMapLocation(location)
+                  }
+               },
+               onMapClick = { latLng, region ->
+                  val screenPercentage = 0.03
+                  val tolerance = (region.farRight.longitude - region.farLeft.longitude) * screenPercentage
+                  val minLongitude = latLng.longitude - tolerance
+                  val maxLongitude = latLng.longitude + tolerance
+                  val minLatitude = latLng.latitude - tolerance
+                  val maxLatitude = latLng.latitude + tolerance
+                  scope.launch {
+                     val lights = lightsViewModel
+                        .getLights(minLatitude, maxLatitude, minLongitude, maxLongitude)
+                        .map { light ->
+                           val key = MapAnnotation.Key(LightKey.fromLight(light).id(), MapAnnotation.Type.LIGHT)
+                           MapAnnotation(key, light.latitude, light.longitude)
+                        }
+
+                     if (lights.size == 1) {
+                        onAnnotationClick(lights.first())
+                     } else if (lights.isNotEmpty()) {
+                        onAnnotationsClick(lights)
+                     }
                   }
                }
             )
@@ -179,6 +205,7 @@ private fun Map(
    lightTileProvider: LightTileProvider,
    annotations: List<MapAnnotation>,
    onMapMove: (MapLocation, Int) -> Unit,
+   onMapClick: (LatLng, VisibleRegion) -> Unit,
    onAnnotationClick: (MapAnnotation) -> Unit,
    onAnnotationsClick: (Collection<MapAnnotation>) -> Unit
 ) {
@@ -267,6 +294,10 @@ private fun Map(
 
             onMapMove(mapLocation, cameraMoveReason)
          }
+
+         map.setOnMapClickListener { latLng ->
+            onMapClick(latLng, map.projection.visibleRegion)
+         }
       }
 
       MapEffect(annotations) { map ->
@@ -276,12 +307,18 @@ private fun Map(
                   onAnnotationClick(item)
                   selectedAnimator = ValueAnimator.ofFloat(1f, 2f)
                   selectedMarker = map.addMarker(MarkerOptions().apply {
-                     icon(BitmapDescriptorFactory.fromResource(item.key.type.icon))
+                     item.key.type.icon?.let { icon ->
+                        icon(BitmapDescriptorFactory.fromResource(icon))
+                     }
                      position(item.position)
                   })
                   selectedMarker?.tag = item.key
-                  val bitmap = BitmapFactory.decodeResource(context.resources, item.key.type.icon)
-                  animateAnnotation(selectedMarker, selectedAnimator, bitmap)
+
+                  item.key.type.icon?.let { icon ->
+                     val bitmap = BitmapFactory.decodeResource(context.resources, icon)
+                     animateAnnotation(selectedMarker, selectedAnimator, bitmap)
+                  }
+
                   animateMap(map, item.position)
                   true
                }

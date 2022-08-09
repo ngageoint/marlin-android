@@ -8,7 +8,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.pager.*
+import mil.nga.msi.repository.light.LightKey
 import mil.nga.msi.ui.asam.sheet.AsamSheetScreen
+import mil.nga.msi.ui.light.sheet.LightSheetScreen
 import mil.nga.msi.ui.map.cluster.MapAnnotation
 import mil.nga.msi.ui.modu.sheet.ModuSheetScreen
 
@@ -45,7 +47,8 @@ fun PagingSheet(
             val annotation = mapAnnotations[page]
             when (annotation.key.type) {
                MapAnnotation.Type.ASAM -> AsamPage(annotation.key.id) { onDetails.invoke(annotation) }
-               MapAnnotation.Type.MODU -> ModuPage(name = annotation.key.id) { onDetails.invoke(annotation) }
+               MapAnnotation.Type.MODU -> ModuPage(annotation.key.id) { onDetails.invoke(annotation) }
+               MapAnnotation.Type.LIGHT -> LightPage(annotation.key.id) { onDetails.invoke(annotation) }
             }
          }
       }
@@ -70,6 +73,18 @@ private fun ModuPage(
 ) {
    ModuSheetScreen(
       name,
+      onDetails = { onDetails() }
+   )
+}
+
+@Composable
+private fun LightPage(
+   id: String,
+   onDetails: () -> Unit,
+) {
+   val key = LightKey.fromId(id)
+   LightSheetScreen(
+      key,
       onDetails = { onDetails() }
    )
 }

@@ -5,7 +5,6 @@ import androidx.navigation.NavType
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import mil.nga.msi.repository.light.LightKey
-import mil.nga.msi.repository.navigationalwarning.NavigationalWarningKey
 
 val NavType.Companion.LightKey: NavType<LightKey?>
    get() = lightKeyType

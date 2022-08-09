@@ -13,7 +13,17 @@ data class LightKey(
    val featureNumber: String,
    val characteristicNumber: Int
 ): Parcelable {
+
+   fun id(): String {
+      return "${volumeNumber}--${featureNumber}--${characteristicNumber}"
+   }
+
    companion object {
+      fun fromId(id: String): LightKey {
+         val (volumeNumber, featureNumber, characteristicNumber) = id.split("--")
+         return LightKey(volumeNumber, featureNumber, characteristicNumber.toInt())
+      }
+
       fun fromLight(light: Light): LightKey {
          return LightKey(light.volumeNumber, light.featureNumber, light.characteristicNumber)
       }

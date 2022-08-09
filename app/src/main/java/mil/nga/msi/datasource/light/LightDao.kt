@@ -26,6 +26,15 @@ interface LightDao {
       maxLongitude: Double
    ): List<Light>
 
+   @Query("SELECT * FROM lights WHERE characteristic_number = :characteristicNumber AND latitude >= :minLatitude AND latitude <= :maxLatitude AND longitude >= :minLongitude AND longitude <= :maxLongitude")
+   fun getLights(
+      minLatitude: Double,
+      maxLatitude: Double,
+      minLongitude: Double,
+      maxLongitude: Double,
+      characteristicNumber: Int
+   ): List<Light>
+
    @Query("SELECT * FROM lights WHERE volume_number = :volumeNumber ORDER BY notice_number DESC LIMIT 1")
    suspend fun getLatestLight(volumeNumber: String): Light?
 

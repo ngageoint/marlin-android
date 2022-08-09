@@ -3,11 +3,14 @@ package mil.nga.msi.ui.light
 import android.net.Uri
 import androidx.navigation.*
 import androidx.navigation.compose.composable
+import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
+import com.google.accompanist.navigation.material.bottomSheet
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import mil.nga.msi.repository.light.LightKey
 import mil.nga.msi.ui.light.detail.LightDetailScreen
 import mil.nga.msi.ui.light.list.LightsScreen
+import mil.nga.msi.ui.light.sheet.LightSheetScreen
 import mil.nga.msi.ui.map.MapRoute
 import mil.nga.msi.ui.navigation.LightKey
 import mil.nga.msi.ui.navigation.Point
@@ -20,9 +23,10 @@ sealed class LightRoute(
    object Main: LightRoute("lights", "Lights")
    object Detail: LightRoute("lights/detail", "Light Details")
    object List: LightRoute("lights/list", "Lights")
-//   object Sheet: AsamRoute("asams/sheet", "ASAM Sheet")
+   object Sheet: LightRoute("lights/sheet", "Light Sheet")
 }
 
+@OptIn(ExperimentalMaterialNavigationApi::class)
 fun NavGraphBuilder.lightGraph(
    navController: NavController,
    bottomBarVisibility: (Boolean) -> Unit,
@@ -61,6 +65,7 @@ fun NavGraphBuilder.lightGraph(
             }
          )
       }
+
       composable(
          route = "${LightRoute.Detail.name}?key={key}",
          arguments = listOf(navArgument("key") { type = NavType.LightKey })
@@ -81,12 +86,17 @@ fun NavGraphBuilder.lightGraph(
             )
          }
       }
-//      bottomSheet("${AsamRoute.Sheet.name}?reference={reference}") { backstackEntry ->
-//         backstackEntry.arguments?.getString("reference")?.let { reference ->
-//            AsamSheetScreen(reference, onDetails = {
-//               navController.navigate("${AsamRoute.Detail.name}?reference=$reference")
-//            })
-//         }
-//      }
+
+      bottomSheet(
+         route = "${LightRoute.Sheet.name}?key={key}",
+         arguments = listOf(navArgument("key") { type = NavType.LightKey })
+      ) { backstackEntry ->
+         backstackEntry.arguments?.getParcelable<LightKey>("key")?.let { key ->
+            LightSheetScreen(key, onDetails = {
+               val encoded = Uri.encode(Json.encodeToString(key))
+               navController.navigate( "${LightRoute.Detail.name}?key=$encoded")
+            })
+         }
+      }
    }
 }
