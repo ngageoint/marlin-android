@@ -1,6 +1,7 @@
 package mil.nga.msi.ui.map.cluster
 
 import android.os.Parcelable
+import androidx.compose.ui.graphics.Color
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.clustering.ClusterItem
 import kotlinx.parcelize.Parcelize
@@ -19,10 +20,10 @@ data class MapAnnotation(
    val latitude: Double,
    val longitude: Double
 ) : Parcelable, ClusterItem {
-   enum class Type constructor(val icon : Int? = null) {
-      ASAM(R.drawable.asam_map_marker_24dp),
-      MODU(R.drawable.modu_map_marker_24dp),
-      LIGHT
+   enum class Type constructor(val color: Color, val icon : Int? = null) {
+      ASAM(Color(0xFF000000), R.drawable.asam_map_marker_24dp),
+      MODU(Color(0xFF0042A4), R.drawable.modu_map_marker_24dp),
+      LIGHT(Color(0xFFFFC500))
    }
 
    @Serializable

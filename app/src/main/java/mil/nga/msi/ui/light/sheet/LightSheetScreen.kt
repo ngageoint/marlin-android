@@ -36,10 +36,10 @@ private fun LightContent(
    Column(
       verticalArrangement = Arrangement.SpaceBetween,
       modifier = Modifier
-         .height(200.dp)
+         .fillMaxHeight()
          .padding(vertical = 8.dp, horizontal = 16.dp)
    ) {
-      Column {
+      Column(Modifier.weight(1f)) {
          CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
             Text(
                text = "${light.featureNumber} ${light.internationalFeature ?: ""} ${light.volumeNumber}",
@@ -78,10 +78,7 @@ private fun LightContent(
       }
 
       TextButton(
-         onClick = { onDetails() },
-         modifier = Modifier
-            .weight(1f, false)
-            .padding(bottom = 16.dp)
+         onClick = { onDetails() }
       ) {
          Text("MORE DETAILS")
       }
