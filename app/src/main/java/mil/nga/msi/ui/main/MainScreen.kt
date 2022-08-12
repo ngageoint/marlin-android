@@ -173,11 +173,11 @@ fun TopBar(title: String, buttonIcon: ImageVector, onButtonClicked: () -> Unit) 
             text = title
          )
       },
-      navigationIcon = {
-         IconButton(onClick = { onButtonClicked() } ) {
-            Icon(buttonIcon, contentDescription = "")
-         }
-      },
+//      navigationIcon = {
+//         IconButton(onClick = { onButtonClicked() } ) {
+//            Icon(buttonIcon, contentDescription = "")
+//         }
+//      },
       backgroundColor = MaterialTheme.colors.primaryVariant
    )
 }
