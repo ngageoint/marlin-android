@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+option java_package = "mil.nga.msi.type";
+option java_multiple_files = true;
+
+import "map_location.proto";
+import "navigational_warning_key.proto";
+
+message UserPreferences {
+  int32 mapLayer = 1;
+  MapLocation mapLocation = 2;
+  bool mgrs = 3;
+  bool gars = 4;
+  map<string, NavigationalWarningKey> lastReadNavigationWarnings = 5;
+}
