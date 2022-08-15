@@ -22,7 +22,7 @@ class LightRemoteDataSource @Inject constructor(
          val week = calendar.get(Calendar.WEEK_OF_YEAR)
 
          minNoticeNumber = "${latestLight.noticeYear}${latestLight.noticeWeek}"
-         maxNoticeNumber = "${year}${week + 1}"
+         maxNoticeNumber = "${year}${"%02d".format(week + 1)}"
       }
 
       val filteredResponse = service.getLights(
