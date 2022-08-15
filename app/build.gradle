@@ -27,11 +27,13 @@ android {
     compileSdk 32
 
     defaultConfig {
+        ext.repo = Grgit.open(currentDir: project.rootDir)
+
         applicationId "mil.nga.msi"
         minSdk 24
         targetSdk 32
         versionName project.version
-        versionCode versionCode()
+        versionCode ext.repo.log().size() as int
 
         kapt {
             arguments {
@@ -168,9 +170,4 @@ dependencies {
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_version"
-}
-
-def versionCode() {
-    ext.repo = Grgit.open(currentDir: project.rootDir)
-    return ext.repo.log().size()
 }
