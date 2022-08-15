@@ -1,6 +1,7 @@
 package mil.nga.msi.ui.navigationalwarning
 
 import android.net.Uri
+import androidx.compose.ui.graphics.Color
 import androidx.navigation.*
 import androidx.navigation.compose.composable
 import kotlinx.serialization.encodeToString
@@ -15,6 +16,7 @@ import mil.nga.msi.ui.navigationalwarning.list.NavigationalWarningsScreen
 sealed class NavigationWarningRoute(
    override val name: String,
    override val title: String,
+   override val color: Color = Color(0xFFD32F2F)
 ): Route {
    object Main: NavigationWarningRoute("navigational_warnings", "Navigational Warnings")
    object Group: NavigationWarningRoute("navigational_warnings/group", "Navigational Warnings")

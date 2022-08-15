@@ -1,6 +1,7 @@
 package mil.nga.msi.ui.asam
 
 import android.net.Uri
+import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -19,6 +20,7 @@ import mil.nga.msi.ui.navigation.Route
 sealed class AsamRoute(
    override val name: String,
    override val title: String,
+   override val color: Color = Color(0xFF000000)
 ): Route {
    object Main: AsamRoute("asams", "ASAMs")
    object Detail: AsamRoute("asams/detail", "ASAM Details")

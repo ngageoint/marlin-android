@@ -12,4 +12,6 @@ message UserPreferences {
   bool mgrs = 3;
   bool gars = 4;
   map<string, NavigationalWarningKey> lastReadNavigationWarnings = 5;
+  map<string, bool> mapped = 6;
+  repeated string tabs = 7;
 }

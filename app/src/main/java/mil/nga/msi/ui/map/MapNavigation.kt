@@ -2,6 +2,7 @@ package mil.nga.msi.ui.map
 
 import android.net.Uri
 import androidx.compose.runtime.*
+import androidx.compose.ui.graphics.Color
 import androidx.navigation.*
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -23,6 +24,7 @@ import mil.nga.msi.ui.sheet.PagingSheet
 sealed class MapRoute(
    override val name: String,
    override val title: String,
+   override val color: Color = Color.Transparent
 ): Route {
    object Map: MapRoute("map", "Map")
    object Settings: MapRoute("settings", "Map Settings")

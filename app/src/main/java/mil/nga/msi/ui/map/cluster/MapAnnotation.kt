@@ -11,6 +11,10 @@ import mil.nga.msi.datasource.asam.AsamMapItem
 import mil.nga.msi.datasource.light.Light
 import mil.nga.msi.datasource.modu.ModuMapItem
 import mil.nga.msi.repository.light.LightKey
+import mil.nga.msi.ui.asam.AsamRoute
+import mil.nga.msi.ui.light.LightRoute
+import mil.nga.msi.ui.modu.ModuRoute
+import mil.nga.msi.ui.navigation.Route
 import kotlin.Comparator
 
 @Serializable
@@ -20,10 +24,10 @@ data class MapAnnotation(
    val latitude: Double,
    val longitude: Double
 ) : Parcelable, ClusterItem {
-   enum class Type constructor(val color: Color, val icon : Int? = null) {
-      ASAM(Color(0xFF000000), R.drawable.asam_map_marker_24dp),
-      MODU(Color(0xFF0042A4), R.drawable.modu_map_marker_24dp),
-      LIGHT(Color(0xFFFFC500))
+   enum class Type constructor(val route: Route, val icon : Int? = null) {
+      ASAM(AsamRoute.Main, R.drawable.asam_map_marker_24dp),
+      MODU(ModuRoute.Main, R.drawable.modu_map_marker_24dp),
+      LIGHT(LightRoute.Main)
    }
 
    @Serializable

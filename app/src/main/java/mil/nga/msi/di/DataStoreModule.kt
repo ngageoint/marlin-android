@@ -9,6 +9,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mil.nga.msi.datasource.navigationwarning.NavigationArea
+import mil.nga.msi.repository.preferences.DataSource
 import mil.nga.msi.type.MapLocation
 import mil.nga.msi.type.NavigationalWarningKey
 import mil.nga.msi.type.UserPreferences
@@ -40,6 +41,10 @@ object DataStoreModule {
                      NavigationArea.NAVAREA_XII.code to NavigationalWarningKey.newBuilder().build(),
                      NavigationArea.SPECIAL_WARNING.code to NavigationalWarningKey.newBuilder().build(),
                   )
+               )
+               .putAllMapped(mutableMapOf<String, Boolean>())
+               .addAllTabs(
+                  listOf(DataSource.ASAM, DataSource.MODU, DataSource.NAVIGATION_WARNING, DataSource.LIGHT).map { it.name }
                )
                .build()
 

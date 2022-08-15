@@ -1,20 +1,15 @@
 package mil.nga.msi.ui.sheet
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.ChevronRight
-import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.pager.*
 import kotlinx.coroutines.launch
@@ -94,7 +89,7 @@ fun PagingSheet(
             modifier = Modifier.fillMaxWidth(),
          ) { page ->
             val annotation = mapAnnotations[page]
-            badgeColor = annotation.key.type.color
+            badgeColor = annotation.key.type.route.color
 
             Column(modifier = Modifier.fillMaxWidth()) {
                when (annotation.key.type) {

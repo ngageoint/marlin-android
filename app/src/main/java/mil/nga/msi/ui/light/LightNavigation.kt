@@ -1,6 +1,7 @@
 package mil.nga.msi.ui.light
 
 import android.net.Uri
+import androidx.compose.ui.graphics.Color
 import androidx.navigation.*
 import androidx.navigation.compose.composable
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
@@ -19,6 +20,7 @@ import mil.nga.msi.ui.navigation.Route
 sealed class LightRoute(
    override val name: String,
    override val title: String,
+   override val color: Color = Color(0xFFFFC500)
 ): Route {
    object Main: LightRoute("lights", "Lights")
    object Detail: LightRoute("lights/detail", "Light Details")

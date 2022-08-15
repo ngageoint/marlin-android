@@ -1,6 +1,7 @@
 package mil.nga.msi.ui.modu
 
 import android.net.Uri
+import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -20,6 +21,7 @@ import mil.nga.msi.ui.navigation.Route
 sealed class ModuRoute(
    override val name: String,
    override val title: String,
+   override val color: Color = Color(0xFF0042A4)
 ): Route {
    object Main: ModuRoute("modus", "MODUs")
    object Detail: ModuRoute("modus/detail", "MODU Details")

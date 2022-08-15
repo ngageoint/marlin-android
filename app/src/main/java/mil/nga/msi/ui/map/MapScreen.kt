@@ -4,6 +4,7 @@ import android.Manifest
 import android.animation.ValueAnimator
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -93,6 +94,7 @@ fun MapScreen(
       )
 
       Box(Modifier.fillMaxWidth()) {
+         Log.i("Billy", "annotations are ${annotations}")
          annotations?.let { annotations ->
             Map(
                selectedAnnotation,
