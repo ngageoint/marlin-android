@@ -1,3 +1,5 @@
+import org.ajoberstar.grgit.Grgit
+
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
@@ -6,7 +8,11 @@ plugins {
     id 'kotlin-parcelize'
     id 'kotlinx-serialization'
     id 'com.google.protobuf'
+    id 'org.ajoberstar.grgit' version '4.1.0'
 }
+
+group 'mil.nga.msi'
+version '0.4.0'
 
 def googleMapsApiReleaseKey = hasProperty('MSI_RELEASE_MAPS_API_KEY') ? MSI_RELEASE_MAPS_API_KEY : ''
 def googleMapsApiDebugKey = hasProperty('MSI_DEBUG_MAPS_API_KEY') ? MSI_DEBUG_MAPS_API_KEY : ''
@@ -24,8 +30,8 @@ android {
         applicationId "mil.nga.msi"
         minSdk 24
         targetSdk 32
-        versionCode 1
-        versionName "0.4.0"
+        versionName project.version
+        versionCode versionCode()
 
         kapt {
             arguments {
@@ -35,11 +41,11 @@ android {
 
         signingConfigs {
             release {
-                if (project.hasProperty('KEYSTORE')) {
-                    storeFile file(KEYSTORE)
-                    storePassword KEYSTORE_PASSWORD
-                    keyAlias KEY_ALIAS
-                    keyPassword KEY_PASSWORD
+                if (project.hasProperty('MSI_KEYSTORE')) {
+                    storeFile file(MSI_KEYSTORE)
+                    storePassword MSI_KEYSTORE_PASSWORD
+                    keyAlias MSI_KEY_ALIAS
+                    keyPassword MSI_KEY_PASSWORD
                 }
             }
         }
@@ -162,4 +168,9 @@ dependencies {
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_version"
+}
+
+def versionCode() {
+    ext.repo = Grgit.open(currentDir: project.rootDir)
+    return ext.repo.log().size()
 }
