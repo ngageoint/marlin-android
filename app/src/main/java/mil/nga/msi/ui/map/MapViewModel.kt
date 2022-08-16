@@ -1,6 +1,8 @@
 package mil.nga.msi.ui.map
 
+import android.util.Log
 import androidx.lifecycle.*
+import com.google.android.gms.maps.model.TileProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import mil.nga.msi.datasource.asam.AsamMapItem
 import mil.nga.msi.datasource.modu.ModuMapItem
@@ -20,7 +22,7 @@ class MapViewModel @Inject constructor(
    moduRepository: ModuRepository,
    val locationPolicy: LocationPolicy,
    val userPreferencesRepository: UserPreferencesRepository,
-   val lightTileProvider: LightTileProvider
+   private val _lightTileProvider: LightTileProvider
 ): ViewModel() {
 
    val baseMap = userPreferencesRepository.baseMapType.asLiveData()
@@ -32,13 +34,21 @@ class MapViewModel @Inject constructor(
 
    suspend fun setMapLocation(mapLocation: MapLocation) = userPreferencesRepository.setMapLocation(mapLocation)
 
-   private val _mapAnnotations = mutableMapOf<MapAnnotation.Type, List<MapAnnotation>>()
+   val lightTileProvider: LiveData<TileProvider?> = Transformations.map(mapped) { mapped ->
+      if (mapped.get(DataSource.LIGHT) == true) {
+         _lightTileProvider
+      } else null
+   }
 
+   private val _mapAnnotations = mutableMapOf<MapAnnotation.Type, List<MapAnnotation>>()
    val mapAnnotations = Transformations.switchMap(mapped) { mapped ->
+      Log.i("Billy", "mapped data source updated")
       MediatorLiveData<List<MapAnnotation>>().apply {
          value = emptyList()
+
          val asamSource = asamRepository.asamMapItems.asLiveData()
          if (mapped[DataSource.ASAM] == true) {
+            Log.i("Billy", "add asam source")
             addSource(asamSource) { asams: List<AsamMapItem> ->
                _mapAnnotations[MapAnnotation.Type.ASAM] = asams.map { MapAnnotation.fromAsam(it) }
                value = _mapAnnotations.flatMap { entry ->  entry.value }

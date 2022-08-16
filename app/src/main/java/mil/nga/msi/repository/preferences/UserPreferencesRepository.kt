@@ -1,9 +1,9 @@
 package mil.nga.msi.repository.preferences
 
+import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.datastore.core.DataStore
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 import mil.nga.msi.datasource.navigationwarning.NavigationArea
 import mil.nga.msi.repository.navigationalwarning.NavigationalWarningKey
 import mil.nga.msi.type.MapLocation
@@ -28,7 +28,7 @@ class UserPreferencesRepository @Inject constructor(
 ) {
    val baseMapType: Flow<BaseMapType> = preferencesDataStore.data.map {
       BaseMapType.fromValue(it.mapLayer)
-   }
+   }.distinctUntilChanged()
 
    suspend fun setBaseMapType(baseMapType: BaseMapType) {
       preferencesDataStore.updateData {
@@ -40,7 +40,7 @@ class UserPreferencesRepository @Inject constructor(
 
    val gars: Flow<Boolean> = preferencesDataStore.data.map {
       it.gars
-   }
+   }.distinctUntilChanged()
 
    suspend fun setGARS(enabled: Boolean) {
       preferencesDataStore.updateData {
@@ -52,7 +52,7 @@ class UserPreferencesRepository @Inject constructor(
 
    val mgrs: Flow<Boolean> = preferencesDataStore.data.map {
       it.mgrs
-   }
+   }.distinctUntilChanged()
 
    suspend fun setMGRS(enabled: Boolean) {
       preferencesDataStore.updateData {
@@ -62,7 +62,7 @@ class UserPreferencesRepository @Inject constructor(
       }
    }
 
-   val mapLocation = preferencesDataStore.data.map { it.mapLocation }
+   val mapLocation = preferencesDataStore.data.map { it.mapLocation }.distinctUntilChanged()
 
    suspend fun setMapLocation(mapLocation: MapLocation) {
       preferencesDataStore.updateData {
@@ -96,7 +96,7 @@ class UserPreferencesRepository @Inject constructor(
       it.mappedMap.mapKeys { entry ->
          DataSource.valueOf(entry.key)
       }
-   }
+   }.distinctUntilChanged()
 
    suspend fun setMapped(type: DataSource) {
       preferencesDataStore.updateData {
@@ -111,7 +111,7 @@ class UserPreferencesRepository @Inject constructor(
       it.tabsList.map { name ->
          DataSource.valueOf(name)
       }
-   }
+   }.distinctUntilChanged()
 
    suspend fun setTabs(tabs: List<DataSource>) {
       preferencesDataStore.updateData {

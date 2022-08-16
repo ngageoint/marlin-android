@@ -42,7 +42,14 @@ object DataStoreModule {
                      NavigationArea.SPECIAL_WARNING.code to NavigationalWarningKey.newBuilder().build(),
                   )
                )
-               .putAllMapped(mutableMapOf<String, Boolean>())
+               .putAllMapped(
+                  mapOf(
+                     DataSource.ASAM.name to true,
+                     DataSource.MODU.name to true,
+                     DataSource.NAVIGATION_WARNING.name to true,
+                     DataSource.LIGHT.name to true
+                  )
+               )
                .addAllTabs(
                   listOf(DataSource.ASAM, DataSource.MODU, DataSource.NAVIGATION_WARNING, DataSource.LIGHT).map { it.name }
                )

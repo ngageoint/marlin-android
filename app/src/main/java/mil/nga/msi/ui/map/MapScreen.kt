@@ -29,7 +29,6 @@ import com.google.maps.android.compose.*
 import kotlinx.coroutines.launch
 import mil.nga.gars.tile.GARSTileProvider
 import mil.nga.mgrs.tile.MGRSTileProvider
-import mil.nga.msi.datasource.light.Light
 import mil.nga.msi.repository.light.LightKey
 import mil.nga.msi.type.MapLocation
 import mil.nga.msi.ui.light.list.LightsViewModel
@@ -37,7 +36,6 @@ import mil.nga.msi.ui.location.LocationPermission
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.cluster.ClusterManager
 import mil.nga.msi.ui.map.cluster.MapAnnotation
-import mil.nga.msi.ui.map.overlay.LightTileProvider
 import mil.nga.msi.ui.map.overlay.OsmTileProvider
 import kotlin.math.roundToInt
 
@@ -62,6 +60,7 @@ fun MapScreen(
    val annotations by mapViewModel.mapAnnotations.observeAsState()
    val location by mapViewModel.locationPolicy.bestLocationProvider.observeAsState()
    var located by remember { mutableStateOf(false) }
+   val lightTileProvider by mapViewModel.lightTileProvider.observeAsState()
 
    val locationPermissionState: PermissionState = rememberPermissionState(
       Manifest.permission.ACCESS_FINE_LOCATION
@@ -94,7 +93,6 @@ fun MapScreen(
       )
 
       Box(Modifier.fillMaxWidth()) {
-         Log.i("Billy", "annotations are ${annotations}")
          annotations?.let { annotations ->
             Map(
                selectedAnnotation,
@@ -105,7 +103,7 @@ fun MapScreen(
                locationPermissionState.status.isGranted,
                gars == true,
                mgrs == true,
-               mapViewModel.lightTileProvider,
+               lightTileProvider,
                annotations,
                onAnnotationClick = { onAnnotationClick.invoke(it) },
                onAnnotationsClick = { onAnnotationsClick.invoke(it) },
@@ -204,7 +202,7 @@ private fun Map(
    locationEnabled: Boolean,
    gars: Boolean,
    mgrs: Boolean,
-   lightTileProvider: LightTileProvider,
+   lightTileProvider: TileProvider?,
    annotations: List<MapAnnotation>,
    onMapMove: (MapLocation, Int) -> Unit,
    onMapClick: (LatLng, VisibleRegion) -> Unit,
@@ -278,7 +276,7 @@ private fun Map(
             TileOverlay(tileProvider = MGRSTileProvider.create(context))
          }
 
-         TileOverlay(tileProvider = lightTileProvider)
+         lightTileProvider?.let { TileOverlay(tileProvider = it )}
       }
 
       MapEffect(null) { map ->
