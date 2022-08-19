@@ -18,7 +18,7 @@ sealed class NavigationWarningRoute(
    override val title: String,
    override val color: Color = Color(0xFFD32F2F)
 ): Route {
-   object Main: NavigationWarningRoute("navigational_warnings", "Navigational Warnings")
+   object Main: NavigationWarningRoute("navigational_warnings", "Warnings")
    object Group: NavigationWarningRoute("navigational_warnings/group", "Navigational Warnings")
    object List: NavigationWarningRoute("navigational_warnings/list", "Navigational Warnings")
    object Detail: NavigationWarningRoute("navigational_warnings/detail", "Navigational Warning Details")

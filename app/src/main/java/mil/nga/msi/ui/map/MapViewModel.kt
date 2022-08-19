@@ -42,13 +42,11 @@ class MapViewModel @Inject constructor(
 
    private val _mapAnnotations = mutableMapOf<MapAnnotation.Type, List<MapAnnotation>>()
    val mapAnnotations = Transformations.switchMap(mapped) { mapped ->
-      Log.i("Billy", "mapped data source updated")
       MediatorLiveData<List<MapAnnotation>>().apply {
          value = emptyList()
 
          val asamSource = asamRepository.asamMapItems.asLiveData()
          if (mapped[DataSource.ASAM] == true) {
-            Log.i("Billy", "add asam source")
             addSource(asamSource) { asams: List<AsamMapItem> ->
                _mapAnnotations[MapAnnotation.Type.ASAM] = asams.map { MapAnnotation.fromAsam(it) }
                value = _mapAnnotations.flatMap { entry ->  entry.value }
