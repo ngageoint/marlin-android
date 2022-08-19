@@ -116,7 +116,7 @@ fun MapScreen(
                      mapViewModel.setMapLocation(location)
                   }
                },
-               onMapClick = { latLng, region ->
+               onMapClick = { latLng, zoom, region ->
                   val screenPercentage = 0.03
                   val tolerance = (region.farRight.longitude - region.farLeft.longitude) * screenPercentage
                   val minLongitude = latLng.longitude - tolerance
@@ -131,10 +131,22 @@ fun MapScreen(
                            MapAnnotation(key, light.latitude, light.longitude)
                         }
 
-                     if (lights.size == 1) {
-                        onAnnotationClick(lights.first())
-                     } else if (lights.isNotEmpty()) {
-                        onAnnotationsClick(lights)
+                     if (lights.isNotEmpty()) {
+                        val bounds = LatLngBounds.builder().apply {
+                           lights.forEach { this.include(LatLng(it.latitude, it.longitude)) }
+                        }.build()
+                        destination = MapLocation.newBuilder()
+                           .setLatitude(bounds.center.latitude)
+                           .setLongitude(bounds.center.longitude)
+                           .setZoom(if (lights.size == 1) 17.0 else zoom.toDouble())
+                           .build()
+
+                        if (lights.size == 1) {
+                           val light = lights.first()
+                           onAnnotationClick(light)
+                        } else {
+                           onAnnotationsClick(lights)
+                        }
                      }
                   }
                }
@@ -205,7 +217,7 @@ private fun Map(
    lightTileProvider: TileProvider?,
    annotations: List<MapAnnotation>,
    onMapMove: (MapLocation, Int) -> Unit,
-   onMapClick: (LatLng, VisibleRegion) -> Unit,
+   onMapClick: (LatLng, Float, VisibleRegion) -> Unit,
    onAnnotationClick: (MapAnnotation) -> Unit,
    onAnnotationsClick: (Collection<MapAnnotation>) -> Unit
 ) {
@@ -296,7 +308,7 @@ private fun Map(
          }
 
          map.setOnMapClickListener { latLng ->
-            onMapClick(latLng, map.projection.visibleRegion)
+            onMapClick(latLng, map.cameraPosition.zoom, map.projection.visibleRegion)
          }
       }
 
