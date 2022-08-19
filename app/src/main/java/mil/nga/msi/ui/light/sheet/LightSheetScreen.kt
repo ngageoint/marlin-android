@@ -36,10 +36,9 @@ private fun LightContent(
    Column(
       verticalArrangement = Arrangement.SpaceBetween,
       modifier = Modifier
-         .fillMaxHeight()
          .padding(vertical = 8.dp, horizontal = 16.dp)
    ) {
-      Column(Modifier.weight(1f)) {
+      Column {
          CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
             Text(
                text = "${light.featureNumber} ${light.internationalFeature ?: ""} ${light.volumeNumber}",
