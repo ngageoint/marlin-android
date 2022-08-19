@@ -11,6 +11,7 @@ import mil.nga.msi.datasource.asam.Asam
 import mil.nga.msi.datasource.light.Light
 import mil.nga.msi.datasource.modu.Modu
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarning
+import mil.nga.msi.datasource.port.Port
 import mil.nga.msi.network.asam.AsamService
 import mil.nga.msi.network.asam.AsamsTypeAdapter
 import mil.nga.msi.network.light.LightService
@@ -19,6 +20,8 @@ import mil.nga.msi.network.modu.ModuService
 import mil.nga.msi.network.modu.ModusTypeAdapter
 import mil.nga.msi.network.navigationalwarning.NavigationalWarningService
 import mil.nga.msi.network.navigationalwarning.NavigationalWarningsTypeAdapter
+import mil.nga.msi.network.port.PortService
+import mil.nga.msi.network.port.PortsTypeAdapter
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -41,6 +44,7 @@ class NetworkModule {
          .registerTypeAdapter(object : TypeToken<List<Modu>>() {}.type, ModusTypeAdapter())
          .registerTypeAdapter(object : TypeToken<List<NavigationalWarning>>() {}.type, NavigationalWarningsTypeAdapter())
          .registerTypeAdapter(object : TypeToken<List<Light>>() {}.type, LightsTypeAdapter())
+         .registerTypeAdapter(object : TypeToken<List<Port>>() {}.type, PortsTypeAdapter())
          .create()
    }
 
@@ -79,5 +83,11 @@ class NetworkModule {
    @Singleton
    fun provideLightService(retrofit: Retrofit): LightService {
       return retrofit.create(LightService::class.java)
+   }
+
+   @Provides
+   @Singleton
+   fun providePortService(retrofit: Retrofit): PortService {
+      return retrofit.create(PortService::class.java)
    }
 }

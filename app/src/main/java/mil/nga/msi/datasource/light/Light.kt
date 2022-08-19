@@ -278,4 +278,32 @@ data class Light(
          characteristic?.substring(IntRange(firstIndex + 1, lastIndex - 1))
       } else null
    }
+
+   override fun toString(): String {
+      return "LIGHT\n\n" +
+         "aidType: ${aidType.orEmpty()}\n" +
+         "characteristic: ${characteristic.orEmpty()}\n" +
+         "characteristicNumber: ${characteristicNumber}\n" +
+         "deleteFlag: ${deleteFlag.orEmpty()}\n" +
+         "featureNumber: ${featureNumber}\n" +
+         "geopoliticalHeading: ${geopoliticalHeading.orEmpty()}\n" +
+         "heightFeet: ${heightFeet?.toString().orEmpty()}\n" +
+         "heightMeters: ${heightMeters?.toString().orEmpty()}\n" +
+         "internationalFeature: ${internationalFeature.orEmpty()}\n" +
+         "localHeading: ${localHeading.orEmpty()}\n" +
+         "name: ${name.orEmpty()}\n" +
+         "noticeNumber: ${noticeNumber?.toString().orEmpty()}\n" +
+         "noticeWeek: ${noticeWeek}\n" +
+         "noticeYear: ${noticeYear}\n" +
+         "position: ${position.orEmpty()}\n" +
+         "postNote: ${postNote.orEmpty()}\n" +
+         "precedingNote: ${precedingNote.orEmpty()}\n" +
+         "range: ${range.orEmpty()}\n" +
+         "regionHeading: ${regionHeading.orEmpty()}\n" +
+         "remarks: ${remarks.orEmpty()}\n" +
+         "removeFromList: ${removeFromList.orEmpty()}\n" +
+         "structure: ${structure.orEmpty()}\n" +
+         "subregionHeading: ${subregionHeading.orEmpty()}\n" +
+         "volumeNumber: ${volumeNumber.orEmpty()}"
+   }
 }

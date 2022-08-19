@@ -11,6 +11,7 @@ import mil.nga.msi.datasource.asam.AsamDao
 import mil.nga.msi.datasource.light.LightDao
 import mil.nga.msi.datasource.modu.ModuDao
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarningDao
+import mil.nga.msi.datasource.port.PortDao
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
@@ -47,5 +48,11 @@ class RoomModule {
    @Singleton
    fun provideLightDao(database: MsiDatabase): LightDao {
       return database.lightDao()
+   }
+
+   @Provides
+   @Singleton
+   fun providePortDao(database: MsiDatabase): PortDao {
+      return database.portDao()
    }
 }

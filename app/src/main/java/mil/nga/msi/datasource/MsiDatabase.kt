@@ -11,6 +11,8 @@ import mil.nga.msi.datasource.modu.Modu
 import mil.nga.msi.datasource.modu.ModuDao
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarning
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarningDao
+import mil.nga.msi.datasource.port.Port
+import mil.nga.msi.datasource.port.PortDao
 
 @Database(
    version = MsiDatabase.VERSION,
@@ -18,7 +20,8 @@ import mil.nga.msi.datasource.navigationwarning.NavigationalWarningDao
       Asam::class,
       Modu::class,
       NavigationalWarning::class,
-      Light::class
+      Light::class,
+      Port::class
    ]
 )
 @TypeConverters(
@@ -35,4 +38,5 @@ abstract class MsiDatabase : RoomDatabase() {
    abstract fun moduDao(): ModuDao
    abstract fun navigationalWarning(): NavigationalWarningDao
    abstract fun lightDao(): LightDao
+   abstract fun portDao(): PortDao
 }

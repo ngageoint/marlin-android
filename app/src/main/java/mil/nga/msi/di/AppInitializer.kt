@@ -10,6 +10,7 @@ import mil.nga.msi.startup.WorkManagerInitializer
 import mil.nga.msi.startup.light.LightInitializer
 import mil.nga.msi.startup.modu.ModuInitializer
 import mil.nga.msi.startup.navigationalwarning.NavigationalWarningInitializer
+import mil.nga.msi.startup.port.PortInitializer
 
 @EntryPoint
 @InstallIn(SingletonComponent::class)
@@ -31,4 +32,5 @@ interface AppInitializer {
    fun inject(moduInitializer: ModuInitializer)
    fun inject(navigationalWarningInitializer: NavigationalWarningInitializer)
    fun inject(lightInitializer: LightInitializer)
+   fun inject(portInitializer: PortInitializer)
 }
