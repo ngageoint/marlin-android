@@ -51,9 +51,9 @@ object DataStoreModule {
                   )
                )
                .addAllTabs(
-                  listOf(DataSource.ASAM, DataSource.MODU).map { it.name }
+                  listOf(DataSource.ASAM, DataSource.MODU, DataSource.NAVIGATION_WARNING, DataSource.LIGHT).map { it.name }
                )
-               .addAllNonTabs(listOf(DataSource.NAVIGATION_WARNING, DataSource.LIGHT).map { it.name })
+               .addAllNonTabs(listOf(DataSource.PORT).map { it.name })
                .build()
 
          override suspend fun readFrom(input: InputStream): UserPreferences {

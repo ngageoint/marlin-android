@@ -12,9 +12,9 @@ class PortLocalDataSource @Inject constructor(
 //   fun observeAsams() = dao.observeAsams()
 //   fun observeAsam(reference: String) = dao.observeAsam(reference)
 //   fun observeAsamMapItems() = dao.observeAsamMapItems()
-//   fun observeAsamListItems() = dao.getAsamListItems()
-//
-//   suspend fun getAsam(reference: String) = dao.getAsam(reference)
+   fun observePortListItems() = dao.getPortListItems()
+
+   suspend fun getPort(portNumber: Int) = dao.getPort(portNumber)
    suspend fun getPorts(): List<Port> = dao.getPorts()
 //   suspend fun getLatestAsam() = dao.getLatestAsam()
 

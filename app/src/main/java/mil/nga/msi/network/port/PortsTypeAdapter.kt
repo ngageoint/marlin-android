@@ -184,10 +184,10 @@ class PortsTypeAdapter: TypeAdapter<List<Port>>() {
                portName = `in`.nextStringOrNull()
             }
             "xcoord" -> {
-               latitude = `in`.nextDoubleOrNull()
+               longitude = `in`.nextDoubleOrNull()
             }
             "ycoord" -> {
-               longitude = `in`.nextDoubleOrNull()
+               latitude = `in`.nextDoubleOrNull()
             }
             "regionNumber" -> {
                regionNumber = `in`.nextIntOrNull()

@@ -24,17 +24,17 @@ interface PortDao {
 //
    @Query("SELECT * FROM ports")
    suspend fun getPorts(): List<Port>
-//
-//   @Query("SELECT * FROM asams WHERE reference = :reference")
-//   suspend fun getAsam(reference: String): Asam?
+
+   @Query("SELECT * FROM ports WHERE port_number = :portNumber")
+   suspend fun getPort(portNumber: Int): Port?
 //
 //   @Query("SELECT * FROM asams ORDER BY date DESC LIMIT 1")
 //   suspend fun getLatestAsam(): Asam?
 //
-//   @Query("SELECT * FROM asams ORDER BY date DESC")
-//   @RewriteQueriesToDropUnusedColumns
-//   fun getAsamListItems(): PagingSource<Int, AsamListItem>
-//
+   @Query("SELECT * FROM ports ORDER BY port_name DESC")
+   @RewriteQueriesToDropUnusedColumns
+   fun getPortListItems(): PagingSource<Int, PortListItem>
+
 //   @Query("SELECT * FROM asams")
 //   @RewriteQueriesToDropUnusedColumns
 //   fun observeAsamMapItems(): Flow<List<AsamMapItem>>

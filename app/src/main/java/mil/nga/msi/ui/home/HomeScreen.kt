@@ -7,6 +7,7 @@ import mil.nga.msi.ui.light.lightGraph
 import mil.nga.msi.ui.map.mapGraph
 import mil.nga.msi.ui.modu.moduGraph
 import mil.nga.msi.ui.navigationalwarning.navigationalWarningGraph
+import mil.nga.msi.ui.port.portGraph
 
 fun NavGraphBuilder.homeGraph(
    navController: NavController,
@@ -41,6 +42,13 @@ fun NavGraphBuilder.homeGraph(
       openNavigationDrawer = { openNavigationDrawer() }
    )
    lightGraph(
+      navController = navController,
+      bottomBarVisibility = { bottomBarVisibility(it) },
+      share = { share(it) },
+      showSnackbar = { showSnackbar(it) },
+      openNavigationDrawer = { openNavigationDrawer() }
+   )
+   portGraph(
       navController = navController,
       bottomBarVisibility = { bottomBarVisibility(it) },
       share = { share(it) },

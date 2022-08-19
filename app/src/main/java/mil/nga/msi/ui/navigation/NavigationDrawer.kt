@@ -77,7 +77,8 @@ fun NavigationDrawer(
          previousNonTabs = nonTabs.toMutableList().apply { removeFirst() }
          previousTabs = tabs.toMutableList().apply { add(lastIndex + 1, list2Element) }
 
-         if (tabs.size > MAX_TABS) {
+         val size = previousTabs?.size ?: 0
+         if (size > MAX_TABS) {
             val evict = tabs[tabs.lastIndex - 1]
             previousTabs = previousTabs?.toMutableList()?.apply { remove(evict) }
             previousNonTabs = previousNonTabs?.toMutableList()?.apply { add(0, evict) }
