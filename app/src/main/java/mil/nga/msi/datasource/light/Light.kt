@@ -108,7 +108,7 @@ data class Light(
    val dms = DMS.from(LatLng(latitude, longitude))
 
    fun isFogSignal(): Boolean {
-      return name?.contains("fog signal", ignoreCase = true) ?: false
+      return remarks?.contains("bl.", ignoreCase = true) ?: false
    }
 
    fun isBuoy(): Boolean {
