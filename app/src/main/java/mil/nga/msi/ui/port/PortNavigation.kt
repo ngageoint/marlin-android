@@ -16,6 +16,7 @@ import mil.nga.msi.ui.asam.sheet.AsamSheetScreen
 import mil.nga.msi.ui.map.MapRoute
 import mil.nga.msi.ui.navigation.Point
 import mil.nga.msi.ui.navigation.Route
+import mil.nga.msi.ui.port.detail.PortDetailScreen
 import mil.nga.msi.ui.port.list.PortsScreen
 
 sealed class PortRoute(
@@ -67,23 +68,23 @@ fun NavGraphBuilder.portGraph(
             }
          )
       }
-//      composable("${PortRoute.Detail.name}?reference={reference}") { backstackEntry ->
-//         bottomBarVisibility(false)
-//
-//         backstackEntry.arguments?.getString("reference")?.let { reference ->
-//            AsamDetailScreen(
-//               reference,
-//               close = { navController.popBackStack() },
-//               onAction = { action ->
-//                  when(action) {
-//                     is AsamAction.Zoom -> zoomTo(action.point)
-//                     is AsamAction.Share -> shareAsam(action.text)
-//                     is AsamAction.Location -> showSnackbar("${action.text} copied to clipboard")
-//                  }
-//               }
-//            )
-//         }
-//      }
+      composable("${PortRoute.Detail.name}?portNumber={portNumber}") { backstackEntry ->
+         bottomBarVisibility(false)
+
+         backstackEntry.arguments?.getString("portNumber")?.toIntOrNull()?.let { portNumber ->
+            PortDetailScreen(
+               portNumber,
+               close = { navController.popBackStack() },
+               onAction = { action ->
+                  when(action) {
+                     is PortAction.Zoom -> zoomTo(action.point)
+                     is PortAction.Share -> shareAsam(action.text)
+                     is PortAction.Location -> showSnackbar("${action.text} copied to clipboard")
+                  }
+               }
+            )
+         }
+      }
 //      bottomSheet("${AsamRoute.Sheet.name}?reference={reference}") { backstackEntry ->
 //         backstackEntry.arguments?.getString("reference")?.let { reference ->
 //            AsamSheetScreen(reference, onDetails = {

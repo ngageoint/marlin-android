@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "52b85e66195981cc08a034d60e6585c1",
+    "identityHash": "b5c0a7e6183232b9738d97a91804dc93",
     "entities": [
       {
         "tableName": "asams",
@@ -426,7 +426,7 @@
       },
       {
         "tableName": "ports",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`port_number` INTEGER NOT NULL, `port_name` TEXT NOT NULL, `latitude` REAL NOT NULL, `longitude` REAL NOT NULL, `region_number` INTEGER, `region_name` TEXT, `country_code` TEXT, `country_name` TEXT, `publication_number` TEXT, `chart_number` TEXT, `navigation_area` TEXT, `harbor_size` TEXT, `harbor_type` TEXT, `shelter` TEXT, `entrance_restriction_tide` TEXT, `entrance_restriction_swell` TEXT, `entrance_restriction_ice` TEXT, `entrance_restriction_other` TEXT, `overhead_limits` TEXT, `channel_depth` INTEGER, `anchorage_depth` INTEGER, `cargo_pier_depth` INTEGER, `oil_terminal_depth` INTEGER, `tide` INTEGER, `max_vessel_length` INTEGER, `max_vessel_beam` INTEGER, `max_vessel_draft` INTEGER, `good_holding_ground` TEXT, `turning_area` TEXT, `first_port_of_entry` TEXT, `us_representative` TEXT, `pilotage_compulsory` TEXT, `pilotage_available` TEXT, `pilotage_local_assist` TEXT, `pilotage_advisable` TEXT, `tugs_salvage` TEXT, `tugs_assist` TEXT, `quarantine_pratique` TEXT, `quarantine_other` TEXT, `communications_telephone` TEXT, `communications_telegraph` TEXT, `communications_radio` TEXT, `communications_radio_telephone` TEXT, `communications_air` TEXT, `communications_rail` TEXT, `facilities_wharves` TEXT, `facilities_anchor` TEXT, `facilities_med_moor` TEXT, `facilities_beach_moor` TEXT, `facilities_ice_moor` TEXT, `medical_facilities` TEXT, `garbage_disposal` TEXT, `degauss` TEXT, `dirty_ballast` TEXT, `cranes_fixed` TEXT, `cranes_mobile` TEXT, `cranes_floating` TEXT, `lifts_100` TEXT, `lifts_50` TEXT, `lifts_25` TEXT, `lifts_0` TEXT, `services_longshore` TEXT, `services_electrical` TEXT, `services_steam` TEXT, `services_navigational_equipment` TEXT, `services_electrical_repair` TEXT, `supplies_provisions` TEXT, `supplies_water` TEXT, `supplies_fuel` TEXT, `supplies_diesel` TEXT, `supplies_deck` TEXT, `supplies_engine` TEXT, `repair_code` TEXT, `drydock` TEXT, `railway` TEXT, `quarantine_sanitation` TEXT, `supplies_aviation_fuel` TEXT, `harbor_use` TEXT, `ukc_management_system` TEXT, `port_security` TEXT, `eta_message` TEXT, `search_and_rescue` TEXT, `traffic_separation_scheme` TEXT, `vessel_traffic_service` TEXT, `chemical_holding_tank_disposal` TEXT, `global_id` TEXT, `facilities_roro` TEXT, `facilities_solid_bulk` TEXT, `facilities_container` TEXT, `facilities_break_bulk` TEXT, `facilities_oil_terminal` TEXT, `facilities_long_terminal` TEXT, `facilities_other` TEXT, `facilities_dangerous_cargo` TEXT, `facilities_liquid_bulk` TEXT, `services_ice_breaking` TEXT, `services_diving` TEXT, `cranes_container` TEXT, `unlo_code` TEXT, `dnc` TEXT, `s_121_water_body` TEXT, `s_57_enc` TEXT, `s_101_enc` TEXT, `dod_water_body` TEXT, `alternate_name` TEXT, `entrance_width` INTEGER, `liquified_natural_gas_terminal_depth` TEXT, `offshore_max_vessel_length` INTEGER, `offshore_max_vessel_beam` INTEGER, `offshore_max_vessel_draft` INTEGER, PRIMARY KEY(`port_number`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`port_number` INTEGER NOT NULL, `port_name` TEXT NOT NULL, `latitude` REAL NOT NULL, `longitude` REAL NOT NULL, `region_number` INTEGER, `region_name` TEXT, `country_code` TEXT, `country_name` TEXT, `publication_number` TEXT, `chart_number` TEXT, `navigation_area` TEXT, `harbor_size` TEXT, `harbor_type` TEXT, `shelter` TEXT, `entrance_restriction_tide` TEXT, `entrance_restriction_swell` TEXT, `entrance_restriction_ice` TEXT, `entrance_restriction_other` TEXT, `overhead_limits` TEXT, `channel_depth` INTEGER, `anchorage_depth` INTEGER, `cargo_pier_depth` INTEGER, `oil_terminal_depth` INTEGER, `tide` INTEGER, `max_vessel_length` INTEGER, `max_vessel_beam` INTEGER, `max_vessel_draft` INTEGER, `good_holding_ground` TEXT, `turning_area` TEXT, `first_port_of_entry` TEXT, `us_representative` TEXT, `pilotage_compulsory` TEXT, `pilotage_available` TEXT, `pilotage_local_assist` TEXT, `pilotage_advisable` TEXT, `tugs_salvage` TEXT, `tugs_assist` TEXT, `quarantine_pratique` TEXT, `quarantine_other` TEXT, `communications_telephone` TEXT, `communications_telegraph` TEXT, `communications_radio` TEXT, `communications_radio_telephone` TEXT, `communications_air` TEXT, `communications_rail` TEXT, `medical_facilities` TEXT, `garbage_disposal` TEXT, `degauss` TEXT, `dirty_ballast` TEXT, `cranes_fixed` TEXT, `cranes_mobile` TEXT, `cranes_floating` TEXT, `cranes_container` TEXT, `lifts_100` TEXT, `lifts_50` TEXT, `lifts_25` TEXT, `lifts_0` TEXT, `services_longshore` TEXT, `services_electrical` TEXT, `services_steam` TEXT, `services_navigational_equipment` TEXT, `services_electrical_repair` TEXT, `services_ice_breaking` TEXT, `services_diving` TEXT, `supplies_provisions` TEXT, `supplies_water` TEXT, `supplies_fuel` TEXT, `supplies_diesel` TEXT, `supplies_deck` TEXT, `supplies_engine` TEXT, `supplies_aviation_fuel` TEXT, `repair_code` TEXT, `dry_dock` TEXT, `railway` TEXT, `quarantine_sanitation` TEXT, `harbor_use` TEXT, `ukc_management_system` TEXT, `port_security` TEXT, `eta_message` TEXT, `search_and_rescue` TEXT, `traffic_separation_scheme` TEXT, `vessel_traffic_service` TEXT, `chemical_holding_tank_disposal` TEXT, `global_id` TEXT, `facilities_roro` TEXT, `facilities_solid_bulk` TEXT, `facilities_container` TEXT, `facilities_break_bulk` TEXT, `facilities_oil_terminal` TEXT, `facilities_long_terminal` TEXT, `facilities_other` TEXT, `facilities_dangerous_cargo` TEXT, `facilities_liquid_bulk` TEXT, `facilities_wharves` TEXT, `facilities_anchor` TEXT, `facilities_med_moor` TEXT, `facilities_beach_moor` TEXT, `facilities_ice_moor` TEXT, `unlo_code` TEXT, `dnc` TEXT, `s_121_water_body` TEXT, `s_57_enc` TEXT, `s_101_enc` TEXT, `dod_water_body` TEXT, `alternate_name` TEXT, `entrance_width` INTEGER, `liquified_natural_gas_terminal_depth` INTEGER, `offshore_max_vessel_length` INTEGER, `offshore_max_vessel_beam` INTEGER, `offshore_max_vessel_draft` INTEGER, PRIMARY KEY(`port_number`))",
         "fields": [
           {
             "fieldPath": "portNumber",
@@ -699,36 +699,6 @@
             "notNull": false
           },
           {
-            "fieldPath": "facilitiesWharves",
-            "columnName": "facilities_wharves",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
-            "fieldPath": "facilitiesAnchor",
-            "columnName": "facilities_anchor",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
-            "fieldPath": "facilitiesMedMoor",
-            "columnName": "facilities_med_moor",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
-            "fieldPath": "facilitiesBeachMoor",
-            "columnName": "facilities_beach_moor",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
-            "fieldPath": "facilitiesIceMoor",
-            "columnName": "facilities_ice_moor",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
             "fieldPath": "medicalFacilities",
             "columnName": "medical_facilities",
             "affinity": "TEXT",
@@ -767,6 +737,12 @@
           {
             "fieldPath": "cranesFloating",
             "columnName": "cranes_floating",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "cranesContainer",
+            "columnName": "cranes_container",
             "affinity": "TEXT",
             "notNull": false
           },
@@ -825,6 +801,18 @@
             "notNull": false
           },
           {
+            "fieldPath": "servicesIceBreaking",
+            "columnName": "services_ice_breaking",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "servicesDiving",
+            "columnName": "services_diving",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
             "fieldPath": "suppliesProvisions",
             "columnName": "supplies_provisions",
             "affinity": "TEXT",
@@ -861,14 +849,20 @@
             "notNull": false
           },
           {
+            "fieldPath": "suppliesAviationFuel",
+            "columnName": "supplies_aviation_fuel",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
             "fieldPath": "repairCode",
             "columnName": "repair_code",
             "affinity": "TEXT",
             "notNull": false
           },
           {
-            "fieldPath": "drydock",
-            "columnName": "drydock",
+            "fieldPath": "dryDock",
+            "columnName": "dry_dock",
             "affinity": "TEXT",
             "notNull": false
           },
@@ -881,12 +875,6 @@
           {
             "fieldPath": "quarantineSanitation",
             "columnName": "quarantine_sanitation",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
-            "fieldPath": "suppliesAviationFuel",
-            "columnName": "supplies_aviation_fuel",
             "affinity": "TEXT",
             "notNull": false
           },
@@ -999,20 +987,32 @@
             "notNull": false
           },
           {
-            "fieldPath": "servicesIceBreaking",
-            "columnName": "services_ice_breaking",
+            "fieldPath": "facilitiesWharves",
+            "columnName": "facilities_wharves",
             "affinity": "TEXT",
             "notNull": false
           },
           {
-            "fieldPath": "servicesDiving",
-            "columnName": "services_diving",
+            "fieldPath": "facilitiesAnchor",
+            "columnName": "facilities_anchor",
             "affinity": "TEXT",
             "notNull": false
           },
           {
-            "fieldPath": "cranesContainer",
-            "columnName": "cranes_container",
+            "fieldPath": "facilitiesMedMoor",
+            "columnName": "facilities_med_moor",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "facilitiesBeachMoor",
+            "columnName": "facilities_beach_moor",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "facilitiesIceMoor",
+            "columnName": "facilities_ice_moor",
             "affinity": "TEXT",
             "notNull": false
           },
@@ -1067,7 +1067,7 @@
           {
             "fieldPath": "liquifiedNaturalGasTerminalDepth",
             "columnName": "liquified_natural_gas_terminal_depth",
-            "affinity": "TEXT",
+            "affinity": "INTEGER",
             "notNull": false
           },
           {
@@ -1102,7 +1102,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '52b85e66195981cc08a034d60e6585c1')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b5c0a7e6183232b9738d97a91804dc93')"
     ]
   }
 }

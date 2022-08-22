@@ -19,9 +19,9 @@ interface PortDao {
 //   @Query("SELECT * FROM asams")
 //   fun observeAsams(): Flow<List<Asam>>
 //
-//   @Query("SELECT * FROM asams WHERE reference = :reference")
-//   fun observeAsam(reference: String): LiveData<Asam>
-//
+   @Query("SELECT * FROM ports WHERE port_number = :portNumber")
+   fun observePort(portNumber: Int): LiveData<Port>
+
    @Query("SELECT * FROM ports")
    suspend fun getPorts(): List<Port>
 
@@ -31,7 +31,7 @@ interface PortDao {
 //   @Query("SELECT * FROM asams ORDER BY date DESC LIMIT 1")
 //   suspend fun getLatestAsam(): Asam?
 //
-   @Query("SELECT * FROM ports ORDER BY port_name DESC")
+   @Query("SELECT * FROM ports ORDER BY port_name ASC")
    @RewriteQueriesToDropUnusedColumns
    fun getPortListItems(): PagingSource<Int, PortListItem>
 

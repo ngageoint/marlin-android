@@ -15,7 +15,7 @@ class PortRepository @Inject constructor(
 //   val asamMapItems = localDataSource.observeAsamMapItems()
    fun getPortListItems() = localDataSource.observePortListItems()
 //
-//   fun observeAsam(reference: String) = localDataSource.observeAsam(reference)
+   fun observePort(portNumber: Int) = localDataSource.observePort(portNumber)
    suspend fun getPort(portNumber: Int) = localDataSource.getPort(portNumber)
 
    suspend fun fetchPorts(refresh: Boolean = false): List<Port> {

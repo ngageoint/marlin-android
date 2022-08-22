@@ -12,7 +12,7 @@ import javax.inject.Inject
 @HiltViewModel
 class PortsViewModel @Inject constructor(
    private val repository: PortRepository,
-   private val locationPolicy: LocationPolicy
+   locationPolicy: LocationPolicy
 ): ViewModel() {
    val locationProvider = locationPolicy.bestLocationProvider
 

@@ -10,7 +10,7 @@ class PortLocalDataSource @Inject constructor(
    private val dao: PortDao
 ) {
 //   fun observeAsams() = dao.observeAsams()
-//   fun observeAsam(reference: String) = dao.observeAsam(reference)
+   fun observePort(portNumber: Int) = dao.observePort(portNumber)
 //   fun observeAsamMapItems() = dao.observeAsamMapItems()
    fun observePortListItems() = dao.getPortListItems()
 

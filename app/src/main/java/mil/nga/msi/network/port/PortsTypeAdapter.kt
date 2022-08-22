@@ -4,7 +4,8 @@ import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
-import mil.nga.msi.datasource.port.Port
+import mil.nga.msi.datasource.port.*
+import mil.nga.msi.datasource.port.types.*
 import mil.nga.msi.network.nextDoubleOrNull
 import mil.nga.msi.network.nextIntOrNull
 import mil.nga.msi.network.nextStringOrNull
@@ -68,14 +69,14 @@ class PortsTypeAdapter: TypeAdapter<List<Port>>() {
       var publicationNumber: String? = null
       var chartNumber: String? = null
       var navigationArea: String? = null
-      var harborSize: String? = null
-      var harborType: String? = null
-      var shelter: String? = null
-      var entranceRestrictionTide: String? = null
-      var entranceRestrictionSwell: String? = null
-      var entranceRestrictionIce: String? = null
-      var entranceRestrictionOther: String? = null
-      var overheadLimits: String? = null
+      var harborSize: Size? = null
+      var harborType: HarborType? = null
+      var shelter: Shelter? = null
+      var entranceRestrictionTide: Decision? = null
+      var entranceRestrictionSwell: Decision? = null
+      var entranceRestrictionIce: Decision? = null
+      var entranceRestrictionOther: Decision? = null
+      var overheadLimits: Decision? = null
       var channelDepth: Int? = null
       var anchorageDepth: Int? = null
       var cargoPierDepth: Int? = null
@@ -84,77 +85,77 @@ class PortsTypeAdapter: TypeAdapter<List<Port>>() {
       var maxVesselLength: Int? = null
       var maxVesselBeam: Int? = null
       var maxVesselDraft: Int? = null
-      var goodHoldingGround: String? = null
-      var turningArea: String? = null
-      var firstPortOfEntry: String? = null
+      var goodHoldingGround: Decision? = null
+      var turningArea: Decision? = null
+      var firstPortOfEntry: Decision? = null
       var usRepresentative: String? = null
-      var pilotageCompulsory: String? = null
-      var pilotageAvailable: String? = null
-      var pilotageLocalAssist: String? = null
-      var pilotageAdvisable: String? = null
-      var tugsSalvage: String? = null
-      var tugsAssist: String? = null
-      var quarantinePratique: String? = null
-      var quarantineOther: String? = null
-      var communicationsTelephone: String? = null
-      var communicationsTelegraph: String? = null
-      var communicationsRadio: String? = null
-      var communicationsRadioTelephone: String? = null
-      var communicationsAir: String? = null
-      var communicationsRail: String? = null
-      var facilitiesWharves: String? = null
-      var facilitiesAnchor: String? = null
-      var facilitiesMedMoor: String? = null
-      var facilitiesBeachMoor: String? = null
-      var facilitiesIceMoor: String? = null
-      var medicalFacilities: String? = null
-      var garbageDisposal: String? = null
-      var degauss: String? = null
-      var dirtyBallast: String? = null
-      var cranesFixed: String? = null
-      var cranesMobile: String? = null
-      var cranesFloating: String? = null
-      var lifts100: String? = null
-      var lifts50: String? = null
-      var lifts25: String? = null
-      var lifts0: String? = null
-      var servicesLongshore: String? = null
-      var servicesElectrical: String? = null
-      var servicesSteam: String? = null
-      var servicesNavigationalEquipment: String? = null
-      var servicesElectricalRepair: String? = null
-      var suppliesProvisions: String? = null
-      var suppliesWater: String? = null
-      var suppliesFuel: String? = null
-      var suppliesDiesel: String? = null
-      var suppliesDeck: String? = null
-      var suppliesEngine: String? = null
-      var repairCode: String? = null
-      var drydock: String? = null
-      var railway: String? = null
-      var quarantineSanitation: String? = null
-      var suppliesAviationFuel: String? = null
-      var harborUse: String? = null
-      var ukcManagementSystem: String? = null
-      var portSecurity: String? = null
-      var etaMessage: String? = null
-      var searchAndRescue: String? = null
-      var trafficSeparationScheme: String? = null
-      var vesselTrafficService: String? = null
-      var chemicalHoldingTankDisposal: String? = null
+      var pilotageCompulsory: Decision? = null
+      var pilotageAvailable: Decision? = null
+      var pilotageLocalAssist: Decision? = null
+      var pilotageAdvisable: Decision? = null
+      var tugsSalvage: Decision? = null
+      var tugsAssist: Decision? = null
+      var quarantinePratique: Decision? = null
+      var quarantineOther: Decision? = null
+      var communicationsTelephone: Decision? = null
+      var communicationsTelegraph: Decision? = null
+      var communicationsRadio: Decision? = null
+      var communicationsRadioTelephone: Decision? = null
+      var communicationsAir: Decision? = null
+      var communicationsRail: Decision? = null
+      var facilitiesWharves: Decision? = null
+      var facilitiesAnchor: Decision? = null
+      var facilitiesMedMoor: Decision? = null
+      var facilitiesBeachMoor: Decision? = null
+      var facilitiesIceMoor: Decision? = null
+      var medicalFacilities: Decision? = null
+      var garbageDisposal: Decision? = null
+      var degauss: Decision? = null
+      var dirtyBallast: Decision? = null
+      var cranesFixed: Decision? = null
+      var cranesMobile: Decision? = null
+      var cranesFloating: Decision? = null
+      var cranesContainer: Decision? = null
+      var lifts100: Decision? = null
+      var lifts50: Decision? = null
+      var lifts25: Decision? = null
+      var lifts0: Decision? = null
+      var servicesLongshore: Decision? = null
+      var servicesElectrical: Decision? = null
+      var servicesSteam: Decision? = null
+      var servicesNavigationalEquipment: Decision? = null
+      var servicesElectricalRepair: Decision? = null
+      var servicesIceBreaking: Decision? = null
+      var servicesDiving: Decision? = null
+      var suppliesProvisions: Decision? = null
+      var suppliesWater: Decision? = null
+      var suppliesFuel: Decision? = null
+      var suppliesDiesel: Decision? = null
+      var suppliesDeck: Decision? = null
+      var suppliesEngine: Decision? = null
+      var suppliesAviationFuel: Decision? = null
+      var repairCode: RepairCode? = null
+      var dryDock: Size? = null
+      var railway: Size? = null
+      var quarantineSanitation: Decision? = null
+      var harborUse: HarborUse? = null
+      var ukcManagementSystem: UnderkeelClearance? = null
+      var portSecurity: Decision? = null
+      var etaMessage: Decision? = null
+      var searchAndRescue: Decision? = null
+      var trafficSeparationScheme: Decision? = null
+      var vesselTrafficService: Decision? = null
+      var chemicalHoldingTankDisposal: Decision? = null
       var globalId: String? = null
-      var facilitiesRoro: String? = null
-      var facilitiesSolidBulk: String? = null
-      var facilitiesContainer: String? = null
-      var facilitiesBreakBulk: String? = null
-      var facilitiesOilTerminal: String? = null
-      var facilitiesLongTerminal: String? = null
-      var facilitiesOther: String? = null
-      var facilitiesDangerousCargo: String? = null
-      var facilitiesLiquidBulk: String? = null
-      var servicesIceBreaking: String? = null
-      var servicesDiving: String? = null
-      var cranesContainer: String? = null
+      var facilitiesRoro: Decision? = null
+      var facilitiesSolidBulk: Decision? = null
+      var facilitiesContainer: Decision? = null
+      var facilitiesBreakBulk: Decision? = null
+      var facilitiesOilTerminal: Decision? = null
+      var facilitiesLongTerminal: Decision? = null
+      var facilitiesOther: Decision? = null
+      var facilitiesDangerousCargo: Decision? = null
+      var facilitiesLiquidBulk: Decision? = null
       var unloCode: String? = null
       var dnc: String? = null
       var s121WaterBody: String? = null
@@ -163,7 +164,7 @@ class PortsTypeAdapter: TypeAdapter<List<Port>>() {
       var dodWaterBody: String? = null
       var alternateName: String? = null
       var entranceWidth: Int? = null
-      var liquifiedNaturalGasTerminalDepth: String? = null
+      var liquifiedNaturalGasTerminalDepth: Int? = null
       var offshoreMaxVesselLength: Int? = null
       var offshoreMaxVesselBeam: Int? = null
       var offshoreMaxVesselDraft: Int? = null
@@ -211,28 +212,44 @@ class PortsTypeAdapter: TypeAdapter<List<Port>>() {
                navigationArea = `in`.nextStringOrNull()
             }
             "harborSize" -> {
-               harborSize = `in`.nextStringOrNull()
+               harborSize = `in`.nextStringOrNull()?.let {
+                  Size.fromValue(it)
+               }
             }
             "harborType" -> {
-               harborType = `in`.nextStringOrNull()
+               harborType = `in`.nextStringOrNull()?.let {
+                  HarborType.fromValue(it)
+               }
             }
             "shelter" -> {
-               shelter = `in`.nextStringOrNull()
+               shelter = `in`.nextStringOrNull()?.let {
+                  Shelter.fromValue(it)
+               }
             }
             "erTide" -> {
-               entranceRestrictionTide = `in`.nextStringOrNull()
+               entranceRestrictionTide = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "erSwell" -> {
-               entranceRestrictionSwell = `in`.nextStringOrNull()
+               entranceRestrictionSwell = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "erIce" -> {
-               entranceRestrictionIce = `in`.nextStringOrNull()
+               entranceRestrictionIce = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "erOther" -> {
-               entranceRestrictionOther = `in`.nextStringOrNull()
+               entranceRestrictionOther = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "overheadLimits" -> {
-               overheadLimits = `in`.nextStringOrNull()
+               overheadLimits = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "chDepth" -> {
                channelDepth = `in`.nextStringOrNull()?.toIntOrNull()
@@ -259,217 +276,355 @@ class PortsTypeAdapter: TypeAdapter<List<Port>>() {
                maxVesselDraft = `in`.nextStringOrNull()?.toIntOrNull()
             }
             "goodHoldingGround" -> {
-               goodHoldingGround = `in`.nextStringOrNull()
+               goodHoldingGround = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "turningArea" -> {
-               turningArea = `in`.nextStringOrNull()
+               turningArea = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "firstPortOfEntry" -> {
-               firstPortOfEntry = `in`.nextStringOrNull()
+               firstPortOfEntry = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "usRep" -> {
                usRepresentative = `in`.nextStringOrNull()
             }
             "ptCompulsory" -> {
-               pilotageCompulsory = `in`.nextStringOrNull()
+               pilotageCompulsory = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "ptAvailable" -> {
-               pilotageAvailable = `in`.nextStringOrNull()
+               pilotageAvailable = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "ptLocalAssist" -> {
-               pilotageLocalAssist = `in`.nextStringOrNull()
+               pilotageLocalAssist = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "ptAdvisable" -> {
-               pilotageAdvisable = `in`.nextStringOrNull()
+               pilotageAdvisable = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "tugsSalvage" -> {
-               tugsSalvage = `in`.nextStringOrNull()
+               tugsSalvage = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "tugsAssist" -> {
-               tugsAssist = `in`.nextStringOrNull()
+               tugsAssist = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "qtPratique" -> {
-               quarantinePratique = `in`.nextStringOrNull()
+               quarantinePratique = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "qtOther" -> {
-               quarantineOther = `in`.nextStringOrNull()
+               quarantineOther = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "cmTelephone" -> {
-               communicationsTelephone = `in`.nextStringOrNull()
+               communicationsTelephone = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "cmTelegraph" -> {
-               communicationsTelegraph = `in`.nextStringOrNull()
+               communicationsTelegraph = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "cmRadio" -> {
-               communicationsRadio = `in`.nextStringOrNull()
+               communicationsRadio = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "cmRadioTel" -> {
-               communicationsRadioTelephone = `in`.nextStringOrNull()
+               communicationsRadioTelephone = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "cmAir" -> {
-               communicationsAir = `in`.nextStringOrNull()
+               communicationsAir = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "cmRail" -> {
-               communicationsRail = `in`.nextStringOrNull()
+               communicationsRail = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "loWharves" -> {
-               facilitiesWharves = `in`.nextStringOrNull()
+               facilitiesWharves = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "loAnchor" -> {
-               facilitiesAnchor = `in`.nextStringOrNull()
+               facilitiesAnchor = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "loMedMoor" -> {
-               facilitiesMedMoor = `in`.nextStringOrNull()
+               facilitiesMedMoor = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "loBeachMoor" -> {
-               facilitiesBeachMoor = `in`.nextStringOrNull()
+               facilitiesBeachMoor = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "loIceMoor" -> {
-               facilitiesIceMoor = `in`.nextStringOrNull()
+               facilitiesIceMoor = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "medFacilities" -> {
-               medicalFacilities = `in`.nextStringOrNull()
+               medicalFacilities = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "garbageDisposal" -> {
-               garbageDisposal = `in`.nextStringOrNull()
+               garbageDisposal = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "degauss" -> {
-               degauss = `in`.nextStringOrNull()
+               degauss = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "dirtyBallast" -> {
-               dirtyBallast = `in`.nextStringOrNull()
+               dirtyBallast = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "crFixed" -> {
-               cranesFixed = `in`.nextStringOrNull()
+               cranesFixed = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "crMobile" -> {
-               cranesMobile = `in`.nextStringOrNull()
+               cranesMobile = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "crFloating" -> {
-               cranesFloating = `in`.nextStringOrNull()
+               cranesFloating = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "lifts100" -> {
-               lifts100 = `in`.nextStringOrNull()
+               lifts100 = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "lifts50" -> {
-               lifts50 = `in`.nextStringOrNull()
+               lifts50 = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "lifts25" -> {
-               lifts25 = `in`.nextStringOrNull()
+               lifts25 = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "lifts0" -> {
-               lifts0 = `in`.nextStringOrNull()
+               lifts0 = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "srLongshore" -> {
-               servicesLongshore = `in`.nextStringOrNull()
+               servicesLongshore = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "srElectrical" -> {
-               servicesElectrical = `in`.nextStringOrNull()
+               servicesElectrical = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "srSteam" -> {
-               servicesSteam = `in`.nextStringOrNull()
+               servicesSteam = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "srNavigEquip" -> {
-               servicesNavigationalEquipment = `in`.nextStringOrNull()
+               servicesNavigationalEquipment = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "srElectRepair" -> {
-               servicesElectricalRepair = `in`.nextStringOrNull()
+               servicesElectricalRepair = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "suProvisions" -> {
-               suppliesProvisions = `in`.nextStringOrNull()
+               suppliesProvisions = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "suWater" -> {
-               suppliesWater = `in`.nextStringOrNull()
+               suppliesWater = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "suFuel" -> {
-               suppliesFuel = `in`.nextStringOrNull()
+               suppliesFuel = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "suDiesel" -> {
-               suppliesDiesel = `in`.nextStringOrNull()
+               suppliesDiesel = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "suDeck" -> {
-               suppliesDeck = `in`.nextStringOrNull()
+               suppliesDeck = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "suEngine" -> {
-               suppliesEngine = `in`.nextStringOrNull()
+               suppliesEngine = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "repairCode" -> {
-               repairCode = `in`.nextStringOrNull()
+               repairCode = `in`.nextStringOrNull()?.let {
+                  RepairCode.fromCode(it)
+               }
             }
             "drydock" -> {
-               drydock = `in`.nextStringOrNull()
+               dryDock = `in`.nextStringOrNull()?.let {
+                  Size.fromValue(it)
+               }
             }
             "railway" -> {
-               railway = `in`.nextStringOrNull()
+               railway = `in`.nextStringOrNull()?.let {
+                  Size.fromValue(it)
+               }
             }
             "qtSanitation" -> {
-               quarantineSanitation = `in`.nextStringOrNull()
+               quarantineSanitation = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "suAviationFuel" -> {
-               suppliesAviationFuel = `in`.nextStringOrNull()
+               suppliesAviationFuel = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "harborUse" -> {
-               harborUse = `in`.nextStringOrNull()
+               harborUse = `in`.nextStringOrNull()?.let {
+                  HarborUse.fromValue(it)
+               }
             }
             "ukcMgmtSystem" -> {
-               ukcManagementSystem = `in`.nextStringOrNull()
+               ukcManagementSystem = `in`.nextStringOrNull()?.let {
+                  UnderkeelClearance.fromValue(it)
+               }
             }
             "portSecurity" -> {
-               portSecurity = `in`.nextStringOrNull()
+               portSecurity = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "etaMessage" -> {
-               etaMessage = `in`.nextStringOrNull()
+               etaMessage = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "searchAndRescue" -> {
-               searchAndRescue = `in`.nextStringOrNull()
+               searchAndRescue = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "tss" -> {
-               trafficSeparationScheme = `in`.nextStringOrNull()
+               trafficSeparationScheme = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "vts" -> {
-               vesselTrafficService = `in`.nextStringOrNull()
+               vesselTrafficService = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "cht" -> {
-               chemicalHoldingTankDisposal = `in`.nextStringOrNull()
+               chemicalHoldingTankDisposal = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "globalId" -> {
                globalId = `in`.nextStringOrNull()
             }
             "loRoro" -> {
-               facilitiesRoro = `in`.nextStringOrNull()
+               facilitiesRoro = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "loSolidBulk" -> {
-               facilitiesSolidBulk = `in`.nextStringOrNull()
+               facilitiesSolidBulk = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "loContainer" -> {
-               facilitiesContainer = `in`.nextStringOrNull()
+               facilitiesContainer = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "loBreakBulk" -> {
-               facilitiesBreakBulk = `in`.nextStringOrNull()
+               facilitiesBreakBulk = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "loOilTerm" -> {
-               facilitiesOilTerminal = `in`.nextStringOrNull()
+               facilitiesOilTerminal = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "loLongTerm" -> {
-               facilitiesLongTerminal = `in`.nextStringOrNull()
+               facilitiesLongTerminal = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "loOther" -> {
-               facilitiesOther = `in`.nextStringOrNull()
+               facilitiesOther = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "loDangCargo" -> {
-               facilitiesDangerousCargo = `in`.nextStringOrNull()
+               facilitiesDangerousCargo = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "loLiquidBulk" -> {
-               facilitiesLiquidBulk = `in`.nextStringOrNull()
+               facilitiesLiquidBulk = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "srIceBreaking" -> {
-               servicesIceBreaking = `in`.nextStringOrNull()
+               servicesIceBreaking = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "srDiving" -> {
-               servicesDiving = `in`.nextStringOrNull()
+               servicesDiving = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "cranesContainer" -> {
-               cranesContainer = `in`.nextStringOrNull()
+               cranesContainer = `in`.nextStringOrNull()?.let {
+                  Decision.fromValue(it)
+               }
             }
             "unloCode" -> {
                unloCode = `in`.nextStringOrNull()
@@ -496,7 +651,7 @@ class PortsTypeAdapter: TypeAdapter<List<Port>>() {
                entranceWidth = `in`.nextStringOrNull()?.toIntOrNull()
             }
             "lngTerminalDepth" -> {
-               liquifiedNaturalGasTerminalDepth = `in`.nextStringOrNull()
+               liquifiedNaturalGasTerminalDepth = `in`.nextIntOrNull()
             }
             "offMaxVesselLength" -> {
                offshoreMaxVesselLength = `in`.nextStringOrNull()?.toIntOrNull()
@@ -584,7 +739,7 @@ class PortsTypeAdapter: TypeAdapter<List<Port>>() {
            this.suppliesDeck = suppliesDeck
            this.suppliesEngine = suppliesEngine
            this.repairCode = repairCode
-           this.drydock = drydock
+           this.dryDock = dryDock
            this.railway = railway
            this.quarantineSanitation = quarantineSanitation
            this.suppliesAviationFuel = suppliesAviationFuel
