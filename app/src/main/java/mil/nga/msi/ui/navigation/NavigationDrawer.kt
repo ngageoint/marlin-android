@@ -27,7 +27,7 @@ import mil.nga.msi.ui.drag.dragContainer
 import mil.nga.msi.ui.drag.rememberDragDropState
 import mil.nga.msi.ui.theme.screenBackground
 
-private const val MAX_TABS = 4
+private val MAX_TABS = 4
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -47,54 +47,57 @@ fun NavigationDrawer(
    if (previousNonTabs == null) { previousNonTabs = nonTabsPreference }
 
    val listState = rememberLazyListState()
-   val dragDropState = rememberDragDropState(listState) { from, to ->
+   val dragDropState = rememberDragDropState(listState) { fromIndex, toIndex ->
       val tabs = previousTabs
       val nonTabs = previousNonTabs
 
       if (tabs == null || nonTabs == null) { return@rememberDragDropState }
-      if (to == 0) { return@rememberDragDropState }
+      if (toIndex == 0) { return@rememberDragDropState }
 
-      if (from <= tabs.size && to <= tabs.size) {
+      if (fromIndex <= tabs.size && toIndex <= tabs.size) {
          // Drag within list1
-         previousTabs = tabs.toMutableList().apply {
-            add(if (to == 0) to else to - 1, removeAt(if (from == 0) from else from - 1))
-         }
+         val to = if (toIndex == 0) toIndex else toIndex - 1
+         val from = if (fromIndex == 0) fromIndex else fromIndex - 1
+         previousTabs = tabs.toMutableList().apply { add(to, removeAt(from)) }
          previousTabs?.let { viewModel.setTabs(it) }
-      } else if (from <= tabs.size && to > tabs.size) {
+      } else if (fromIndex <= tabs.size && toIndex > tabs.size) {
          // Drag from list1 to list2
-         val list1Element = tabs[from - 1]
+         val list1Element = tabs[fromIndex - 1]
          previousTabs = tabs.toMutableList().apply { removeLast() }
          previousNonTabs = nonTabs.toMutableList().apply {
-            add(to - tabs.size - 1, list1Element)
+            add(toIndex - tabs.size - 1, list1Element)
          }
 
          previousTabs?.let { viewModel.setTabs(it) }
          previousNonTabs?.let { viewModel.setNonTabs(it) }
-      } else if (from >= tabs.size - 2 && to <= tabs.size + 1) {
+      } else if (fromIndex >= tabs.size - 2 && toIndex <= tabs.size + 1) {
          // Drag from list2 to list1
-         val list2Element = nonTabs[from - tabs.size - 2]
+         val list2Element = nonTabs[fromIndex - tabs.size - 2]
 
          previousNonTabs = nonTabs.toMutableList().apply { removeFirst() }
          previousTabs = tabs.toMutableList().apply { add(lastIndex + 1, list2Element) }
 
-         val size = previousTabs?.size ?: 0
-         if (size > MAX_TABS) {
-            val evict = tabs[tabs.lastIndex - 1]
-            previousTabs = previousTabs?.toMutableList()?.apply { remove(evict) }
-            previousNonTabs = previousNonTabs?.toMutableList()?.apply { add(0, evict) }
-         }
-
          previousTabs?.let { viewModel.setTabs(it) }
          previousNonTabs?.let { viewModel.setNonTabs(it) }
-      } else if (from <= tabs.size + nonTabs.size + 1 && to <= tabs.size + nonTabs.size + 1) {
+      } else if (fromIndex <= tabs.size + nonTabs.size + 1 && toIndex <= tabs.size + nonTabs.size + 1) {
          // Drag within list2
          previousNonTabs = nonTabs.toMutableList().apply {
-            add(to - tabs.size - 2, removeAt(from - tabs.size - 2))
+            add(toIndex - tabs.size - 2, removeAt(fromIndex - tabs.size - 2))
          }
 
          previousNonTabs?.let { viewModel.setNonTabs(it) }
       }
+
+      if (tabs.size > MAX_TABS) {
+         val evict = tabs[tabs.lastIndex - 1]
+         previousTabs = tabs.toMutableList().apply { remove(evict) }
+         previousNonTabs = nonTabs.toMutableList().apply { add(0, evict) }
+
+         previousTabs?.let { viewModel.setTabs(it) }
+         previousNonTabs?.let { viewModel.setNonTabs(it) }
+      }
    }
+
 
    val tabs = previousTabs
    val nonTabs = previousNonTabs
@@ -119,7 +122,7 @@ fun NavigationDrawer(
 
          itemsIndexed(
             tabs,
-         key = { _, tab -> tab.name }
+            key = { _, tab -> tab.name }
          ) { index, tab ->
             DraggableItem(dragDropState, index + 1) { isDragging ->
                val isMapped = mapped?.get(tab) ?: false
@@ -152,7 +155,7 @@ fun NavigationDrawer(
 
          itemsIndexed(
             nonTabs,
-         key = { _, tab -> tab.name }
+            key = { _, tab -> tab.name }
          ) { index, tab ->
             DraggableItem(dragDropState, tabs.size + index + 2) { isDragging ->
                val isMapped = mapped?.get(tab) ?: false
@@ -180,7 +183,7 @@ fun NavigationDrawer(
 private fun NavigationRow(
    tab: DataSource,
    isDragging: Boolean = false,
-   isMapped: Boolean,
+   isMapped: Boolean? = null,
    onMapClicked: (() -> Unit)? = null,
    onDestinationClicked: (route: Route) -> Unit
 ) {
@@ -228,10 +231,10 @@ private fun NavigationRow(
                      )
                   }
 
-                  if (tab.mappable) {
+                  isMapped?.let { mapped ->
                      var icon = Icons.Default.LocationOff
                      var iconColor = Color.Black.copy(alpha = ContentAlpha.disabled)
-                     if (isMapped) {
+                     if (mapped) {
                         icon = Icons.Default.LocationOn
                         iconColor = MaterialTheme.colors.primary
                      }
