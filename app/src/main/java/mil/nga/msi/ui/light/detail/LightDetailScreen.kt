@@ -44,7 +44,6 @@ import mil.nga.msi.ui.map.BaseMapType
 import mil.nga.msi.ui.map.MapClip
 import mil.nga.msi.ui.navigation.Point
 import mil.nga.msi.ui.theme.screenBackground
-import kotlin.math.min
 
 @Composable
 fun LightDetailScreen(
@@ -378,10 +377,7 @@ private fun LightDetail(
             if (lightSectors.isNotEmpty()) {
                LightImage(
                   lightSectors,
-                  height = 100,
-                  width = 100,
-                  arcWidth = 3.0,
-                  arcRadius = 50.0
+                  arcWidth = 3.0
                )
             }
          }
@@ -429,19 +425,10 @@ private fun LightDetail(
 @Composable
 private fun LightImage(
    sectors: List<LightSector>,
-   arcRadius: Double? = null,
    arcWidth: Double? = null,
    includeLetters: Boolean = true,
-   includeSectorDashes: Boolean = false,
-   height: Int,
-   width: Int
 ) {
    val strokeWidth = 6
-   val radius: Double = arcRadius ?: (min(
-      width / 2.0,
-      height / 2.0
-   ) - (if (arcWidth != null) arcWidth / 2.0 else strokeWidth / 2.0))
-
    val sizeInPx = with(LocalDensity.current) { 100.dp.toPx() }
    val textSizeInPx = with(LocalDensity.current) { 12.dp.toPx() }
 

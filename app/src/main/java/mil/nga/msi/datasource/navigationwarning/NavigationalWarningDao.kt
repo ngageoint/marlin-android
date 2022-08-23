@@ -45,6 +45,7 @@ interface NavigationalWarningDao {
    ): Flow<List<NavigationalWarningGroup>>
 
    @Query("SELECT * FROM navigational_warnings WHERE navigation_area = :navigationArea AND issue_date > :date ORDER BY issue_date DESC")
+   @RewriteQueriesToDropUnusedColumns
    fun getNavigationalWarningsGreaterThan(date: Date, navigationArea: NavigationArea?): Flow<List<NavigationalWarningListItem>>
 
    @Query("DELETE FROM navigational_warnings WHERE number IN (:numbers)")

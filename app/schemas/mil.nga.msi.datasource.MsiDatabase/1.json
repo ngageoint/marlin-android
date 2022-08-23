@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "b5c0a7e6183232b9738d97a91804dc93",
+    "identityHash": "7ddb3b5963eff4c3f3dfd4941d4019b3",
     "entities": [
       {
         "tableName": "asams",
@@ -160,7 +160,7 @@
       },
       {
         "tableName": "navigational_warnings",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`number` INTEGER NOT NULL, `year` INTEGER NOT NULL, `navigation_area` TEXT NOT NULL, `issue_date` INTEGER NOT NULL, `subregion` TEXT, `text` TEXT, `status` TEXT, `authority` TEXT, `cancel_number` INTEGER, `cancelDate` INTEGER, `cancel_navigation_area` TEXT, `cancel_year` INTEGER, PRIMARY KEY(`number`, `year`, `navigation_area`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`number` INTEGER NOT NULL, `year` INTEGER NOT NULL, `navigation_area` TEXT NOT NULL, `issue_date` INTEGER NOT NULL, `subregions` TEXT, `text` TEXT, `status` TEXT, `authority` TEXT, `cancel_number` INTEGER, `cancelDate` INTEGER, `cancel_navigation_area` TEXT, `cancel_year` INTEGER, PRIMARY KEY(`number`, `year`, `navigation_area`))",
         "fields": [
           {
             "fieldPath": "number",
@@ -188,7 +188,7 @@
           },
           {
             "fieldPath": "subregions",
-            "columnName": "subregion",
+            "columnName": "subregions",
             "affinity": "TEXT",
             "notNull": false
           },
@@ -1102,7 +1102,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b5c0a7e6183232b9738d97a91804dc93')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '7ddb3b5963eff4c3f3dfd4941d4019b3')"
     ]
   }
 }

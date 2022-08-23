@@ -14,6 +14,7 @@ import mil.nga.msi.repository.preferences.UserPreferencesRepository
 import javax.inject.Inject
 
 @HiltViewModel
+@OptIn(ExperimentalCoroutinesApi::class)
 class NavigationalWarningsViewModel @Inject constructor(
    private val repository: NavigationalWarningRepository,
    private val userPreferencesRepository: UserPreferencesRepository

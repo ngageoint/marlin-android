@@ -9,7 +9,8 @@ import mil.nga.msi.network.nextDoubleOrNull
 import mil.nga.msi.network.nextStringOrNull
 import java.lang.UnsupportedOperationException
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
 
 class AsamsTypeAdapter: TypeAdapter<List<Asam>>() {
    override fun read(`in`: JsonReader): List<Asam> {

@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import com.google.android.gms.maps.model.TileProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flatMapLatest
 import mil.nga.msi.datasource.navigationwarning.NavigationArea
 import mil.nga.msi.location.LocationPolicy
@@ -15,6 +16,7 @@ import javax.inject.Inject
 import javax.inject.Named
 
 @HiltViewModel
+@OptIn(ExperimentalCoroutinesApi::class)
 class NavigationalWarningAreasViewModel @Inject constructor(
    private val locationPolicy: LocationPolicy,
    val repository: NavigationalWarningRepository,
