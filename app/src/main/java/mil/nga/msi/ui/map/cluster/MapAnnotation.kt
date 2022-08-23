@@ -15,6 +15,7 @@ import mil.nga.msi.ui.asam.AsamRoute
 import mil.nga.msi.ui.light.LightRoute
 import mil.nga.msi.ui.modu.ModuRoute
 import mil.nga.msi.ui.navigation.Route
+import mil.nga.msi.ui.port.PortRoute
 import kotlin.Comparator
 
 @Serializable
@@ -27,7 +28,8 @@ data class MapAnnotation(
    enum class Type constructor(val route: Route, val icon : Int? = null) {
       ASAM(AsamRoute.Main, R.drawable.asam_map_marker_24dp),
       MODU(ModuRoute.Main, R.drawable.modu_map_marker_24dp),
-      LIGHT(LightRoute.Main)
+      LIGHT(LightRoute.Main),
+      PORT(PortRoute.Main)
    }
 
    @Serializable

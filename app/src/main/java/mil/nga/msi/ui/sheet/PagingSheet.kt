@@ -18,6 +18,7 @@ import mil.nga.msi.ui.asam.sheet.AsamSheetScreen
 import mil.nga.msi.ui.light.sheet.LightSheetScreen
 import mil.nga.msi.ui.map.cluster.MapAnnotation
 import mil.nga.msi.ui.modu.sheet.ModuSheetScreen
+import mil.nga.msi.ui.port.sheet.PortSheetScreen
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
@@ -96,6 +97,7 @@ fun PagingSheet(
                   MapAnnotation.Type.ASAM -> AsamPage(annotation.key.id) { onDetails(annotation) }
                   MapAnnotation.Type.MODU -> ModuPage(annotation.key.id) { onDetails(annotation) }
                   MapAnnotation.Type.LIGHT -> LightPage(annotation.key.id) { onDetails(annotation) }
+                  MapAnnotation.Type.PORT -> PortPage(annotation.key.id) { onDetails(annotation) }
                }
             }
          }
@@ -134,6 +136,17 @@ private fun LightPage(
    val key = LightKey.fromId(id)
    LightSheetScreen(
       key,
+      onDetails = { onDetails() }
+   )
+}
+
+@Composable
+private fun PortPage(
+   id: String,
+   onDetails: () -> Unit,
+) {
+   PortSheetScreen(
+      id,
       onDetails = { onDetails() }
    )
 }

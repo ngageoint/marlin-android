@@ -3,20 +3,19 @@ package mil.nga.msi.ui.light
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
+import com.google.android.gms.maps.model.TileProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
-import mil.nga.msi.datasource.asam.Asam
 import mil.nga.msi.datasource.light.Light
-import mil.nga.msi.repository.asam.AsamRepository
 import mil.nga.msi.repository.light.LightRepository
 import mil.nga.msi.repository.preferences.UserPreferencesRepository
-import mil.nga.msi.ui.map.overlay.LightTileProvider
 import javax.inject.Inject
+import javax.inject.Named
 
 @HiltViewModel
 class LightViewModel @Inject constructor(
    private val repository: LightRepository,
-   private val userPreferencesRepository: UserPreferencesRepository,
-   val tileProvider: LightTileProvider
+   userPreferencesRepository: UserPreferencesRepository,
+   @Named("lightTileProvider") val tileProvider: TileProvider
 ): ViewModel() {
    val baseMap = userPreferencesRepository.baseMapType.asLiveData()
 

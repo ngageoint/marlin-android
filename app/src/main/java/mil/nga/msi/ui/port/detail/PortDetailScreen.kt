@@ -20,6 +20,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.TileProvider
 import mil.nga.msi.R
 import mil.nga.msi.coordinate.DMS
 import mil.nga.msi.datasource.port.Port
@@ -60,6 +61,7 @@ fun PortDetailScreen(
       PortDetailContent(
          port = port,
          baseMap = baseMap,
+         tileProvider = viewModel.tileProvider,
          location = location,
          onZoom = { onAction(PortAction.Zoom(it)) },
          onShare = { onAction(PortAction.Share(port.toString())) },
@@ -72,6 +74,7 @@ fun PortDetailScreen(
 private fun PortDetailContent(
    port: Port?,
    baseMap: BaseMapType?,
+   tileProvider: TileProvider,
    location: Location?,
    onZoom: (Point) -> Unit,
    onShare: () -> Unit,
@@ -91,6 +94,7 @@ private fun PortDetailContent(
             PortHeader(
                port = port,
                baseMap = baseMap,
+               tileProvider = tileProvider,
                location = location,
                onZoom = onZoom,
                onShare = onShare,
@@ -106,6 +110,7 @@ private fun PortDetailContent(
 private fun PortHeader(
    port: Port,
    baseMap: BaseMapType?,
+   tileProvider: TileProvider,
    location: Location?,
    onZoom: (Point) -> Unit,
    onShare: () -> Unit,
@@ -115,8 +120,8 @@ private fun PortHeader(
       Column {
          MapClip(
             latLng = LatLng(port.latitude, port.longitude),
-            icon = R.drawable.asam_map_marker_24dp,
-            baseMap = baseMap
+            baseMap = baseMap,
+            tileProvider = tileProvider
          )
 
          Column {

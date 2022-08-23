@@ -47,7 +47,8 @@ object DataStoreModule {
                      DataSource.ASAM.name to true,
                      DataSource.MODU.name to true,
                      DataSource.NAVIGATION_WARNING.name to true,
-                     DataSource.LIGHT.name to true
+                     DataSource.LIGHT.name to true,
+                     DataSource.PORT.name to true
                   )
                )
                .addAllTabs(

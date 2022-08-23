@@ -19,6 +19,7 @@ import mil.nga.msi.ui.modu.ModuRoute
 import mil.nga.msi.ui.navigation.Point
 import mil.nga.msi.ui.navigation.MapAnnotationsType
 import mil.nga.msi.ui.navigation.Route
+import mil.nga.msi.ui.port.PortRoute
 import mil.nga.msi.ui.sheet.PagingSheet
 
 sealed class MapRoute(
@@ -74,6 +75,9 @@ fun NavGraphBuilder.mapGraph(
                   val encoded = Uri.encode(Json.encodeToString(lightKey))
                   navController.navigate(LightRoute.Sheet.name + "?key=${encoded}")
                }
+               MapAnnotation.Type.PORT -> {
+                  navController.navigate(PortRoute.Sheet.name + "?portNumber=${annotation.key.id}")
+               }
             }
          },
          onAnnotationsClick = { annotations ->
@@ -114,6 +118,9 @@ fun NavGraphBuilder.mapGraph(
                   val key = LightKey.fromId(annotation.key.id)
                   val encoded = Uri.encode(Json.encodeToString(key))
                   navController.navigate(LightRoute.Detail.name + "?key=${encoded}")
+               }
+               MapAnnotation.Type.PORT -> {
+                  navController.navigate(PortRoute.Detail.name + "?portNumber=${annotation.key.id}")
                }
             }
          }

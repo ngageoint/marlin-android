@@ -10,19 +10,17 @@ import com.google.accompanist.navigation.material.ExperimentalMaterialNavigation
 import com.google.accompanist.navigation.material.bottomSheet
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import mil.nga.msi.ui.asam.detail.AsamDetailScreen
-import mil.nga.msi.ui.asam.list.AsamsScreen
-import mil.nga.msi.ui.asam.sheet.AsamSheetScreen
 import mil.nga.msi.ui.map.MapRoute
 import mil.nga.msi.ui.navigation.Point
 import mil.nga.msi.ui.navigation.Route
 import mil.nga.msi.ui.port.detail.PortDetailScreen
 import mil.nga.msi.ui.port.list.PortsScreen
+import mil.nga.msi.ui.port.sheet.PortSheetScreen
 
 sealed class PortRoute(
    override val name: String,
    override val title: String,
-   override val color: Color = Color(0xFF000000)
+   override val color: Color = Color(0xFF5856d6)
 ): Route {
    object Main: PortRoute("ports", "Ports")
    object Detail: PortRoute("ports/detail", "Port Details")
@@ -39,7 +37,7 @@ fun NavGraphBuilder.portGraph(
    showSnackbar: (String) -> Unit
 ) {
    val shareAsam: (String) -> Unit = {
-      share(Pair("Share ASAM Information", it))
+      share(Pair("Share Port Information", it))
    }
 
    val zoomTo: (Point) -> Unit = { point ->
@@ -85,12 +83,12 @@ fun NavGraphBuilder.portGraph(
             )
          }
       }
-//      bottomSheet("${AsamRoute.Sheet.name}?reference={reference}") { backstackEntry ->
-//         backstackEntry.arguments?.getString("reference")?.let { reference ->
-//            AsamSheetScreen(reference, onDetails = {
-//               navController.navigate("${AsamRoute.Detail.name}?reference=$reference")
-//            })
-//         }
-//      }
+      bottomSheet("${PortRoute.Sheet.name}?portNumber={portNumber}") { backstackEntry ->
+         backstackEntry.arguments?.getString("portNumber")?.let { portNumber ->
+            PortSheetScreen(portNumber, onDetails = {
+               navController.navigate("${PortRoute.Detail.name}?portNumber=$portNumber")
+            })
+         }
+      }
    }
 }

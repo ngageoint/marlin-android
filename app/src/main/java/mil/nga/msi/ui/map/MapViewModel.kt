@@ -1,6 +1,5 @@
 package mil.nga.msi.ui.map
 
-import android.util.Log
 import androidx.lifecycle.*
 import com.google.android.gms.maps.model.TileProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -13,8 +12,8 @@ import mil.nga.msi.repository.preferences.DataSource
 import mil.nga.msi.repository.preferences.UserPreferencesRepository
 import mil.nga.msi.type.MapLocation
 import mil.nga.msi.ui.map.cluster.MapAnnotation
-import mil.nga.msi.ui.map.overlay.LightTileProvider
 import javax.inject.Inject
+import javax.inject.Named
 
 @HiltViewModel
 class MapViewModel @Inject constructor(
@@ -22,7 +21,8 @@ class MapViewModel @Inject constructor(
    moduRepository: ModuRepository,
    val locationPolicy: LocationPolicy,
    val userPreferencesRepository: UserPreferencesRepository,
-   private val _lightTileProvider: LightTileProvider
+   @Named("lightTileProvider") private val _lightTileProvider: TileProvider,
+   @Named("portTileProvider") private val _portTileProvider: TileProvider
 ): ViewModel() {
 
    val baseMap = userPreferencesRepository.baseMapType.asLiveData()
@@ -35,8 +35,14 @@ class MapViewModel @Inject constructor(
    suspend fun setMapLocation(mapLocation: MapLocation) = userPreferencesRepository.setMapLocation(mapLocation)
 
    val lightTileProvider: LiveData<TileProvider?> = Transformations.map(mapped) { mapped ->
-      if (mapped.get(DataSource.LIGHT) == true) {
+      if (mapped[DataSource.LIGHT] == true) {
          _lightTileProvider
+      } else null
+   }
+
+   val portTileProvider: LiveData<TileProvider?> = Transformations.map(mapped) { mapped ->
+      if (mapped[DataSource.PORT] == true) {
+         _portTileProvider
       } else null
    }
 

@@ -37,6 +37,7 @@ import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.cluster.ClusterManager
 import mil.nga.msi.ui.map.cluster.MapAnnotation
 import mil.nga.msi.ui.map.overlay.OsmTileProvider
+import mil.nga.msi.ui.port.list.PortsViewModel
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalPermissionsApi::class)
@@ -49,7 +50,8 @@ fun MapScreen(
    onMapSettings: () -> Unit,
    openDrawer: () -> Unit,
    mapViewModel: MapViewModel = hiltViewModel(),
-   lightsViewModel: LightsViewModel = hiltViewModel()
+   lightsViewModel: LightsViewModel = hiltViewModel(),
+   portsViewModel: PortsViewModel = hiltViewModel()
 ) {
    val scope = rememberCoroutineScope()
    val gars by mapViewModel.gars.observeAsState()
@@ -61,6 +63,7 @@ fun MapScreen(
    val location by mapViewModel.locationPolicy.bestLocationProvider.observeAsState()
    var located by remember { mutableStateOf(false) }
    val lightTileProvider by mapViewModel.lightTileProvider.observeAsState()
+   val portTileProvider by mapViewModel.portTileProvider.observeAsState()
 
    val locationPermissionState: PermissionState = rememberPermissionState(
       Manifest.permission.ACCESS_FINE_LOCATION
@@ -104,6 +107,7 @@ fun MapScreen(
                gars == true,
                mgrs == true,
                lightTileProvider,
+               portTileProvider,
                annotations,
                onAnnotationClick = { onAnnotationClick.invoke(it) },
                onAnnotationsClick = { onAnnotationsClick.invoke(it) },
@@ -124,16 +128,28 @@ fun MapScreen(
                   val minLatitude = latLng.latitude - tolerance
                   val maxLatitude = latLng.latitude + tolerance
                   scope.launch {
-                     val lights = lightsViewModel
-                        .getLights(minLatitude, maxLatitude, minLongitude, maxLongitude)
-                        .map { light ->
-                           val key = MapAnnotation.Key(LightKey.fromLight(light).id(), MapAnnotation.Type.LIGHT)
-                           MapAnnotation(key, light.latitude, light.longitude)
-                        }
+                     val lights = if (lightTileProvider != null) {
+                        lightsViewModel
+                           .getLights(minLatitude, maxLatitude, minLongitude, maxLongitude)
+                           .map { light ->
+                              val key = MapAnnotation.Key(LightKey.fromLight(light).id(), MapAnnotation.Type.LIGHT)
+                              MapAnnotation(key, light.latitude, light.longitude)
+                           }
+                     } else emptyList()
 
-                     if (lights.isNotEmpty()) {
+                     val ports = if (portTileProvider != null) {
+                        portsViewModel
+                           .getPorts(minLatitude, maxLatitude, minLongitude, maxLongitude)
+                           .map { port ->
+                              val key = MapAnnotation.Key(port.portNumber.toString(), MapAnnotation.Type.PORT)
+                              MapAnnotation(key, port.latitude, port.longitude)
+                           }
+                     } else emptyList()
+
+                     val items = lights + ports
+                     if (items.isNotEmpty()) {
                         val bounds = LatLngBounds.builder().apply {
-                           lights.forEach { this.include(LatLng(it.latitude, it.longitude)) }
+                           items.forEach { this.include(LatLng(it.latitude, it.longitude)) }
                         }.build()
                         destination = MapLocation.newBuilder()
                            .setLatitude(bounds.center.latitude)
@@ -141,11 +157,10 @@ fun MapScreen(
                            .setZoom(if (lights.size == 1) 17.0 else zoom.toDouble())
                            .build()
 
-                        if (lights.size == 1) {
-                           val light = lights.first()
-                           onAnnotationClick(light)
+                        if (items.size == 1) {
+                           onAnnotationClick(items.first())
                         } else {
-                           onAnnotationsClick(lights)
+                           onAnnotationsClick(items)
                         }
                      }
                   }
@@ -215,6 +230,7 @@ private fun Map(
    gars: Boolean,
    mgrs: Boolean,
    lightTileProvider: TileProvider?,
+   portTileProvider: TileProvider?,
    annotations: List<MapAnnotation>,
    onMapMove: (MapLocation, Int) -> Unit,
    onMapClick: (LatLng, Float, VisibleRegion) -> Unit,
@@ -289,6 +305,7 @@ private fun Map(
          }
 
          lightTileProvider?.let { TileOverlay(tileProvider = it )}
+         portTileProvider?.let { TileOverlay(tileProvider = it) }
       }
 
       MapEffect(null) { map ->
