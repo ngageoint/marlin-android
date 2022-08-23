@@ -250,19 +250,18 @@ private fun AsamProperty(
 ) {
    if (value?.isNotBlank() == true) {
       Column(Modifier.padding(vertical = 8.dp)) {
-         Text(
-            text = title,
-            style = MaterialTheme.typography.subtitle1,
-            fontWeight = FontWeight.Medium,
-            modifier = Modifier.padding(bottom = 4.dp)
-         )
-
          CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
             Text(
-               text = value,
-               style = MaterialTheme.typography.body1
+               text = title,
+               style = MaterialTheme.typography.body2,
+               modifier = Modifier.padding(bottom = 4.dp)
             )
          }
+
+         Text(
+            text = value,
+            style = MaterialTheme.typography.body1
+         )
       }
    }
 }

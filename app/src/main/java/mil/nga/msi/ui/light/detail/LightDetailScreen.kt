@@ -393,30 +393,32 @@ private fun LightDetail(
                .padding(bottom = 8.dp)
          ) {
             Column {
-               Text(
-                  text = "Range (nm)",
-                  style = MaterialTheme.typography.body1
-               )
-               CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
+               CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                   Text(
-                     text = light.range ?: "",
+                     text = "Range (nm)",
                      style = MaterialTheme.typography.body2
                   )
                }
+
+               Text(
+                  text = light.range ?: "",
+                  style = MaterialTheme.typography.body1
+               )
             }
 
             light.remarks?.trim()?.let { remarks ->
                Column {
-                  Text(
-                     text = "Remarks",
-                     style = MaterialTheme.typography.body1
-                  )
-                  CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
+                  CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                      Text(
-                        text = remarks,
+                        text = "Remarks",
                         style = MaterialTheme.typography.body2
                      )
                   }
+
+                  Text(
+                     text = remarks,
+                     style = MaterialTheme.typography.body1
+                  )
                }
             }
          }
@@ -439,9 +441,6 @@ private fun LightImage(
       width / 2.0,
       height / 2.0
    ) - (if (arcWidth != null) arcWidth / 2.0 else strokeWidth / 2.0))
-   val sectorDashLength = if(includeSectorDashes) min(width / 2.0, height / 2.0) else 0.0
-   val wholeColor = MaterialTheme.colors.primary // TODO should be gray from iOS
-   val diameter = radius * 2.0
 
    val sizeInPx = with(LocalDensity.current) { 100.dp.toPx() }
    val textSizeInPx = with(LocalDensity.current) { 12.dp.toPx() }
