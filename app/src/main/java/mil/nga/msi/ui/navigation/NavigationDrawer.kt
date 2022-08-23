@@ -27,7 +27,7 @@ import mil.nga.msi.ui.drag.dragContainer
 import mil.nga.msi.ui.drag.rememberDragDropState
 import mil.nga.msi.ui.theme.screenBackground
 
-private val MAX_TABS = 4
+private const val MAX_TABS = 4
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -183,7 +183,7 @@ fun NavigationDrawer(
 private fun NavigationRow(
    tab: DataSource,
    isDragging: Boolean = false,
-   isMapped: Boolean? = null,
+   isMapped: Boolean,
    onMapClicked: (() -> Unit)? = null,
    onDestinationClicked: (route: Route) -> Unit
 ) {
@@ -231,10 +231,10 @@ private fun NavigationRow(
                      )
                   }
 
-                  isMapped?.let { mapped ->
+                  if (tab.mappable) {
                      var icon = Icons.Default.LocationOff
                      var iconColor = Color.Black.copy(alpha = ContentAlpha.disabled)
-                     if (mapped) {
+                     if (isMapped) {
                         icon = Icons.Default.LocationOn
                         iconColor = MaterialTheme.colors.primary
                      }
