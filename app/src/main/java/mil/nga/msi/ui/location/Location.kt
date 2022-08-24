@@ -1,7 +1,8 @@
 package mil.nga.msi.ui.location
 
 import android.location.Location
-import kotlin.math.roundToInt
+import mil.nga.sf.Point
+import kotlin.math.*
 
 fun Location.generalDirection(location: Location): String {
    val directions = listOf("N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WNW", "NW", "NNW")
@@ -18,4 +19,25 @@ fun Location.generalDirection(location: Location): String {
    }
    val index = (bearing / indexDegrees).roundToInt() % directions.size
    return directions[index]
+}
+
+fun Point.wgs84ToWebMercator(): Point {
+   val a = 6378137.0
+   val lambda = x / 180 * PI
+   val phi = y / 180 * PI
+   val x = a * lambda
+   val y = a * ln(tan(PI / 4 + phi / 2))
+
+   return Point(x, y)
+}
+
+fun Point.webMercatorToWgs84(): Point {
+   val a = 6378137.0
+   val d = -y / a
+   val phi = PI / 2 - 2 * atan(exp(d))
+   val lambda = x / a
+   val latitude = phi / PI * 180
+   val longitude = lambda / PI * 180
+
+   return Point(longitude, latitude)
 }

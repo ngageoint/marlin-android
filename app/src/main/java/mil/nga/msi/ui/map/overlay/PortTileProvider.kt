@@ -2,17 +2,18 @@ package mil.nga.msi.ui.map.overlay
 
 import android.app.Application
 import android.graphics.*
+import android.util.Log
 import androidx.compose.ui.graphics.toArgb
 import com.google.android.gms.maps.model.Tile
 import com.google.android.gms.maps.model.TileProvider
 import mil.nga.msi.repository.port.PortRepository
 import mil.nga.msi.repository.preferences.DataSource
+import mil.nga.msi.ui.location.webMercatorToWgs84
+import mil.nga.msi.ui.location.wgs84ToWebMercator
+import mil.nga.sf.Point
 import java.io.ByteArrayOutputStream
 import javax.inject.Inject
-import kotlin.math.PI
-import kotlin.math.atan
-import kotlin.math.exp
-import kotlin.math.pow
+import kotlin.math.*
 
 class PortTileProvider @Inject constructor(
    val application: Application,
@@ -20,15 +21,31 @@ class PortTileProvider @Inject constructor(
 ) : TileProvider {
 
    override fun getTile(x: Int, y: Int, z: Int): Tile? {
+      val width = (application.resources.displayMetrics.density * 512).toInt()
+      val height = (application.resources.displayMetrics.density * 512).toInt()
+
       val minTileLon = longitude(x = x, zoom = z)
       val maxTileLon = longitude(x = x + 1, zoom = z)
       val minTileLat = latitude(y = y + 1, zoom = z)
       val maxTileLat = latitude(y = y, zoom = z)
 
-      val minQueryLon = longitude(x = x - 1, zoom = z)
-      val maxQueryLon = longitude(x = x + 2, zoom = z)
-      val minQueryLat = latitude(y = y + 2, zoom = z)
-      val maxQueryLat = latitude(y = y - 1, zoom = z)
+      val neCorner3857 = Point(maxTileLon, maxTileLat).wgs84ToWebMercator()
+      val swCorner3857 = Point(minTileLon, minTileLat).wgs84ToWebMercator()
+      val minTileX = swCorner3857.x
+      val minTileY = swCorner3857.y
+      val maxTileX = neCorner3857.x
+      val maxTileY = neCorner3857.y
+
+      // Border tile by 20 miles, biggest light in MSI.
+      // Border has to be at least 256 pixels as well
+      val tolerance = max(20.0 * 1609.344, ((maxTileX - minTileX) / (width / 2)) * 12)
+
+      val neCornerTolerance = Point(maxTileX + tolerance, maxTileY + tolerance).webMercatorToWgs84()
+      val swCornerTolerance = Point(minTileX - tolerance, minTileY - tolerance).webMercatorToWgs84()
+      val minQueryLon = swCornerTolerance.x
+      val maxQueryLon = neCornerTolerance.x
+      val minQueryLat = swCornerTolerance.y
+      val maxQueryLat = neCornerTolerance.y
 
       val ports = repository.getPorts(
          minLatitude = minQueryLat,
@@ -39,16 +56,14 @@ class PortTileProvider @Inject constructor(
 
       if (ports.isEmpty()) return null
 
-      val width = (application.resources.displayMetrics.density * 512).toInt()
-      val height = (application.resources.displayMetrics.density * 512).toInt()
-
       val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
       val canvas = Canvas(bitmap)
 
       ports.forEach { port ->
          portImage()?.let { image ->
-            val xPosition = (((port.longitude - minTileLon) / (maxTileLon - minTileLon)) * width)
-            val yPosition = height - (((port.latitude - minTileLat) / (maxTileLat - minTileLat)) * height)
+            val webMercator = Point(port.longitude, port.latitude).wgs84ToWebMercator()
+            val xPosition = (((webMercator.x - minTileX) / (maxTileX - minTileX)) * width)
+            val yPosition = height - (((webMercator.y - minTileY) / (maxTileY - minTileY)) * height)
             val destination = Rect(
                xPosition.toInt() - image.width,
                yPosition.toInt() - image.height,
@@ -75,7 +90,7 @@ class PortTileProvider @Inject constructor(
    }
 
    private fun portImage(): Bitmap? {
-      val size = (application.resources.displayMetrics.density * 14).toInt()
+      val size = (application.resources.displayMetrics.density * 12).toInt()
       val stroke = (application.resources.displayMetrics.density * 2)
       val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
       val canvas = Canvas(bitmap)

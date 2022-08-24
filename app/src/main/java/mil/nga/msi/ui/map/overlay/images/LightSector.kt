@@ -4,7 +4,6 @@ import android.content.Context
 import android.graphics.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import mil.nga.msi.datasource.light.Light
 import mil.nga.msi.datasource.light.LightSector
 
 fun sectorImage(

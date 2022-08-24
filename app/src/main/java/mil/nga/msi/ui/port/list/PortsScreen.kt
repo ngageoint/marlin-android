@@ -169,13 +169,11 @@ private fun PortContent(
                val direction = location.generalDirection(portLocation)
                val nmi = distance * 0.539957
                CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-                  item.alternateName?.let {
-                     Text(
-                        text = "${String.format("%.2f", nmi)}, $direction",
-                        style = MaterialTheme.typography.body2,
-                        modifier = Modifier.padding(top = 4.dp)
-                     )
-                  }
+                  Text(
+                     text = "${String.format("%.2f", nmi)}, $direction",
+                     style = MaterialTheme.typography.body2,
+                     modifier = Modifier.padding(top = 4.dp)
+                  )
                }
             }
          }

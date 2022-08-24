@@ -1,10 +1,12 @@
 package mil.nga.msi.datasource.light
 
+import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import com.google.android.gms.maps.model.LatLng
 import mil.nga.msi.coordinate.DMS
+import java.lang.Exception
 
 enum class LightColor(val color: Color) {
    WHITE(Color(0xDEFFFF00)),
@@ -184,7 +186,7 @@ data class Light(
                   val component = groups[name]
                   if (component != null) {
                      if (name == "visible") {
-                        visibleColor = lightColors()[0]
+                        visibleColor = lightColors().firstOrNull()
                      } else if (name == "color") {
                         color = remarks.substring(component.range)
                      } else if (name == "startdeg") {

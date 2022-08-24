@@ -6,10 +6,9 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import mil.nga.msi.datasource.light.Light
 import mil.nga.msi.datasource.light.LightColor
 
-fun Light.raconImage(
+fun raconImage(
    context: Context,
    small: Boolean
 ): Bitmap {

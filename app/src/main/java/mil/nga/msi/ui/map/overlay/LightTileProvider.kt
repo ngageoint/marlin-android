@@ -6,31 +6,47 @@ import com.google.android.gms.maps.model.Tile
 import com.google.android.gms.maps.model.TileProvider
 import mil.nga.msi.datasource.light.Light
 import mil.nga.msi.repository.light.LightRepository
+import mil.nga.msi.ui.location.webMercatorToWgs84
+import mil.nga.msi.ui.location.wgs84ToWebMercator
 import mil.nga.msi.ui.map.overlay.images.*
+import mil.nga.sf.Point
 import java.io.ByteArrayOutputStream
 import javax.inject.Inject
-import kotlin.math.PI
-import kotlin.math.atan
-import kotlin.math.exp
-import kotlin.math.pow
+import kotlin.math.*
 
 class LightTileProvider @Inject constructor(
    val application: Application,
    val repository: LightRepository
 ) : TileProvider {
 
-   override fun getTile(x: Int, y: Int, z: Int): Tile? {
-      if (z < 8) return null
+   override fun getTile(x: Int, y: Int, z: Int): Tile {
+      if (z < 3) return TileProvider.NO_TILE
+
+      val width = (application.resources.displayMetrics.density * 512).toInt()
+      val height = (application.resources.displayMetrics.density * 512).toInt()
 
       val minTileLon = longitude(x = x, zoom = z)
       val maxTileLon = longitude(x = x + 1, zoom = z)
       val minTileLat = latitude(y = y + 1, zoom = z)
       val maxTileLat = latitude(y = y, zoom = z)
 
-      val minQueryLon = longitude(x = x - 1, zoom = z)
-      val maxQueryLon = longitude(x = x + 2, zoom = z)
-      val minQueryLat = latitude(y = y + 2, zoom = z)
-      val maxQueryLat = latitude(y = y - 1, zoom = z)
+      val neCorner3857 = Point(maxTileLon, maxTileLat).wgs84ToWebMercator()
+      val swCorner3857 = Point(minTileLon, minTileLat).wgs84ToWebMercator()
+      val minTileX = swCorner3857.x
+      val minTileY = swCorner3857.y
+      val maxTileX = neCorner3857.x
+      val maxTileY = neCorner3857.y
+
+      // Border tile by 20 miles, biggest light in MSI.
+      // Border has to be at least 256 pixels as well
+      val tolerance = max(20.0 * 1609.344, ((maxTileX - minTileX) / (width / 2)) * 20)
+
+      val neCornerTolerance = Point(maxTileX + tolerance, maxTileY + tolerance).webMercatorToWgs84()
+      val swCornerTolerance = Point(minTileX - tolerance, minTileY - tolerance).webMercatorToWgs84()
+      val minQueryLon = swCornerTolerance.x
+      val maxQueryLon = neCornerTolerance.x
+      val minQueryLat = swCornerTolerance.y
+      val maxQueryLat = neCornerTolerance.y
 
       val lights = repository.getLights(
          minLatitude = minQueryLat,
@@ -39,18 +55,14 @@ class LightTileProvider @Inject constructor(
          maxLongitude = maxQueryLon
       )
 
-      if (lights.isEmpty()) return null
-
-      val width = (application.resources.displayMetrics.density * 512).toInt()
-      val height = (application.resources.displayMetrics.density * 512).toInt()
-
       val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
       val canvas = Canvas(bitmap)
 
       lights.forEach { light ->
          lightImages(light, small = z < 13).forEach { image ->
-            val xPosition = (((light.longitude - minTileLon) / (maxTileLon - minTileLon)) * width)
-            val yPosition = height - (((light.latitude - minTileLat) / (maxTileLat - minTileLat)) * height)
+            val webMercator = Point(light.longitude, light.latitude).wgs84ToWebMercator()
+            val xPosition = (((webMercator.x - minTileX) / (maxTileX - minTileX)) * width)
+            val yPosition = height - (((webMercator.y - minTileY) / (maxTileY - minTileY)) * height)
             val destination = Rect(
                xPosition.toInt() - image.width,
                yPosition.toInt() - image.height,
@@ -98,7 +110,7 @@ class LightTileProvider @Inject constructor(
       } else if(colors.isNotEmpty()) {
          images.add(colorImage(application, colors, small))
       } else {
-         images.add(light.raconImage(application, small))
+         images.add(raconImage(application, small))
       }
 
       return images
