@@ -79,7 +79,7 @@ class UserPreferencesRepository @Inject constructor(
       }
    }
 
-   val lastReadNavigationalWarnings: Flow<MutableMap<String,  mil.nga.msi.type.NavigationalWarningKey>> = emptyFlow() //preferencesDataStore.data.map { it.lastReadNavigationWarningsMap }
+   val lastReadNavigationalWarnings: Flow<MutableMap<String,  mil.nga.msi.type.NavigationalWarningKey>> = preferencesDataStore.data.map { it.lastReadNavigationWarningsMap }
 
    suspend fun setLastReadNavigationalWarning(navigationArea: NavigationArea, key: NavigationalWarningKey) {
       preferencesDataStore.updateData {
