@@ -27,7 +27,10 @@ fun PagingSheet(
    onDetails: (MapAnnotation) -> Unit,
 ) {
    val scope = rememberCoroutineScope()
-   var badgeColor by remember { mutableStateOf(Color.Transparent) }
+   val pagerState = rememberPagerState()
+   var badgeColor = remember(pagerState.currentPage) {
+      mapAnnotations[pagerState.currentPage].key.type.route.color
+   }
 
    Row(Modifier.height(280.dp)) {
       Box(
@@ -38,7 +41,6 @@ fun PagingSheet(
       )
 
       Column {
-         val pagerState = rememberPagerState()
 
          Row(
             horizontalArrangement = Arrangement.Center,
