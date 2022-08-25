@@ -2,7 +2,7 @@ package mil.nga.msi.repository.light
 
 import androidx.work.*
 import mil.nga.msi.datasource.light.Light
-import mil.nga.msi.datasource.light.LightVolume
+import mil.nga.msi.datasource.light.PublicationVolume
 import mil.nga.msi.work.light.RefreshLightWorker
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -43,7 +43,7 @@ class LightRepository @Inject constructor(
 
    suspend fun fetchLights(refresh: Boolean = false): List<Light> {
       if (refresh) {
-         LightVolume.values().forEach { lightVolume ->
+         PublicationVolume.values().forEach { lightVolume ->
             val lights = remoteDataSource.fetchLights(lightVolume)
             localDataSource.insert(lights)
          }

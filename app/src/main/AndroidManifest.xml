@@ -50,6 +50,10 @@
             <meta-data
                 android:name="mil.nga.msi.startup.port.PortInitializer"
                 android:value="androidx.startup" />
+
+            <meta-data
+                android:name="mil.nga.msi.startup.radiobeacon.RadioBeaconInitializer"
+                android:value="androidx.startup" />
         </provider>
 
         <activity

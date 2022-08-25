@@ -1,6 +1,6 @@
 package mil.nga.msi.datasource.light
 
-enum class LightVolume(val volumeQuery: String, val volumeTitle: String) {
+enum class PublicationVolume(val volumeQuery: String, val volumeTitle: String) {
    PUB_110("110", "PUB 110"),
    PUB_111("111", "PUB 111"),
    PUB_112("112", "PUB 112"),

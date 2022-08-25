@@ -12,6 +12,7 @@ import mil.nga.msi.datasource.light.Light
 import mil.nga.msi.datasource.modu.Modu
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarning
 import mil.nga.msi.datasource.port.Port
+import mil.nga.msi.datasource.radiobeacon.RadioBeacon
 import mil.nga.msi.network.asam.AsamService
 import mil.nga.msi.network.asam.AsamsTypeAdapter
 import mil.nga.msi.network.light.LightService
@@ -22,10 +23,13 @@ import mil.nga.msi.network.navigationalwarning.NavigationalWarningService
 import mil.nga.msi.network.navigationalwarning.NavigationalWarningsTypeAdapter
 import mil.nga.msi.network.port.PortService
 import mil.nga.msi.network.port.PortsTypeAdapter
+import mil.nga.msi.network.radiobeacon.RadioBeaconService
+import mil.nga.msi.network.radiobeacon.RadioBeaconsTypeAdapter
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.List
+import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
@@ -34,7 +38,13 @@ class NetworkModule {
 
    @Singleton
    @Provides
-   fun provideOkHttpClient(): OkHttpClient = OkHttpClient.Builder().build()
+   fun provideOkHttpClient(): OkHttpClient {
+      return OkHttpClient.Builder()
+         .connectTimeout(60, TimeUnit.SECONDS)
+         .readTimeout(60, TimeUnit.SECONDS)
+         .writeTimeout(60, TimeUnit.SECONDS)
+         .build()
+   }
 
    @Provides
    @Singleton
@@ -45,6 +55,7 @@ class NetworkModule {
          .registerTypeAdapter(object : TypeToken<List<NavigationalWarning>>() {}.type, NavigationalWarningsTypeAdapter())
          .registerTypeAdapter(object : TypeToken<List<Light>>() {}.type, LightsTypeAdapter())
          .registerTypeAdapter(object : TypeToken<List<Port>>() {}.type, PortsTypeAdapter())
+         .registerTypeAdapter(object : TypeToken<List<RadioBeacon>>() {}.type, RadioBeaconsTypeAdapter())
          .create()
    }
 
@@ -89,5 +100,11 @@ class NetworkModule {
    @Singleton
    fun providePortService(retrofit: Retrofit): PortService {
       return retrofit.create(PortService::class.java)
+   }
+
+   @Provides
+   @Singleton
+   fun provideRadioBeaconService(retrofit: Retrofit): RadioBeaconService {
+      return retrofit.create(RadioBeaconService::class.java)
    }
 }

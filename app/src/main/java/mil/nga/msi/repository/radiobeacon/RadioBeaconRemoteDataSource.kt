@@ -1,19 +1,19 @@
-package mil.nga.msi.repository.light
+package mil.nga.msi.repository.radiobeacon
 
-import mil.nga.msi.datasource.light.Light
 import mil.nga.msi.datasource.light.PublicationVolume
-import mil.nga.msi.network.light.LightService
+import mil.nga.msi.datasource.radiobeacon.RadioBeacon
+import mil.nga.msi.network.radiobeacon.RadioBeaconService
 import java.util.*
 import javax.inject.Inject
 
-class LightRemoteDataSource @Inject constructor(
-   private val service: LightService,
-   private val localDataSource: LightLocalDataSource
+class RadioBeaconRemoteDataSource @Inject constructor(
+   private val service: RadioBeaconService,
+   private val localDataSource: RadioBeaconLocalDataSource
 ) {
-   suspend fun fetchLights(publicationVolume: PublicationVolume): List<Light> {
-      val lights = mutableListOf<Light>()
+   suspend fun fetchRadioBeacons(publicationVolume: PublicationVolume): List<RadioBeacon> {
+      val beacons = mutableListOf<RadioBeacon>()
 
-      val latestLight = localDataSource.getLatestLight(publicationVolume.volumeTitle)
+      val latestLight = localDataSource.getLatestRadioBeacon(publicationVolume.volumeTitle)
       var minNoticeNumber: String? = ""
       var maxNoticeNumber: String? = ""
       if (latestLight != null) {
@@ -25,7 +25,7 @@ class LightRemoteDataSource @Inject constructor(
          maxNoticeNumber = "${year}${"%02d".format(week + 1)}"
       }
 
-      val filteredResponse = service.getLights(
+      val filteredResponse = service.getRadioBeacons(
          volume = publicationVolume.volumeQuery,
          minNoticeNumber = minNoticeNumber,
          maxNoticeNumber = maxNoticeNumber
@@ -34,17 +34,17 @@ class LightRemoteDataSource @Inject constructor(
       if (filteredResponse.isSuccessful) {
          val body = filteredResponse.body()
          if (latestLight != null && body?.isNotEmpty() == true) {
-            // Pull all lights again and save to ensure regions are set correctly
-            val response = service.getLights(volume = publicationVolume.volumeQuery)
+            // Pull all radio beacons again and save to ensure regions are set correctly
+            val response = service.getRadioBeacons(volume = publicationVolume.volumeQuery)
             if (response.isSuccessful) {
                // TODO do we need to remove lights that don't come back that we have locally?
-               response.body()?.let { lights.addAll(it) }
+               response.body()?.let { beacons.addAll(it) }
             }
          } else {
-            body?.let { lights.addAll(it) }
+            body?.let { beacons.addAll(it) }
          }
       }
 
-      return lights
+      return beacons
    }
 }

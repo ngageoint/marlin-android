@@ -13,6 +13,8 @@ import mil.nga.msi.datasource.navigationwarning.NavigationalWarning
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarningDao
 import mil.nga.msi.datasource.port.Port
 import mil.nga.msi.datasource.port.PortDao
+import mil.nga.msi.datasource.radiobeacon.RadioBeacon
+import mil.nga.msi.datasource.radiobeacon.RadioBeaconDao
 
 @Database(
    version = MsiDatabase.VERSION,
@@ -21,7 +23,8 @@ import mil.nga.msi.datasource.port.PortDao
       Modu::class,
       NavigationalWarning::class,
       Light::class,
-      Port::class
+      Port::class,
+      RadioBeacon::class
    ]
 )
 @TypeConverters(
@@ -39,4 +42,5 @@ abstract class MsiDatabase : RoomDatabase() {
    abstract fun navigationalWarning(): NavigationalWarningDao
    abstract fun lightDao(): LightDao
    abstract fun portDao(): PortDao
+   abstract fun radioBeaconDao(): RadioBeaconDao
 }

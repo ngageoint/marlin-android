@@ -12,6 +12,7 @@ import mil.nga.msi.datasource.light.LightDao
 import mil.nga.msi.datasource.modu.ModuDao
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarningDao
 import mil.nga.msi.datasource.port.PortDao
+import mil.nga.msi.datasource.radiobeacon.RadioBeaconDao
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
@@ -54,5 +55,11 @@ class RoomModule {
    @Singleton
    fun providePortDao(database: MsiDatabase): PortDao {
       return database.portDao()
+   }
+
+   @Provides
+   @Singleton
+   fun provideRadioBeaconDao(database: MsiDatabase): RadioBeaconDao {
+      return database.radioBeaconDao()
    }
 }
