@@ -10,6 +10,18 @@ Marlin adheres to [Semantic Versioning](http://semver.org/).
 ##### Bug Fixes
 
 ---
+## 0.5.0
+
+### Summary
+This release includes the following MSI data sources
+* ASAMs
+* MODUS
+* Navigational Warnings
+* Lights
+* World Ports
+
+##### Features
+  * World Ports
 
 ## 0.4.0
 
