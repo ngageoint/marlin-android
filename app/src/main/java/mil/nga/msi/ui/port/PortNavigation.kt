@@ -20,12 +20,13 @@ import mil.nga.msi.ui.port.sheet.PortSheetScreen
 sealed class PortRoute(
    override val name: String,
    override val title: String,
+   override val shortTitle: String,
    override val color: Color = Color(0xFF5856d6)
 ): Route {
-   object Main: PortRoute("ports", "Ports")
-   object Detail: PortRoute("ports/detail", "Port Details")
-   object List: PortRoute("ports/list", "Ports")
-   object Sheet: PortRoute("ports/sheet", "Port Sheet")
+   object Main: PortRoute("ports", "World Ports", "Ports")
+   object Detail: PortRoute("ports/detail", "World Port Details", "Port Details")
+   object List: PortRoute("ports/list", "World Ports", "Ports")
+   object Sheet: PortRoute("ports/sheet", "World Port Sheet", "Port Sheet")
 }
 
 @OptIn(ExperimentalMaterialNavigationApi::class)

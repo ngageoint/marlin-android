@@ -11,6 +11,7 @@ import com.google.accompanist.navigation.material.bottomSheet
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import mil.nga.msi.repository.light.LightKey
+import mil.nga.msi.repository.radiobeacon.RadioBeaconKey
 import mil.nga.msi.ui.asam.AsamRoute
 import mil.nga.msi.ui.light.LightRoute
 import mil.nga.msi.ui.map.cluster.MapAnnotation
@@ -20,11 +21,13 @@ import mil.nga.msi.ui.navigation.Point
 import mil.nga.msi.ui.navigation.MapAnnotationsType
 import mil.nga.msi.ui.navigation.Route
 import mil.nga.msi.ui.port.PortRoute
+import mil.nga.msi.ui.radiobeacon.RadioBeaconRoute
 import mil.nga.msi.ui.sheet.PagingSheet
 
 sealed class MapRoute(
    override val name: String,
    override val title: String,
+   override val shortTitle: String = title,
    override val color: Color = Color.Transparent
 ): Route {
    object Map: MapRoute("map", "Map")
@@ -78,6 +81,11 @@ fun NavGraphBuilder.mapGraph(
                MapAnnotation.Type.PORT -> {
                   navController.navigate(PortRoute.Sheet.name + "?portNumber=${annotation.key.id}")
                }
+               MapAnnotation.Type.RADIO_BEACON -> {
+                  val beaconKey = RadioBeaconKey.fromId(annotation.key.id)
+                  val encoded = Uri.encode(Json.encodeToString(beaconKey))
+                  navController.navigate(RadioBeaconRoute.Sheet.name + "?key=${encoded}")
+               }
             }
          },
          onAnnotationsClick = { annotations ->
@@ -121,6 +129,9 @@ fun NavGraphBuilder.mapGraph(
                }
                MapAnnotation.Type.PORT -> {
                   navController.navigate(PortRoute.Detail.name + "?portNumber=${annotation.key.id}")
+               }
+               MapAnnotation.Type.RADIO_BEACON -> {
+                  navController.navigate(RadioBeaconRoute.Detail.name + "?key=${annotation.key.id}")
                }
             }
          }

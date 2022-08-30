@@ -7,7 +7,6 @@ import javax.inject.Inject
 class LightLocalDataSource @Inject constructor(
    private val dao: LightDao
 ) {
-   fun observeMapItems() = dao.observeMapItems()
    fun observeLightListItems() = dao.getLightListItems()
 
    fun observeLight(

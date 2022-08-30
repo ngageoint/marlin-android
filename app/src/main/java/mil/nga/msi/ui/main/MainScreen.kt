@@ -128,7 +128,7 @@ fun MainScreen(
                                  contentDescription = tab.route.title
                               )
                            },
-                           label = { Text(tab.route.title) },
+                           label = { Text(tab.route.shortTitle) },
                            selectedContentColor = MaterialTheme.colors.primary,
                            unselectedContentColor = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.disabled),
                            selected = currentDestination?.hierarchy?.any { it.route?.substringBefore("?") == tab.route.name } == true,

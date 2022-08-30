@@ -20,6 +20,7 @@ import mil.nga.msi.ui.navigation.Route
 sealed class LightRoute(
    override val name: String,
    override val title: String,
+   override val shortTitle: String = title,
    override val color: Color = Color(0xFFFFC500)
 ): Route {
    object Main: LightRoute("lights", "Lights")

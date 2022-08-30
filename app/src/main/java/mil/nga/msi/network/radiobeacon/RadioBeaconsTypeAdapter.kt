@@ -6,6 +6,7 @@ import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
 import mil.nga.msi.coordinate.DMS
+import mil.nga.msi.datasource.light.Light
 import mil.nga.msi.datasource.radiobeacon.RadioBeacon
 import mil.nga.msi.network.nextStringOrNull
 import java.lang.UnsupportedOperationException
@@ -47,11 +48,17 @@ class RadioBeaconsTypeAdapter: TypeAdapter<List<RadioBeacon>>() {
 
       `in`.beginArray()
 
+      var previousRegionHeading: String? = null
       while (`in`.hasNext()) {
-         try {
-            readRadioBeacon(`in`)?.let { beacons.add(it) }
-         } catch(e: Exception) {
-            Log.i("Billy", "foo")
+         readRadioBeacon(`in`)?.let {
+            it.regionHeading = it.regionHeading ?: previousRegionHeading
+            it.sectionHeader = "${it.geopoliticalHeading ?: ""}${it.regionHeading ?: ""})"
+
+            if (previousRegionHeading != it.regionHeading) {
+               previousRegionHeading = it.regionHeading
+            }
+
+            beacons.add(it)
          }
       }
 

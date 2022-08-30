@@ -21,6 +21,7 @@ import mil.nga.msi.ui.navigation.Route
 sealed class ModuRoute(
    override val name: String,
    override val title: String,
+   override val shortTitle: String = title,
    override val color: Color = Color(0xFF0042A4)
 ): Route {
    object Main: ModuRoute("modus", "MODUs")

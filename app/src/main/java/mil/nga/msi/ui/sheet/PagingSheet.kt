@@ -14,11 +14,13 @@ import androidx.compose.ui.unit.dp
 import com.google.accompanist.pager.*
 import kotlinx.coroutines.launch
 import mil.nga.msi.repository.light.LightKey
+import mil.nga.msi.repository.radiobeacon.RadioBeaconKey
 import mil.nga.msi.ui.asam.sheet.AsamSheetScreen
 import mil.nga.msi.ui.light.sheet.LightSheetScreen
 import mil.nga.msi.ui.map.cluster.MapAnnotation
 import mil.nga.msi.ui.modu.sheet.ModuSheetScreen
 import mil.nga.msi.ui.port.sheet.PortSheetScreen
+import mil.nga.msi.ui.radiobeacon.sheet.RadioBeaconSheetScreen
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
@@ -100,6 +102,7 @@ fun PagingSheet(
                   MapAnnotation.Type.MODU -> ModuPage(annotation.key.id) { onDetails(annotation) }
                   MapAnnotation.Type.LIGHT -> LightPage(annotation.key.id) { onDetails(annotation) }
                   MapAnnotation.Type.PORT -> PortPage(annotation.key.id) { onDetails(annotation) }
+                  MapAnnotation.Type.RADIO_BEACON -> RadioBeaconPage(annotation.key.id) { onDetails(annotation) }
                }
             }
          }
@@ -148,6 +151,18 @@ private fun PortPage(
 ) {
    PortSheetScreen(
       id,
+      onDetails = { onDetails() }
+   )
+}
+
+@Composable
+private fun RadioBeaconPage(
+   id: String,
+   onDetails: () -> Unit,
+) {
+   val key = RadioBeaconKey.fromId(id)
+   RadioBeaconSheetScreen(
+      key,
       onDetails = { onDetails() }
    )
 }

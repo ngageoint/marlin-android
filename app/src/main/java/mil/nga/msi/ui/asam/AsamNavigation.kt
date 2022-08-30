@@ -20,6 +20,7 @@ import mil.nga.msi.ui.navigation.Route
 sealed class AsamRoute(
    override val name: String,
    override val title: String,
+   override val shortTitle: String = title,
    override val color: Color = Color(0xFF000000)
 ): Route {
    object Main: AsamRoute("asams", "ASAMs")

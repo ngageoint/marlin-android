@@ -8,8 +8,10 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mil.nga.msi.repository.light.LightRepository
 import mil.nga.msi.repository.port.PortRepository
+import mil.nga.msi.repository.radiobeacon.RadioBeaconRepository
 import mil.nga.msi.ui.map.overlay.LightTileProvider
 import mil.nga.msi.ui.map.overlay.PortTileProvider
+import mil.nga.msi.ui.map.overlay.RadioBeaconTileProvider
 import javax.inject.Named
 import javax.inject.Singleton
 
@@ -28,5 +30,12 @@ class MapModule {
    @Named("portTileProvider")
    fun providePortTileProvider(application: Application, repository: PortRepository): TileProvider {
       return PortTileProvider(application, repository)
+   }
+
+   @Singleton
+   @Provides
+   @Named("radioBeaconTileProvider")
+   fun provideRadioBeaconProvider(application: Application, repository: RadioBeaconRepository): TileProvider {
+      return RadioBeaconTileProvider(application, repository)
    }
 }

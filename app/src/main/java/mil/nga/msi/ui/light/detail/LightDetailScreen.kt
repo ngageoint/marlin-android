@@ -425,8 +425,7 @@ private fun LightDetail(
 @Composable
 private fun LightImage(
    sectors: List<LightSector>,
-   arcWidth: Double? = null,
-   includeLetters: Boolean = true,
+   arcWidth: Double? = null
 ) {
    val strokeWidth = 6
    val sizeInPx = with(LocalDensity.current) { 100.dp.toPx() }
@@ -468,7 +467,8 @@ private fun LightImage(
             )
          }
 
-         if (includeLetters) {
+
+         sector.text?.let { text ->
             Canvas(modifier = Modifier.fillMaxSize()) {
                drawIntoCanvas {
                   val midPointAngle = (sector.startDegrees) + (sector.endDegrees - sector.startDegrees) / 2.0
@@ -491,7 +491,7 @@ private fun LightImage(
                      -(sizeInPx / 2 - paint.measureText(sector.text) / 2)
                   )
 
-                  it.nativeCanvas.drawText(sector.text, 0f, 0f, paint)
+                  it.nativeCanvas.drawText(text, 0f, 0f, paint)
                }
             }
          }

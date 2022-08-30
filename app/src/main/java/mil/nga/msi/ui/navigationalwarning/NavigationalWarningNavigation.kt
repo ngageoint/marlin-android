@@ -16,12 +16,13 @@ import mil.nga.msi.ui.navigationalwarning.list.NavigationalWarningsScreen
 sealed class NavigationWarningRoute(
    override val name: String,
    override val title: String,
+   override val shortTitle: String,
    override val color: Color = Color(0xFFD32F2F)
 ): Route {
-   object Main: NavigationWarningRoute("navigational_warnings", "Warnings")
-   object Group: NavigationWarningRoute("navigational_warnings/group", "Navigational Warnings")
-   object List: NavigationWarningRoute("navigational_warnings/list", "Navigational Warnings")
-   object Detail: NavigationWarningRoute("navigational_warnings/detail", "Navigational Warning Details")
+   object Main: NavigationWarningRoute("navigational_warnings", "Navigational Warnings", "Warnings")
+   object Group: NavigationWarningRoute("navigational_warnings/group", "Navigational Warnings", "Navigational Warnings")
+   object List: NavigationWarningRoute("navigational_warnings/list", "Navigational Warnings", "Navigational Warnings")
+   object Detail: NavigationWarningRoute("navigational_warnings/detail", "Navigational Warning Details", "Navigational Warning Details")
 }
 
 fun NavGraphBuilder.navigationalWarningGraph(

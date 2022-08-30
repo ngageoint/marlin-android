@@ -6,5 +6,5 @@ data class LightSector(
    val startDegrees: Double,
    val endDegrees: Double,
    val color: Color,
-   val text: String
+   val text: String? = null
 )

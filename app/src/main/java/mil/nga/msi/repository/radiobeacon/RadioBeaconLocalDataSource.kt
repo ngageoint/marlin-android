@@ -8,26 +8,25 @@ class RadioBeaconLocalDataSource @Inject constructor(
    private val dao: RadioBeaconDao
 ) {
 //   fun observeMapItems() = dao.observeMapItems()
-//   fun observeLightListItems() = dao.getLightListItems()
-//
-//   fun observeLight(
-//      volumeNumber: String,
-//      featureNumber: String
-//   ) = dao.observeLight(volumeNumber, featureNumber)
-//
-//   suspend fun getLight(
-//      volumeNumber: String,
-//      featureNumber: String,
-//      characteristicNumber: Int
-//   ) = dao.getLight(volumeNumber, featureNumber, characteristicNumber)
-//
-//   fun getLights(
-//      minLatitude: Double,
-//      maxLatitude: Double,
-//      minLongitude: Double,
-//      maxLongitude: Double
-//   ) = dao.getLights(minLatitude, maxLatitude, minLongitude, maxLongitude)
-//
+   fun observeRadioBeaconListItems() = dao.getRadioBeaconListItems()
+
+   fun observeRadioBeacon(
+      volumeNumber: String,
+      featureNumber: String
+   ) = dao.observeRadioBeacon(volumeNumber, featureNumber)
+
+   suspend fun getRadioBeacon(
+      volumeNumber: String,
+      featureNumber: String
+   ) = dao.getRadioBeacon(volumeNumber, featureNumber)
+
+   fun getRadioBeacons(
+      minLatitude: Double,
+      maxLatitude: Double,
+      minLongitude: Double,
+      maxLongitude: Double
+   ) = dao.getRadioBeacons(minLatitude, maxLatitude, minLongitude, maxLongitude)
+
 //   fun getLights(
 //      minLatitude: Double,
 //      maxLatitude: Double,

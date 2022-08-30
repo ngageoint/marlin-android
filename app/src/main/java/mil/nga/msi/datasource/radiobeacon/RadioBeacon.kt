@@ -4,6 +4,8 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import com.google.android.gms.maps.model.LatLng
 import mil.nga.msi.coordinate.DMS
+import mil.nga.msi.datasource.light.LightSector
+import mil.nga.msi.repository.preferences.DataSource
 
 @Entity(
    tableName = "radio_beacons",
@@ -73,8 +75,94 @@ data class RadioBeacon(
    @ColumnInfo(name = "delete_flag")
    var deleteFlag: String? = null
 
+   @ColumnInfo(name = "section_header")
+   var sectionHeader: String = ""
+
    @Transient
    val dms = DMS.from(LatLng(latitude, longitude))
+
+   fun expandedCharacteristic(): String? {
+      var expanded = characteristic
+      expanded = expanded?.replace("aero", "aeronautical")
+      expanded = expanded?.replace( "si", "silence")
+      expanded = expanded?.replace("tr", "transmission")
+      return expanded
+   }
+
+   fun expandedCharacteristicWithoutCode(): String? {
+      return characteristic?.substringAfter(").\n")
+         .takeIf { it?.isNotEmpty() == true }
+         ?.replace("aero", "aeronautical")
+         ?.replace( "si", "silence")
+         ?.replace("tr", "transmission")
+   }
+
+   fun morseCode(): String? {
+      return characteristic?.substringAfter("(")?.substringBefore(")") ?: return null
+   }
+
+   fun morseLetter(): String {
+      return characteristic?.substringBefore("\n").orEmpty()
+   }
+
+   fun information() = mapOf(
+      "Number" to featureNumber,
+      "Name" to name,
+      "Geopolitical Heading" to geopoliticalHeading,
+      "Position" to position.orEmpty(),
+      "Characteristic" to expandedCharacteristic(),
+      "Range (nmi)" to range.toString(),
+      "Sequence" to sequenceText,
+      "Frequency" to frequency,
+      "Remarks" to stationRemark,
+   )
+
+   fun azimuthCoverage(): List<LightSector> {
+      val sectors = mutableListOf<LightSector>()
+
+      val regex = Regex("(?<azimuth>(Azimuth coverage)?).?((?<startdeg>(\\d*))\\^)?((?<startminutes>[0-9]*)[\\`'])?(-(?<enddeg>(\\d*))\\^)?(?<endminutes>[0-9]*)[\\`']?\\.")
+      stationRemark?.let { remark ->
+         var previousEnd = 0.0
+
+         regex.findAll(remark).forEach {  matchResult ->
+            val groups =  matchResult.groups as? MatchNamedGroupCollection
+
+            if (groups != null) {
+               var end = 0.0
+               var start: Double? = null
+
+               arrayOf("startdeg", "startminutes", "enddeg", "endminutes").forEach { name ->
+                  val component = groups[name]
+                  if (component != null) {
+                     if (name == "startdeg") {
+                        start = (start ?: 0.0) + (remark.substring(component.range).toDoubleOrNull() ?: 0.0) - 90
+                     } else if (name == "startminutes") {
+                        start = (start ?: 0.0) + ((remark.substring(component.range).toDoubleOrNull() ?: 0.0)  / 60)
+                     } else if (name == "enddeg") {
+                        end = (remark.substring(component.range).toDoubleOrNull() ?: 0.0) - 90
+                     } else if (name == "endminutes") {
+                        end += (remark.substring(component.range).toDoubleOrNull() ?: 0.0) / 60
+                     }
+                  }
+               }
+
+               val startDegrees = start
+               if (startDegrees != null) {
+                  sectors.add(LightSector(startDegrees, end, DataSource.RADIO_BEACON.color))
+               } else {
+                  if (end < previousEnd) {
+                     end += 360.0
+                  }
+                  sectors.add(LightSector(previousEnd, end, DataSource.RADIO_BEACON.color))
+               }
+
+               previousEnd = end
+            }
+         }
+      }
+
+      return sectors
+   }
 
    override fun toString(): String {
       return "LIGHT\n\n" +

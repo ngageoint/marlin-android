@@ -47,6 +47,6 @@ fun MapClip(
          )
       }
 
-      tileProvider?.let { TileOverlay(tileProvider = it) }
+      tileProvider?.let { TileOverlay(tileProvider = it, zIndex = -1f) }
    }
 }

@@ -1,15 +1,24 @@
 package mil.nga.msi.ui.map
 
 import androidx.lifecycle.*
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.TileProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import mil.nga.msi.datasource.asam.AsamMapItem
 import mil.nga.msi.datasource.modu.ModuMapItem
 import mil.nga.msi.location.LocationPolicy
 import mil.nga.msi.repository.asam.AsamRepository
+import mil.nga.msi.repository.light.LightKey
+import mil.nga.msi.repository.light.LightRepository
 import mil.nga.msi.repository.modu.ModuRepository
+import mil.nga.msi.repository.port.PortRepository
 import mil.nga.msi.repository.preferences.DataSource
 import mil.nga.msi.repository.preferences.UserPreferencesRepository
+import mil.nga.msi.repository.radiobeacon.RadioBeaconKey
+import mil.nga.msi.repository.radiobeacon.RadioBeaconRepository
 import mil.nga.msi.type.MapLocation
 import mil.nga.msi.ui.map.cluster.MapAnnotation
 import javax.inject.Inject
@@ -19,10 +28,14 @@ import javax.inject.Named
 class MapViewModel @Inject constructor(
    asamRepository: AsamRepository,
    moduRepository: ModuRepository,
+   val lightRepository: LightRepository,
+   val portRepository: PortRepository,
+   val beaconRepository: RadioBeaconRepository,
    val locationPolicy: LocationPolicy,
    val userPreferencesRepository: UserPreferencesRepository,
-   @Named("lightTileProvider") private val _lightTileProvider: TileProvider,
-   @Named("portTileProvider") private val _portTileProvider: TileProvider
+   @Named("lightTileProvider") private val lightTileProvider: TileProvider,
+   @Named("portTileProvider") private val portTileProvider: TileProvider,
+   @Named("radioBeaconTileProvider") private val radioBeaconTileProvider: TileProvider
 ): ViewModel() {
 
    val baseMap = userPreferencesRepository.baseMapType.asLiveData()
@@ -34,16 +47,28 @@ class MapViewModel @Inject constructor(
 
    suspend fun setMapLocation(mapLocation: MapLocation) = userPreferencesRepository.setMapLocation(mapLocation)
 
-   val lightTileProvider: LiveData<TileProvider?> = Transformations.map(mapped) { mapped ->
-      if (mapped[DataSource.LIGHT] == true) {
-         _lightTileProvider
-      } else null
-   }
+   val tileProviders: LiveData<MutableList<TileProvider>> = Transformations.switchMap(mapped) { mapped ->
+      MediatorLiveData<MutableList<TileProvider>>().apply {
+         value = mutableListOf()
 
-   val portTileProvider: LiveData<TileProvider?> = Transformations.map(mapped) { mapped ->
-      if (mapped[DataSource.PORT] == true) {
-         _portTileProvider
-      } else null
+         if (mapped[DataSource.LIGHT] == true) {
+            value?.add(lightTileProvider)
+         } else {
+            value?.remove(lightTileProvider)
+         }
+
+         if (mapped[DataSource.PORT] == true) {
+            value?.add(portTileProvider)
+         } else {
+            value?.remove(portTileProvider)
+         }
+
+         if (mapped[DataSource.RADIO_BEACON] == true) {
+            value?.add(radioBeaconTileProvider)
+         } else {
+            value?.remove(radioBeaconTileProvider)
+         }
+      }
    }
 
    private val _mapAnnotations = mutableMapOf<MapAnnotation.Type, List<MapAnnotation>>()
@@ -75,5 +100,42 @@ class MapViewModel @Inject constructor(
             value = _mapAnnotations.flatMap { entry ->  entry.value }
          }
       }
+   }
+
+   suspend fun getMapAnnotations(
+      minLongitude: Double,
+      maxLongitude: Double,
+      minLatitude: Double,
+      maxLatitude: Double
+   ) = withContext(Dispatchers.IO) {
+      val dataSources = mapped.value ?: emptyMap()
+      val lights = if (dataSources.containsKey(DataSource.LIGHT)) {
+         lightRepository
+            .getLights(minLatitude, maxLatitude, minLongitude, maxLongitude)
+            .map { light ->
+               val key = MapAnnotation.Key(LightKey.fromLight(light).id(), MapAnnotation.Type.LIGHT)
+               MapAnnotation(key, light.latitude, light.longitude)
+            }
+      } else emptyList()
+
+      val ports = if (dataSources.containsKey(DataSource.PORT)) {
+         portRepository
+            .getPorts(minLatitude, maxLatitude, minLongitude, maxLongitude)
+            .map { port ->
+               val key = MapAnnotation.Key(port.portNumber.toString(), MapAnnotation.Type.PORT)
+               MapAnnotation(key, port.latitude, port.longitude)
+            }
+      } else emptyList()
+
+      val beacons = if (dataSources.containsKey(DataSource.PORT)) {
+         beaconRepository
+            .getRadioBeacons(minLatitude, maxLatitude, minLongitude, maxLongitude)
+            .map { beacon ->
+               val key = MapAnnotation.Key(RadioBeaconKey.fromRadioBeacon(beacon).id(), MapAnnotation.Type.RADIO_BEACON)
+               MapAnnotation(key, beacon.latitude, beacon.longitude)
+            }
+      } else emptyList()
+
+      lights + ports + beacons
    }
 }

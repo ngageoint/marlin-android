@@ -16,6 +16,7 @@ import mil.nga.msi.ui.light.LightRoute
 import mil.nga.msi.ui.modu.ModuRoute
 import mil.nga.msi.ui.navigation.Route
 import mil.nga.msi.ui.port.PortRoute
+import mil.nga.msi.ui.radiobeacon.RadioBeaconRoute
 import kotlin.Comparator
 
 @Serializable
@@ -29,7 +30,8 @@ data class MapAnnotation(
       ASAM(AsamRoute.Main, R.drawable.asam_map_marker_24dp),
       MODU(ModuRoute.Main, R.drawable.modu_map_marker_24dp),
       LIGHT(LightRoute.Main),
-      PORT(PortRoute.Main)
+      PORT(PortRoute.Main),
+      RADIO_BEACON(RadioBeaconRoute.Main),
    }
 
    @Serializable

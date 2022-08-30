@@ -48,13 +48,14 @@ object DataStoreModule {
                      DataSource.MODU.name to true,
                      DataSource.NAVIGATION_WARNING.name to true,
                      DataSource.LIGHT.name to true,
-                     DataSource.PORT.name to true
+                     DataSource.PORT.name to true,
+                     DataSource.RADIO_BEACON.name to true
                   )
                )
                .addAllTabs(
                   listOf(DataSource.ASAM, DataSource.MODU, DataSource.NAVIGATION_WARNING, DataSource.LIGHT).map { it.name }
                )
-               .addAllNonTabs(listOf(DataSource.PORT).map { it.name })
+               .addAllNonTabs(listOf(DataSource.PORT, DataSource.RADIO_BEACON).map { it.name })
                .build()
 
          override suspend fun readFrom(input: InputStream): UserPreferences {

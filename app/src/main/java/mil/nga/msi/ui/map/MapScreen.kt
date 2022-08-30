@@ -4,7 +4,6 @@ import android.Manifest
 import android.animation.ValueAnimator
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -29,15 +28,12 @@ import com.google.maps.android.compose.*
 import kotlinx.coroutines.launch
 import mil.nga.gars.tile.GARSTileProvider
 import mil.nga.mgrs.tile.MGRSTileProvider
-import mil.nga.msi.repository.light.LightKey
 import mil.nga.msi.type.MapLocation
-import mil.nga.msi.ui.light.list.LightsViewModel
 import mil.nga.msi.ui.location.LocationPermission
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.cluster.ClusterManager
 import mil.nga.msi.ui.map.cluster.MapAnnotation
 import mil.nga.msi.ui.map.overlay.OsmTileProvider
-import mil.nga.msi.ui.port.list.PortsViewModel
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalPermissionsApi::class)
@@ -49,9 +45,7 @@ fun MapScreen(
    onAnnotationsClick: (Collection<MapAnnotation>) -> Unit,
    onMapSettings: () -> Unit,
    openDrawer: () -> Unit,
-   mapViewModel: MapViewModel = hiltViewModel(),
-   lightsViewModel: LightsViewModel = hiltViewModel(),
-   portsViewModel: PortsViewModel = hiltViewModel()
+   mapViewModel: MapViewModel = hiltViewModel()
 ) {
    val scope = rememberCoroutineScope()
    val gars by mapViewModel.gars.observeAsState()
@@ -62,8 +56,7 @@ fun MapScreen(
    val annotations by mapViewModel.mapAnnotations.observeAsState()
    val location by mapViewModel.locationPolicy.bestLocationProvider.observeAsState()
    var located by remember { mutableStateOf(false) }
-   val lightTileProvider by mapViewModel.lightTileProvider.observeAsState()
-   val portTileProvider by mapViewModel.portTileProvider.observeAsState()
+   val tileProviders by mapViewModel.tileProviders.observeAsState(emptyList())
 
    val locationPermissionState: PermissionState = rememberPermissionState(
       Manifest.permission.ACCESS_FINE_LOCATION
@@ -106,8 +99,7 @@ fun MapScreen(
                locationPermissionState.status.isGranted,
                gars == true,
                mgrs == true,
-               lightTileProvider,
-               portTileProvider,
+               tileProviders,
                annotations,
                onAnnotationClick = { onAnnotationClick.invoke(it) },
                onAnnotationsClick = { onAnnotationsClick.invoke(it) },
@@ -123,44 +115,29 @@ fun MapScreen(
                onMapClick = { latLng, zoom, region ->
                   val screenPercentage = 0.03
                   val tolerance = (region.farRight.longitude - region.farLeft.longitude) * screenPercentage
-                  val minLongitude = latLng.longitude - tolerance
-                  val maxLongitude = latLng.longitude + tolerance
-                  val minLatitude = latLng.latitude - tolerance
-                  val maxLatitude = latLng.latitude + tolerance
                   scope.launch {
-                     val lights = if (lightTileProvider != null) {
-                        lightsViewModel
-                           .getLights(minLatitude, maxLatitude, minLongitude, maxLongitude)
-                           .map { light ->
-                              val key = MapAnnotation.Key(LightKey.fromLight(light).id(), MapAnnotation.Type.LIGHT)
-                              MapAnnotation(key, light.latitude, light.longitude)
-                           }
-                     } else emptyList()
+                     val mapAnnotations = mapViewModel.getMapAnnotations(
+                        minLongitude = latLng.longitude - tolerance,
+                        maxLongitude = latLng.longitude + tolerance,
+                        minLatitude = latLng.latitude - tolerance,
+                        maxLatitude = latLng.latitude + tolerance
+                     )
 
-                     val ports = if (portTileProvider != null) {
-                        portsViewModel
-                           .getPorts(minLatitude, maxLatitude, minLongitude, maxLongitude)
-                           .map { port ->
-                              val key = MapAnnotation.Key(port.portNumber.toString(), MapAnnotation.Type.PORT)
-                              MapAnnotation(key, port.latitude, port.longitude)
-                           }
-                     } else emptyList()
-
-                     val items = lights + ports
-                     if (items.isNotEmpty()) {
+                     if (mapAnnotations.isNotEmpty()) {
                         val bounds = LatLngBounds.builder().apply {
-                           items.forEach { this.include(LatLng(it.latitude, it.longitude)) }
+                           mapAnnotations.forEach { this.include(LatLng(it.latitude, it.longitude)) }
                         }.build()
+
                         destination = MapLocation.newBuilder()
                            .setLatitude(bounds.center.latitude)
                            .setLongitude(bounds.center.longitude)
-                           .setZoom(if (lights.size == 1) 17.0 else zoom.toDouble())
+                           .setZoom(if (mapAnnotations.size == 1) 17.0 else zoom.toDouble())
                            .build()
 
-                        if (items.size == 1) {
-                           onAnnotationClick(items.first())
+                        if (mapAnnotations.size == 1) {
+                           onAnnotationClick(mapAnnotations.first())
                         } else {
-                           onAnnotationsClick(items)
+                           onAnnotationsClick(mapAnnotations)
                         }
                      }
                   }
@@ -229,8 +206,7 @@ private fun Map(
    locationEnabled: Boolean,
    gars: Boolean,
    mgrs: Boolean,
-   lightTileProvider: TileProvider?,
-   portTileProvider: TileProvider?,
+   tileProviders: List<TileProvider>,
    annotations: List<MapAnnotation>,
    onMapMove: (MapLocation, Int) -> Unit,
    onMapClick: (LatLng, Float, VisibleRegion) -> Unit,
@@ -304,8 +280,9 @@ private fun Map(
             TileOverlay(tileProvider = MGRSTileProvider.create(context))
          }
 
-         lightTileProvider?.let { TileOverlay(tileProvider = it )}
-         portTileProvider?.let { TileOverlay(tileProvider = it) }
+         tileProviders.forEach { tileProvider ->
+            TileOverlay(tileProvider = tileProvider )
+         }
       }
 
       MapEffect(null) { map ->

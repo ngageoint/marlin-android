@@ -14,7 +14,7 @@ fun sectorImage(
    return if (small) {
       sectorImageSmall(context, sectors)
    } else {
-      sectorImageLarge(context, sectors, includeLetters = true, includeSectorDashes = true)
+      sectorImageLarge(context, sectors, includeSectorDashes = true)
    }
 }
 
@@ -53,7 +53,6 @@ private fun sectorImageSmall(
 private fun sectorImageLarge(
    context: Context,
    sectors: List<LightSector>,
-   includeLetters: Boolean = true,
    includeSectorDashes: Boolean = true
 ): Bitmap {
    val size = (context.resources.displayMetrics.density * 256).toInt()
@@ -110,7 +109,7 @@ private fun sectorImageLarge(
          canvas.drawPath(path2, paint)
       }
 
-      if (includeLetters) {
+      sector.text?.let { text ->
          val midPointAngle = (sector.startDegrees) + (sector.endDegrees - sector.startDegrees) / 2.0
 
          val paint = Paint().apply {
@@ -131,7 +130,7 @@ private fun sectorImageLarge(
             -(arcSize / 2f - stroke)
          )
 
-         canvas.drawText(sector.text, 0f, 0f, paint)
+         canvas.drawText(text, 0f, 0f, paint)
       }
    }
 
