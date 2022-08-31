@@ -16,5 +16,12 @@ class AsamLocalDataSource @Inject constructor(
    suspend fun getAsams(): List<Asam> = dao.getAsams()
    suspend fun getLatestAsam() = dao.getLatestAsam()
 
+   fun getAsams(
+      minLatitude: Double,
+      maxLatitude: Double,
+      minLongitude: Double,
+      maxLongitude: Double
+   ) = dao.getAsams(minLatitude, maxLatitude, minLongitude, maxLongitude)
+
    suspend fun insert(asams: List<Asam>) = dao.insert(asams)
 }

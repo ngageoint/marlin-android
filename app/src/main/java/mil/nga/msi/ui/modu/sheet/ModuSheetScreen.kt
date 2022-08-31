@@ -12,9 +12,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import mil.nga.msi.datasource.asam.Asam
 import mil.nga.msi.datasource.modu.Modu
-import mil.nga.msi.ui.asam.AsamViewModel
 import mil.nga.msi.ui.modu.ModuViewModel
 import java.text.SimpleDateFormat
 import java.util.*

@@ -1,15 +1,12 @@
 package mil.nga.msi.network.radiobeacon
 
-import android.util.Log
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
 import mil.nga.msi.coordinate.DMS
-import mil.nga.msi.datasource.light.Light
 import mil.nga.msi.datasource.radiobeacon.RadioBeacon
 import mil.nga.msi.network.nextStringOrNull
-import java.lang.UnsupportedOperationException
 
 class RadioBeaconsTypeAdapter: TypeAdapter<List<RadioBeacon>>() {
    override fun read(`in`: JsonReader): List<RadioBeacon> {

@@ -1,16 +1,13 @@
 package mil.nga.msi.network.navigationalwarning
 
-import android.util.Log
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
-import mil.nga.msi.datasource.modu.RigStatusConverter
 import mil.nga.msi.datasource.navigationwarning.NavigationArea
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarning
 import mil.nga.msi.network.nextIntOrNull
 import mil.nga.msi.network.nextStringOrNull
-import java.lang.UnsupportedOperationException
 import java.text.SimpleDateFormat
 import java.util.*
 

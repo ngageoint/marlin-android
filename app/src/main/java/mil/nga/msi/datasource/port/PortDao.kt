@@ -3,7 +3,6 @@ package mil.nga.msi.datasource.port
 import androidx.lifecycle.LiveData
 import androidx.paging.PagingSource
 import androidx.room.*
-import mil.nga.msi.datasource.light.Light
 
 @Dao
 interface PortDao {

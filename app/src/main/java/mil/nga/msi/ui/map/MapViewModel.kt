@@ -1,8 +1,6 @@
 package mil.nga.msi.ui.map
 
 import androidx.lifecycle.*
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.TileProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -26,13 +24,17 @@ import javax.inject.Named
 
 @HiltViewModel
 class MapViewModel @Inject constructor(
-   asamRepository: AsamRepository,
-   moduRepository: ModuRepository,
+   val asamRepository: AsamRepository,
+   val moduRepository: ModuRepository,
    val lightRepository: LightRepository,
    val portRepository: PortRepository,
-   val beaconRepository: RadioBeaconRepository,
    val locationPolicy: LocationPolicy,
    val userPreferencesRepository: UserPreferencesRepository,
+   private val beaconRepository: RadioBeaconRepository,
+   @Named("mgrsTileProvider") private val mgrsTileProvider: TileProvider,
+   @Named("garsTileProvider") private val garsTileProvider: TileProvider,
+   @Named("asamTileProvider") private val asamTileProvider: TileProvider,
+   @Named("moduTileProvider") private val moduTileProvider: TileProvider,
    @Named("lightTileProvider") private val lightTileProvider: TileProvider,
    @Named("portTileProvider") private val portTileProvider: TileProvider,
    @Named("radioBeaconTileProvider") private val radioBeaconTileProvider: TileProvider
@@ -40,64 +42,93 @@ class MapViewModel @Inject constructor(
 
    val baseMap = userPreferencesRepository.baseMapType.asLiveData()
    val mapLocation = userPreferencesRepository.mapLocation.asLiveData()
-   val gars = userPreferencesRepository.gars.asLiveData()
-   val mgrs = userPreferencesRepository.mgrs.asLiveData()
-
+   private val _zoom = MutableLiveData<Int>()
    private val mapped = userPreferencesRepository.mapped.asLiveData()
 
-   suspend fun setMapLocation(mapLocation: MapLocation) = userPreferencesRepository.setMapLocation(mapLocation)
+   suspend fun setMapLocation(mapLocation: MapLocation, zoom: Int) {
+      _zoom.value = zoom
+      userPreferencesRepository.setMapLocation(mapLocation)
+   }
 
-   val tileProviders: LiveData<MutableList<TileProvider>> = Transformations.switchMap(mapped) { mapped ->
-      MediatorLiveData<MutableList<TileProvider>>().apply {
-         value = mutableListOf()
+   private val _tileProviders = MediatorLiveData<Set<TileProvider>>()
+   val tileProviders: LiveData<Set<TileProvider>> = _tileProviders
+   init {
+      _tileProviders.addSource(userPreferencesRepository.mgrs.asLiveData()) { enabled ->
+         val providers = _tileProviders.value?.toMutableSet() ?: mutableSetOf()
+         if (enabled) providers.add(mgrsTileProvider) else providers.remove(mgrsTileProvider)
+         _tileProviders.value = providers
+      }
+
+      _tileProviders.addSource(userPreferencesRepository.gars.asLiveData()) { enabled ->
+         val providers = _tileProviders.value?.toMutableSet() ?: mutableSetOf()
+         if (enabled) providers.add(garsTileProvider) else providers.remove(garsTileProvider)
+         _tileProviders.value = providers
+      }
+
+      _tileProviders.addSource(mapped) { mapped ->
+         val providers = _tileProviders.value?.toMutableSet() ?: mutableSetOf()
+
+         if (mapped[DataSource.ASAM] == true) {
+            providers.add(asamTileProvider)
+         } else {
+            providers.remove(asamTileProvider)
+         }
+
+         if (mapped[DataSource.MODU] == true) {
+            providers.add(moduTileProvider)
+         } else {
+            providers.remove(moduTileProvider)
+         }
 
          if (mapped[DataSource.LIGHT] == true) {
-            value?.add(lightTileProvider)
+            providers.add(lightTileProvider)
          } else {
-            value?.remove(lightTileProvider)
+            providers.remove(lightTileProvider)
          }
 
          if (mapped[DataSource.PORT] == true) {
-            value?.add(portTileProvider)
+            providers.add(portTileProvider)
          } else {
-            value?.remove(portTileProvider)
+            providers.remove(portTileProvider)
          }
 
          if (mapped[DataSource.RADIO_BEACON] == true) {
-            value?.add(radioBeaconTileProvider)
+            providers.add(radioBeaconTileProvider)
          } else {
-            value?.remove(radioBeaconTileProvider)
+            providers.remove(radioBeaconTileProvider)
          }
+
+         _tileProviders.value = providers
       }
    }
 
    private val _mapAnnotations = mutableMapOf<MapAnnotation.Type, List<MapAnnotation>>()
-   val mapAnnotations = Transformations.switchMap(mapped) { mapped ->
-      MediatorLiveData<List<MapAnnotation>>().apply {
-         value = emptyList()
-
+   private val _markers = MediatorLiveData<List<MapAnnotation>>()
+   val mapAnnotations: LiveData<List<MapAnnotation>> = _markers
+   init {
+      _markers.addSource(_zoom) { zoom ->
          val asamSource = asamRepository.asamMapItems.asLiveData()
-         if (mapped[DataSource.ASAM] == true) {
-            addSource(asamSource) { asams: List<AsamMapItem> ->
+         if (mapped.value?.get(DataSource.ASAM) == true && zoom >= 13) {
+            _markers.addSource(asamSource) { asams: List<AsamMapItem> ->
                _mapAnnotations[MapAnnotation.Type.ASAM] = asams.map { MapAnnotation.fromAsam(it) }
-               value = _mapAnnotations.flatMap { entry ->  entry.value }
+               _markers.value = _mapAnnotations.flatMap { entry ->  entry.value }
             }
          } else {
-            removeSource(asamSource)
+            _markers.removeSource(asamSource)
             _mapAnnotations[MapAnnotation.Type.ASAM] = emptyList()
-            value = _mapAnnotations.flatMap { entry ->  entry.value }
+            _markers.value = _mapAnnotations.flatMap { entry ->  entry.value }
          }
 
          val moduSource = moduRepository.moduMapItems.asLiveData()
-         if (mapped[DataSource.MODU] == true) {
-            addSource(moduSource) { modus: List<ModuMapItem> ->
+         if (mapped.value?.get(DataSource.MODU) == true && zoom >= 13) {
+            _markers.addSource(moduSource) { modus: List<ModuMapItem> ->
                _mapAnnotations[MapAnnotation.Type.MODU] = modus.map { MapAnnotation.fromModu(it) }
-               value = _mapAnnotations.flatMap { entry ->  entry.value }
+               _markers.value = _mapAnnotations.flatMap { entry ->  entry.value }
             }
          } else {
-            removeSource(moduSource)
+            _markers.removeSource(moduSource)
             _mapAnnotations[MapAnnotation.Type.MODU] = emptyList()
-            value = _mapAnnotations.flatMap { entry ->  entry.value }
+            _markers.value = _mapAnnotations.flatMap { entry ->  entry.value }
          }
       }
    }
@@ -109,7 +140,26 @@ class MapViewModel @Inject constructor(
       maxLatitude: Double
    ) = withContext(Dispatchers.IO) {
       val dataSources = mapped.value ?: emptyMap()
-      val lights = if (dataSources.containsKey(DataSource.LIGHT)) {
+
+      val asams = if (dataSources[DataSource.ASAM] == true) {
+         asamRepository
+            .getAsams(minLatitude, maxLatitude, minLongitude, maxLongitude)
+            .map { asam ->
+               val key = MapAnnotation.Key(asam.reference, MapAnnotation.Type.ASAM)
+               MapAnnotation(key, asam.latitude, asam.longitude)
+            }
+      } else emptyList()
+
+      val modus = if (dataSources[DataSource.MODU] == true) {
+         moduRepository
+            .getModus(minLatitude, maxLatitude, minLongitude, maxLongitude)
+            .map { modu ->
+               val key = MapAnnotation.Key(modu.name, MapAnnotation.Type.MODU)
+               MapAnnotation(key, modu.latitude, modu.longitude)
+            }
+      } else emptyList()
+
+      val lights = if (dataSources[DataSource.LIGHT] == true) {
          lightRepository
             .getLights(minLatitude, maxLatitude, minLongitude, maxLongitude)
             .map { light ->
@@ -118,7 +168,7 @@ class MapViewModel @Inject constructor(
             }
       } else emptyList()
 
-      val ports = if (dataSources.containsKey(DataSource.PORT)) {
+      val ports = if (dataSources[DataSource.PORT] == true) {
          portRepository
             .getPorts(minLatitude, maxLatitude, minLongitude, maxLongitude)
             .map { port ->
@@ -127,7 +177,7 @@ class MapViewModel @Inject constructor(
             }
       } else emptyList()
 
-      val beacons = if (dataSources.containsKey(DataSource.PORT)) {
+      val beacons = if (dataSources[DataSource.PORT] == true) {
          beaconRepository
             .getRadioBeacons(minLatitude, maxLatitude, minLongitude, maxLongitude)
             .map { beacon ->
@@ -136,6 +186,6 @@ class MapViewModel @Inject constructor(
             }
       } else emptyList()
 
-      lights + ports + beacons
+      asams + modus + lights + ports + beacons
    }
 }

@@ -25,6 +25,14 @@ interface AsamDao {
    @Query("SELECT * FROM asams")
    suspend fun getAsams(): List<Asam>
 
+   @Query("SELECT * FROM asams WHERE latitude >= :minLatitude AND latitude <= :maxLatitude AND longitude >= :minLongitude AND longitude <= :maxLongitude")
+   fun getAsams(
+      minLatitude: Double,
+      maxLatitude: Double,
+      minLongitude: Double,
+      maxLongitude: Double
+   ): List<Asam>
+
    @Query("SELECT * FROM asams WHERE reference = :reference")
    suspend fun getAsam(reference: String): Asam?
 

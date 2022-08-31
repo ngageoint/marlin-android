@@ -5,7 +5,10 @@ import android.animation.ValueAnimator
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.material.ContentAlpha
+import androidx.compose.material.FloatingActionButton
+import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.outlined.LocationSearching
@@ -19,21 +22,21 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.animation.doOnEnd
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.google.accompanist.permissions.*
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.PermissionState
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.LocationSource
 import com.google.android.gms.maps.model.*
 import com.google.maps.android.compose.*
 import kotlinx.coroutines.launch
-import mil.nga.gars.tile.GARSTileProvider
-import mil.nga.mgrs.tile.MGRSTileProvider
 import mil.nga.msi.type.MapLocation
 import mil.nga.msi.ui.location.LocationPermission
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.cluster.ClusterManager
 import mil.nga.msi.ui.map.cluster.MapAnnotation
-import mil.nga.msi.ui.map.overlay.OsmTileProvider
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalPermissionsApi::class)
@@ -48,15 +51,13 @@ fun MapScreen(
    mapViewModel: MapViewModel = hiltViewModel()
 ) {
    val scope = rememberCoroutineScope()
-   val gars by mapViewModel.gars.observeAsState()
-   val mgrs by mapViewModel.mgrs.observeAsState()
    val baseMap by mapViewModel.baseMap.observeAsState()
    val mapOrigin by mapViewModel.mapLocation.observeAsState()
    var destination by remember { mutableStateOf(mapDestination) }
-   val annotations by mapViewModel.mapAnnotations.observeAsState()
+   val annotations by mapViewModel.mapAnnotations.observeAsState(emptyList())
    val location by mapViewModel.locationPolicy.bestLocationProvider.observeAsState()
    var located by remember { mutableStateOf(false) }
-   val tileProviders by mapViewModel.tileProviders.observeAsState(emptyList())
+   val tileProviders by mapViewModel.tileProviders.observeAsState(emptySet())
 
    val locationPermissionState: PermissionState = rememberPermissionState(
       Manifest.permission.ACCESS_FINE_LOCATION
@@ -89,61 +90,63 @@ fun MapScreen(
       )
 
       Box(Modifier.fillMaxWidth()) {
-         annotations?.let { annotations ->
-            Map(
-               selectedAnnotation,
-               origin,
-               destination,
-               baseMap,
-               locationSource,
-               locationPermissionState.status.isGranted,
-               gars == true,
-               mgrs == true,
-               tileProviders,
-               annotations,
-               onAnnotationClick = { onAnnotationClick.invoke(it) },
-               onAnnotationsClick = { onAnnotationsClick.invoke(it) },
-               onMapMove = { location, reason ->
-                  if (reason == GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE) {
-                     located = false
-                     destination = null
-                  }
-                  scope.launch {
-                     mapViewModel.setMapLocation(location)
-                  }
-               },
-               onMapClick = { latLng, zoom, region ->
-                  val screenPercentage = 0.03
-                  val tolerance = (region.farRight.longitude - region.farLeft.longitude) * screenPercentage
-                  scope.launch {
-                     val mapAnnotations = mapViewModel.getMapAnnotations(
-                        minLongitude = latLng.longitude - tolerance,
-                        maxLongitude = latLng.longitude + tolerance,
-                        minLatitude = latLng.latitude - tolerance,
-                        maxLatitude = latLng.latitude + tolerance
-                     )
+         Map(
+            selectedAnnotation,
+            origin,
+            destination,
+            baseMap,
+            locationSource,
+            locationPermissionState.status.isGranted,
+            tileProviders,
+            annotations,
+            onAnnotationClick = { onAnnotationClick.invoke(it) },
+            onAnnotationsClick = { onAnnotationsClick.invoke(it) },
+            onMapMove = { position, reason ->
+               if (reason == GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE) {
+                  located = false
+                  destination = null
+               }
+               scope.launch {
+                  val location = MapLocation.newBuilder()
+                     .setLatitude(position.target.latitude)
+                     .setLongitude(position.target.longitude)
+                     .setZoom(position.zoom.toDouble())
+                     .build()
 
-                     if (mapAnnotations.isNotEmpty()) {
-                        val bounds = LatLngBounds.builder().apply {
-                           mapAnnotations.forEach { this.include(LatLng(it.latitude, it.longitude)) }
-                        }.build()
+                  mapViewModel.setMapLocation(location, position.zoom.toInt())
+               }
+            },
+            onMapClick = { latLng, zoom, region ->
+               val screenPercentage = 0.03
+               val tolerance = (region.farRight.longitude - region.farLeft.longitude) * screenPercentage
+               scope.launch {
+                  val mapAnnotations = mapViewModel.getMapAnnotations(
+                     minLongitude = latLng.longitude - tolerance,
+                     maxLongitude = latLng.longitude + tolerance,
+                     minLatitude = latLng.latitude - tolerance,
+                     maxLatitude = latLng.latitude + tolerance
+                  )
 
-                        destination = MapLocation.newBuilder()
-                           .setLatitude(bounds.center.latitude)
-                           .setLongitude(bounds.center.longitude)
-                           .setZoom(if (mapAnnotations.size == 1) 17.0 else zoom.toDouble())
-                           .build()
+                  if (mapAnnotations.isNotEmpty()) {
+                     val bounds = LatLngBounds.builder().apply {
+                        mapAnnotations.forEach { this.include(LatLng(it.latitude, it.longitude)) }
+                     }.build()
 
-                        if (mapAnnotations.size == 1) {
-                           onAnnotationClick(mapAnnotations.first())
-                        } else {
-                           onAnnotationsClick(mapAnnotations)
-                        }
+                     destination = MapLocation.newBuilder()
+                        .setLatitude(bounds.center.latitude)
+                        .setLongitude(bounds.center.longitude)
+                        .setZoom(if (mapAnnotations.size == 1) 17.0 else zoom.toDouble())
+                        .build()
+
+                     if (mapAnnotations.size == 1) {
+                        onAnnotationClick(mapAnnotations.first())
+                     } else {
+                        onAnnotationsClick(mapAnnotations)
                      }
                   }
                }
-            )
-         }
+            }
+         )
 
          FloatingActionButton(
             onClick = { onMapSettings() },
@@ -204,11 +207,9 @@ private fun Map(
    baseMap: BaseMapType?,
    locationSource: LocationSource,
    locationEnabled: Boolean,
-   gars: Boolean,
-   mgrs: Boolean,
-   tileProviders: List<TileProvider>,
+   tileProviders: Set<TileProvider>,
    annotations: List<MapAnnotation>,
-   onMapMove: (MapLocation, Int) -> Unit,
+   onMapMove: (CameraPosition, Int) -> Unit,
    onMapClick: (LatLng, Float, VisibleRegion) -> Unit,
    onAnnotationClick: (MapAnnotation) -> Unit,
    onAnnotationsClick: (Collection<MapAnnotation>) -> Unit
@@ -268,17 +269,17 @@ private fun Map(
             }
          }
 
-         if (baseMap == BaseMapType.OSM) {
-            TileOverlay(tileProvider = OsmTileProvider())
-         }
+//         if (baseMap == BaseMapType.OSM) {
+//            TileOverlay(tileProvider = OsmTileProvider())
+//         }
 
-         if (gars) {
-            TileOverlay(tileProvider = GARSTileProvider.create(context))
-         }
-
-         if (mgrs) {
-            TileOverlay(tileProvider = MGRSTileProvider.create(context))
-         }
+//         if (gars) {
+//            TileOverlay(tileProvider = GARSTileProvider.create(context))
+//         }
+//
+//         if (mgrs) {
+//            TileOverlay(tileProvider = MGRSTileProvider.create(context))
+//         }
 
          tileProviders.forEach { tileProvider ->
             TileOverlay(tileProvider = tileProvider )
@@ -291,14 +292,7 @@ private fun Map(
          }
 
          map.setOnCameraMoveListener {
-            val position = map.cameraPosition
-            val mapLocation = MapLocation.newBuilder()
-               .setLatitude(position.target.latitude)
-               .setLongitude(position.target.longitude)
-               .setZoom(position.zoom.toDouble())
-               .build()
-
-            onMapMove(mapLocation, cameraMoveReason)
+            onMapMove(map.cameraPosition, cameraMoveReason)
          }
 
          map.setOnMapClickListener { latLng ->

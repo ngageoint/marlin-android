@@ -14,7 +14,7 @@ fun sectorImage(
    return if (small) {
       sectorImageSmall(context, sectors)
    } else {
-      sectorImageLarge(context, sectors, includeSectorDashes = true)
+      sectorImageLarge(context, sectors)
    }
 }
 
@@ -52,8 +52,7 @@ private fun sectorImageSmall(
 
 private fun sectorImageLarge(
    context: Context,
-   sectors: List<LightSector>,
-   includeSectorDashes: Boolean = true
+   sectors: List<LightSector>
 ): Bitmap {
    val size = (context.resources.displayMetrics.density * 256).toInt()
    val stroke = (context.resources.displayMetrics.density * 6).toInt()
@@ -86,38 +85,29 @@ private fun sectorImageLarge(
          }
       )
 
-      if (includeSectorDashes) {
-         val sectorDashLength = (context.resources.displayMetrics.density * 128).toInt()
-         val sectorDashInterval = (context.resources.displayMetrics.density * 2)
-         val paint = Paint().apply {
-            color = Color(0x33000000).toArgb()
-            style = Paint.Style.STROKE
-            strokeWidth = (context.resources.displayMetrics.density * 1)
-            pathEffect = DashPathEffect(floatArrayOf(sectorDashInterval, sectorDashInterval), 0f)
-         }
-
-         val path1 = Path()
-         path1.moveTo(center.x, center.y)
-         path1.lineTo(center.x + sectorDashLength, center.y)
-         path1.transform(Matrix().apply { postRotate(sector.startDegrees.toFloat() + 90f, center.x , center.y) })
-         canvas.drawPath(path1, paint)
-
-         val path2 = Path()
-         path2.moveTo(center.x, center.y)
-         path2.lineTo(center.x + sectorDashLength, center.y)
-         path2.transform(Matrix().apply { postRotate(sector.endDegrees.toFloat() + 90f, center.x , center.y) })
-         canvas.drawPath(path2, paint)
+      val sectorDashLength = (context.resources.displayMetrics.density * 128).toInt()
+      val sectorDashInterval = (context.resources.displayMetrics.density * 2)
+      val paint = Paint().apply {
+         color = Color(0x33000000).toArgb()
+         style = Paint.Style.STROKE
+         strokeWidth = (context.resources.displayMetrics.density * 1)
+         pathEffect = DashPathEffect(floatArrayOf(sectorDashInterval, sectorDashInterval), 0f)
       }
+
+      val path1 = Path()
+      path1.moveTo(center.x, center.y)
+      path1.lineTo(center.x + sectorDashLength, center.y)
+      path1.transform(Matrix().apply { postRotate(sector.startDegrees.toFloat() + 90f, center.x , center.y) })
+      canvas.drawPath(path1, paint)
+
+      val path2 = Path()
+      path2.moveTo(center.x, center.y)
+      path2.lineTo(center.x + sectorDashLength, center.y)
+      path2.transform(Matrix().apply { postRotate(sector.endDegrees.toFloat() + 90f, center.x , center.y) })
+      canvas.drawPath(path2, paint)
 
       sector.text?.let { text ->
          val midPointAngle = (sector.startDegrees) + (sector.endDegrees - sector.startDegrees) / 2.0
-
-         val paint = Paint().apply {
-            isAntiAlias = true
-            textSize = (context.resources.displayMetrics.density * 12)
-            color = Color.Black.toArgb() // TODO adjust for filled circle
-            typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
-         }
 
          canvas.translate(
             (size / 2f) - (paint.measureText(sector.text) / 2),
@@ -130,7 +120,12 @@ private fun sectorImageLarge(
             -(arcSize / 2f - stroke)
          )
 
-         canvas.drawText(text, 0f, 0f, paint)
+         canvas.drawText(text, 0f, 0f, Paint().apply {
+            isAntiAlias = true
+            textSize = (context.resources.displayMetrics.density * 12)
+            color = Color.Black.toArgb() // TODO adjust for filled circle
+            typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
+         })
       }
    }
 

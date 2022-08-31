@@ -16,5 +16,12 @@ class ModuLocalDataSource @Inject constructor(
    suspend fun getModus() = dao.getModus()
    suspend fun getLatestModu() = dao.getLatestModu()
 
+   fun getModus(
+      minLatitude: Double,
+      maxLatitude: Double,
+      minLongitude: Double,
+      maxLongitude: Double
+   ) = dao.getModus(minLatitude, maxLatitude, minLongitude, maxLongitude)
+
    suspend fun insert(modus: List<Modu>) = dao.insert(modus)
 }

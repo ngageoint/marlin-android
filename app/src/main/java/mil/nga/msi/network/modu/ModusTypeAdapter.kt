@@ -9,7 +9,6 @@ import mil.nga.msi.datasource.modu.RigStatus
 import mil.nga.msi.datasource.modu.RigStatusConverter
 import mil.nga.msi.network.nextDoubleOrNull
 import mil.nga.msi.network.nextStringOrNull
-import java.lang.UnsupportedOperationException
 import java.text.SimpleDateFormat
 import java.util.*
 

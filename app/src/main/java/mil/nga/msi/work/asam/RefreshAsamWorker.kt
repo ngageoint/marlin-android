@@ -1,7 +1,6 @@
 package mil.nga.msi.work.asam
 
 import android.content.Context
-import android.util.Log
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters

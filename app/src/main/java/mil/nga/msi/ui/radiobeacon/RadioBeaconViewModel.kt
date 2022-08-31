@@ -5,9 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import com.google.android.gms.maps.model.TileProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
-import mil.nga.msi.datasource.light.Light
 import mil.nga.msi.datasource.radiobeacon.RadioBeacon
-import mil.nga.msi.repository.light.LightRepository
 import mil.nga.msi.repository.preferences.UserPreferencesRepository
 import mil.nga.msi.repository.radiobeacon.RadioBeaconRepository
 import javax.inject.Inject

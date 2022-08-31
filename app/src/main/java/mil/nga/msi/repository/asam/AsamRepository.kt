@@ -18,6 +18,13 @@ class AsamRepository @Inject constructor(
    fun observeAsam(reference: String) = localDataSource.observeAsam(reference)
    suspend fun getAsam(reference: String) = localDataSource.getAsam(reference)
 
+   fun getAsams(
+      minLatitude: Double,
+      maxLatitude: Double,
+      minLongitude: Double,
+      maxLongitude: Double
+   ) = localDataSource.getAsams(minLatitude, maxLatitude, minLongitude, maxLongitude)
+
    suspend fun fetchAsams(refresh: Boolean = false): List<Asam> {
       if (refresh) {
          val asams = remoteDataSource.fetchAsams()

@@ -6,27 +6,29 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
 import androidx.compose.ui.graphics.toArgb
-import mil.nga.msi.datasource.port.Port
-import mil.nga.msi.repository.map.PortTileRepository
+import mil.nga.msi.datasource.asam.Asam
+import mil.nga.msi.repository.map.AsamTileRepository
 import mil.nga.msi.repository.preferences.DataSource
 import javax.inject.Inject
 
-class PortTileProvider @Inject constructor(
+class AsamTileProvider @Inject constructor(
    val application: Application,
-   val repository: PortTileRepository
+   val repository: AsamTileRepository
 ) : DataSourceTileProvider(application, repository)
 
-class PortTile(
-   private val port: Port
+class AsamTile(
+   asam: Asam
 ): Tileable {
-   override val latitude = port.latitude
-   override val longitude = port.longitude
+   override val latitude = asam.latitude
+   override val longitude = asam.longitude
 
    override fun tile(context: Context, zoom: Int): List<Bitmap> {
-      return listOf(portTile(context))
+      return if (zoom < 13) {
+         listOf(asamTile(context))
+      } else emptyList()
    }
 
-   private fun portTile(
+   private fun asamTile(
       context: Context
    ): Bitmap {
       val size = (context.resources.displayMetrics.density * 12).toInt()
@@ -39,7 +41,7 @@ class PortTile(
          size / 2f,
          (size / 2f) - stroke,
          Paint().apply {
-            color = DataSource.PORT.color.toArgb()
+            color = DataSource.ASAM.color.toArgb()
             style = Paint.Style.FILL
             strokeWidth = stroke
          }

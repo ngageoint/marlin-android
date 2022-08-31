@@ -1,7 +1,6 @@
 package mil.nga.msi.datasource
 
 import androidx.room.TypeConverter
-import java.util.*
 
 class StringListTypeConverter {
    @TypeConverter

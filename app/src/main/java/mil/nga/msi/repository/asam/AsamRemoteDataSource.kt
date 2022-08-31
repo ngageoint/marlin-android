@@ -3,8 +3,7 @@ package mil.nga.msi.repository.asam
 import mil.nga.msi.datasource.asam.Asam
 import mil.nga.msi.network.asam.AsamService
 import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import java.util.*
 import javax.inject.Inject
 
 class AsamRemoteDataSource @Inject constructor(

@@ -18,6 +18,13 @@ class ModuRepository @Inject constructor(
    fun observeModu(name: String) = localDataSource.observeModu(name)
    suspend fun getModu(name: String) = localDataSource.getModu(name)
 
+   fun getModus(
+      minLatitude: Double,
+      maxLatitude: Double,
+      minLongitude: Double,
+      maxLongitude: Double
+   ) = localDataSource.getModus(minLatitude, maxLatitude, minLongitude, maxLongitude)
+
    suspend fun fetchModus(refresh: Boolean = false): List<Modu> {
       if (refresh) {
          val modus = remoteDataSource.fetchModus()

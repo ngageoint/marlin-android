@@ -1,8 +1,6 @@
 package mil.nga.msi.datasource.navigationwarning
 
 import androidx.room.ColumnInfo
-import com.google.android.gms.maps.model.LatLng
-import mil.nga.msi.coordinate.DMS
 import java.util.*
 
 data class NavigationalWarningListItem(

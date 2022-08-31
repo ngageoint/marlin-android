@@ -7,10 +7,8 @@ import com.google.gson.stream.JsonWriter
 import mil.nga.msi.datasource.asam.Asam
 import mil.nga.msi.network.nextDoubleOrNull
 import mil.nga.msi.network.nextStringOrNull
-import java.lang.UnsupportedOperationException
 import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import java.util.*
 
 class AsamsTypeAdapter: TypeAdapter<List<Asam>>() {
    override fun read(`in`: JsonReader): List<Asam> {

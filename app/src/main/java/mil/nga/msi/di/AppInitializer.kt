@@ -5,8 +5,8 @@ import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
-import mil.nga.msi.startup.asam.AsamInitializer
 import mil.nga.msi.startup.WorkManagerInitializer
+import mil.nga.msi.startup.asam.AsamInitializer
 import mil.nga.msi.startup.light.LightInitializer
 import mil.nga.msi.startup.modu.ModuInitializer
 import mil.nga.msi.startup.navigationalwarning.NavigationalWarningInitializer

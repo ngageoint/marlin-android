@@ -38,4 +38,13 @@ interface ModuDao {
    @Query("SELECT * FROM modus")
    @RewriteQueriesToDropUnusedColumns
    fun observeModuMapItems(): Flow<List<ModuMapItem>>
+
+   @Query("SELECT * FROM modus WHERE latitude >= :minLatitude AND latitude <= :maxLatitude AND longitude >= :minLongitude AND longitude <= :maxLongitude")
+   fun getModus(
+      minLatitude: Double,
+      maxLatitude: Double,
+      minLongitude: Double,
+      maxLongitude: Double
+   ): List<Modu>
+
 }

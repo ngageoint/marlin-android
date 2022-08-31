@@ -2,8 +2,10 @@ package mil.nga.msi.ui.main
 
 import android.content.Context
 import android.content.Intent
-import androidx.compose.animation.*
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -26,7 +28,7 @@ import kotlinx.coroutines.launch
 import mil.nga.msi.R
 import mil.nga.msi.ui.home.homeGraph
 import mil.nga.msi.ui.map.MapRoute
-import mil.nga.msi.ui.navigation.*
+import mil.nga.msi.ui.navigation.NavigationDrawer
 
 @OptIn(ExperimentalMaterialNavigationApi::class)
 @Composable

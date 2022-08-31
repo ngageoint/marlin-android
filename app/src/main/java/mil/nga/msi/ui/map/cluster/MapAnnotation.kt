@@ -1,7 +1,6 @@
 package mil.nga.msi.ui.map.cluster
 
 import android.os.Parcelable
-import androidx.compose.ui.graphics.Color
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.clustering.ClusterItem
 import kotlinx.parcelize.Parcelize
@@ -17,7 +16,6 @@ import mil.nga.msi.ui.modu.ModuRoute
 import mil.nga.msi.ui.navigation.Route
 import mil.nga.msi.ui.port.PortRoute
 import mil.nga.msi.ui.radiobeacon.RadioBeaconRoute
-import kotlin.Comparator
 
 @Serializable
 @Parcelize

@@ -8,7 +8,6 @@ import mil.nga.msi.coordinate.DMS
 import mil.nga.msi.datasource.light.Light
 import mil.nga.msi.network.nextIntOrNull
 import mil.nga.msi.network.nextStringOrNull
-import java.lang.UnsupportedOperationException
 
 class LightsTypeAdapter: TypeAdapter<List<Light>>() {
    override fun read(`in`: JsonReader): List<Light> {

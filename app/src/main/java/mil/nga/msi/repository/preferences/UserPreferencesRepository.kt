@@ -2,7 +2,9 @@ package mil.nga.msi.repository.preferences
 
 import androidx.compose.ui.graphics.Color
 import androidx.datastore.core.DataStore
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import mil.nga.msi.R
 import mil.nga.msi.datasource.navigationwarning.NavigationArea
 import mil.nga.msi.repository.navigationalwarning.NavigationalWarningKey

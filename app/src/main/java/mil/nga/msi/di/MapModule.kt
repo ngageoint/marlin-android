@@ -6,12 +6,15 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import mil.nga.msi.repository.light.LightRepository
-import mil.nga.msi.repository.port.PortRepository
-import mil.nga.msi.repository.radiobeacon.RadioBeaconRepository
-import mil.nga.msi.ui.map.overlay.LightTileProvider
-import mil.nga.msi.ui.map.overlay.PortTileProvider
-import mil.nga.msi.ui.map.overlay.RadioBeaconTileProvider
+import mil.nga.gars.tile.GARSTileProvider
+import mil.nga.mgrs.tile.MGRSTileProvider
+import mil.nga.msi.repository.asam.AsamLocalDataSource
+import mil.nga.msi.repository.light.LightLocalDataSource
+import mil.nga.msi.repository.map.*
+import mil.nga.msi.repository.modu.ModuLocalDataSource
+import mil.nga.msi.repository.port.PortLocalDataSource
+import mil.nga.msi.repository.radiobeacon.RadioBeaconLocalDataSource
+import mil.nga.msi.ui.map.overlay.*
 import javax.inject.Named
 import javax.inject.Singleton
 
@@ -20,22 +23,50 @@ import javax.inject.Singleton
 class MapModule {
    @Singleton
    @Provides
+   @Named("mgrsTileProvider")
+   fun provideMgrsTileProvider(application: Application): TileProvider {
+      return MGRSTileProvider.create(application)
+   }
+
+   @Singleton
+   @Provides
+   @Named("garsTileProvider")
+   fun provideGarsTileProvider(application: Application): TileProvider {
+      return GARSTileProvider.create(application)
+   }
+
+   @Singleton
+   @Provides
+   @Named("asamTileProvider")
+   fun provideAsamTileProvider(application: Application, dataSource: AsamLocalDataSource): TileProvider {
+      return AsamTileProvider(application, AsamTileRepository(dataSource))
+   }
+
+   @Singleton
+   @Provides
+   @Named("moduTileProvider")
+   fun provideModuTileProvider(application: Application, dataSource: ModuLocalDataSource): TileProvider {
+      return ModuTileProvider(application, ModuTileRepository(dataSource))
+   }
+
+   @Singleton
+   @Provides
    @Named("lightTileProvider")
-   fun provideLightTileProvider(application: Application, repository: LightRepository): TileProvider {
-      return LightTileProvider(application, repository)
+   fun provideLightTileProvider(application: Application, dataSource: LightLocalDataSource): TileProvider {
+      return LightTileProvider(application, LightTileRepository(dataSource))
    }
 
    @Singleton
    @Provides
    @Named("portTileProvider")
-   fun providePortTileProvider(application: Application, repository: PortRepository): TileProvider {
-      return PortTileProvider(application, repository)
+   fun providePortTileProvider(application: Application, dataSource: PortLocalDataSource): TileProvider {
+      return PortTileProvider(application, PortTileRepository(dataSource))
    }
 
    @Singleton
    @Provides
    @Named("radioBeaconTileProvider")
-   fun provideRadioBeaconProvider(application: Application, repository: RadioBeaconRepository): TileProvider {
-      return RadioBeaconTileProvider(application, repository)
+   fun provideRadioBeaconProvider(application: Application, dataSource: RadioBeaconLocalDataSource): TileProvider {
+      return RadioBeaconTileProvider(application, RadioBeaconTileRepository(dataSource))
    }
 }
