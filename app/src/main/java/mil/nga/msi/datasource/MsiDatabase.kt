@@ -5,6 +5,8 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import mil.nga.msi.datasource.asam.Asam
 import mil.nga.msi.datasource.asam.AsamDao
+import mil.nga.msi.datasource.dgpsstation.DgpsStation
+import mil.nga.msi.datasource.dgpsstation.DgpsStationDao
 import mil.nga.msi.datasource.light.Light
 import mil.nga.msi.datasource.light.LightDao
 import mil.nga.msi.datasource.modu.Modu
@@ -24,7 +26,8 @@ import mil.nga.msi.datasource.radiobeacon.RadioBeaconDao
       NavigationalWarning::class,
       Light::class,
       Port::class,
-      RadioBeacon::class
+      RadioBeacon::class,
+      DgpsStation::class
    ]
 )
 @TypeConverters(
@@ -43,4 +46,5 @@ abstract class MsiDatabase : RoomDatabase() {
    abstract fun lightDao(): LightDao
    abstract fun portDao(): PortDao
    abstract fun radioBeaconDao(): RadioBeaconDao
+   abstract fun dgpsStationDao(): DgpsStationDao
 }

@@ -12,7 +12,6 @@ class RadioBeaconRepository @Inject constructor(
    private val localDataSource: RadioBeaconLocalDataSource,
    private val remoteDataSource: RadioBeaconRemoteDataSource
 ) {
-//   val mapItems = localDataSource.observeMapItems()
    fun getRadioBeaconListItems() = localDataSource.observeRadioBeaconListItems()
 
    fun observeRadioBeacon(
@@ -32,14 +31,6 @@ class RadioBeaconRepository @Inject constructor(
       maxLongitude: Double
    ) = localDataSource.getRadioBeacons(minLatitude, maxLatitude, minLongitude, maxLongitude)
 
-//   fun getLights(
-//      minLatitude: Double,
-//      maxLatitude: Double,
-//      minLongitude: Double,
-//      maxLongitude: Double,
-//      characteristicNumber: Int
-//   ) = localDataSource.getLights(minLatitude, maxLatitude, minLongitude, maxLongitude, characteristicNumber)
-//
    suspend fun fetchRadioBeacons(refresh: Boolean = false): List<RadioBeacon> {
       if (refresh) {
          PublicationVolume.values().forEach { volume ->

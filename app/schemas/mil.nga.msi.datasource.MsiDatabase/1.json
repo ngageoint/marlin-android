@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "504ff788d26de381e8fc144b59a32070",
+    "identityHash": "eb96e7251e94cbb4456730534a2aaa83",
     "entities": [
       {
         "tableName": "asams",
@@ -1244,12 +1244,159 @@
         },
         "indices": [],
         "foreignKeys": []
+      },
+      {
+        "tableName": "dgps_stations",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`volume_number` TEXT NOT NULL, `feature_number` INTEGER NOT NULL, `notice_week` TEXT NOT NULL, `notice_year` TEXT NOT NULL, `latitude` REAL NOT NULL, `longitude` REAL NOT NULL, `aid_type` TEXT, `geopolitical_heading` TEXT, `region_heading` TEXT, `preceding_note` TEXT, `name` TEXT, `position` TEXT, `station_id` TEXT, `range` INTEGER, `frequency` INTEGER, `transfer_rate` INTEGER, `remarks` TEXT, `post_note` TEXT, `notice_number` INTEGER, `remove_from_list` TEXT, `delete_flag` TEXT, `section_header` TEXT NOT NULL, PRIMARY KEY(`volume_number`, `feature_number`))",
+        "fields": [
+          {
+            "fieldPath": "volumeNumber",
+            "columnName": "volume_number",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "featureNumber",
+            "columnName": "feature_number",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "noticeWeek",
+            "columnName": "notice_week",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "noticeYear",
+            "columnName": "notice_year",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "latitude",
+            "columnName": "latitude",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "longitude",
+            "columnName": "longitude",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "aidType",
+            "columnName": "aid_type",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "geopoliticalHeading",
+            "columnName": "geopolitical_heading",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "regionHeading",
+            "columnName": "region_heading",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "precedingNote",
+            "columnName": "preceding_note",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "position",
+            "columnName": "position",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "stationId",
+            "columnName": "station_id",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "range",
+            "columnName": "range",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "frequency",
+            "columnName": "frequency",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "transferRate",
+            "columnName": "transfer_rate",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "remarks",
+            "columnName": "remarks",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "postNote",
+            "columnName": "post_note",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "noticeNumber",
+            "columnName": "notice_number",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "removeFromList",
+            "columnName": "remove_from_list",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "deleteFlag",
+            "columnName": "delete_flag",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "sectionHeader",
+            "columnName": "section_header",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "volume_number",
+            "feature_number"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '504ff788d26de381e8fc144b59a32070')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'eb96e7251e94cbb4456730534a2aaa83')"
     ]
   }
 }

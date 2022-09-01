@@ -8,6 +8,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mil.nga.msi.datasource.MsiDatabase
 import mil.nga.msi.datasource.asam.AsamDao
+import mil.nga.msi.datasource.dgpsstation.DgpsStationDao
 import mil.nga.msi.datasource.light.LightDao
 import mil.nga.msi.datasource.modu.ModuDao
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarningDao
@@ -61,5 +62,12 @@ class RoomModule {
    @Singleton
    fun provideRadioBeaconDao(database: MsiDatabase): RadioBeaconDao {
       return database.radioBeaconDao()
+
+   }
+
+   @Provides
+   @Singleton
+   fun provideDgpsStationDao(database: MsiDatabase): DgpsStationDao {
+      return database.dgpsStationDao()
    }
 }

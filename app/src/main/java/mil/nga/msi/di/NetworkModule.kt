@@ -8,6 +8,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mil.nga.msi.datasource.asam.Asam
+import mil.nga.msi.datasource.dgpsstation.DgpsStation
 import mil.nga.msi.datasource.light.Light
 import mil.nga.msi.datasource.modu.Modu
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarning
@@ -15,6 +16,8 @@ import mil.nga.msi.datasource.port.Port
 import mil.nga.msi.datasource.radiobeacon.RadioBeacon
 import mil.nga.msi.network.asam.AsamService
 import mil.nga.msi.network.asam.AsamsTypeAdapter
+import mil.nga.msi.network.dgpsstations.DgpsStationService
+import mil.nga.msi.network.dgpsstations.DgpsStationsTypeAdapter
 import mil.nga.msi.network.light.LightService
 import mil.nga.msi.network.light.LightsTypeAdapter
 import mil.nga.msi.network.modu.ModuService
@@ -56,6 +59,7 @@ class NetworkModule {
          .registerTypeAdapter(object : TypeToken<List<Light>>() {}.type, LightsTypeAdapter())
          .registerTypeAdapter(object : TypeToken<List<Port>>() {}.type, PortsTypeAdapter())
          .registerTypeAdapter(object : TypeToken<List<RadioBeacon>>() {}.type, RadioBeaconsTypeAdapter())
+         .registerTypeAdapter(object : TypeToken<List<DgpsStation>>() {}.type, DgpsStationsTypeAdapter())
          .create()
    }
 
@@ -106,5 +110,11 @@ class NetworkModule {
    @Singleton
    fun provideRadioBeaconService(retrofit: Retrofit): RadioBeaconService {
       return retrofit.create(RadioBeaconService::class.java)
+   }
+
+   @Provides
+   @Singleton
+   fun provideDgpsStationService(retrofit: Retrofit): DgpsStationService {
+      return retrofit.create(DgpsStationService::class.java)
    }
 }
