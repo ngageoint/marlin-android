@@ -107,7 +107,7 @@ data class RadioBeacon(
 
    fun information() = mapOf(
       "Number" to featureNumber,
-      "Name" to name,
+      "Name and Location" to name,
       "Geopolitical Heading" to geopoliticalHeading,
       "Position" to position.orEmpty(),
       "Characteristic" to expandedCharacteristic(),

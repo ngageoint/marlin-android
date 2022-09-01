@@ -2,15 +2,16 @@ package mil.nga.msi.ui.dgpsstation
 
 import android.net.Uri
 import androidx.compose.ui.graphics.Color
-import androidx.navigation.NavController
-import androidx.navigation.NavGraphBuilder
+import androidx.navigation.*
 import androidx.navigation.compose.composable
-import androidx.navigation.navigation
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import mil.nga.msi.repository.dgpsstation.DgpsStationKey
+import mil.nga.msi.ui.dgpsstation.detail.DgpsStationDetailScreen
 import mil.nga.msi.ui.dgpsstation.list.DgpsStationsScreen
 import mil.nga.msi.ui.map.MapRoute
+import mil.nga.msi.ui.navigation.DgpsStation
 import mil.nga.msi.ui.navigation.Point
 import mil.nga.msi.ui.navigation.Route
 
@@ -66,27 +67,27 @@ fun NavGraphBuilder.dgpsStationGraph(
          )
       }
 
-//      composable(
-//         route = "${RadioBeaconRoute.Detail.name}?key={key}",
-//         arguments = listOf(navArgument("key") { type = NavType.RadioBeacon })
-//      ) { backstackEntry ->
-//         bottomBarVisibility(false)
-//
-//         backstackEntry.arguments?.getParcelable<RadioBeaconKey>("key")?.let { key ->
-//            RadioBeaconDetailScreen(
-//               key,
-//               close = { navController.popBackStack() },
-//               onAction = { action ->
-//                  when(action) {
-//                     is RadioBeaconAction.Zoom -> zoomTo(action.point)
-//                     is RadioBeaconAction.Share -> shareLight(action.text)
-//                     is RadioBeaconAction.Location -> showSnackbar("${action.text} copied to clipboard")
-//                  }
-//               }
-//            )
-//         }
-//      }
-//
+      composable(
+         route = "${DgpsStationRoute.Detail.name}?key={key}",
+         arguments = listOf(navArgument("key") { type = NavType.DgpsStation })
+      ) { backstackEntry ->
+         bottomBarVisibility(false)
+
+         backstackEntry.arguments?.getParcelable<DgpsStationKey>("key")?.let { key ->
+            DgpsStationDetailScreen(
+               key,
+               close = { navController.popBackStack() },
+               onAction = { action ->
+                  when(action) {
+                     is DgpsStationAction.Zoom -> zoomTo(action.point)
+                     is DgpsStationAction.Share -> shareLight(action.text)
+                     is DgpsStationAction.Location -> showSnackbar("${action.text} copied to clipboard")
+                  }
+               }
+            )
+         }
+      }
+
 //      bottomSheet(
 //         route = "${RadioBeaconRoute.Sheet.name}?key={key}",
 //         arguments = listOf(navArgument("key") { type = NavType.RadioBeacon })

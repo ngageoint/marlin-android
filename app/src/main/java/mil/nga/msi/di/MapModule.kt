@@ -9,6 +9,7 @@ import dagger.hilt.components.SingletonComponent
 import mil.nga.gars.tile.GARSTileProvider
 import mil.nga.mgrs.tile.MGRSTileProvider
 import mil.nga.msi.repository.asam.AsamLocalDataSource
+import mil.nga.msi.repository.dgpsstation.DgpsStationLocalDataSource
 import mil.nga.msi.repository.light.LightLocalDataSource
 import mil.nga.msi.repository.map.*
 import mil.nga.msi.repository.modu.ModuLocalDataSource
@@ -68,5 +69,12 @@ class MapModule {
    @Named("radioBeaconTileProvider")
    fun provideRadioBeaconProvider(application: Application, dataSource: RadioBeaconLocalDataSource): TileProvider {
       return RadioBeaconTileProvider(application, RadioBeaconTileRepository(dataSource))
+   }
+
+   @Singleton
+   @Provides
+   @Named("dgpsStationTileProvider")
+   fun provideDgpsStationProvider(application: Application, dataSource: DgpsStationLocalDataSource): TileProvider {
+      return DgpsStationTileProvider(application, DgpsStationTileRepository(dataSource))
    }
 }

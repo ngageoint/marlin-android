@@ -81,11 +81,13 @@ data class DgpsStation(
 
    fun information() = mapOf(
       "Number" to featureNumber,
-      "Name" to name,
+      "Name and Location" to name,
       "Geopolitical Heading" to geopoliticalHeading,
       "Position" to position.orEmpty(),
       "Range (nmi)" to range.toString(),
       "Frequency" to frequency,
+      "Transfer Rate" to transferRate,
+      "Notice Number" to noticeNumber,
       "Remarks" to remarks,
    )
 
