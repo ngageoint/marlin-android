@@ -7,10 +7,9 @@ import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 import mil.nga.msi.R
 import mil.nga.msi.datasource.asam.AsamMapItem
-import mil.nga.msi.datasource.light.Light
 import mil.nga.msi.datasource.modu.ModuMapItem
-import mil.nga.msi.repository.light.LightKey
 import mil.nga.msi.ui.asam.AsamRoute
+import mil.nga.msi.ui.dgpsstation.DgpsStationRoute
 import mil.nga.msi.ui.light.LightRoute
 import mil.nga.msi.ui.modu.ModuRoute
 import mil.nga.msi.ui.navigation.Route
@@ -30,6 +29,7 @@ data class MapAnnotation(
       LIGHT(LightRoute.Main),
       PORT(PortRoute.Main),
       RADIO_BEACON(RadioBeaconRoute.Main),
+      DGPS_STATION(DgpsStationRoute.Main)
    }
 
    @Serializable
@@ -49,10 +49,6 @@ data class MapAnnotation(
       }
       fun fromModu(modu: ModuMapItem): MapAnnotation {
          return MapAnnotation(Key(modu.name, Type.MODU), modu.latitude, modu.longitude)
-      }
-
-      fun fromLight(light: Light): MapAnnotation {
-         return MapAnnotation(Key(LightKey.fromLight(light).id(), Type.LIGHT), light.latitude, light.longitude)
       }
 
       val idComparator = Comparator<MapAnnotation> { a, b ->

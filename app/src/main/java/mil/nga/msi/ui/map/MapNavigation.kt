@@ -16,9 +16,11 @@ import com.google.accompanist.navigation.material.ExperimentalMaterialNavigation
 import com.google.accompanist.navigation.material.bottomSheet
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import mil.nga.msi.repository.dgpsstation.DgpsStationKey
 import mil.nga.msi.repository.light.LightKey
 import mil.nga.msi.repository.radiobeacon.RadioBeaconKey
 import mil.nga.msi.ui.asam.AsamRoute
+import mil.nga.msi.ui.dgpsstation.DgpsStationRoute
 import mil.nga.msi.ui.light.LightRoute
 import mil.nga.msi.ui.map.cluster.MapAnnotation
 import mil.nga.msi.ui.map.settings.MapSettingsScreen
@@ -92,6 +94,11 @@ fun NavGraphBuilder.mapGraph(
                   val encoded = Uri.encode(Json.encodeToString(beaconKey))
                   navController.navigate(RadioBeaconRoute.Sheet.name + "?key=${encoded}")
                }
+               MapAnnotation.Type.DGPS_STATION -> {
+                  val dgpsStationKey = DgpsStationKey.fromId(annotation.key.id)
+                  val encoded = Uri.encode(Json.encodeToString(dgpsStationKey))
+                  navController.navigate(DgpsStationRoute.Sheet.name + "?key=${encoded}")
+               }
             }
          },
          onAnnotationsClick = { annotations ->
@@ -138,6 +145,9 @@ fun NavGraphBuilder.mapGraph(
                }
                MapAnnotation.Type.RADIO_BEACON -> {
                   navController.navigate(RadioBeaconRoute.Detail.name + "?key=${annotation.key.id}")
+               }
+               MapAnnotation.Type.DGPS_STATION -> {
+                  navController.navigate(DgpsStationRoute.Detail.name + "?key=${annotation.key.id}")
                }
             }
          }

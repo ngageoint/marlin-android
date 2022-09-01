@@ -5,6 +5,7 @@ import com.google.android.gms.maps.model.TileProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.asam.AsamMapItem
 import mil.nga.msi.datasource.modu.ModuMapItem
 import mil.nga.msi.location.LocationPolicy
@@ -13,7 +14,6 @@ import mil.nga.msi.repository.light.LightKey
 import mil.nga.msi.repository.light.LightRepository
 import mil.nga.msi.repository.modu.ModuRepository
 import mil.nga.msi.repository.port.PortRepository
-import mil.nga.msi.repository.preferences.DataSource
 import mil.nga.msi.repository.preferences.UserPreferencesRepository
 import mil.nga.msi.repository.radiobeacon.RadioBeaconKey
 import mil.nga.msi.repository.radiobeacon.RadioBeaconRepository

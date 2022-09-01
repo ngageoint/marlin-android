@@ -4,8 +4,8 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import com.google.android.gms.maps.model.LatLng
 import mil.nga.msi.coordinate.DMS
+import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.light.LightSector
-import mil.nga.msi.repository.preferences.DataSource
 
 @Entity(
    tableName = "radio_beacons",

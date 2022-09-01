@@ -108,6 +108,7 @@ fun PagingSheet(
                   MapAnnotation.Type.LIGHT -> LightPage(annotation.key.id) { onDetails(annotation) }
                   MapAnnotation.Type.PORT -> PortPage(annotation.key.id) { onDetails(annotation) }
                   MapAnnotation.Type.RADIO_BEACON -> RadioBeaconPage(annotation.key.id) { onDetails(annotation) }
+                  MapAnnotation.Type.DGPS_STATION -> DgpsStationPage(annotation.key.id) { onDetails(annotation) }
                }
             }
          }
@@ -170,4 +171,16 @@ private fun RadioBeaconPage(
       key,
       onDetails = { onDetails() }
    )
+}
+
+@Composable
+private fun DgpsStationPage(
+   id: String,
+   onDetails: () -> Unit,
+) {
+//   val key = RadioBeaconKey.fromId(id)
+//   RadioBeaconSheetScreen(
+//      key,
+//      onDetails = { onDetails() }
+//   )
 }

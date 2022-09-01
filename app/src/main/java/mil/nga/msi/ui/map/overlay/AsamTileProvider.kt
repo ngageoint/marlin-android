@@ -6,9 +6,9 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
 import androidx.compose.ui.graphics.toArgb
+import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.asam.Asam
 import mil.nga.msi.repository.map.AsamTileRepository
-import mil.nga.msi.repository.preferences.DataSource
 import javax.inject.Inject
 
 class AsamTileProvider @Inject constructor(

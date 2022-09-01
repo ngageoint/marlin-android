@@ -5,9 +5,9 @@ import android.content.Context
 import android.graphics.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.radiobeacon.RadioBeacon
 import mil.nga.msi.repository.map.RadioBeaconTileRepository
-import mil.nga.msi.repository.preferences.DataSource
 import javax.inject.Inject
 
 class RadioBeaconTileProvider @Inject constructor(

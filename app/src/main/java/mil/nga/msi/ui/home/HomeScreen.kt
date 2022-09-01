@@ -3,6 +3,7 @@ package mil.nga.msi.ui.home
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import mil.nga.msi.ui.asam.asamGraph
+import mil.nga.msi.ui.dgpsstation.dgpsStationGraph
 import mil.nga.msi.ui.light.lightGraph
 import mil.nga.msi.ui.map.mapGraph
 import mil.nga.msi.ui.modu.moduGraph
@@ -57,6 +58,13 @@ fun NavGraphBuilder.homeGraph(
       openNavigationDrawer = { openNavigationDrawer() }
    )
    radioBeaconGraph(
+      navController = navController,
+      bottomBarVisibility = { bottomBarVisibility(it) },
+      share = { share(it) },
+      showSnackbar = { showSnackbar(it) },
+      openNavigationDrawer = { openNavigationDrawer() }
+   )
+   dgpsStationGraph(
       navController = navController,
       bottomBarVisibility = { bottomBarVisibility(it) },
       share = { share(it) },

@@ -11,8 +11,8 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.navigationwarning.NavigationArea
-import mil.nga.msi.repository.preferences.DataSource
 import mil.nga.msi.type.MapLocation
 import mil.nga.msi.type.NavigationalWarningKey
 import mil.nga.msi.type.UserPreferences
@@ -52,13 +52,14 @@ object DataStoreModule {
                      DataSource.NAVIGATION_WARNING.name to true,
                      DataSource.LIGHT.name to true,
                      DataSource.PORT.name to true,
-                     DataSource.RADIO_BEACON.name to true
+                     DataSource.RADIO_BEACON.name to true,
+                     DataSource.DGPS_STATION.name to true
                   )
                )
                .addAllTabs(
                   listOf(DataSource.ASAM, DataSource.MODU, DataSource.NAVIGATION_WARNING, DataSource.LIGHT).map { it.name }
                )
-               .addAllNonTabs(listOf(DataSource.PORT, DataSource.RADIO_BEACON).map { it.name })
+               .addAllNonTabs(listOf(DataSource.PORT, DataSource.RADIO_BEACON, DataSource.DGPS_STATION).map { it.name })
                .build()
 
          override suspend fun readFrom(input: InputStream): UserPreferences {

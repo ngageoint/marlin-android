@@ -6,9 +6,9 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
 import androidx.compose.ui.graphics.toArgb
+import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.port.Port
 import mil.nga.msi.repository.map.PortTileRepository
-import mil.nga.msi.repository.preferences.DataSource
 import javax.inject.Inject
 
 class PortTileProvider @Inject constructor(
