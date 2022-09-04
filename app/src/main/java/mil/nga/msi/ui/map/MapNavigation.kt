@@ -39,7 +39,7 @@ sealed class MapRoute(
    override val color: Color = Color.Transparent
 ): Route {
    object Map: MapRoute("map", "Map")
-   object Settings: MapRoute("settings", "Map Settings")
+   object Settings: MapRoute("mapSettings", "Map Settings")
    object PagerSheet: MapRoute("annotationPagerSheet", "Map")
 }
 

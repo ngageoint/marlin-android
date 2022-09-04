@@ -14,6 +14,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOff
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -31,8 +32,8 @@ import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.ui.drag.DraggableItem
 import mil.nga.msi.ui.drag.dragContainer
 import mil.nga.msi.ui.drag.rememberDragDropState
+import mil.nga.msi.ui.settings.SettingsRoute
 import mil.nga.msi.ui.theme.screenBackground
-
 
 private const val MAX_TABS = 4
 
@@ -182,6 +183,57 @@ fun NavigationDrawer(
                )
             }
          }
+
+         item {
+            Column(
+               Modifier
+                  .padding(top = 32.dp)
+                  .height(72.dp)
+                  .fillMaxWidth()
+            ) {
+               Row(
+                  verticalAlignment = Alignment.CenterVertically,
+                  modifier = Modifier
+                     .fillMaxSize()
+                     .background(MaterialTheme.colors.background)
+                     .clickable {
+                        onDestinationClicked(SettingsRoute.Main.name)
+                     }
+               ) {
+
+                  CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                     Icon(
+                        Icons.Default.Settings,
+                        modifier = Modifier.padding(start = 8.dp),
+                        contentDescription = "Settings"
+                     )
+                  }
+
+                  Column(
+                     verticalArrangement = Arrangement.Center,
+                     modifier = Modifier.fillMaxWidth()
+                  ) {
+                     Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier
+                           .height(72.dp)
+                           .fillMaxWidth()
+                           .weight(1f)
+                           .padding(horizontal = 8.dp)
+                     ) {
+                        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
+                           Text(
+                              text = SettingsRoute.Main.title,
+                              style = MaterialTheme.typography.body2,
+                              fontWeight = FontWeight.Medium
+                           )
+                        }
+                     }
+                  }
+               }
+            }
+         }
       }
    }
 }
@@ -218,7 +270,6 @@ private fun NavigationRow(
                   .background(tab.color)
             )
 
-            // TODO bitmap
             CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                val bitmap = AppCompatResources.getDrawable(LocalContext.current, tab.icon)!!.toBitmap().asImageBitmap()
                Icon(
@@ -279,10 +330,10 @@ private fun NavigationRow(
                      }
                   }
                }
-
-               Divider(Modifier.fillMaxWidth())
             }
          }
       }
+
+      Divider(Modifier.fillMaxWidth())
    }
 }

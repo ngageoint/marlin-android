@@ -10,6 +10,7 @@ import mil.nga.msi.ui.modu.moduGraph
 import mil.nga.msi.ui.navigationalwarning.navigationalWarningGraph
 import mil.nga.msi.ui.port.portGraph
 import mil.nga.msi.ui.radiobeacon.radioBeaconGraph
+import mil.nga.msi.ui.settings.settingsGraph
 
 fun NavGraphBuilder.homeGraph(
    navController: NavController,
@@ -69,6 +70,12 @@ fun NavGraphBuilder.homeGraph(
       bottomBarVisibility = { bottomBarVisibility(it) },
       share = { share(it) },
       showSnackbar = { showSnackbar(it) },
+      openNavigationDrawer = { openNavigationDrawer() }
+   )
+
+   settingsGraph(
+      navController = navController,
+      bottomBarVisibility = { bottomBarVisibility(false) },
       openNavigationDrawer = { openNavigationDrawer() }
    )
 }
