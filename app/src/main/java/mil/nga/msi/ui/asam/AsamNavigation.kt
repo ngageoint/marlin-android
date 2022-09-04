@@ -20,13 +20,13 @@ import mil.nga.msi.ui.navigation.Route
 sealed class AsamRoute(
    override val name: String,
    override val title: String,
-   override val shortTitle: String = title,
+   override val shortTitle: String,
    override val color: Color = Color(0xFF000000)
 ): Route {
-   object Main: AsamRoute("asams", "ASAMs")
-   object Detail: AsamRoute("asams/detail", "ASAM Details")
-   object List: AsamRoute("asams/list", "ASAMs")
-   object Sheet: AsamRoute("asams/sheet", "ASAM Sheet")
+   object Main: AsamRoute("asams", "Anti-Shipping Activity Messages", "ASAMs")
+   object Detail: AsamRoute("asams/detail", "Anti-Shipping Activity Message Details", "ASAM Details")
+   object List: AsamRoute("asams/list", "Anti-Shipping Activity Messages", "ASAMs")
+   object Sheet: AsamRoute("asams/sheet", "Anti-Shipping Activity Message Sheet", "ASAM Sheet")
 }
 
 @OptIn(ExperimentalMaterialNavigationApi::class)

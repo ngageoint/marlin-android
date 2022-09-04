@@ -20,13 +20,13 @@ import mil.nga.msi.ui.navigation.Route
 sealed class ModuRoute(
    override val name: String,
    override val title: String,
-   override val shortTitle: String = title,
+   override val shortTitle: String,
    override val color: Color = Color(0xFF0042A4)
 ): Route {
-   object Main: ModuRoute("modus", "MODUs")
-   object Detail: ModuRoute("modus/detail", "MODU Details")
-   object List: ModuRoute("modus/list", "MODUs")
-   object Sheet: ModuRoute("modus/sheet", "Modu Sheet")
+   object Main: ModuRoute("modus", "Mobile Offshore Drilling Units", "MODUs")
+   object Detail: ModuRoute("modus/detail", "Mobile Offshore Drilling Unit Details", "MODU Details")
+   object List: ModuRoute("modus/list", "Mobile Offshore Drilling Units", "MODUs")
+   object Sheet: ModuRoute("modus/sheet", "Mobile Offshore Drilling Unit Sheet", "Modu Sheet")
 }
 
 @OptIn(ExperimentalMaterialNavigationApi::class)

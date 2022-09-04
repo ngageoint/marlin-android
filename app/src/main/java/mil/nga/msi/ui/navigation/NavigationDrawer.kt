@@ -1,5 +1,6 @@
 package mil.nga.msi.ui.navigation
 
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -19,8 +20,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.core.graphics.drawable.toBitmap
 import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.launch
 import mil.nga.msi.datasource.DataSource
@@ -28,6 +32,7 @@ import mil.nga.msi.ui.drag.DraggableItem
 import mil.nga.msi.ui.drag.dragContainer
 import mil.nga.msi.ui.drag.rememberDragDropState
 import mil.nga.msi.ui.theme.screenBackground
+
 
 private const val MAX_TABS = 4
 
@@ -198,6 +203,7 @@ private fun NavigationRow(
             .fillMaxWidth()
       ) {
          Row(
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                .fillMaxSize()
                .background(MaterialTheme.colors.background)
@@ -207,10 +213,20 @@ private fun NavigationRow(
          ) {
             Box(
                modifier = Modifier
-                  .width(6.dp)
+                  .width(8.dp)
                   .fillMaxHeight()
                   .background(tab.color)
             )
+
+            // TODO bitmap
+            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+               val bitmap = AppCompatResources.getDrawable(LocalContext.current, tab.icon)!!.toBitmap().asImageBitmap()
+               Icon(
+                  bitmap = bitmap,
+                  modifier = Modifier.padding(start = 8.dp),
+                  contentDescription = "Navigation Tab Icon"
+               )
+            }
 
             Column(
                verticalArrangement = Arrangement.Center,
@@ -223,12 +239,12 @@ private fun NavigationRow(
                      .height(72.dp)
                      .fillMaxWidth()
                      .weight(1f)
-                     .padding(horizontal = 16.dp)
+                     .padding(horizontal = 8.dp)
                ) {
                   CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
                      Text(
                         text = tab.route.title,
-                        style = MaterialTheme.typography.body1,
+                        style = MaterialTheme.typography.body2,
                         fontWeight = FontWeight.Medium
                      )
                   }
