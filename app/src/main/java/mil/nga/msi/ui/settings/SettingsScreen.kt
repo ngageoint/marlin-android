@@ -16,7 +16,6 @@ import androidx.compose.ui.unit.dp
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.theme.screenBackground
 
-
 @Composable
 fun SettingsScreen(
    openDrawer: () -> Unit,
