@@ -31,6 +31,7 @@ class MapViewModel @Inject constructor(
    val locationPolicy: LocationPolicy,
    val userPreferencesRepository: UserPreferencesRepository,
    private val beaconRepository: RadioBeaconRepository,
+   @Named("osmTileProvider") private val osmTileProvider: TileProvider,
    @Named("mgrsTileProvider") private val mgrsTileProvider: TileProvider,
    @Named("garsTileProvider") private val garsTileProvider: TileProvider,
    @Named("asamTileProvider") private val asamTileProvider: TileProvider,
@@ -62,6 +63,18 @@ class MapViewModel @Inject constructor(
       _tileProviders.addSource(userPreferencesRepository.gars.asLiveData()) { enabled ->
          val providers = _tileProviders.value?.toMutableSet() ?: mutableSetOf()
          if (enabled) providers.add(garsTileProvider) else providers.remove(garsTileProvider)
+         _tileProviders.value = providers
+      }
+
+      _tileProviders.addSource(baseMap) { baseMap ->
+         val providers = _tileProviders.value?.toMutableSet() ?: mutableSetOf()
+
+         if (baseMap == BaseMapType.OSM) {
+            providers.add(osmTileProvider)
+         } else {
+            providers.remove(osmTileProvider)
+         }
+
          _tileProviders.value = providers
       }
 

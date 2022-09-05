@@ -24,6 +24,13 @@ import javax.inject.Singleton
 class MapModule {
    @Singleton
    @Provides
+   @Named("osmTileProvider")
+   fun provideOSMTileProvider(): TileProvider {
+      return OsmTileProvider()
+   }
+
+   @Singleton
+   @Provides
    @Named("mgrsTileProvider")
    fun provideMgrsTileProvider(application: Application): TileProvider {
       return MGRSTileProvider.create(application)

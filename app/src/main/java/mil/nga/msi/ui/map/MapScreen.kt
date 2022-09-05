@@ -39,6 +39,10 @@ import mil.nga.msi.ui.map.cluster.ClusterManager
 import mil.nga.msi.ui.map.cluster.MapAnnotation
 import kotlin.math.roundToInt
 
+
+// TODO invalidate tiles if new data source data comes in
+// TODO ASAM and MODU icons as tile images
+
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun MapScreen(
@@ -268,18 +272,6 @@ private fun Map(
                }
             }
          }
-
-//         if (baseMap == BaseMapType.OSM) {
-//            TileOverlay(tileProvider = OsmTileProvider())
-//         }
-
-//         if (gars) {
-//            TileOverlay(tileProvider = GARSTileProvider.create(context))
-//         }
-//
-//         if (mgrs) {
-//            TileOverlay(tileProvider = MGRSTileProvider.create(context))
-//         }
 
          tileProviders.forEach { tileProvider ->
             TileOverlay(tileProvider = tileProvider )
