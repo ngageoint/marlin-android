@@ -11,10 +11,10 @@ interface AsamDao {
    suspend fun insert(asam: Asam)
 
    @Insert(onConflict = OnConflictStrategy.REPLACE)
-   suspend fun insert(asams: List<Asam>)
+   suspend fun insert(asams: List<Asam>): List<Long>
 
    @Update(onConflict = OnConflictStrategy.REPLACE)
-   suspend fun update(asam: Asam)
+   suspend fun update(asam: Asam): Int
 
    @Query("SELECT * FROM asams")
    fun observeAsams(): Flow<List<Asam>>
@@ -46,4 +46,7 @@ interface AsamDao {
    @Query("SELECT * FROM asams")
    @RewriteQueriesToDropUnusedColumns
    fun observeAsamMapItems(): Flow<List<AsamMapItem>>
+
+   @Query("SELECT COUNT(*) FROM asams WHERE reference IN (:references)")
+   fun existingAsams(references: List<String>): Int
 }

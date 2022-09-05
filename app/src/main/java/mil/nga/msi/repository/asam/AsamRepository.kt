@@ -1,12 +1,16 @@
 package mil.nga.msi.repository.asam
 
+import android.app.Application
+import android.util.Log
 import androidx.work.*
+import mil.nga.msi.MarlinNotification
 import mil.nga.msi.datasource.asam.Asam
 import mil.nga.msi.work.asam.RefreshAsamWorker
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class AsamRepository @Inject constructor(
+   val application: Application,
    private val workManager: WorkManager,
    private val localDataSource: AsamLocalDataSource,
    private val remoteDataSource: AsamRemoteDataSource
@@ -28,7 +32,10 @@ class AsamRepository @Inject constructor(
    suspend fun fetchAsams(refresh: Boolean = false): List<Asam> {
       if (refresh) {
          val asams = remoteDataSource.fetchAsams()
+         val new = asams.size - localDataSource.existingAsams(asams.map { it.reference })
+         MarlinNotification.asam(application.applicationContext, new)
          localDataSource.insert(asams)
+         Log.i("Billy", "Inserted asams is $new")
       }
 
       return localDataSource.getAsams()
