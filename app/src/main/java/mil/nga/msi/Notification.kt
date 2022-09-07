@@ -30,6 +30,7 @@ class MarlinNotification {
    companion object {
       private const val AsamNotificationId = 1
 
+      // TODO no notification if original tile load
       fun asam(context: Context, count: Int) {
          if (count > 0 ) {
             val notification =  NotificationCompat.Builder(context, MarlinNotificationChannelId)

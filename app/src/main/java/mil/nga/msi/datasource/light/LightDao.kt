@@ -10,10 +10,10 @@ interface LightDao {
    suspend fun insert(light: Light)
 
    @Insert(onConflict = OnConflictStrategy.REPLACE)
-   suspend fun insert(lights: List<Light>)
+   suspend fun insert(lights: List<Light>): List<Long>
 
    @Update(onConflict = OnConflictStrategy.REPLACE)
-   suspend fun update(light: Light)
+   suspend fun update(light: Light): Int
 
    @Query("SELECT * FROM lights")
    suspend fun getLights(): List<Light>
@@ -46,6 +46,9 @@ interface LightDao {
 
    @Query("SELECT * FROM lights ORDER BY section_header ASC, feature_number ASC")
    @RewriteQueriesToDropUnusedColumns
-   fun getLightListItems(): PagingSource<Int, LightListItem>
+   fun observeLightListItems(): PagingSource<Int, LightListItem>
 
+   @Query("SELECT * FROM lights ORDER BY volume_number, feature_number, characteristic_number")
+   @RewriteQueriesToDropUnusedColumns
+   fun observeLightMapItems(): Flow<List<LightMapItem>>
 }

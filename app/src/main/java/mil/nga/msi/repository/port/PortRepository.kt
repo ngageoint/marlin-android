@@ -11,6 +11,7 @@ class PortRepository @Inject constructor(
    private val localDataSource: PortLocalDataSource,
    private val remoteDataSource: PortRemoteDataSource
 ) {
+   val portMapItems = localDataSource.observePortMapItems()
    fun getPortListItems() = localDataSource.observePortListItems()
 
    fun getPorts(

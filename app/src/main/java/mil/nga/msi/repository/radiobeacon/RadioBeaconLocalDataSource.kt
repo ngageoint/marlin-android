@@ -7,7 +7,8 @@ import javax.inject.Inject
 class RadioBeaconLocalDataSource @Inject constructor(
    private val dao: RadioBeaconDao
 ) {
-   fun observeRadioBeaconListItems() = dao.getRadioBeaconListItems()
+   fun observeRadioBeaconMapItems() = dao.observeRadioBeaconMapItems()
+   fun observeRadioBeaconListItems() = dao.observeRadioBeaconListItems()
 
    fun observeRadioBeacon(
       volumeNumber: String,

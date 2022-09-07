@@ -43,7 +43,7 @@ interface AsamDao {
    @RewriteQueriesToDropUnusedColumns
    fun getAsamListItems(): PagingSource<Int, AsamListItem>
 
-   @Query("SELECT * FROM asams")
+   @Query("SELECT * FROM asams ORDER BY reference")
    @RewriteQueriesToDropUnusedColumns
    fun observeAsamMapItems(): Flow<List<AsamMapItem>>
 

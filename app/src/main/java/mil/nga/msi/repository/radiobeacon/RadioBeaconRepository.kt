@@ -12,6 +12,7 @@ class RadioBeaconRepository @Inject constructor(
    private val localDataSource: RadioBeaconLocalDataSource,
    private val remoteDataSource: RadioBeaconRemoteDataSource
 ) {
+   val radioBeaconMapItems = localDataSource.observeRadioBeaconMapItems()
    fun getRadioBeaconListItems() = localDataSource.observeRadioBeaconListItems()
 
    fun observeRadioBeacon(

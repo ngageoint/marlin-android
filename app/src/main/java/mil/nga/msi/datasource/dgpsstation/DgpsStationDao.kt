@@ -10,12 +10,12 @@ interface DgpsStationDao {
    suspend fun insert(dgpsStation: DgpsStation)
 
    @Insert(onConflict = OnConflictStrategy.REPLACE)
-   suspend fun insert(lights: List<DgpsStation>)
+   suspend fun insert(dgpsStations: List<DgpsStation>)
 
    @Update(onConflict = OnConflictStrategy.REPLACE)
-   suspend fun update(light: DgpsStation)
+   suspend fun update(dgpsStation: DgpsStation)
 
-   @Query("SELECT * FROM lights")
+   @Query("SELECT * FROM dgps_stations")
    suspend fun getDgpsStations(): List<DgpsStation>
 
    @Query("SELECT * FROM dgps_stations WHERE latitude >= :minLatitude AND latitude <= :maxLatitude AND longitude >= :minLongitude AND longitude <= :maxLongitude")
@@ -38,4 +38,8 @@ interface DgpsStationDao {
    @Query("SELECT * FROM dgps_stations ORDER BY section_header ASC, feature_number ASC")
    @RewriteQueriesToDropUnusedColumns
    fun getDgpsListItems(): PagingSource<Int, DgpsStationListItem>
+
+   @Query("SELECT * FROM dgps_stations ORDER BY section_header ASC, feature_number ASC")
+   @RewriteQueriesToDropUnusedColumns
+   fun getDgpsMapItems(): PagingSource<Int, DgpsStationMapItem>
 }

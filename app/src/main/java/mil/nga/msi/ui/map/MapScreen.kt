@@ -40,7 +40,7 @@ import mil.nga.msi.ui.map.cluster.MapAnnotation
 import kotlin.math.roundToInt
 
 
-// TODO invalidate tiles if new data source data comes in
+// TODO better way to detect individual tile provider change
 // TODO ASAM and MODU icons as tile images
 
 @OptIn(ExperimentalPermissionsApi::class)
@@ -111,13 +111,13 @@ fun MapScreen(
                   destination = null
                }
                scope.launch {
-                  val location = MapLocation.newBuilder()
+                  val mapLocation = MapLocation.newBuilder()
                      .setLatitude(position.target.latitude)
                      .setLongitude(position.target.longitude)
                      .setZoom(position.zoom.toDouble())
                      .build()
 
-                  mapViewModel.setMapLocation(location, position.zoom.toInt())
+                  mapViewModel.setMapLocation(mapLocation, position.zoom.toInt())
                }
             },
             onMapClick = { latLng, zoom, region ->
@@ -273,9 +273,7 @@ private fun Map(
             }
          }
 
-         tileProviders.forEach { tileProvider ->
-            TileOverlay(tileProvider = tileProvider )
-         }
+         tileProviders.forEach { TileOverlay(tileProvider = it ) }
       }
 
       MapEffect(null) { map ->

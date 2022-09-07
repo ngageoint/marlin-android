@@ -7,15 +7,15 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface RadioBeaconDao {
    @Insert(onConflict = OnConflictStrategy.REPLACE)
-   suspend fun insert(light: RadioBeacon)
+   suspend fun insert(beacon: RadioBeacon)
 
    @Insert(onConflict = OnConflictStrategy.REPLACE)
-   suspend fun insert(lights: List<RadioBeacon>)
+   suspend fun insert(beacons: List<RadioBeacon>)
 
    @Update(onConflict = OnConflictStrategy.REPLACE)
-   suspend fun update(light: RadioBeacon)
+   suspend fun update(beacon: RadioBeacon)
 
-   @Query("SELECT * FROM lights")
+   @Query("SELECT * FROM radio_beacons")
    suspend fun getRadioBeacons(): List<RadioBeacon>
 
    @Query("SELECT * FROM radio_beacons WHERE latitude >= :minLatitude AND latitude <= :maxLatitude AND longitude >= :minLongitude AND longitude <= :maxLongitude")
@@ -37,5 +37,9 @@ interface RadioBeaconDao {
 
    @Query("SELECT * FROM radio_beacons ORDER BY section_header ASC, feature_number ASC")
    @RewriteQueriesToDropUnusedColumns
-   fun getRadioBeaconListItems(): PagingSource<Int, RadioBeaconListItem>
+   fun observeRadioBeaconListItems(): PagingSource<Int, RadioBeaconListItem>
+
+   @Query("SELECT * FROM radio_beacons ORDER BY volume_number, feature_number")
+   @RewriteQueriesToDropUnusedColumns
+   fun observeRadioBeaconMapItems(): Flow<List<RadioBeaconMapItem>>
 }

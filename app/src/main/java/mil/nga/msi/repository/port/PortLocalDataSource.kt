@@ -8,7 +8,8 @@ class PortLocalDataSource @Inject constructor(
    private val dao: PortDao
 ) {
    fun observePort(portNumber: Int) = dao.observePort(portNumber)
-   fun observePortListItems() = dao.getPortListItems()
+   fun observePortMapItems() = dao.observePortMapItems()
+   fun observePortListItems() = dao.observePortListItems()
 
    suspend fun getPort(portNumber: Int) = dao.getPort(portNumber)
    suspend fun getPorts(): List<Port> = dao.getPorts()

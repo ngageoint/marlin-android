@@ -1,7 +1,6 @@
 package mil.nga.msi.repository.asam
 
 import android.app.Application
-import android.util.Log
 import androidx.work.*
 import mil.nga.msi.MarlinNotification
 import mil.nga.msi.datasource.asam.Asam
@@ -35,7 +34,6 @@ class AsamRepository @Inject constructor(
          val new = asams.size - localDataSource.existingAsams(asams.map { it.reference })
          MarlinNotification.asam(application.applicationContext, new)
          localDataSource.insert(asams)
-         Log.i("Billy", "Inserted asams is $new")
       }
 
       return localDataSource.getAsams()

@@ -12,6 +12,7 @@ class LightRepository @Inject constructor(
    private val localDataSource: LightLocalDataSource,
    private val remoteDataSource: LightRemoteDataSource
 ) {
+   val lightMapItems = localDataSource.observeLightMapItems()
    fun getLightListItems() = localDataSource.observeLightListItems()
 
    fun observeLight(
@@ -42,8 +43,8 @@ class LightRepository @Inject constructor(
 
    suspend fun fetchLights(refresh: Boolean = false): List<Light> {
       if (refresh) {
-         PublicationVolume.values().forEach { lightVolume ->
-            val lights = remoteDataSource.fetchLights(lightVolume)
+         PublicationVolume.values().forEach { volume ->
+            val lights = remoteDataSource.fetchLights(volume)
             localDataSource.insert(lights)
          }
       }

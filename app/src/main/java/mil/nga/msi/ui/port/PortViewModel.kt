@@ -23,6 +23,6 @@ class PortViewModel @Inject constructor(
    val baseMap = userPreferencesRepository.baseMapType.asLiveData()
 
    fun getPort(portNumber: Int): LiveData<Port> {
-      return repository.observePort(portNumber)
+      return repository.observePort(portNumber).asLiveData()
    }
 }

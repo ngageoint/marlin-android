@@ -11,10 +11,10 @@ interface ModuDao {
    suspend fun insert(modu: Modu)
 
    @Insert(onConflict = OnConflictStrategy.REPLACE)
-   suspend fun insert(asams: List<Modu>)
+   suspend fun insert(modus: List<Modu>)
 
    @Update(onConflict = OnConflictStrategy.REPLACE)
-   suspend fun update(asam: Modu)
+   suspend fun update(modu: Modu)
 
    @Query("SELECT * FROM modus")
    fun observeModus(): Flow<List<Modu>>
@@ -35,7 +35,7 @@ interface ModuDao {
    @RewriteQueriesToDropUnusedColumns
    fun getModuListItems(): PagingSource<Int, ModuListItem>
 
-   @Query("SELECT * FROM modus")
+   @Query("SELECT * FROM modus ORDER BY name")
    @RewriteQueriesToDropUnusedColumns
    fun observeModuMapItems(): Flow<List<ModuMapItem>>
 

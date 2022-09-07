@@ -1,9 +1,11 @@
 package mil.nga.msi.ui.map
 
+import android.app.Application
 import androidx.lifecycle.*
 import com.google.android.gms.maps.model.TileProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.withContext
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.asam.AsamMapItem
@@ -12,6 +14,7 @@ import mil.nga.msi.location.LocationPolicy
 import mil.nga.msi.repository.asam.AsamRepository
 import mil.nga.msi.repository.light.LightKey
 import mil.nga.msi.repository.light.LightRepository
+import mil.nga.msi.repository.map.*
 import mil.nga.msi.repository.modu.ModuRepository
 import mil.nga.msi.repository.port.PortRepository
 import mil.nga.msi.repository.preferences.UserPreferencesRepository
@@ -19,32 +22,35 @@ import mil.nga.msi.repository.radiobeacon.RadioBeaconKey
 import mil.nga.msi.repository.radiobeacon.RadioBeaconRepository
 import mil.nga.msi.type.MapLocation
 import mil.nga.msi.ui.map.cluster.MapAnnotation
+import mil.nga.msi.ui.map.overlay.*
 import javax.inject.Inject
 import javax.inject.Named
 
 @HiltViewModel
 class MapViewModel @Inject constructor(
+   private val application: Application,
    val asamRepository: AsamRepository,
+   val asamTileRepository: AsamTileRepository,
    val moduRepository: ModuRepository,
+   private val moduTileRepository: ModuTileRepository,
    val lightRepository: LightRepository,
+   private val lightTileRepository: LightTileRepository,
    val portRepository: PortRepository,
+   private val portTileRepository: PortTileRepository,
+   private val beaconRepository: RadioBeaconRepository,
+   private val beaconTileRepository: RadioBeaconTileRepository,
    val locationPolicy: LocationPolicy,
    val userPreferencesRepository: UserPreferencesRepository,
-   private val beaconRepository: RadioBeaconRepository,
    @Named("osmTileProvider") private val osmTileProvider: TileProvider,
    @Named("mgrsTileProvider") private val mgrsTileProvider: TileProvider,
    @Named("garsTileProvider") private val garsTileProvider: TileProvider,
-   @Named("asamTileProvider") private val asamTileProvider: TileProvider,
-   @Named("moduTileProvider") private val moduTileProvider: TileProvider,
-   @Named("lightTileProvider") private val lightTileProvider: TileProvider,
-   @Named("portTileProvider") private val portTileProvider: TileProvider,
-   @Named("radioBeaconTileProvider") private val radioBeaconTileProvider: TileProvider
 ): ViewModel() {
 
    val baseMap = userPreferencesRepository.baseMapType.asLiveData()
    val mapLocation = userPreferencesRepository.mapLocation.asLiveData()
    private val _zoom = MutableLiveData<Int>()
    private val mapped = userPreferencesRepository.mapped.asLiveData()
+
 
    suspend fun setMapLocation(mapLocation: MapLocation, zoom: Int) {
       _zoom.value = zoom
@@ -53,6 +59,11 @@ class MapViewModel @Inject constructor(
 
    private val _tileProviders = MediatorLiveData<Set<TileProvider>>()
    val tileProviders: LiveData<Set<TileProvider>> = _tileProviders
+   private var asamTileProvider = AsamTileProvider(application, asamTileRepository)
+   private var moduTileProvider = ModuTileProvider(application, moduTileRepository)
+   private var portTileProvider = PortTileProvider(application, portTileRepository)
+   private var beaconTileProvider = RadioBeaconTileProvider(application, beaconTileRepository)
+   private var lightTileProvider = LightTileProvider(application, lightTileRepository)
    init {
       _tileProviders.addSource(userPreferencesRepository.mgrs.asLiveData()) { enabled ->
          val providers = _tileProviders.value?.toMutableSet() ?: mutableSetOf()
@@ -82,36 +93,98 @@ class MapViewModel @Inject constructor(
          val providers = _tileProviders.value?.toMutableSet() ?: mutableSetOf()
 
          if (mapped[DataSource.ASAM] == true) {
+            providers.remove(asamTileProvider)
+            asamTileProvider = AsamTileProvider(application, asamTileRepository)
             providers.add(asamTileProvider)
          } else {
             providers.remove(asamTileProvider)
          }
 
          if (mapped[DataSource.MODU] == true) {
+            providers.remove(moduTileProvider)
+            moduTileProvider = ModuTileProvider(application, moduTileRepository)
             providers.add(moduTileProvider)
          } else {
             providers.remove(moduTileProvider)
          }
 
          if (mapped[DataSource.LIGHT] == true) {
+            providers.remove(lightTileProvider)
+            lightTileProvider = LightTileProvider(application, lightTileRepository)
             providers.add(lightTileProvider)
          } else {
             providers.remove(lightTileProvider)
          }
 
          if (mapped[DataSource.PORT] == true) {
+            providers.remove(portTileProvider)
+            portTileProvider = PortTileProvider(application, portTileRepository)
             providers.add(portTileProvider)
          } else {
             providers.remove(portTileProvider)
          }
 
          if (mapped[DataSource.RADIO_BEACON] == true) {
-            providers.add(radioBeaconTileProvider)
+            providers.remove(beaconTileProvider)
+            beaconTileProvider = RadioBeaconTileProvider(application, beaconTileRepository)
+            providers.add(beaconTileProvider)
          } else {
-            providers.remove(radioBeaconTileProvider)
+            providers.remove(beaconTileProvider)
          }
 
          _tileProviders.value = providers
+      }
+
+      _tileProviders.addSource(asamRepository.asamMapItems.distinctUntilChanged().asLiveData()) {
+         if (mapped.value?.get(DataSource.ASAM) == true) {
+            val providers = _tileProviders.value?.toMutableSet() ?: mutableSetOf()
+            providers.remove(asamTileProvider)
+            asamTileProvider = AsamTileProvider(application, asamTileRepository)
+            providers.add(asamTileProvider)
+            _tileProviders.value = providers
+         }
+      }
+
+      _tileProviders.addSource(moduRepository.moduMapItems.distinctUntilChanged().asLiveData()) {
+         if (mapped.value?.get(DataSource.MODU) == true) {
+            if (mapped.value?.get(DataSource.MODU) == true) {
+               val providers = _tileProviders.value?.toMutableSet() ?: mutableSetOf()
+               providers.remove(moduTileProvider)
+               moduTileProvider = ModuTileProvider(application, moduTileRepository)
+               providers.add(moduTileProvider)
+               _tileProviders.value = providers
+            }
+         }
+      }
+
+      _tileProviders.addSource(lightRepository.lightMapItems.distinctUntilChanged().asLiveData()) {
+         if (mapped.value?.get(DataSource.LIGHT) == true) {
+            val providers = _tileProviders.value?.toMutableSet() ?: mutableSetOf()
+            providers.remove(lightTileProvider)
+            lightTileProvider = LightTileProvider(application, lightTileRepository)
+            providers.add(lightTileProvider)
+            _tileProviders.value = providers
+         }
+      }
+
+      _tileProviders.addSource(portRepository.portMapItems.distinctUntilChanged().asLiveData()) {
+         if (mapped.value?.get(DataSource.PORT) == true) {
+            val providers = _tileProviders.value?.toMutableSet() ?: mutableSetOf()
+            providers.remove(portTileProvider)
+            portTileProvider = PortTileProvider(application, portTileRepository)
+            providers.add(portTileProvider)
+            _tileProviders.value = providers
+         }
+      }
+
+      _tileProviders.addSource(beaconRepository.radioBeaconMapItems.distinctUntilChanged().asLiveData()) {
+         if (mapped.value?.get(DataSource.RADIO_BEACON) == true) {
+            val providers = _tileProviders.value?.toMutableSet() ?: mutableSetOf()
+            providers.remove(beaconTileProvider)
+            beaconTileProvider = RadioBeaconTileProvider(application, beaconTileRepository)
+            providers.add(beaconTileProvider)
+            _tileProviders.value = providers
+         }
       }
    }
 

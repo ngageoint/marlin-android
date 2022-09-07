@@ -1,8 +1,8 @@
 package mil.nga.msi.datasource.port
 
-import androidx.lifecycle.LiveData
 import androidx.paging.PagingSource
 import androidx.room.*
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface PortDao {
@@ -16,7 +16,7 @@ interface PortDao {
    suspend fun update(port: Port)
 
    @Query("SELECT * FROM ports WHERE port_number = :portNumber")
-   fun observePort(portNumber: Int): LiveData<Port>
+   fun observePort(portNumber: Int): Flow<Port>
 
    @Query("SELECT * FROM ports")
    suspend fun getPorts(): List<Port>
@@ -34,5 +34,8 @@ interface PortDao {
 
    @Query("SELECT * FROM ports ORDER BY port_name ASC")
    @RewriteQueriesToDropUnusedColumns
-   fun getPortListItems(): PagingSource<Int, PortListItem>
+   fun observePortListItems(): PagingSource<Int, PortListItem>
+
+   @Query("SELECT * FROM ports ORDER BY port_number")
+   fun observePortMapItems(): Flow<List<PortMapItem>>
 }

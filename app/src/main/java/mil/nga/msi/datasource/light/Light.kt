@@ -105,7 +105,7 @@ data class Light(
    var sectionHeader: String = ""
 
    @Transient
-   val dms = DMS.from(LatLng(latitude, longitude))
+   val dms = DMS.from(LatLng(latitude.toDouble(), longitude.toDouble()))
 
    fun isFogSignal(): Boolean {
       return remarks?.contains("bl.", ignoreCase = true) ?: false
