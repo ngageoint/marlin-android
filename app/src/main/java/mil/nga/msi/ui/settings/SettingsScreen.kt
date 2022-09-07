@@ -7,7 +7,7 @@ import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -18,15 +18,15 @@ import mil.nga.msi.ui.theme.screenBackground
 
 @Composable
 fun SettingsScreen(
-   openDrawer: () -> Unit,
+   close: () -> Unit,
    onDisclaimer: () -> Unit,
    onAbout: () -> Unit
 ) {
    Column(modifier = Modifier.fillMaxSize()) {
       TopBar(
          title = SettingsRoute.Main.title,
-         buttonIcon = Icons.Filled.Menu,
-         onButtonClicked = { openDrawer() }
+         buttonIcon = Icons.Filled.Close,
+         onButtonClicked = { close() }
       )
 
       Settings(

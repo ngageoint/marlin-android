@@ -33,7 +33,7 @@ fun NavGraphBuilder.settingsGraph(
          bottomBarVisibility(true)
 
          SettingsScreen(
-            openDrawer = { openNavigationDrawer() },
+            close = { navController.popBackStack() },
             onDisclaimer = {
                navController.navigate(SettingsRoute.Disclaimer.name)
             },
