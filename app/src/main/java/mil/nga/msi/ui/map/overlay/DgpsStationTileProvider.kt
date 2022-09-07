@@ -81,7 +81,7 @@ class DgpsStationTile(
       canvas.drawBitmap(
          icon.toBitmap(),
          null,
-         Rect(size - iconSize, size - iconSize, iconSize, iconSize)
+         Rect(size - iconSize, size - iconSize, iconSize, iconSize),
          null
       )
 
