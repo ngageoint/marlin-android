@@ -15,20 +15,20 @@ class RadioBeaconTileProvider @Inject constructor(
    val repository: RadioBeaconTileRepository
 ) : DataSourceTileProvider(application, repository)
 
-class RadioBeaconTile(
+class RadioBeaconImage(
    private val beacon: RadioBeacon
-): Tileable {
+): DataSourceImage {
    override val latitude = beacon.latitude
    override val longitude = beacon.longitude
 
-   override fun tile(context: Context, zoom: Int): List<Bitmap> {
-      val tile = if (zoom < 13) {
+   override fun image(context: Context, zoom: Int): List<Bitmap> {
+      val image = if (zoom < 13) {
          radioBeaconSectorImageSmall(context)
       } else {
          sectorImageLarge(context, beacon)
       }
 
-      return listOf(tile)
+      return listOf(image)
    }
 
    private fun radioBeaconSectorImageSmall(

@@ -19,6 +19,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.TileProvider
 import mil.nga.msi.R
 import mil.nga.msi.coordinate.DMS
 import mil.nga.msi.datasource.asam.Asam
@@ -52,6 +53,7 @@ fun AsamDetailScreen(
       AsamDetailContent(
          asam = asam,
          baseMap = baseMap,
+         tileProvider = viewModel.tileProvider,
          onZoom = { onAction(AsamAction.Zoom(it)) },
          onShare = { onAction(AsamAction.Share(asam.toString())) },
          onCopyLocation = { onAction(AsamAction.Location(it)) }
@@ -63,6 +65,7 @@ fun AsamDetailScreen(
 private fun AsamDetailContent(
    asam: Asam?,
    baseMap: BaseMapType?,
+   tileProvider: TileProvider,
    onZoom: (Point) -> Unit,
    onShare: () -> Unit,
    onCopyLocation: (String) -> Unit
@@ -77,7 +80,14 @@ private fun AsamDetailContent(
                .padding(all = 8.dp)
                .verticalScroll(rememberScrollState())
          ) {
-            AsamHeader(asam, baseMap, onZoom, onShare, onCopyLocation)
+            AsamHeader(
+               asam = asam,
+               baseMap = baseMap,
+               tileProvider = tileProvider,
+               onZoom = onZoom,
+               onShare = onShare,
+               onCopyLocation = onCopyLocation
+            )
             AsamDescription(asam.description)
             AsamInformation(asam)
          }
@@ -89,6 +99,7 @@ private fun AsamDetailContent(
 private fun AsamHeader(
    asam: Asam,
    baseMap: BaseMapType?,
+   tileProvider: TileProvider,
    onZoom: (Point) -> Unit,
    onShare: () -> Unit,
    onCopyLocation: (String) -> Unit
@@ -97,7 +108,7 @@ private fun AsamHeader(
       Column {
          MapClip(
             latLng = LatLng(asam.latitude, asam.longitude),
-            icon = R.drawable.asam_map_marker_24dp,
+            tileProvider = tileProvider,
             baseMap = baseMap
          )
 

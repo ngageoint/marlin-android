@@ -19,6 +19,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.TileProvider
 import mil.nga.msi.R
 import mil.nga.msi.coordinate.DMS
 import mil.nga.msi.datasource.modu.Modu
@@ -53,6 +54,7 @@ fun ModuDetailScreen(
       ModuDetailContent(
          modu = modu,
          baseMap = baseMap,
+         tileProvider = viewModel.tileProvider,
          onZoom = { modu?.let { onAction(ModuAction.Zoom(Point(it.latitude, it.latitude))) } },
          onShare = { onAction(ModuAction.Share(modu.toString())) },
          onCopyLocation = { onAction(ModuAction.Location(it)) }
@@ -64,6 +66,7 @@ fun ModuDetailScreen(
 private fun ModuDetailContent(
    modu: Modu?,
    baseMap: BaseMapType?,
+   tileProvider: TileProvider,
    onZoom: () -> Unit,
    onShare: () -> Unit,
    onCopyLocation: (String) -> Unit,
@@ -78,7 +81,7 @@ private fun ModuDetailContent(
                .padding(all = 8.dp)
                .verticalScroll(rememberScrollState())
          ) {
-            ModuHeader(modu, baseMap, onZoom, onShare, onCopyLocation)
+            ModuHeader(modu, baseMap, tileProvider, onZoom, onShare, onCopyLocation)
             ModuInformation(modu)
          }
       }
@@ -89,6 +92,7 @@ private fun ModuDetailContent(
 private fun ModuHeader(
    modu: Modu,
    baseMap: BaseMapType?,
+   tileProvider: TileProvider,
    onZoom: () -> Unit,
    onShare: () -> Unit,
    onCopyLocation: (String) -> Unit,
@@ -99,7 +103,7 @@ private fun ModuHeader(
       Column {
          MapClip(
             latLng = LatLng(modu.latitude, modu.longitude),
-            icon = R.drawable.modu_map_marker_24dp,
+            tileProvider = tileProvider,
             baseMap = baseMap
          )
 

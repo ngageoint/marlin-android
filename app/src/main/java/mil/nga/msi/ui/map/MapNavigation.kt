@@ -1,16 +1,11 @@
 package mil.nga.msi.ui.map
 
 import android.net.Uri
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import com.google.accompanist.navigation.material.bottomSheet
@@ -59,21 +54,11 @@ fun NavGraphBuilder.mapGraph(
       )
    ) { backstackEntry ->
       bottomBarVisibility(true)
-      var selectedAnnotation by remember { mutableStateOf<MapAnnotation?>(null) }
       val mapDestination = backstackEntry.arguments?.getParcelable<Point?>("point")?.asMapLocation(16f)
 
-      val navBackStackEntry by navController.currentBackStackEntryAsState()
-      val route = navBackStackEntry?.destination?.route
-      if (route?.startsWith(AsamRoute.Sheet.name) != true &&
-         route?.startsWith(ModuRoute.Sheet.name) != true) {
-         selectedAnnotation = null
-      }
-
       MapScreen(
-         selectedAnnotation = selectedAnnotation,
          mapDestination = mapDestination,
          onAnnotationClick = { annotation ->
-            selectedAnnotation = annotation
             when (annotation.key.type) {
                MapAnnotation.Type.ASAM ->  {
                   navController.navigate(AsamRoute.Sheet.name + "?reference=${annotation.key.id}")

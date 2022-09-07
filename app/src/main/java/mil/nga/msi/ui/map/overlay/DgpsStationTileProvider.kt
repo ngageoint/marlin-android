@@ -20,23 +20,23 @@ class DgpsStationTileProvider @Inject constructor(
    val repository: DgpsStationTileRepository
 ) : DataSourceTileProvider(application, repository)
 
-class DgpsStationTile(
+class DgpsStationImage(
    dgpsStation: DgpsStation
-): Tileable {
+): DataSourceImage {
    override val latitude = dgpsStation.latitude
    override val longitude = dgpsStation.longitude
 
-   override fun tile(context: Context, zoom: Int): List<Bitmap> {
-      val tile =  if (zoom < 13) {
-         dgpsStationTile(context)
+   override fun image(context: Context, zoom: Int): List<Bitmap> {
+      val image =  if (zoom < 13) {
+         dgpsStationImage(context)
       } else {
-         dgpsStationIconTile(context)
+         dgpsStationIconImage(context)
       }
 
-      return listOf(tile)
+      return listOf(image)
    }
 
-   private fun dgpsStationTile(
+   private fun dgpsStationImage(
       context: Context
    ): Bitmap {
       val size = (context.resources.displayMetrics.density * 12).toInt()
@@ -58,7 +58,7 @@ class DgpsStationTile(
       return bitmap
    }
 
-   private fun dgpsStationIconTile(
+   private fun dgpsStationIconImage(
       context: Context
    ): Bitmap {
       val size = (context.resources.displayMetrics.density * 24).toInt()
@@ -84,7 +84,6 @@ class DgpsStationTile(
          Rect(size - iconSize, size - iconSize, iconSize, iconSize),
          null
       )
-
 
       return bitmap
    }

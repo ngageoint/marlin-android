@@ -20,7 +20,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.TileProvider
-import mil.nga.msi.R
 import mil.nga.msi.coordinate.DMS
 import mil.nga.msi.datasource.dgpsstation.DgpsStation
 import mil.nga.msi.repository.dgpsstation.DgpsStationKey
@@ -99,7 +98,7 @@ private fun DgpsStationHeader(
       Column {
          MapClip(
             latLng = LatLng(dgpsStation.latitude, dgpsStation.longitude),
-            icon = R.drawable.asam_map_marker_24dp,
+            tileProvider = tileProvider,
             baseMap = baseMap
          )
 

@@ -13,13 +13,13 @@ class LightTileProvider @Inject constructor(
    val repository: LightTileRepository
 ) : DataSourceTileProvider(application, repository)
 
-class LightTile(
+class LightImage(
    private val light: Light
-): Tileable {
+): DataSourceImage {
    override val latitude = light.latitude
    override val longitude = light.longitude
 
-   override fun tile(context: Context, zoom: Int): List<Bitmap> {
+   override fun image(context: Context, zoom: Int): List<Bitmap> {
       val images = mutableListOf<Bitmap>()
 
       if (light.isFogSignal()) {

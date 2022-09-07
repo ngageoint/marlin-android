@@ -19,14 +19,14 @@ interface TileRepository {
       maxLatitude: Double,
       minLongitude: Double,
       maxLongitude: Double
-   ): List<Tileable>
+   ): List<DataSourceImage>
 }
 
-interface Tileable {
+interface DataSourceImage {
    val latitude: Double
    val longitude: Double
 
-   fun tile(context: Context, zoom: Int): List<Bitmap>
+   fun image(context: Context, zoom: Int): List<Bitmap>
 }
 
 open class DataSourceTileProvider(
@@ -73,7 +73,7 @@ open class DataSourceTileProvider(
       val canvas = Canvas(bitmap)
 
       items.forEach { item ->
-         item.tile(application, z).forEach { image ->
+         item.image(application, z).forEach { image ->
             val webMercator = Point(item.longitude, item.latitude).wgs84ToWebMercator()
             val xPosition = (((webMercator.x - minTileX) / (maxTileX - minTileX)) * width)
             val yPosition = height - (((webMercator.y - minTileY) / (maxTileY - minTileY)) * height)

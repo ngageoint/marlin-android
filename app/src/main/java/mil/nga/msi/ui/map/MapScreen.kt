@@ -1,9 +1,6 @@
 package mil.nga.msi.ui.map
 
 import android.Manifest
-import android.animation.ValueAnimator
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.FloatingActionButton
@@ -18,9 +15,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.core.animation.doOnEnd
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
@@ -35,9 +30,7 @@ import kotlinx.coroutines.launch
 import mil.nga.msi.type.MapLocation
 import mil.nga.msi.ui.location.LocationPermission
 import mil.nga.msi.ui.main.TopBar
-import mil.nga.msi.ui.map.cluster.ClusterManager
 import mil.nga.msi.ui.map.cluster.MapAnnotation
-import kotlin.math.roundToInt
 
 // TODO better way to detect individual tile provider change
 // TODO ASAM and MODU icons as tile images
@@ -45,7 +38,6 @@ import kotlin.math.roundToInt
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun MapScreen(
-   selectedAnnotation: MapAnnotation?,
    mapDestination : MapLocation? = null,
    onAnnotationClick: (MapAnnotation) -> Unit,
    onAnnotationsClick: (Collection<MapAnnotation>) -> Unit,
@@ -57,7 +49,6 @@ fun MapScreen(
    val baseMap by mapViewModel.baseMap.observeAsState()
    val mapOrigin by mapViewModel.mapLocation.observeAsState()
    var destination by remember { mutableStateOf(mapDestination) }
-   val annotations by mapViewModel.mapAnnotations.observeAsState(emptyList())
    val location by mapViewModel.locationPolicy.bestLocationProvider.observeAsState()
    var located by remember { mutableStateOf(false) }
    val tileProviders by mapViewModel.tileProviders.observeAsState(emptySet())
@@ -94,16 +85,12 @@ fun MapScreen(
 
       Box(Modifier.fillMaxWidth()) {
          Map(
-            selectedAnnotation,
             origin,
             destination,
             baseMap,
             locationSource,
             locationPermissionState.status.isGranted,
             tileProviders,
-            annotations,
-            onAnnotationClick = { onAnnotationClick.invoke(it) },
-            onAnnotationsClick = { onAnnotationsClick.invoke(it) },
             onMapMove = { position, reason ->
                if (reason == GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE) {
                   located = false
@@ -204,18 +191,14 @@ fun MapScreen(
 @OptIn(MapsComposeExperimentalApi::class)
 @Composable
 private fun Map(
-   selectedAnnotation: MapAnnotation?,
    origin: MapLocation?,
    destination: MapLocation?,
    baseMap: BaseMapType?,
    locationSource: LocationSource,
    locationEnabled: Boolean,
    tileProviders: Set<TileProvider>,
-   annotations: List<MapAnnotation>,
    onMapMove: (CameraPosition, Int) -> Unit,
-   onMapClick: (LatLng, Float, VisibleRegion) -> Unit,
-   onAnnotationClick: (MapAnnotation) -> Unit,
-   onAnnotationsClick: (Collection<MapAnnotation>) -> Unit
+   onMapClick: (LatLng, Float, VisibleRegion) -> Unit
 ) {
    val scope = rememberCoroutineScope()
 
@@ -227,20 +210,6 @@ private fun Map(
       origin?.let { origin ->
          cameraPositionState.position = CameraPosition.fromLatLngZoom(LatLng(origin.latitude, origin.longitude), origin.zoom.toFloat())
       }
-   }
-
-   var previousAnnotations by remember { mutableStateOf(listOf<MapAnnotation>()) }
-
-   var selectedMarker by remember { mutableStateOf<Marker?>(null) }
-   var selectedAnimator by remember { mutableStateOf<ValueAnimator?>(null) }
-
-   if (selectedAnnotation == null) {
-      selectedAnimator?.doOnEnd {
-         selectedMarker?.remove()
-         selectedMarker = null
-      }
-      selectedAnimator?.reverse()
-      selectedAnimator = null
    }
 
    GoogleMap(
@@ -259,9 +228,6 @@ private fun Map(
       ),
       locationSource = locationSource
    ) {
-      val context = LocalContext.current
-      var clusterManager by remember { mutableStateOf<ClusterManager?>(null)}
-
       if (isMapLoaded) {
          LaunchedEffect(destination) {
             destination?.let { destination ->
@@ -288,99 +254,5 @@ private fun Map(
             onMapClick(latLng, map.cameraPosition.zoom, map.projection.visibleRegion)
          }
       }
-
-      MapEffect(annotations) { map ->
-         if (clusterManager == null) {
-            clusterManager = ClusterManager(context, map).apply {
-               setOnClusterItemClickListener { item ->
-                  onAnnotationClick(item)
-                  selectedAnimator = ValueAnimator.ofFloat(1f, 2f)
-                  selectedMarker = map.addMarker(MarkerOptions().apply {
-                     item.key.type.icon?.let { icon ->
-                        icon(BitmapDescriptorFactory.fromResource(icon))
-                     }
-                     position(item.position)
-                  })
-                  selectedMarker?.tag = item.key
-
-                  item.key.type.icon?.let { icon ->
-                     val bitmap = BitmapFactory.decodeResource(context.resources, icon)
-                     animateAnnotation(selectedMarker, selectedAnimator, bitmap)
-                  }
-
-                  animateMap(map, item.position)
-                  true
-               }
-
-               setOnClusterClickListener { cluster ->
-                  if (map.maxZoomLevel == map.cameraPosition.zoom) {
-                     onAnnotationsClick(cluster.items)
-                  } else {
-                     val builder = LatLngBounds.Builder()
-                     cluster.items.forEach { builder.include(it.position) }
-                     map.animateCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 20))
-                  }
-                  true
-               }
-            }
-         }
-
-         var updateCluster = false
-         clusterManager?.let { manager ->
-            val annotationSet = sortedSetOf(MapAnnotation.idComparator, *annotations.toTypedArray())
-            val previousAnnotationSet = sortedSetOf(MapAnnotation.idComparator, *previousAnnotations.toTypedArray())
-
-            // add new
-            annotationSet.minus(previousAnnotationSet).forEach {
-               manager.addItem(it)
-               updateCluster = true
-            }
-
-            // update existing
-            annotationSet.intersect(previousAnnotationSet).forEach { annotation ->
-               clusterManager?.getClusterItem(annotation.key)?.let {
-                  manager.removeItem(it)
-                  manager.addItem(annotation)
-               }
-
-               updateCluster = true
-            }
-
-            // remove old
-            previousAnnotationSet.minus(annotationSet).forEach {
-               manager.removeItem(it)
-               updateCluster = true
-            }
-
-            if (updateCluster) {
-               manager.cluster()
-               previousAnnotations = annotations
-            }
-         }
-      }
    }
-}
-
-private fun animateMap(map: GoogleMap, latLng: LatLng) {
-   val cameraUpdate = CameraUpdateFactory.newLatLng(latLng)
-   map.animateCamera(cameraUpdate)
-}
-
-private fun animateAnnotation(
-   marker: Marker?,
-   animator: ValueAnimator?,
-   bitmap: Bitmap
-) {
-   animator?.duration = 500
-   animator?.addUpdateListener { animation ->
-      val scale = animation.animatedValue as Float
-      val sizeX = (bitmap.width * scale).roundToInt()
-      val sizeY = (bitmap.height * scale).roundToInt()
-      val scaled =  Bitmap.createScaledBitmap(bitmap, sizeX, sizeY, false)
-
-      if (marker?.tag != null) {
-         marker.setIcon(BitmapDescriptorFactory.fromBitmap(scaled))
-      }
-   }
-   animator?.start()
 }
