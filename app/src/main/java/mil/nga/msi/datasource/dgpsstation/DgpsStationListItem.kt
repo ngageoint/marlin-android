@@ -9,7 +9,7 @@ data class DgpsStationListItem(
    @ColumnInfo(name = "volume_number") val volumeNumber: String,
    @ColumnInfo(name = "latitude") val latitude: Double,
    @ColumnInfo(name = "longitude") val longitude: Double,
-   @ColumnInfo(name = "station_remark") val stationRemark: String?
+   @ColumnInfo(name = "remarks") val remarks: String?
 ) {
    @ColumnInfo(name = "name")
    var name: String? = null

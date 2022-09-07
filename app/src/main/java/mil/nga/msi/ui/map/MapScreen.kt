@@ -39,7 +39,6 @@ import mil.nga.msi.ui.map.cluster.ClusterManager
 import mil.nga.msi.ui.map.cluster.MapAnnotation
 import kotlin.math.roundToInt
 
-
 // TODO better way to detect individual tile provider change
 // TODO ASAM and MODU icons as tile images
 

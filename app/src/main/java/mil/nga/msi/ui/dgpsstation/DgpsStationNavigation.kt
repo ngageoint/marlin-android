@@ -5,11 +5,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.navigation.*
 import androidx.navigation.compose.composable
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
+import com.google.accompanist.navigation.material.bottomSheet
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import mil.nga.msi.repository.dgpsstation.DgpsStationKey
 import mil.nga.msi.ui.dgpsstation.detail.DgpsStationDetailScreen
 import mil.nga.msi.ui.dgpsstation.list.DgpsStationsScreen
+import mil.nga.msi.ui.dgpsstation.sheet.DgpsStationSheetScreen
 import mil.nga.msi.ui.map.MapRoute
 import mil.nga.msi.ui.navigation.DgpsStation
 import mil.nga.msi.ui.navigation.Point
@@ -88,16 +90,16 @@ fun NavGraphBuilder.dgpsStationGraph(
          }
       }
 
-//      bottomSheet(
-//         route = "${RadioBeaconRoute.Sheet.name}?key={key}",
-//         arguments = listOf(navArgument("key") { type = NavType.RadioBeacon })
-//      ) { backstackEntry ->
-//         backstackEntry.arguments?.getParcelable<RadioBeaconKey>("key")?.let { key ->
-//            RadioBeaconSheetScreen(key, onDetails = {
-//               val encoded = Uri.encode(Json.encodeToString(key))
-//               navController.navigate( "${RadioBeaconRoute.Detail.name}?key=$encoded")
-//            })
-//         }
-//      }
+      bottomSheet(
+         route = "${DgpsStationRoute.Sheet.name}?key={key}",
+         arguments = listOf(navArgument("key") { type = NavType.DgpsStation })
+      ) { backstackEntry ->
+         backstackEntry.arguments?.getParcelable<DgpsStationKey>("key")?.let { key ->
+            DgpsStationSheetScreen(key, onDetails = {
+               val encoded = Uri.encode(Json.encodeToString(key))
+               navController.navigate( "${DgpsStationRoute.Detail.name}?key=$encoded")
+            })
+         }
+      }
    }
 }

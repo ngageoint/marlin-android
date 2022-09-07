@@ -39,7 +39,7 @@ interface DgpsStationDao {
    @RewriteQueriesToDropUnusedColumns
    fun getDgpsListItems(): PagingSource<Int, DgpsStationListItem>
 
-   @Query("SELECT * FROM dgps_stations ORDER BY section_header ASC, feature_number ASC")
+   @Query("SELECT * FROM dgps_stations ORDER BY volume_number ASC, feature_number ASC")
    @RewriteQueriesToDropUnusedColumns
-   fun getDgpsMapItems(): PagingSource<Int, DgpsStationMapItem>
+   fun getDgpsMapItems(): Flow<List<DgpsStationMapItem>>
 }

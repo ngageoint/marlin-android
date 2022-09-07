@@ -8,6 +8,7 @@ class DgpsStationLocalDataSource @Inject constructor(
    private val dao: DgpsStationDao
 ) {
    fun observeDgpsStationListItems() = dao.getDgpsListItems()
+   fun observeDgpsStationMapItems() = dao.getDgpsMapItems()
 
    fun observeDgpsStation(
       volumeNumber: String,

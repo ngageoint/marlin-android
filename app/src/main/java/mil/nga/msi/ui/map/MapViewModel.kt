@@ -12,6 +12,8 @@ import mil.nga.msi.datasource.asam.AsamMapItem
 import mil.nga.msi.datasource.modu.ModuMapItem
 import mil.nga.msi.location.LocationPolicy
 import mil.nga.msi.repository.asam.AsamRepository
+import mil.nga.msi.repository.dgpsstation.DgpsStationKey
+import mil.nga.msi.repository.dgpsstation.DgpsStationRepository
 import mil.nga.msi.repository.light.LightKey
 import mil.nga.msi.repository.light.LightRepository
 import mil.nga.msi.repository.map.*
@@ -39,6 +41,8 @@ class MapViewModel @Inject constructor(
    private val portTileRepository: PortTileRepository,
    private val beaconRepository: RadioBeaconRepository,
    private val beaconTileRepository: RadioBeaconTileRepository,
+   private val dgpsStationRepository: DgpsStationRepository,
+   private val dgpsStationTileRepository: DgpsStationTileRepository,
    val locationPolicy: LocationPolicy,
    val userPreferencesRepository: UserPreferencesRepository,
    @Named("osmTileProvider") private val osmTileProvider: TileProvider,
@@ -50,7 +54,6 @@ class MapViewModel @Inject constructor(
    val mapLocation = userPreferencesRepository.mapLocation.asLiveData()
    private val _zoom = MutableLiveData<Int>()
    private val mapped = userPreferencesRepository.mapped.asLiveData()
-
 
    suspend fun setMapLocation(mapLocation: MapLocation, zoom: Int) {
       _zoom.value = zoom
@@ -64,6 +67,7 @@ class MapViewModel @Inject constructor(
    private var portTileProvider = PortTileProvider(application, portTileRepository)
    private var beaconTileProvider = RadioBeaconTileProvider(application, beaconTileRepository)
    private var lightTileProvider = LightTileProvider(application, lightTileRepository)
+   private var dgpsTileProvider = DgpsStationTileProvider(application, dgpsStationTileRepository)
    init {
       _tileProviders.addSource(userPreferencesRepository.mgrs.asLiveData()) { enabled ->
          val providers = _tileProviders.value?.toMutableSet() ?: mutableSetOf()
@@ -132,6 +136,14 @@ class MapViewModel @Inject constructor(
             providers.remove(beaconTileProvider)
          }
 
+         if (mapped[DataSource.DGPS_STATION] == true) {
+            providers.remove(dgpsTileProvider)
+            dgpsTileProvider = DgpsStationTileProvider(application, dgpsStationTileRepository)
+            providers.add(dgpsTileProvider)
+         } else {
+            providers.remove(dgpsTileProvider)
+         }
+
          _tileProviders.value = providers
       }
 
@@ -183,6 +195,16 @@ class MapViewModel @Inject constructor(
             providers.remove(beaconTileProvider)
             beaconTileProvider = RadioBeaconTileProvider(application, beaconTileRepository)
             providers.add(beaconTileProvider)
+            _tileProviders.value = providers
+         }
+      }
+
+      _tileProviders.addSource(dgpsStationRepository.dgpsStationMapItems.distinctUntilChanged().asLiveData()) {
+         if (mapped.value?.get(DataSource.DGPS_STATION) == true) {
+            val providers = _tileProviders.value?.toMutableSet() ?: mutableSetOf()
+            providers.remove(dgpsTileProvider)
+            dgpsTileProvider = DgpsStationTileProvider(application, dgpsStationTileRepository)
+            providers.add(dgpsTileProvider)
             _tileProviders.value = providers
          }
       }
@@ -263,7 +285,7 @@ class MapViewModel @Inject constructor(
             }
       } else emptyList()
 
-      val beacons = if (dataSources[DataSource.PORT] == true) {
+      val beacons = if (dataSources[DataSource.RADIO_BEACON] == true) {
          beaconRepository
             .getRadioBeacons(minLatitude, maxLatitude, minLongitude, maxLongitude)
             .map { beacon ->
@@ -272,6 +294,15 @@ class MapViewModel @Inject constructor(
             }
       } else emptyList()
 
-      asams + modus + lights + ports + beacons
+      val dgps = if (dataSources[DataSource.DGPS_STATION] == true) {
+         dgpsStationRepository
+            .getDgpsStations(minLatitude, maxLatitude, minLongitude, maxLongitude)
+            .map { dgps ->
+               val key = MapAnnotation.Key(DgpsStationKey.fromDgpsStation(dgps).id(), MapAnnotation.Type.DGPS_STATION)
+               MapAnnotation(key, dgps.latitude, dgps.longitude)
+            }
+      } else emptyList()
+
+      asams + modus + lights + ports + beacons + dgps
    }
 }

@@ -23,5 +23,5 @@ enum class DataSource(
    LIGHT(LightRoute.Main, true, Color(0xFFFFC500), R.drawable.ic_baseline_lightbulb_24),
    PORT(PortRoute.Main, true, Color(0xFF5856d6), R.drawable.ic_baseline_anchor_24),
    RADIO_BEACON(RadioBeaconRoute.Main, true, Color(0xFF007BFF), R.drawable.ic_baseline_settings_input_antenna_24),
-   DGPS_STATION(DgpsStationRoute.Main, true, Color(0xFFFFB300), R.drawable.ic_baseline_settings_input_antenna_24)
+   DGPS_STATION(DgpsStationRoute.Main, true, Color(0xFFFFB300), R.drawable.ic_dgps_icon_24)
 }

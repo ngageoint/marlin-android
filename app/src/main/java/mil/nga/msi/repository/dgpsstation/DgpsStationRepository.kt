@@ -13,6 +13,7 @@ class DgpsStationRepository @Inject constructor(
    private val remoteDataSource: DgpsStationRemoteDataSource
 ) {
    fun getDgpsStationListItems() = localDataSource.observeDgpsStationListItems()
+   val dgpsStationMapItems = localDataSource.observeDgpsStationMapItems()
 
    fun observeDgpsStation(
       volumeNumber: String,
