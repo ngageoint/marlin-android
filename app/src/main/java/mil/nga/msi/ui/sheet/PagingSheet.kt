@@ -18,9 +18,11 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 import kotlinx.coroutines.launch
+import mil.nga.msi.repository.dgpsstation.DgpsStationKey
 import mil.nga.msi.repository.light.LightKey
 import mil.nga.msi.repository.radiobeacon.RadioBeaconKey
 import mil.nga.msi.ui.asam.sheet.AsamSheetScreen
+import mil.nga.msi.ui.dgpsstation.sheet.DgpsStationSheetScreen
 import mil.nga.msi.ui.light.sheet.LightSheetScreen
 import mil.nga.msi.ui.map.cluster.MapAnnotation
 import mil.nga.msi.ui.modu.sheet.ModuSheetScreen
@@ -178,9 +180,9 @@ private fun DgpsStationPage(
    id: String,
    onDetails: () -> Unit,
 ) {
-//   val key = RadioBeaconKey.fromId(id)
-//   RadioBeaconSheetScreen(
-//      key,
-//      onDetails = { onDetails() }
-//   )
+   val key = DgpsStationKey.fromId(id)
+   DgpsStationSheetScreen(
+      key,
+      onDetails = { onDetails() }
+   )
 }

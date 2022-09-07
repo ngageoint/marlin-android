@@ -129,10 +129,14 @@ fun NavGraphBuilder.mapGraph(
                   navController.navigate(PortRoute.Detail.name + "?portNumber=${annotation.key.id}")
                }
                MapAnnotation.Type.RADIO_BEACON -> {
-                  navController.navigate(RadioBeaconRoute.Detail.name + "?key=${annotation.key.id}")
+                  val key = RadioBeaconKey.fromId(annotation.key.id)
+                  val encoded = Uri.encode(Json.encodeToString(key))
+                  navController.navigate(RadioBeaconRoute.Detail.name + "?key=${encoded}")
                }
                MapAnnotation.Type.DGPS_STATION -> {
-                  navController.navigate(DgpsStationRoute.Detail.name + "?key=${annotation.key.id}")
+                  val key = DgpsStationKey.fromId(annotation.key.id)
+                  val encoded = Uri.encode(Json.encodeToString(key))
+                  navController.navigate(DgpsStationRoute.Detail.name + "?key=${encoded}")
                }
             }
          }
