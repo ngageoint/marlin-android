@@ -124,7 +124,7 @@ fun NavigationDrawer(
                   text = "Data Source Tabs (Drag to reorder, $MAX_TABS max.)",
                   style = MaterialTheme.typography.body2,
                   fontWeight = FontWeight.Medium,
-                  modifier = Modifier.padding(start = 8.dp, top = 16.dp, bottom = 16.dp)
+                  modifier = Modifier.padding(start = 8.dp, top = 32.dp, bottom = 16.dp)
                )
             }
          }
@@ -158,7 +158,7 @@ fun NavigationDrawer(
                   text = "Other Data Sources (Drag to add to tabs)",
                   style = MaterialTheme.typography.body2,
                   fontWeight = FontWeight.Medium,
-                  modifier = Modifier.padding(start = 8.dp, top = 16.dp, bottom = 16.dp)
+                  modifier = Modifier.padding(start = 8.dp, top = 32.dp, bottom = 16.dp)
                )
             }
          }
