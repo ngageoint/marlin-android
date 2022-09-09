@@ -13,15 +13,18 @@ class RadioBeaconRemoteDataSource @Inject constructor(
    suspend fun fetchRadioBeacons(publicationVolume: PublicationVolume): List<RadioBeacon> {
       val beacons = mutableListOf<RadioBeacon>()
 
-      val latestLight = localDataSource.getLatestRadioBeacon(publicationVolume.volumeTitle)
+      val latestBeacon = localDataSource.getLatestRadioBeacon(publicationVolume.volumeTitle)
       var minNoticeNumber: String? = ""
       var maxNoticeNumber: String? = ""
-      if (latestLight != null) {
+      if (latestBeacon != null) {
          val calendar = Calendar.getInstance()
          val year = calendar.get(Calendar.YEAR)
          val week = calendar.get(Calendar.WEEK_OF_YEAR)
 
-         minNoticeNumber = "${latestLight.noticeYear}${latestLight.noticeWeek}"
+         val minYear = latestBeacon.noticeYear
+         val minWeek = latestBeacon.noticeWeek.toInt()
+
+         minNoticeNumber = "${minYear}${"%02d".format(minWeek + 1)}"
          maxNoticeNumber = "${year}${"%02d".format(week + 1)}"
       }
 
@@ -33,7 +36,7 @@ class RadioBeaconRemoteDataSource @Inject constructor(
 
       if (filteredResponse.isSuccessful) {
          val body = filteredResponse.body()
-         if (latestLight != null && body?.isNotEmpty() == true) {
+         if (latestBeacon != null && body?.isNotEmpty() == true) {
             // Pull all radio beacons again and save to ensure regions are set correctly
             val response = service.getRadioBeacons(volume = publicationVolume.volumeQuery)
             if (response.isSuccessful) {

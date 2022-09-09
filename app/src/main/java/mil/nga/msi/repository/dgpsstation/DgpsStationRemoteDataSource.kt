@@ -21,7 +21,10 @@ class DgpsStationRemoteDataSource @Inject constructor(
          val year = calendar.get(Calendar.YEAR)
          val week = calendar.get(Calendar.WEEK_OF_YEAR)
 
-         minNoticeNumber = "${latestDgpsStation.noticeYear}${latestDgpsStation.noticeWeek}"
+         val minYear = latestDgpsStation.noticeYear
+         val minWeek = latestDgpsStation.noticeWeek.toInt()
+
+         minNoticeNumber = "${minYear}${"%02d".format(minWeek + 1)}"
          maxNoticeNumber = "${year}${"%02d".format(week + 1)}"
       }
 
