@@ -1,6 +1,7 @@
 package mil.nga.msi.repository.asam
 
 import android.app.Application
+import androidx.lifecycle.map
 import androidx.work.*
 import mil.nga.msi.MarlinNotification
 import mil.nga.msi.datasource.asam.Asam
@@ -72,6 +73,10 @@ class AsamRepository @Inject constructor(
          ExistingPeriodicWorkPolicy.KEEP,
          fetchRequest.build()
       )
+   }
+
+   val fetching = workManager.getWorkInfosForUniqueWorkLiveData(FETCH_LATEST_ASAMS_TASK).map { workInfo ->
+      workInfo.first()?.state == WorkInfo.State.RUNNING
    }
 
    companion object {

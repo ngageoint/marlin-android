@@ -1,5 +1,6 @@
 package mil.nga.msi.repository.modu
 
+import androidx.lifecycle.map
 import androidx.work.*
 import mil.nga.msi.datasource.modu.Modu
 import mil.nga.msi.work.modu.RefreshModuWorker
@@ -67,6 +68,10 @@ class ModuRepository @Inject constructor(
          ExistingPeriodicWorkPolicy.KEEP,
          fetchRequest.build()
       )
+   }
+
+   val fetching = workManager.getWorkInfosForUniqueWorkLiveData(FETCH_LATEST_MODUS_TASK).map { workInfo ->
+      workInfo.first()?.state == WorkInfo.State.RUNNING
    }
 
    companion object {

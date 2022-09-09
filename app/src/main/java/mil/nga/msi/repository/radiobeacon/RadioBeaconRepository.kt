@@ -1,5 +1,6 @@
 package mil.nga.msi.repository.radiobeacon
 
+import androidx.lifecycle.map
 import androidx.work.*
 import mil.nga.msi.datasource.light.PublicationVolume
 import mil.nga.msi.datasource.radiobeacon.RadioBeacon
@@ -76,6 +77,10 @@ class RadioBeaconRepository @Inject constructor(
          ExistingPeriodicWorkPolicy.KEEP,
          fetchRequest.build()
       )
+   }
+
+   val fetching = workManager.getWorkInfosForUniqueWorkLiveData(FETCH_LATEST_RADIO_BEACONS_TASK).map { workInfo ->
+      workInfo.first()?.state == WorkInfo.State.RUNNING
    }
 
    companion object {

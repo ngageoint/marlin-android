@@ -6,17 +6,21 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import mil.nga.msi.datasource.DataSource
+import mil.nga.msi.repository.DataSourceRepository
 import mil.nga.msi.repository.preferences.UserPreferencesRepository
 import javax.inject.Inject
 
 @HiltViewModel
 class NavigationViewModel @Inject constructor(
+   dataSourceRepository: DataSourceRepository,
    private val userPreferencesRepository: UserPreferencesRepository
 ): ViewModel() {
 
    val mapped = userPreferencesRepository.mapped.asLiveData()
    val tabs = userPreferencesRepository.tabs.asLiveData()
    val nonTabs = userPreferencesRepository.nonTabs.asLiveData()
+
+   val fetching = dataSourceRepository.fetching
 
    suspend fun toggleOnMap(dataSource: DataSource) {
      userPreferencesRepository.setMapped(dataSource)

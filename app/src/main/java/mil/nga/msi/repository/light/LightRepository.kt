@@ -1,5 +1,6 @@
 package mil.nga.msi.repository.light
 
+import androidx.lifecycle.map
 import androidx.work.*
 import mil.nga.msi.datasource.light.Light
 import mil.nga.msi.datasource.light.PublicationVolume
@@ -49,6 +50,7 @@ class LightRepository @Inject constructor(
          }
       }
 
+
       return localDataSource.getLights()
    }
 
@@ -85,6 +87,10 @@ class LightRepository @Inject constructor(
          ExistingPeriodicWorkPolicy.KEEP,
          fetchRequest.build()
       )
+   }
+
+   val fetching = workManager.getWorkInfosForUniqueWorkLiveData(FETCH_LATEST_LIGHTS_TASK).map { workInfo ->
+      workInfo.first()?.state == WorkInfo.State.RUNNING
    }
 
    companion object {

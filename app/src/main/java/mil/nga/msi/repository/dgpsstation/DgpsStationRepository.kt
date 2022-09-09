@@ -1,5 +1,6 @@
 package mil.nga.msi.repository.dgpsstation
 
+import androidx.lifecycle.map
 import androidx.work.*
 import mil.nga.msi.datasource.dgpsstation.DgpsStation
 import mil.nga.msi.datasource.light.PublicationVolume
@@ -76,6 +77,10 @@ class DgpsStationRepository @Inject constructor(
          ExistingPeriodicWorkPolicy.KEEP,
          fetchRequest.build()
       )
+   }
+
+   val fetching = workManager.getWorkInfosForUniqueWorkLiveData(FETCH_LATEST_DGPS_STATIONS_TASK).map { workInfo ->
+      workInfo.first()?.state == WorkInfo.State.RUNNING
    }
 
    companion object {

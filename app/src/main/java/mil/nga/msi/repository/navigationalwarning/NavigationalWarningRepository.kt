@@ -1,5 +1,6 @@
 package mil.nga.msi.repository.navigationalwarning
 
+import androidx.lifecycle.map
 import androidx.work.*
 import mil.nga.msi.datasource.navigationwarning.NavigationArea
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarning
@@ -73,6 +74,10 @@ class NavigationalWarningRepository @Inject constructor(
          ExistingPeriodicWorkPolicy.KEEP,
          fetchRequest.build()
       )
+   }
+
+   val fetching = workManager.getWorkInfosForUniqueWorkLiveData(FETCH_LATEST_NAVIGATIONAL_WARNINGS_TASK).map { workInfo ->
+      workInfo.first()?.state == WorkInfo.State.RUNNING
    }
 
    companion object {

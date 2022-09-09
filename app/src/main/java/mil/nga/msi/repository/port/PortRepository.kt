@@ -1,5 +1,6 @@
 package mil.nga.msi.repository.port
 
+import androidx.lifecycle.map
 import androidx.work.*
 import mil.nga.msi.datasource.port.Port
 import mil.nga.msi.work.port.RefreshPortWorker
@@ -66,6 +67,10 @@ class PortRepository @Inject constructor(
          ExistingPeriodicWorkPolicy.KEEP,
          fetchRequest.build()
       )
+   }
+
+   val fetching = workManager.getWorkInfosForUniqueWorkLiveData(FETCH_LATEST_PORTS_TASK).map { workInfo ->
+      workInfo.first()?.state == WorkInfo.State.RUNNING
    }
 
    companion object {

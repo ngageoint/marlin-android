@@ -45,6 +45,7 @@ fun NavigationDrawer(
 ) {
    val scope = rememberCoroutineScope()
    val mapped by viewModel.mapped.observeAsState()
+   val loadingState by viewModel.fetching.observeAsState(emptyMap())
 
    val tabsPreference by viewModel.tabs.observeAsState()
    val nonTabsPreference by viewModel.nonTabs.observeAsState()
@@ -136,6 +137,7 @@ fun NavigationDrawer(
                val isMapped = mapped?.get(tab) ?: false
                NavigationRow(
                   tab = tab,
+                  loading = loadingState[tab],
                   isMapped = isMapped,
                   isDragging = isDragging,
                   onMapClicked = {
@@ -170,6 +172,7 @@ fun NavigationDrawer(
 
                NavigationRow(
                   tab = tab,
+                  loading = loadingState[tab],
                   isMapped = isMapped,
                   isDragging = isDragging,
                   onMapClicked = {
@@ -241,6 +244,7 @@ fun NavigationDrawer(
 @Composable
 private fun NavigationRow(
    tab: DataSource,
+   loading: Boolean?,
    isDragging: Boolean = false,
    isMapped: Boolean,
    onMapClicked: (() -> Unit)? = null,
@@ -270,13 +274,23 @@ private fun NavigationRow(
                   .background(tab.color)
             )
 
-            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-               val bitmap = AppCompatResources.getDrawable(LocalContext.current, tab.icon)!!.toBitmap().asImageBitmap()
-               Icon(
-                  bitmap = bitmap,
-                  modifier = Modifier.padding(start = 8.dp),
-                  contentDescription = "Navigation Tab Icon"
-               )
+            if (loading == true) {
+               Box(Modifier.padding(start = 8.dp)) {
+                  CircularProgressIndicator(
+                     color = MaterialTheme.colors.onSurface.copy(alpha = .4f),
+                     strokeWidth = 3.dp,
+                     modifier = Modifier.size(24.dp)
+                  )
+               }
+            } else {
+               CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                  val bitmap = AppCompatResources.getDrawable(LocalContext.current, tab.icon)!!.toBitmap().asImageBitmap()
+                  Icon(
+                     bitmap = bitmap,
+                     modifier = Modifier.padding(start = 8.dp),
+                     contentDescription = "Navigation Tab Icon"
+                  )
+               }
             }
 
             Column(
