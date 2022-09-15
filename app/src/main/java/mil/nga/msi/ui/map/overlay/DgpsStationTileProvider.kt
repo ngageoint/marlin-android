@@ -25,6 +25,7 @@ class DgpsStationImage(
 ): DataSourceImage {
    override val latitude = dgpsStation.latitude
    override val longitude = dgpsStation.longitude
+   override val dataSource = DataSource.DGPS_STATION
 
    override fun image(context: Context, zoom: Int): List<Bitmap> {
       val image =  if (zoom < 13) {

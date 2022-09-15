@@ -20,6 +20,7 @@ class RadioBeaconImage(
 ): DataSourceImage {
    override val latitude = beacon.latitude
    override val longitude = beacon.longitude
+   override val dataSource = DataSource.RADIO_BEACON
 
    override fun image(context: Context, zoom: Int): List<Bitmap> {
       val image = if (zoom < 13) {

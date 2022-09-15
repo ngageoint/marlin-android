@@ -3,6 +3,7 @@ package mil.nga.msi.ui.map.overlay
 import android.app.Application
 import android.content.Context
 import android.graphics.Bitmap
+import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.light.Light
 import mil.nga.msi.repository.map.LightTileRepository
 import mil.nga.msi.ui.map.overlay.images.*
@@ -18,6 +19,7 @@ class LightImage(
 ): DataSourceImage {
    override val latitude = light.latitude
    override val longitude = light.longitude
+   override val dataSource = DataSource.LIGHT
 
    override fun image(context: Context, zoom: Int): List<Bitmap> {
       val images = mutableListOf<Bitmap>()

@@ -25,6 +25,7 @@ class PortImage(
 ): DataSourceImage {
    override val latitude = port.latitude
    override val longitude = port.longitude
+   override val dataSource = DataSource.PORT
 
    override fun image(context: Context, zoom: Int): List<Bitmap> {
       val image =  if (zoom < 13) {

@@ -4,9 +4,14 @@ import android.app.Application
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.graphics.Paint
 import android.graphics.Rect
+import androidx.appcompat.content.res.AppCompatResources
+import androidx.compose.ui.graphics.toArgb
+import androidx.core.graphics.drawable.toBitmap
 import com.google.android.gms.maps.model.Tile
 import com.google.android.gms.maps.model.TileProvider
+import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.ui.location.webMercatorToWgs84
 import mil.nga.msi.ui.location.wgs84ToWebMercator
 import mil.nga.sf.Point
@@ -25,8 +30,45 @@ interface TileRepository {
 interface DataSourceImage {
    val latitude: Double
    val longitude: Double
+   val dataSource: DataSource
 
-   fun image(context: Context, zoom: Int): List<Bitmap>
+   fun image(
+      context: Context,
+      zoom: Int
+   ): List<Bitmap>
+
+   fun circleImage(
+      context: Context,
+      mapZoom: Int,
+   ): Bitmap {
+      val screenDensity = context.resources.displayMetrics.density
+      val radius = mapZoom / .5f * screenDensity * dataSource.imageScale
+      val size = (radius * 2).toInt()
+      val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
+      val canvas = Canvas(bitmap)
+
+      canvas.drawCircle(
+         radius,
+         radius,
+         radius,
+         Paint().apply {
+            color = dataSource.color.toArgb()
+            style = Paint.Style.FILL
+         }
+      )
+
+      val iconSize = (size * .8).toInt()
+      val icon = AppCompatResources.getDrawable(context, dataSource.icon)!!
+      icon.setBounds(0, 0, iconSize, iconSize)
+      canvas.drawBitmap(
+         icon.toBitmap(),
+         null,
+         Rect(size - iconSize, size - iconSize, iconSize, iconSize),
+         null
+      )
+
+      return bitmap
+   }
 }
 
 open class DataSourceTileProvider(
