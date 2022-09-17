@@ -10,6 +10,9 @@ class LightLocalDataSource @Inject constructor(
    fun observeLightMapItems() = dao.observeLightMapItems()
    fun observeLightListItems() = dao.observeLightListItems()
 
+   fun isEmpty() = dao.count() == 0
+   suspend fun existingLights(ids: List<String>) = dao.existingLights(ids)
+
    fun observeLight(
       volumeNumber: String,
       featureNumber: String

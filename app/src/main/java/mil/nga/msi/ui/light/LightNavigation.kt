@@ -50,7 +50,10 @@ fun NavGraphBuilder.lightGraph(
       route = LightRoute.Main.name,
       startDestination = LightRoute.List.name
    ) {
-      composable(LightRoute.List.name) {
+      composable(
+         route = LightRoute.List.name,
+         deepLinks = listOf(navDeepLink { uriPattern = "marlin://${LightRoute.List.name}" })
+      ) {
          bottomBarVisibility(true)
 
          LightsScreen(

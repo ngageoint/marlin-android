@@ -5,7 +5,7 @@ import com.google.android.gms.maps.model.LatLng
 import mil.nga.msi.coordinate.DMS
 
 data class DgpsStationListItem(
-   @ColumnInfo(name = "feature_number") val featureNumber: Int,
+   @ColumnInfo(name = "feature_number") val featureNumber: Float,
    @ColumnInfo(name = "volume_number") val volumeNumber: String,
    @ColumnInfo(name = "latitude") val latitude: Double,
    @ColumnInfo(name = "longitude") val longitude: Double,

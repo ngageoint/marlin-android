@@ -10,14 +10,17 @@ class DgpsStationLocalDataSource @Inject constructor(
    fun observeDgpsStationListItems() = dao.getDgpsListItems()
    fun observeDgpsStationMapItems() = dao.getDgpsMapItems()
 
+   fun isEmpty() = dao.count() == 0
+   suspend fun existingDgpsStations(ids: List<String>) = dao.existingDgpsStations(ids)
+
    fun observeDgpsStation(
       volumeNumber: String,
-      featureNumber: Int
+      featureNumber: Float
    ) = dao.observeDgpsStation(volumeNumber, featureNumber)
 
    suspend fun getDgpsStation(
       volumeNumber: String,
-      featureNumber: Int
+      featureNumber: Float
    ) = dao.getDgpsStation(volumeNumber, featureNumber)
 
    fun getDgpsStations(

@@ -2,6 +2,7 @@ package mil.nga.msi.repository.dgpsstation
 
 import androidx.lifecycle.map
 import androidx.work.*
+import mil.nga.msi.MarlinNotification
 import mil.nga.msi.datasource.dgpsstation.DgpsStation
 import mil.nga.msi.datasource.light.PublicationVolume
 import mil.nga.msi.work.dgpsstation.RefreshDgpsStationWorker
@@ -11,19 +12,20 @@ import javax.inject.Inject
 class DgpsStationRepository @Inject constructor(
    private val workManager: WorkManager,
    private val localDataSource: DgpsStationLocalDataSource,
-   private val remoteDataSource: DgpsStationRemoteDataSource
+   private val remoteDataSource: DgpsStationRemoteDataSource,
+   private val notification: MarlinNotification
 ) {
    fun getDgpsStationListItems() = localDataSource.observeDgpsStationListItems()
    val dgpsStationMapItems = localDataSource.observeDgpsStationMapItems()
 
    fun observeDgpsStation(
       volumeNumber: String,
-      featureNumber: Int,
+      featureNumber: Float,
    ) = localDataSource.observeDgpsStation(volumeNumber, featureNumber)
 
    suspend fun getDgpsStation(
       volumeNumber: String,
-      featureNumber: Int
+      featureNumber: Float
    ) = localDataSource.getDgpsStation(volumeNumber, featureNumber)
 
    fun getDgpsStations(
@@ -35,10 +37,21 @@ class DgpsStationRepository @Inject constructor(
 
    suspend fun fetchDgpsStations(refresh: Boolean = false): List<DgpsStation> {
       if (refresh) {
+         val newStations = mutableListOf<DgpsStation>()
+         val isEmpty = localDataSource.isEmpty()
+
          PublicationVolume.values().forEach { volume ->
-            val dgpsStations = remoteDataSource.fetchDgpsStations(volume)
-            localDataSource.insert(dgpsStations)
+            val stations = remoteDataSource.fetchDgpsStations(volume)
+
+            if (!isEmpty) {
+               newStations.addAll(stations.subtract(localDataSource.existingDgpsStations(stations.map { it.compositeKey() }).toSet()).toList())
+            }
+
+            localDataSource.insert(stations)
          }
+
+
+         notification.dgpsStation(newStations)
       }
 
       return localDataSource.getDgpsStations()

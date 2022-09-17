@@ -10,6 +10,9 @@ class RadioBeaconLocalDataSource @Inject constructor(
    fun observeRadioBeaconMapItems() = dao.observeRadioBeaconMapItems()
    fun observeRadioBeaconListItems() = dao.observeRadioBeaconListItems()
 
+   fun isEmpty() = dao.count() == 0
+   suspend fun existingRadioBeacons(ids: List<String>) = dao.existingRadioBeacons(ids)
+
    fun observeRadioBeacon(
       volumeNumber: String,
       featureNumber: String

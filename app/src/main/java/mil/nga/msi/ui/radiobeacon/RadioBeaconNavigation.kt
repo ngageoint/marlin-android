@@ -50,7 +50,10 @@ fun NavGraphBuilder.radioBeaconGraph(
       route = RadioBeaconRoute.Main.name,
       startDestination = RadioBeaconRoute.List.name
    ) {
-      composable(RadioBeaconRoute.List.name) {
+      composable(
+         route = RadioBeaconRoute.List.name,
+         deepLinks = listOf(navDeepLink { uriPattern = "marlin://${RadioBeaconRoute.List.name}" })
+      ) {
          bottomBarVisibility(true)
 
          RadioBeaconsScreen(

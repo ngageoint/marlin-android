@@ -15,6 +15,9 @@ interface PortDao {
    @Update(onConflict = OnConflictStrategy.REPLACE)
    suspend fun update(port: Port)
 
+   @Query("SELECT COUNT(*) from ports")
+   fun count(): Int
+
    @Query("SELECT * FROM ports WHERE port_number = :portNumber")
    fun observePort(portNumber: Int): Flow<Port>
 
@@ -38,4 +41,7 @@ interface PortDao {
 
    @Query("SELECT * FROM ports ORDER BY port_number")
    fun observePortMapItems(): Flow<List<PortMapItem>>
+
+   @Query("SELECT * FROM ports WHERE port_number IN (:portNumbers)")
+   suspend fun existingPorts(portNumbers: List<Int>): List<Port>
 }

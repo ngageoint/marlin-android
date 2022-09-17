@@ -39,7 +39,10 @@ fun NavGraphBuilder.navigationalWarningGraph(
       route = NavigationWarningRoute.Main.name,
       startDestination = NavigationWarningRoute.Group.name,
    ) {
-      composable(NavigationWarningRoute.Group.name) {
+      composable(
+         route = NavigationWarningRoute.Group.name,
+         deepLinks = listOf(navDeepLink { uriPattern = "marlin://${NavigationWarningRoute.Group.name}" })
+      ) {
          bottomBarVisibility(true)
 
          NavigationalWarningGroupScreen(

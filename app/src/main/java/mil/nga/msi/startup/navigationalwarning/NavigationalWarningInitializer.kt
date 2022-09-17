@@ -16,7 +16,7 @@ class NavigationalWarningInitializer: Initializer<NavigationalWarningRepository>
       AppInitializer.resolve(context).inject(this)
 
       repository.fetchNavigationalWarnings()
-      repository.fetchNavigaionalWarningsPeriodically()
+      repository.fetchNavigationalWarningsPeriodically()
       return repository
    }
 

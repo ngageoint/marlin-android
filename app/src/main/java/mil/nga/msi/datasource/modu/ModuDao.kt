@@ -16,6 +16,9 @@ interface ModuDao {
    @Update(onConflict = OnConflictStrategy.REPLACE)
    suspend fun update(modu: Modu)
 
+   @Query("SELECT COUNT(*) from modus")
+   fun count(): Int
+
    @Query("SELECT * FROM modus")
    fun observeModus(): Flow<List<Modu>>
 
@@ -47,4 +50,7 @@ interface ModuDao {
       maxLongitude: Double
    ): List<Modu>
 
+   @Query("SELECT * FROM modus WHERE name IN (:names)")
+   suspend fun existingModus(names: List<String>): List<Modu>
 }
+

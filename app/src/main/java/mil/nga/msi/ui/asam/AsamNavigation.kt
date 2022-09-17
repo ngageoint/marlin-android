@@ -5,6 +5,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import androidx.navigation.navDeepLink
 import androidx.navigation.navigation
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import com.google.accompanist.navigation.material.bottomSheet
@@ -50,7 +51,10 @@ fun NavGraphBuilder.asamGraph(
       route = AsamRoute.Main.name,
       startDestination = AsamRoute.List.name
    ) {
-      composable(AsamRoute.List.name) {
+      composable(
+         route = AsamRoute.List.name,
+         deepLinks = listOf(navDeepLink { uriPattern = "marlin://${AsamRoute.List.name}" })
+      ) {
          bottomBarVisibility(true)
 
          AsamsScreen(

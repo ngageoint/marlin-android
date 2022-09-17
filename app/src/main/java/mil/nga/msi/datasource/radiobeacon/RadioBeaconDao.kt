@@ -15,6 +15,9 @@ interface RadioBeaconDao {
    @Update(onConflict = OnConflictStrategy.REPLACE)
    suspend fun update(beacon: RadioBeacon)
 
+   @Query("SELECT COUNT(*) from radio_beacons")
+   fun count(): Int
+
    @Query("SELECT * FROM radio_beacons")
    suspend fun getRadioBeacons(): List<RadioBeacon>
 
@@ -42,4 +45,7 @@ interface RadioBeaconDao {
    @Query("SELECT * FROM radio_beacons ORDER BY volume_number, feature_number")
    @RewriteQueriesToDropUnusedColumns
    fun observeRadioBeaconMapItems(): Flow<List<RadioBeaconMapItem>>
+
+   @Query("SELECT * FROM radio_beacons WHERE id IN (:ids)")
+   suspend fun existingRadioBeacons(ids: List<String>): List<RadioBeacon>
 }

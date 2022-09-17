@@ -2,6 +2,7 @@ package mil.nga.msi.repository.light
 
 import androidx.lifecycle.map
 import androidx.work.*
+import mil.nga.msi.MarlinNotification
 import mil.nga.msi.datasource.light.Light
 import mil.nga.msi.datasource.light.PublicationVolume
 import mil.nga.msi.work.light.RefreshLightWorker
@@ -11,7 +12,8 @@ import javax.inject.Inject
 class LightRepository @Inject constructor(
    private val workManager: WorkManager,
    private val localDataSource: LightLocalDataSource,
-   private val remoteDataSource: LightRemoteDataSource
+   private val remoteDataSource: LightRemoteDataSource,
+   private val notification: MarlinNotification
 ) {
    val lightMapItems = localDataSource.observeLightMapItems()
    fun getLightListItems() = localDataSource.observeLightListItems()
@@ -44,12 +46,21 @@ class LightRepository @Inject constructor(
 
    suspend fun fetchLights(refresh: Boolean = false): List<Light> {
       if (refresh) {
+         val newLights = mutableListOf<Light>()
+         val isEmpty = localDataSource.isEmpty()
+
          PublicationVolume.values().forEach { volume ->
             val lights = remoteDataSource.fetchLights(volume)
+
+            if (!isEmpty) {
+               newLights.addAll(lights.subtract(localDataSource.existingLights(lights.map { it.compositeKey() }).toSet()).toList())
+            }
+
             localDataSource.insert(lights)
          }
-      }
 
+         notification.light(newLights)
+      }
 
       return localDataSource.getLights()
    }

@@ -10,7 +10,7 @@ import mil.nga.msi.datasource.dgpsstation.DgpsStationListItem
 @Parcelize
 data class DgpsStationKey(
    val volumeNumber: String,
-   val featureNumber: Int
+   val featureNumber: Float
 ): Parcelable {
 
    fun id(): String {
@@ -20,7 +20,7 @@ data class DgpsStationKey(
    companion object {
       fun fromId(id: String): DgpsStationKey {
          val (volumeNumber, featureNumber) = id.split("--")
-         return DgpsStationKey(volumeNumber, featureNumber.toInt())
+         return DgpsStationKey(volumeNumber, featureNumber.toFloat())
       }
 
       fun fromDgpsStation(dgpsStation: DgpsStation): DgpsStationKey {
@@ -28,7 +28,7 @@ data class DgpsStationKey(
       }
 
       fun fromDgpsStation(item: DgpsStationListItem): DgpsStationKey {
-         return DgpsStationKey(item.volumeNumber, item.featureNumber)
+         return DgpsStationKey(item.volumeNumber, item.featureNumber.toFloat())
       }
    }
 }

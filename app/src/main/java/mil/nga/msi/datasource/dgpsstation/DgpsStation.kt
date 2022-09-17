@@ -2,19 +2,24 @@ package mil.nga.msi.datasource.dgpsstation
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Index
 import com.google.android.gms.maps.model.LatLng
 import mil.nga.msi.coordinate.DMS
 
 @Entity(
    tableName = "dgps_stations",
-   primaryKeys = ["volume_number", "feature_number"]
+   primaryKeys = ["volume_number", "feature_number"],
+   indices = [Index(value = ["id"], unique = true)]
 )
 data class DgpsStation(
+   @ColumnInfo(name = "id")
+   val id: String,
+
    @ColumnInfo(name = "volume_number")
    val volumeNumber: String,
 
    @ColumnInfo(name = "feature_number")
-   val featureNumber: Int,
+   val featureNumber: Float,
 
    @ColumnInfo(name = "notice_week")
    var noticeWeek: String,
@@ -53,7 +58,7 @@ data class DgpsStation(
    var range: Int? = null
 
    @ColumnInfo(name = "frequency")
-   var frequency: Int? = null
+   var frequency: Float? = null
 
    @ColumnInfo(name = "transfer_rate")
    var transferRate: Int? = null
@@ -110,6 +115,16 @@ data class DgpsStation(
          "Frequency: ${frequency.toString()}\n" +
          "Station Remark: ${remarks.orEmpty()}\n" +
          "Remove From List: ${removeFromList.orEmpty()}\n" +
-         "Volume Number: ${volumeNumber.orEmpty()}"
+         "Volume Number: ${volumeNumber}"
+   }
+
+   fun compositeKey(): String {
+      return compositeKey(volumeNumber, featureNumber)
+   }
+
+   companion object {
+      fun compositeKey(volumeNumber: String, featureNumber: Float): String {
+         return "$volumeNumber--$featureNumber"
+      }
    }
 }

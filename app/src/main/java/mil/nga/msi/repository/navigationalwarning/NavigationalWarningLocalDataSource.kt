@@ -11,6 +11,9 @@ class NavigationalWarningLocalDataSource @Inject constructor(
 ) {
    suspend fun insert(navigationalWarnings: List<NavigationalWarning>) = dao.insert(navigationalWarnings)
 
+   fun isEmpty() = dao.count() == 0
+   suspend fun existingNavigationalWarnings(ids: List<String>) = dao.existingNavigationalWarnings(ids)
+
    fun observeNavigationalWarningsByArea(navigationArea: NavigationArea?) = dao.getNavigationalWarningsByArea(navigationArea)
    fun observeNavigationalWarning(key: NavigationalWarningKey) = dao.observeNavigationalWarning(key.number, key.year, key.navigationArea)
    fun observeNavigationalWarningsByNavigationArea(

@@ -12,6 +12,9 @@ import mil.nga.msi.datasource.light.LightSector
    primaryKeys = ["volume_number", "feature_number"]
 )
 data class RadioBeacon(
+   @ColumnInfo(name = "id")
+   val id: String,
+
    @ColumnInfo(name = "volume_number")
    val volumeNumber: String,
 
@@ -164,6 +167,10 @@ data class RadioBeacon(
       return sectors
    }
 
+   fun compositeKey(): String {
+      return compositeKey(volumeNumber, featureNumber)
+   }
+
    override fun toString(): String {
       return "LIGHT\n\n" +
          "aidType: ${aidType.orEmpty()}\n" +
@@ -185,5 +192,11 @@ data class RadioBeacon(
          "stationRemark: ${stationRemark.orEmpty()}\n" +
          "removeFromList: ${removeFromList.orEmpty()}\n" +
          "volumeNumber: ${volumeNumber.orEmpty()}"
+   }
+
+   companion object {
+      fun compositeKey(volumeNumber: String, featureNumber: String): String {
+         return "$volumeNumber--$featureNumber"
+      }
    }
 }

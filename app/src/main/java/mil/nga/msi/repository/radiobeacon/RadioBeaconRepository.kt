@@ -2,6 +2,7 @@ package mil.nga.msi.repository.radiobeacon
 
 import androidx.lifecycle.map
 import androidx.work.*
+import mil.nga.msi.MarlinNotification
 import mil.nga.msi.datasource.light.PublicationVolume
 import mil.nga.msi.datasource.radiobeacon.RadioBeacon
 import mil.nga.msi.work.radiobeacon.RefreshRadioBeaconWorker
@@ -11,7 +12,8 @@ import javax.inject.Inject
 class RadioBeaconRepository @Inject constructor(
    private val workManager: WorkManager,
    private val localDataSource: RadioBeaconLocalDataSource,
-   private val remoteDataSource: RadioBeaconRemoteDataSource
+   private val remoteDataSource: RadioBeaconRemoteDataSource,
+   private val notification: MarlinNotification
 ) {
    val radioBeaconMapItems = localDataSource.observeRadioBeaconMapItems()
    fun getRadioBeaconListItems() = localDataSource.observeRadioBeaconListItems()
@@ -35,10 +37,20 @@ class RadioBeaconRepository @Inject constructor(
 
    suspend fun fetchRadioBeacons(refresh: Boolean = false): List<RadioBeacon> {
       if (refresh) {
+         val newBeacons = mutableListOf<RadioBeacon>()
+         val isEmpty = localDataSource.isEmpty()
+
          PublicationVolume.values().forEach { volume ->
             val beacons = remoteDataSource.fetchRadioBeacons(volume)
+
+            if (!isEmpty) {
+               newBeacons.addAll(beacons.subtract(localDataSource.existingRadioBeacons(beacons.map { it.compositeKey() }).toSet()).toList())
+            }
+
             localDataSource.insert(beacons)
          }
+
+         notification.radioBeacon(newBeacons)
       }
 
       return localDataSource.getRadioBeacons()

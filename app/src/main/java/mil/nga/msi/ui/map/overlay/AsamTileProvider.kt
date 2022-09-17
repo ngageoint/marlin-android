@@ -24,6 +24,6 @@ class AsamImage(
       context: Context,
       zoom: Int
    ): List<Bitmap> {
-      return listOf(circleImage(context,zoom))
+      return listOf(circleImage(context, zoom))
    }
 }

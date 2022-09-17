@@ -15,6 +15,9 @@ interface LightDao {
    @Update(onConflict = OnConflictStrategy.REPLACE)
    suspend fun update(light: Light): Int
 
+   @Query("SELECT COUNT(*) from lights")
+   fun count(): Int
+
    @Query("SELECT * FROM lights")
    suspend fun getLights(): List<Light>
 
@@ -51,4 +54,7 @@ interface LightDao {
    @Query("SELECT * FROM lights ORDER BY volume_number, feature_number, characteristic_number")
    @RewriteQueriesToDropUnusedColumns
    fun observeLightMapItems(): Flow<List<LightMapItem>>
+
+   @Query("SELECT * FROM lights WHERE id IN (:ids)")
+   suspend fun existingLights(ids: List<String>): List<Light>
 }

@@ -5,6 +5,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import androidx.navigation.navDeepLink
 import androidx.navigation.navigation
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import com.google.accompanist.navigation.material.bottomSheet
@@ -50,7 +51,10 @@ fun NavGraphBuilder.portGraph(
       route = PortRoute.Main.name,
       startDestination = PortRoute.List.name
    ) {
-      composable(PortRoute.List.name) {
+      composable(
+         route = PortRoute.List.name,
+         deepLinks = listOf(navDeepLink { uriPattern = "marlin://${PortRoute.List.name}" })
+      ) {
          bottomBarVisibility(true)
 
          PortsScreen(

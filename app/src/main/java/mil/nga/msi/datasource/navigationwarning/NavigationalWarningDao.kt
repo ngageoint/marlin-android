@@ -15,6 +15,9 @@ interface NavigationalWarningDao {
    @Update(onConflict = OnConflictStrategy.REPLACE)
    suspend fun update(navigationalWarning: NavigationalWarning)
 
+   @Query("SELECT COUNT(*) from navigational_warnings")
+   fun count(): Int
+
    @Query("SELECT * FROM navigational_warnings WHERE number = :number AND year = :year AND navigation_area = :navigationArea")
    fun observeNavigationalWarning(number: Int, year: Int, navigationArea: NavigationArea): Flow<NavigationalWarning?>
 
@@ -50,4 +53,7 @@ interface NavigationalWarningDao {
 
    @Query("DELETE FROM navigational_warnings WHERE number IN (:numbers)")
    suspend fun deleteNavigationalWarnings(numbers: List<Int>)
+
+   @Query("SELECT * FROM navigational_warnings WHERE id IN (:ids)")
+   suspend fun existingNavigationalWarnings(ids: List<String>): List<NavigationalWarning>
 }

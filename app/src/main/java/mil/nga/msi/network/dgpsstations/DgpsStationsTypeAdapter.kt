@@ -6,6 +6,7 @@ import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
 import mil.nga.msi.coordinate.DMS
 import mil.nga.msi.datasource.dgpsstation.DgpsStation
+import mil.nga.msi.network.nextDoubleOrNull
 import mil.nga.msi.network.nextIntOrNull
 import mil.nga.msi.network.nextStringOrNull
 
@@ -67,7 +68,7 @@ class DgpsStationsTypeAdapter: TypeAdapter<List<DgpsStation>>() {
 
    private fun readDgpsStation(`in`: JsonReader): DgpsStation? {
       var volumeNumber: String? = null
-      var featureNumber: Int? = null
+      var featureNumber: Float? = null
       var latitude: Double? = null
       var longitude: Double? = null
       var aidType: String? = null
@@ -78,7 +79,7 @@ class DgpsStationsTypeAdapter: TypeAdapter<List<DgpsStation>>() {
       var range: Int? = null
       var transferRate: Int? = null
       var stationId: String? = null
-      var frequency: Int? = null
+      var frequency: Float? = null
       var remarks: String? = null
       var postNote: String? = null
       var noticeNumber: Int? = null
@@ -101,7 +102,7 @@ class DgpsStationsTypeAdapter: TypeAdapter<List<DgpsStation>>() {
                volumeNumber = `in`.nextStringOrNull()
             }
             "featureNumber" -> {
-               featureNumber = `in`.nextIntOrNull()
+               featureNumber = `in`.nextDoubleOrNull()?.toFloat()
             }
             "position" -> {
                position = `in`.nextStringOrNull()
@@ -134,7 +135,7 @@ class DgpsStationsTypeAdapter: TypeAdapter<List<DgpsStation>>() {
                transferRate = `in`.nextIntOrNull()
             }
             "frequency" -> {
-               frequency = `in`.nextIntOrNull()
+               frequency = `in`.nextDoubleOrNull()?.toFloat()
             }
             "remarks" -> {
                remarks = `in`.nextStringOrNull()
@@ -167,7 +168,7 @@ class DgpsStationsTypeAdapter: TypeAdapter<List<DgpsStation>>() {
       `in`.endObject()
 
       return if (volumeNumber != null && featureNumber != null && noticeYear != null && noticeWeek != null && latitude != null && longitude != null) {
-         DgpsStation(volumeNumber, featureNumber, noticeYear, noticeWeek, latitude, longitude).apply {
+         DgpsStation(DgpsStation.compositeKey(volumeNumber, featureNumber), volumeNumber, featureNumber, noticeYear, noticeWeek, latitude, longitude).apply {
             this.aidType = aidType
             this.geopoliticalHeading = geopoliticalHeading
             this.regionHeading = regionHeading

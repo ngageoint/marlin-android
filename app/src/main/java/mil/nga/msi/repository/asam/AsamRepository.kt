@@ -13,7 +13,8 @@ class AsamRepository @Inject constructor(
    val application: Application,
    private val workManager: WorkManager,
    private val localDataSource: AsamLocalDataSource,
-   private val remoteDataSource: AsamRemoteDataSource
+   private val remoteDataSource: AsamRemoteDataSource,
+   private val notification: MarlinNotification
 ) {
    val asams = localDataSource.observeAsams()
    val asamMapItems = localDataSource.observeAsamMapItems()
@@ -32,8 +33,12 @@ class AsamRepository @Inject constructor(
    suspend fun fetchAsams(refresh: Boolean = false): List<Asam> {
       if (refresh) {
          val asams = remoteDataSource.fetchAsams()
-         val new = asams.size - localDataSource.existingAsams(asams.map { it.reference })
-         MarlinNotification.asam(application.applicationContext, new)
+
+         if (!localDataSource.isEmpty()) {
+            val newAsams = asams.subtract(localDataSource.existingAsams(asams.map { it.reference }).toSet()).toList()
+            notification.asam(newAsams)
+         }
+
          localDataSource.insert(asams)
       }
 

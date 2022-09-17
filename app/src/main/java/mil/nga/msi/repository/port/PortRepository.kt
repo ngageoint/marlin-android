@@ -2,6 +2,7 @@ package mil.nga.msi.repository.port
 
 import androidx.lifecycle.map
 import androidx.work.*
+import mil.nga.msi.MarlinNotification
 import mil.nga.msi.datasource.port.Port
 import mil.nga.msi.work.port.RefreshPortWorker
 import java.util.concurrent.TimeUnit
@@ -10,7 +11,8 @@ import javax.inject.Inject
 class PortRepository @Inject constructor(
    private val workManager: WorkManager,
    private val localDataSource: PortLocalDataSource,
-   private val remoteDataSource: PortRemoteDataSource
+   private val remoteDataSource: PortRemoteDataSource,
+   private val notification: MarlinNotification
 ) {
    val portMapItems = localDataSource.observePortMapItems()
    fun getPortListItems() = localDataSource.observePortListItems()
@@ -28,6 +30,12 @@ class PortRepository @Inject constructor(
    suspend fun fetchPorts(refresh: Boolean = false): List<Port> {
       if (refresh) {
          val ports = remoteDataSource.fetchPorts()
+
+         if (!localDataSource.isEmpty()) {
+            val newPorts = ports.subtract(localDataSource.existingPorts(ports.map { it.portNumber }).toSet()).toList()
+            notification.port(newPorts)
+         }
+
          localDataSource.insert(ports)
       }
 

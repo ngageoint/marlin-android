@@ -15,6 +15,9 @@ interface DgpsStationDao {
    @Update(onConflict = OnConflictStrategy.REPLACE)
    suspend fun update(dgpsStation: DgpsStation)
 
+   @Query("SELECT COUNT(*) from dgps_stations")
+   fun count(): Int
+
    @Query("SELECT * FROM dgps_stations")
    suspend fun getDgpsStations(): List<DgpsStation>
 
@@ -30,10 +33,10 @@ interface DgpsStationDao {
    suspend fun getLatestDgpsStation(volumeNumber: String): DgpsStation?
 
    @Query("SELECT * FROM dgps_stations WHERE volume_number = :volumeNumber AND feature_number = :featureNumber")
-   suspend fun getDgpsStation(volumeNumber: String, featureNumber: Int): DgpsStation?
+   suspend fun getDgpsStation(volumeNumber: String, featureNumber: Float): DgpsStation?
 
    @Query("SELECT * FROM dgps_stations WHERE volume_number = :volumeNumber AND feature_number = :featureNumber ORDER BY feature_number")
-   fun observeDgpsStation(volumeNumber: String, featureNumber: Int): Flow<DgpsStation>
+   fun observeDgpsStation(volumeNumber: String, featureNumber: Float): Flow<DgpsStation>
 
    @Query("SELECT * FROM dgps_stations ORDER BY section_header ASC, feature_number ASC")
    @RewriteQueriesToDropUnusedColumns
@@ -42,4 +45,7 @@ interface DgpsStationDao {
    @Query("SELECT * FROM dgps_stations ORDER BY volume_number ASC, feature_number ASC")
    @RewriteQueriesToDropUnusedColumns
    fun getDgpsMapItems(): Flow<List<DgpsStationMapItem>>
+
+   @Query("SELECT * FROM dgps_stations WHERE id IN (:ids)")
+   suspend fun existingDgpsStations(ids: List<String>): List<DgpsStation>
 }

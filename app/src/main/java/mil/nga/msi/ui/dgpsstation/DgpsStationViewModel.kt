@@ -19,7 +19,7 @@ class DgpsStationViewModel @Inject constructor(
 ): ViewModel() {
    val baseMap = userPreferencesRepository.baseMapType.asLiveData()
 
-   fun getDgpsStation(volumeNumber: String, featureNumber: Int): LiveData<DgpsStation> {
+   fun getDgpsStation(volumeNumber: String, featureNumber: Float): LiveData<DgpsStation> {
       return repository.observeDgpsStation(volumeNumber, featureNumber).asLiveData()
    }
 }

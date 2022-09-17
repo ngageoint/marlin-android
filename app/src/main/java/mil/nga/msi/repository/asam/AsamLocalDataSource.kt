@@ -12,11 +12,13 @@ class AsamLocalDataSource @Inject constructor(
    fun observeAsamMapItems() = dao.observeAsamMapItems()
    fun observeAsamListItems() = dao.getAsamListItems()
 
+   fun isEmpty() = dao.count() == 0
+
    suspend fun getAsam(reference: String) = dao.getAsam(reference)
    suspend fun getAsams(): List<Asam> = dao.getAsams()
    suspend fun getLatestAsam() = dao.getLatestAsam()
 
-   fun existingAsams(references: List<String>) = dao.existingAsams(references)
+   suspend fun existingAsams(references: List<String>) = dao.existingAsams(references)
 
    fun getAsams(
       minLatitude: Double,

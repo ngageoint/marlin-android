@@ -2,6 +2,7 @@ package mil.nga.msi.repository.modu
 
 import androidx.lifecycle.map
 import androidx.work.*
+import mil.nga.msi.MarlinNotification
 import mil.nga.msi.datasource.modu.Modu
 import mil.nga.msi.work.modu.RefreshModuWorker
 import java.util.concurrent.TimeUnit
@@ -10,7 +11,8 @@ import javax.inject.Inject
 class ModuRepository @Inject constructor(
    private val workManager: WorkManager,
    private val localDataSource: ModuLocalDataSource,
-   private val remoteDataSource: ModuRemoteDataSource
+   private val remoteDataSource: ModuRemoteDataSource,
+   private val notification: MarlinNotification
 ) {
    val modus = localDataSource.observeModus()
    val moduMapItems = localDataSource.observeModuMapItems()
@@ -29,6 +31,12 @@ class ModuRepository @Inject constructor(
    suspend fun fetchModus(refresh: Boolean = false): List<Modu> {
       if (refresh) {
          val modus = remoteDataSource.fetchModus()
+
+         if (!localDataSource.isEmpty()) {
+            val newModus = modus.subtract(localDataSource.existingModus(modus.map { it.name }).toSet()).toList()
+            notification.modo(newModus)
+         }
+
          localDataSource.insert(modus)
       }
 

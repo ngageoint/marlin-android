@@ -21,7 +21,7 @@ class DgpsStationsViewModel @Inject constructor(
 ): ViewModel() {
    suspend fun getDgpsStation(
       volumeNumber: String,
-      featureNumber: Int
+      featureNumber: Float
    ): DgpsStation? {
       return repository.getDgpsStation(volumeNumber, featureNumber)
    }

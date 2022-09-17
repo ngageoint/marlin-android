@@ -2,6 +2,7 @@ package mil.nga.msi.repository.navigationalwarning
 
 import androidx.lifecycle.map
 import androidx.work.*
+import mil.nga.msi.MarlinNotification
 import mil.nga.msi.datasource.navigationwarning.NavigationArea
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarning
 import mil.nga.msi.work.navigationalwarning.RefreshNavigationalWarningWorker
@@ -12,7 +13,8 @@ import javax.inject.Inject
 class NavigationalWarningRepository @Inject constructor(
    private val workManager: WorkManager,
    private val localDataSource: NavigationalWarningLocalDataSource,
-   private val remoteDataSource: NavigationalWarningRemoteDataSource
+   private val remoteDataSource: NavigationalWarningRemoteDataSource,
+   private val notification: MarlinNotification
 ) {
    fun getNavigationalWarningsByArea(navigationArea: NavigationArea?) = localDataSource.observeNavigationalWarningsByArea(navigationArea)
    fun getNavigationalWarningsByNavigationArea(
@@ -30,6 +32,12 @@ class NavigationalWarningRepository @Inject constructor(
    suspend fun fetchNavigationalWarnings(refresh: Boolean = false): List<NavigationalWarning> {
       if (refresh) {
          val remoteWarnings = remoteDataSource.fetchNavigationalWarnings()
+
+         if (!localDataSource.isEmpty()) {
+            val newWarnings = remoteWarnings.subtract(localDataSource.existingNavigationalWarnings(remoteWarnings.map { it.compositeKey() }).toSet()).toList()
+            notification.navigationWarning(newWarnings)
+         }
+
          localDataSource.insert(remoteWarnings)
 
          val localSet = sortedSetOf(NavigationalWarning.numberComparator, *localDataSource.getNavigationalWarnings().toTypedArray())
@@ -59,7 +67,7 @@ class NavigationalWarningRepository @Inject constructor(
          )
    }
 
-   fun fetchNavigaionalWarningsPeriodically() {
+   fun fetchNavigationalWarningsPeriodically() {
       val fetchRequest = PeriodicWorkRequestBuilder<RefreshNavigationalWarningWorker>(
          REFRESH_RATE_HOURS, TimeUnit.HOURS
       ).setConstraints(

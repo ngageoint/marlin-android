@@ -50,7 +50,10 @@ fun NavGraphBuilder.dgpsStationGraph(
       route = DgpsStationRoute.Main.name,
       startDestination = DgpsStationRoute.List.name
    ) {
-      composable(DgpsStationRoute.List.name) {
+      composable(
+         route = DgpsStationRoute.List.name,
+         deepLinks = listOf(navDeepLink { uriPattern = "marlin://${DgpsStationRoute.List.name}" })
+      ) {
          bottomBarVisibility(true)
 
          DgpsStationsScreen(

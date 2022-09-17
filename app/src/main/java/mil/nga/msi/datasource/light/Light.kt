@@ -3,6 +3,7 @@ package mil.nga.msi.datasource.light
 import androidx.compose.ui.graphics.Color
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Index
 import com.google.android.gms.maps.model.LatLng
 import mil.nga.msi.coordinate.DMS
 
@@ -20,9 +21,13 @@ enum class LightColor(val color: Color) {
 
 @Entity(
    tableName = "lights",
-   primaryKeys = ["volume_number", "feature_number", "characteristic_number"]
+   primaryKeys = ["volume_number", "feature_number", "characteristic_number"],
+   indices = [Index(value = ["id"], unique = true)]
 )
 data class Light(
+   @ColumnInfo(name = "id")
+   val id: String,
+
    @ColumnInfo(name = "volume_number")
    val volumeNumber: String,
 
@@ -279,6 +284,10 @@ data class Light(
       } else null
    }
 
+   fun compositeKey(): String {
+      return compositeKey(volumeNumber, featureNumber, characteristicNumber)
+   }
+
    override fun toString(): String {
       return "LIGHT\n\n" +
          "aidType: ${aidType.orEmpty()}\n" +
@@ -305,5 +314,11 @@ data class Light(
          "structure: ${structure.orEmpty()}\n" +
          "subregionHeading: ${subregionHeading.orEmpty()}\n" +
          "volumeNumber: ${volumeNumber.orEmpty()}"
+   }
+
+   companion object {
+      fun compositeKey(volumeNumber: String, featureNumber: String, characteristicNumber: Int): String {
+         return "$volumeNumber--$featureNumber--${characteristicNumber}"
+      }
    }
 }

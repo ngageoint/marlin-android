@@ -166,7 +166,7 @@ class RadioBeaconsTypeAdapter: TypeAdapter<List<RadioBeacon>>() {
       `in`.endObject()
 
       return if (volumeNumber != null && featureNumber != null && noticeYear != null && noticeWeek != null && latitude != null && longitude != null) {
-         RadioBeacon(volumeNumber, featureNumber, noticeYear, noticeWeek, latitude, longitude).apply {
+         RadioBeacon(RadioBeacon.compositeKey(volumeNumber, featureNumber), volumeNumber, featureNumber, noticeYear, noticeWeek, latitude, longitude).apply {
             this.aidType = aidType
             this.geopoliticalHeading = geopoliticalHeading
             this.regionHeading = regionHeading

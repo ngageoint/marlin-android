@@ -11,8 +11,11 @@ class PortLocalDataSource @Inject constructor(
    fun observePortMapItems() = dao.observePortMapItems()
    fun observePortListItems() = dao.observePortListItems()
 
+   fun isEmpty() = dao.count() == 0
+
    suspend fun getPort(portNumber: Int) = dao.getPort(portNumber)
    suspend fun getPorts(): List<Port> = dao.getPorts()
+   suspend fun existingPorts(portNumbers: List<Int>) = dao.existingPorts(portNumbers)
 
    fun getPorts(
       minLatitude: Double,

@@ -204,7 +204,7 @@ class LightsTypeAdapter: TypeAdapter<List<Light>>() {
       `in`.endObject()
 
       return if (volumeNumber != null && featureNumber != null && characteristicNumber != null && noticeYear != null && noticeWeek != null && latitude != null && longitude != null) {
-         Light(volumeNumber, featureNumber, characteristicNumber, noticeYear, noticeWeek, latitude, longitude).apply {
+         Light(Light.compositeKey(volumeNumber, featureNumber, characteristicNumber), volumeNumber, featureNumber, characteristicNumber, noticeYear, noticeWeek, latitude, longitude).apply {
             this.internationalFeature = internationalFeature
             this.aidType = aidType
             this.geopoliticalHeading = geopoliticalHeading

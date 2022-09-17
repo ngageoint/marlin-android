@@ -12,9 +12,13 @@ class ModuLocalDataSource @Inject constructor(
    fun observeModuMapItems() = dao.observeModuMapItems()
    fun observeModuListItems() = dao.getModuListItems()
 
+   fun isEmpty() = dao.count() == 0
+
    suspend fun getModu(name: String) = dao.getModu(name)
    suspend fun getModus() = dao.getModus()
    suspend fun getLatestModu() = dao.getLatestModu()
+
+   suspend fun existingModus(names: List<String>) = dao.existingModus(names)
 
    fun getModus(
       minLatitude: Double,
