@@ -51,7 +51,7 @@ class DataSourceRepository @Inject constructor(
       }
 
       addSource(dgpsStationRepository.fetching) {
-         value = value?.toMutableMap()?.apply { put(DataSource.RADIO_BEACON, it) }
+         value = value?.toMutableMap()?.apply { put(DataSource.DGPS_STATION, it) }
       }
    }
 }
