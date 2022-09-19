@@ -26,7 +26,6 @@ import com.google.android.gms.maps.LocationSource
 import com.google.android.gms.maps.model.*
 import com.google.maps.android.compose.*
 import kotlinx.coroutines.launch
-import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.type.MapLocation
 import mil.nga.msi.ui.location.LocationPermission
 import mil.nga.msi.ui.main.TopBar
@@ -193,7 +192,7 @@ private fun Map(
    baseMap: BaseMapType?,
    locationSource: LocationSource,
    locationEnabled: Boolean,
-   tileProviders: Map<DataSource, TileProvider>,
+   tileProviders: Map<TileProviderType, TileProvider>,
    onMapMove: (CameraPosition, Int) -> Unit,
    onMapClick: (LatLng, Float, VisibleRegion) -> Unit
 ) {
@@ -209,12 +208,15 @@ private fun Map(
       }
    }
 
-   val asamTileProvider = tileProviders[DataSource.ASAM]
-   val moduTileProvider = tileProviders[DataSource.MODU]
-   val lightTileProvider = tileProviders[DataSource.LIGHT]
-   val portTileProvider = tileProviders[DataSource.PORT]
-   val beaconTileProvider = tileProviders[DataSource.RADIO_BEACON]
-   val dgpsStationTileProvider = tileProviders[DataSource.DGPS_STATION]
+   val mgrsTileProvider = tileProviders[TileProviderType.MGRS]
+   val garsTileProvider = tileProviders[TileProviderType.GARS]
+   val osmTileProvider = tileProviders[TileProviderType.OSM]
+   val asamTileProvider = tileProviders[TileProviderType.ASAM]
+   val moduTileProvider = tileProviders[TileProviderType.MODU]
+   val lightTileProvider = tileProviders[TileProviderType.LIGHT]
+   val portTileProvider = tileProviders[TileProviderType.PORT]
+   val beaconTileProvider = tileProviders[TileProviderType.RADIO_BEACON]
+   val dgpsStationTileProvider = tileProviders[TileProviderType.DGPS_STATION]
 
    GoogleMap(
       cameraPositionState = cameraPositionState,
@@ -241,7 +243,9 @@ private fun Map(
                }
             }
          }
-
+         mgrsTileProvider?.let { TileOverlay(tileProvider = it)}
+         garsTileProvider?.let { TileOverlay(tileProvider = it)}
+         osmTileProvider?.let { TileOverlay(tileProvider = it)}
          asamTileProvider?.let { TileOverlay(tileProvider = it)}
          moduTileProvider?.let { TileOverlay(tileProvider = it)}
          lightTileProvider?.let { TileOverlay(tileProvider = it)}

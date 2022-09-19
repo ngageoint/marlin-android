@@ -26,6 +26,18 @@ import mil.nga.msi.ui.map.overlay.*
 import javax.inject.Inject
 import javax.inject.Named
 
+enum class TileProviderType {
+   MGRS,
+   GARS,
+   OSM,
+   ASAM,
+   MODU,
+   LIGHT,
+   PORT,
+   RADIO_BEACON,
+   DGPS_STATION
+}
+
 @HiltViewModel
 class MapViewModel @Inject constructor(
    private val application: Application,
@@ -65,74 +77,74 @@ class MapViewModel @Inject constructor(
    private var lightTileProvider = LightTileProvider(application, lightTileRepository)
    private var dgpsTileProvider = DgpsStationTileProvider(application, dgpsStationTileRepository)
 
-   val tileProviders: LiveData<Map<DataSource, TileProvider>> = MediatorLiveData<Map<DataSource, TileProvider>>().apply {
-//      addSource(userPreferencesRepository.mgrs.asLiveData()) { enabled ->
-//         val providers = value?.toMutableMap() ?: mutableSetOf()
-//         if (enabled) providers.add(mgrsTileProvider) else providers.remove(mgrsTileProvider)
-//         value = providers
-//      }
-//
-//      addSource(userPreferencesRepository.gars.asLiveData()) { enabled ->
-//         val providers = value?.toMutableMap() ?: mutableSetOf()
-//         if (enabled) providers.add(garsTileProvider) else providers.remove(garsTileProvider)
-//         value = providers
-//      }
-//
-//      addSource(baseMap) { baseMap ->
-//         val providers = value?.toMutableMap() ?: mutableSetOf()
-//
-//         if (baseMap == BaseMapType.OSM) {
-//            providers.add(osmTileProvider)
-//         } else {
-//            providers.remove(osmTileProvider)
-//         }
-//
-//         value = providers
-//      }
+   val tileProviders: LiveData<Map<TileProviderType, TileProvider>> = MediatorLiveData<Map<TileProviderType, TileProvider>>().apply {
+      addSource(userPreferencesRepository.mgrs.asLiveData()) { enabled ->
+         val providers = value?.toMutableMap() ?: mutableMapOf()
+         if (enabled) providers[TileProviderType.MGRS] = mgrsTileProvider else providers.remove(TileProviderType.MGRS)
+         value = providers
+      }
+
+      addSource(userPreferencesRepository.gars.asLiveData()) { enabled ->
+         val providers = value?.toMutableMap() ?: mutableMapOf()
+         if (enabled) providers[TileProviderType.GARS] = garsTileProvider else providers.remove(TileProviderType.GARS)
+         value = providers
+      }
+
+      addSource(baseMap) { baseMap ->
+         val providers = value?.toMutableMap() ?: mutableMapOf()
+
+         if (baseMap == BaseMapType.OSM) {
+            providers[TileProviderType.OSM] = osmTileProvider
+         } else {
+            providers.remove(TileProviderType.OSM)
+         }
+
+         value = providers
+      }
 
       addSource(mapped) { mapped ->
          val providers = value?.toMutableMap() ?: mutableMapOf()
 
          if (mapped[DataSource.ASAM] == true) {
             asamTileProvider = AsamTileProvider(application, asamTileRepository)
-            providers[DataSource.ASAM] = asamTileProvider
+            providers[TileProviderType.ASAM] = asamTileProvider
          } else {
-            providers.remove(DataSource.ASAM)
+            providers.remove(TileProviderType.ASAM)
          }
 
          if (mapped[DataSource.MODU] == true) {
             moduTileProvider = ModuTileProvider(application, moduTileRepository)
-            providers.put(DataSource.MODU, moduTileProvider)
+            providers[TileProviderType.MODU] = moduTileProvider
          } else {
-            providers.remove(DataSource.MODU)
+            providers.remove(TileProviderType.MODU)
          }
 
          if (mapped[DataSource.LIGHT] == true) {
             lightTileProvider = LightTileProvider(application, lightTileRepository)
-            providers.put(DataSource.LIGHT, lightTileProvider)
+            providers[TileProviderType.LIGHT] = lightTileProvider
          } else {
-            providers.remove(DataSource.LIGHT)
+            providers.remove(TileProviderType.LIGHT)
          }
 
          if (mapped[DataSource.PORT] == true) {
             portTileProvider = PortTileProvider(application, portTileRepository)
-            providers.put(DataSource.PORT, portTileProvider)
+            providers[TileProviderType.PORT] = portTileProvider
          } else {
-            providers.remove(DataSource.PORT)
+            providers.remove(TileProviderType.PORT)
          }
 
          if (mapped[DataSource.RADIO_BEACON] == true) {
             beaconTileProvider = RadioBeaconTileProvider(application, beaconTileRepository)
-            providers.put(DataSource.RADIO_BEACON, beaconTileProvider)
+            providers[TileProviderType.RADIO_BEACON] = beaconTileProvider
          } else {
-            providers.remove(DataSource.RADIO_BEACON)
+            providers.remove(TileProviderType.RADIO_BEACON)
          }
 
          if (mapped[DataSource.DGPS_STATION] == true) {
             dgpsTileProvider = DgpsStationTileProvider(application, dgpsStationTileRepository)
-            providers.put(DataSource.DGPS_STATION, dgpsTileProvider)
+            providers[TileProviderType.DGPS_STATION] = dgpsTileProvider
          } else {
-            providers.remove(DataSource.DGPS_STATION)
+            providers.remove(TileProviderType.DGPS_STATION)
          }
 
          value = providers
@@ -142,7 +154,7 @@ class MapViewModel @Inject constructor(
          if (mapped.value?.get(DataSource.ASAM) == true) {
             val providers = value?.toMutableMap() ?: mutableMapOf()
             asamTileProvider = AsamTileProvider(application, asamTileRepository)
-            providers.put(DataSource.ASAM, asamTileProvider)
+            providers[TileProviderType.ASAM] = asamTileProvider
             value = providers
          }
       }
@@ -152,7 +164,7 @@ class MapViewModel @Inject constructor(
             if (mapped.value?.get(DataSource.MODU) == true) {
                val providers = value?.toMutableMap() ?: mutableMapOf()
                moduTileProvider = ModuTileProvider(application, moduTileRepository)
-               providers.put(DataSource.MODU, moduTileProvider)
+               providers[TileProviderType.MODU] = moduTileProvider
                value = providers
             }
          }
@@ -162,7 +174,7 @@ class MapViewModel @Inject constructor(
          if (mapped.value?.get(DataSource.LIGHT) == true) {
             val providers = value?.toMutableMap() ?: mutableMapOf()
             lightTileProvider = LightTileProvider(application, lightTileRepository)
-            providers.put(DataSource.LIGHT, lightTileProvider)
+            providers[TileProviderType.LIGHT] = lightTileProvider
             value = providers
          }
       }
@@ -171,7 +183,7 @@ class MapViewModel @Inject constructor(
          if (mapped.value?.get(DataSource.PORT) == true) {
             val providers = value?.toMutableMap() ?: mutableMapOf()
             portTileProvider = PortTileProvider(application, portTileRepository)
-            providers.put(DataSource.PORT, portTileProvider)
+            providers[TileProviderType.PORT] = portTileProvider
             value = providers
          }
       }
@@ -180,7 +192,7 @@ class MapViewModel @Inject constructor(
          if (mapped.value?.get(DataSource.RADIO_BEACON) == true) {
             val providers = value?.toMutableMap() ?: mutableMapOf()
             beaconTileProvider = RadioBeaconTileProvider(application, beaconTileRepository)
-            providers.put(DataSource.RADIO_BEACON, beaconTileProvider)
+            providers[TileProviderType.RADIO_BEACON] = beaconTileProvider
             value = providers
          }
       }
@@ -189,7 +201,7 @@ class MapViewModel @Inject constructor(
          if (mapped.value?.get(DataSource.DGPS_STATION) == true) {
             val providers = value?.toMutableMap() ?: mutableMapOf()
             dgpsTileProvider = DgpsStationTileProvider(application, dgpsStationTileRepository)
-            providers.put(DataSource.DGPS_STATION, dgpsTileProvider)
+            providers[TileProviderType.DGPS_STATION] = dgpsTileProvider
             value = providers
          }
       }
