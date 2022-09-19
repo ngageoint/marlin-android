@@ -22,18 +22,15 @@ import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.LocationSource
 import com.google.android.gms.maps.model.*
 import com.google.maps.android.compose.*
 import kotlinx.coroutines.launch
+import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.type.MapLocation
 import mil.nga.msi.ui.location.LocationPermission
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.cluster.MapAnnotation
-
-// TODO better way to detect individual tile provider change
-// TODO ASAM and MODU icons as tile images
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
@@ -51,7 +48,7 @@ fun MapScreen(
    var destination by remember { mutableStateOf(mapDestination) }
    val location by mapViewModel.locationPolicy.bestLocationProvider.observeAsState()
    var located by remember { mutableStateOf(false) }
-   val tileProviders by mapViewModel.tileProviders.observeAsState(emptySet())
+   val tileProviders by mapViewModel.tileProviders.observeAsState(emptyMap())
 
    val locationPermissionState: PermissionState = rememberPermissionState(
       Manifest.permission.ACCESS_FINE_LOCATION
@@ -92,7 +89,7 @@ fun MapScreen(
             locationPermissionState.status.isGranted,
             tileProviders,
             onMapMove = { position, reason ->
-               if (reason == GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE) {
+               if (reason == com.google.android.gms.maps.GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE) {
                   located = false
                   destination = null
                }
@@ -196,7 +193,7 @@ private fun Map(
    baseMap: BaseMapType?,
    locationSource: LocationSource,
    locationEnabled: Boolean,
-   tileProviders: Set<TileProvider>,
+   tileProviders: Map<DataSource, TileProvider>,
    onMapMove: (CameraPosition, Int) -> Unit,
    onMapClick: (LatLng, Float, VisibleRegion) -> Unit
 ) {
@@ -211,6 +208,13 @@ private fun Map(
          cameraPositionState.position = CameraPosition.fromLatLngZoom(LatLng(origin.latitude, origin.longitude), origin.zoom.toFloat())
       }
    }
+
+   val asamTileProvider = tileProviders[DataSource.ASAM]
+   val moduTileProvider = tileProviders[DataSource.MODU]
+   val lightTileProvider = tileProviders[DataSource.LIGHT]
+   val portTileProvider = tileProviders[DataSource.PORT]
+   val beaconTileProvider = tileProviders[DataSource.RADIO_BEACON]
+   val dgpsStationTileProvider = tileProviders[DataSource.DGPS_STATION]
 
    GoogleMap(
       cameraPositionState = cameraPositionState,
@@ -238,7 +242,12 @@ private fun Map(
             }
          }
 
-         tileProviders.forEach { TileOverlay(tileProvider = it ) }
+         asamTileProvider?.let { TileOverlay(tileProvider = it)}
+         moduTileProvider?.let { TileOverlay(tileProvider = it)}
+         lightTileProvider?.let { TileOverlay(tileProvider = it)}
+         portTileProvider?.let { TileOverlay(tileProvider = it)}
+         beaconTileProvider?.let { TileOverlay(tileProvider = it)}
+         dgpsStationTileProvider?.let { TileOverlay(tileProvider = it)}
       }
 
       MapEffect(null) { map ->
