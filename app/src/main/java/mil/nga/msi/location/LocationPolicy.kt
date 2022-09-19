@@ -28,7 +28,8 @@ class LocationPolicy @Inject constructor(val locationProvider: LocationProvider)
     }
 
     private fun isBetterLocation(location: Location, currentBestLocation: Location?): Boolean {
-        if (currentBestLocation == null) { // A new location is always better than no location
+        if (currentBestLocation == null) {
+            // A new location is always better than no location
             return true
         }
 

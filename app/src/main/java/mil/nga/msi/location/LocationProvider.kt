@@ -40,17 +40,19 @@ class LocationProvider @Inject constructor(
     }
 
     fun requestLocationUpdates() {
-        fusedLocationClient?.lastLocation?.addOnCompleteListener {
-            value = it.result
-        }
+        try {
+            fusedLocationClient?.lastLocation?.addOnCompleteListener {
+                value = it.result
+            }
 
-        Log.v(LOG_NAME, "request location updates")
-        val locationRequest = LocationRequest.create().apply {
-            interval = 10000
-            fastestInterval = 5000
-            priority = PRIORITY_HIGH_ACCURACY // TODO need to check if they enabled course or high
-        }
+            Log.v(LOG_NAME, "request location updates")
+            val locationRequest = LocationRequest.create().apply {
+                interval = 10000
+                fastestInterval = 5000
+                priority = PRIORITY_HIGH_ACCURACY // TODO need to check if they enabled course or high
+            }
 
-        fusedLocationClient?.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
+            fusedLocationClient?.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
+        } catch (ignore: SecurityException) {}
     }
 }
