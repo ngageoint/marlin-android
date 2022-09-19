@@ -49,12 +49,33 @@ fun PagingSheet(
             .background(badgeColor)
       )
 
-      Column {
+      Box {
+         HorizontalPager(
+            count = mapAnnotations.size,
+            state = pagerState,
+            modifier = Modifier.fillMaxWidth(),
+         ) { page ->
+            val annotation = mapAnnotations[page]
+            badgeColor = annotation.key.type.route.color
+
+            Column(modifier = Modifier.fillMaxWidth()) {
+               when (annotation.key.type) {
+                  MapAnnotation.Type.ASAM -> AsamPage(annotation.key.id) { onDetails(annotation) }
+                  MapAnnotation.Type.MODU -> ModuPage(annotation.key.id) { onDetails(annotation) }
+                  MapAnnotation.Type.LIGHT -> LightPage(annotation.key.id) { onDetails(annotation) }
+                  MapAnnotation.Type.PORT -> PortPage(annotation.key.id) { onDetails(annotation) }
+                  MapAnnotation.Type.RADIO_BEACON -> RadioBeaconPage(annotation.key.id) { onDetails(annotation) }
+                  MapAnnotation.Type.DGPS_STATION -> DgpsStationPage(annotation.key.id) { onDetails(annotation) }
+               }
+            }
+         }
 
          Row(
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+               .height(60.dp)
+               .fillMaxWidth()
          ) {
             val previousEnabled = pagerState.currentPage > 0
             IconButton(
@@ -93,27 +114,6 @@ fun PagingSheet(
                )
             }
          }
-
-         HorizontalPager(
-            count = mapAnnotations.size,
-            state = pagerState,
-            contentPadding = PaddingValues(horizontal = 0.dp),
-            modifier = Modifier.fillMaxWidth(),
-         ) { page ->
-            val annotation = mapAnnotations[page]
-            badgeColor = annotation.key.type.route.color
-
-            Column(modifier = Modifier.fillMaxWidth()) {
-               when (annotation.key.type) {
-                  MapAnnotation.Type.ASAM -> AsamPage(annotation.key.id) { onDetails(annotation) }
-                  MapAnnotation.Type.MODU -> ModuPage(annotation.key.id) { onDetails(annotation) }
-                  MapAnnotation.Type.LIGHT -> LightPage(annotation.key.id) { onDetails(annotation) }
-                  MapAnnotation.Type.PORT -> PortPage(annotation.key.id) { onDetails(annotation) }
-                  MapAnnotation.Type.RADIO_BEACON -> RadioBeaconPage(annotation.key.id) { onDetails(annotation) }
-                  MapAnnotation.Type.DGPS_STATION -> DgpsStationPage(annotation.key.id) { onDetails(annotation) }
-               }
-            }
-         }
       }
    }
 }
@@ -125,7 +125,8 @@ private fun AsamPage(
 ) {
    AsamSheetScreen(
       reference,
-      onDetails = { onDetails() }
+      onDetails = { onDetails() },
+      modifier = Modifier.fillMaxHeight()
    )
 }
 
@@ -136,7 +137,8 @@ private fun ModuPage(
 ) {
    ModuSheetScreen(
       name,
-      onDetails = { onDetails() }
+      onDetails = { onDetails() },
+      modifier = Modifier.fillMaxHeight()
    )
 }
 
@@ -148,7 +150,8 @@ private fun LightPage(
    val key = LightKey.fromId(id)
    LightSheetScreen(
       key,
-      onDetails = { onDetails() }
+      onDetails = { onDetails() },
+      modifier = Modifier.fillMaxHeight()
    )
 }
 
@@ -159,7 +162,8 @@ private fun PortPage(
 ) {
    PortSheetScreen(
       id,
-      onDetails = { onDetails() }
+      onDetails = { onDetails() },
+      modifier = Modifier.fillMaxHeight()
    )
 }
 
@@ -171,7 +175,8 @@ private fun RadioBeaconPage(
    val key = RadioBeaconKey.fromId(id)
    RadioBeaconSheetScreen(
       key,
-      onDetails = { onDetails() }
+      onDetails = { onDetails() },
+      modifier = Modifier.fillMaxHeight()
    )
 }
 
@@ -183,6 +188,7 @@ private fun DgpsStationPage(
    val key = DgpsStationKey.fromId(id)
    DgpsStationSheetScreen(
       key,
-      onDetails = { onDetails() }
+      onDetails = { onDetails() },
+      modifier = Modifier.fillMaxHeight()
    )
 }

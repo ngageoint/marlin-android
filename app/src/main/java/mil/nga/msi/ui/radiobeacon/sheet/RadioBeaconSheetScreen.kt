@@ -1,5 +1,7 @@
 package mil.nga.msi.ui.radiobeacon.sheet
 
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -7,11 +9,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import mil.nga.msi.R
+import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.radiobeacon.RadioBeacon
 import mil.nga.msi.repository.radiobeacon.RadioBeaconKey
 import mil.nga.msi.ui.radiobeacon.RadioBeaconViewModel
@@ -20,12 +26,15 @@ import mil.nga.msi.ui.radiobeacon.RadioBeaconViewModel
 fun RadioBeaconSheetScreen(
    key: RadioBeaconKey,
    onDetails: (() -> Unit)? = null,
+   modifier: Modifier = Modifier,
    viewModel: RadioBeaconViewModel = hiltViewModel()
 ) {
    val beacon by viewModel.getRadioBeacon(key.volumeNumber, key.featureNumber).observeAsState()
    beacon?.let {
-      RadioBeaconContent(beacon = it) {
-         onDetails?.invoke()
+      Column(modifier = modifier) {
+         RadioBeaconContent(beacon = it) {
+            onDetails?.invoke()
+         }
       }
    }
 }
@@ -35,12 +44,25 @@ private fun RadioBeaconContent(
    beacon: RadioBeacon,
    onDetails: () -> Unit,
 ) {
-   Column(
-      verticalArrangement = Arrangement.SpaceBetween,
-      modifier = Modifier
-         .padding(vertical = 8.dp, horizontal = 16.dp)
-   ) {
-      Column {
+   Column(modifier = Modifier.padding(vertical = 8.dp)) {
+      Box(
+         contentAlignment = Alignment.Center,
+         modifier = Modifier
+            .padding(horizontal = 16.dp)
+            .size(48.dp)
+      ) {
+         Canvas(modifier = Modifier.fillMaxSize(), onDraw = {
+            drawCircle(color = DataSource.RADIO_BEACON.color)
+         })
+
+         Image(
+            painter = painterResource(id = R.drawable.ic_baseline_settings_input_antenna_24),
+            modifier = Modifier.size(24.dp),
+            contentDescription = "Radio Beacon icon",
+         )
+      }
+
+      Column(Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
          CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
             Text(
                text = "${beacon.featureNumber} ${beacon.volumeNumber}",

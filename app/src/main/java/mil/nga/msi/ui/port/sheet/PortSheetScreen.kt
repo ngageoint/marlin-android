@@ -1,19 +1,22 @@
 package mil.nga.msi.ui.port.sheet
 
 import android.location.Location
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.port.Port
 import mil.nga.msi.ui.location.generalDirection
 import mil.nga.msi.ui.port.PortViewModel
@@ -22,6 +25,7 @@ import mil.nga.msi.ui.port.PortViewModel
 fun PortSheetScreen(
    id: String,
    onDetails: (() -> Unit)? = null,
+   modifier: Modifier = Modifier,
    viewModel: PortViewModel = hiltViewModel()
 ) {
    val location by viewModel.locationProvider.observeAsState()
@@ -29,8 +33,10 @@ fun PortSheetScreen(
    id.toIntOrNull()?.let { portNumber ->
       val port by viewModel.getPort(portNumber).observeAsState()
       port?.let {
-         PortContent(port = it, location = location) {
-            onDetails?.invoke()
+         Column(modifier = modifier) {
+            PortContent(port = it, location = location) {
+               onDetails?.invoke()
+            }
          }
       }
    }
@@ -42,7 +48,24 @@ private fun PortContent(
    location: Location?,
    onDetails: () -> Unit,
 ) {
-   Column() {
+   Column(modifier = Modifier.padding(vertical = 8.dp)) {
+      Box(
+         contentAlignment = Alignment.Center,
+         modifier = Modifier
+            .padding(horizontal = 16.dp)
+            .size(48.dp)
+      ) {
+         Canvas(modifier = Modifier.fillMaxSize(), onDraw = {
+            drawCircle(color = DataSource.PORT.color)
+         })
+
+         Image(
+            painter = painterResource(id = mil.nga.msi.R.drawable.ic_baseline_anchor_24),
+            modifier = Modifier.size(24.dp),
+            contentDescription = "Port icon",
+         )
+      }
+
       Column(
          modifier = Modifier
             .padding(vertical = 8.dp, horizontal = 16.dp)

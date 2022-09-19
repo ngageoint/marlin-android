@@ -1,18 +1,21 @@
 package mil.nga.msi.ui.light.sheet
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.light.Light
 import mil.nga.msi.repository.light.LightKey
 import mil.nga.msi.ui.light.LightViewModel
@@ -21,12 +24,15 @@ import mil.nga.msi.ui.light.LightViewModel
 fun LightSheetScreen(
    key: LightKey,
    onDetails: (() -> Unit)? = null,
+   modifier: Modifier = Modifier,
    viewModel: LightViewModel = hiltViewModel()
 ) {
    val light by viewModel.getLight(key.volumeNumber, key.featureNumber).observeAsState()
    light?.first()?.let {
-      LightContent(light = it) {
-         onDetails?.invoke()
+      Column(modifier = modifier) {
+         LightContent(light = it) {
+            onDetails?.invoke()
+         }
       }
    }
 }
@@ -37,11 +43,26 @@ private fun LightContent(
    onDetails: () -> Unit,
 ) {
    Column(
-      verticalArrangement = Arrangement.SpaceBetween,
-      modifier = Modifier
-         .padding(vertical = 8.dp, horizontal = 16.dp)
+      modifier = Modifier.padding(vertical = 8.dp)
    ) {
-      Column {
+      Box(
+         contentAlignment = Alignment.Center,
+         modifier = Modifier
+            .padding(horizontal = 16.dp)
+            .size(48.dp)
+      ) {
+         Canvas(modifier = Modifier.fillMaxSize(), onDraw = {
+            drawCircle(color = DataSource.LIGHT.color)
+         })
+
+         Image(
+            painter = painterResource(id = mil.nga.msi.R.drawable.ic_baseline_lightbulb_24),
+            modifier = Modifier.size(24.dp),
+            contentDescription = "Light icon",
+         )
+      }
+
+      Column(Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
          CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
             Text(
                text = "${light.featureNumber} ${light.internationalFeature ?: ""} ${light.volumeNumber}",
