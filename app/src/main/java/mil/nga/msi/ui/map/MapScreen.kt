@@ -1,6 +1,7 @@
 package mil.nga.msi.ui.map
 
 import android.Manifest
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -25,13 +26,16 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.LocationSource
 import com.google.android.gms.maps.model.*
 import com.google.maps.android.compose.*
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import mil.nga.msi.type.MapLocation
 import mil.nga.msi.ui.location.LocationPermission
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.cluster.MapAnnotation
+import kotlin.time.ExperimentalTime
+import kotlin.time.seconds
 
-@OptIn(ExperimentalPermissionsApi::class)
+@OptIn(ExperimentalPermissionsApi::class, ExperimentalTime::class)
 @Composable
 fun MapScreen(
    mapDestination : MapLocation? = null,
@@ -43,12 +47,25 @@ fun MapScreen(
 ) {
    val scope = rememberCoroutineScope()
    val fetching by mapViewModel.fetching.observeAsState(emptyMap())
+   var fetchingVisibility by remember { mutableStateOf(true) }
    val baseMap by mapViewModel.baseMap.observeAsState()
    val mapOrigin by mapViewModel.mapLocation.observeAsState()
    var destination by remember { mutableStateOf(mapDestination) }
    val location by mapViewModel.locationPolicy.bestLocationProvider.observeAsState()
    var located by remember { mutableStateOf(false) }
    val tileProviders by mapViewModel.tileProviders.observeAsState(emptyMap())
+
+   var ticks by remember { mutableStateOf(0) }
+   LaunchedEffect(fetching) {
+      if(fetchingVisibility) {
+         delay(1.seconds)
+         ticks++
+      }
+
+      if (ticks > 0) {
+         fetchingVisibility = false
+      }
+   }
 
    val locationPermissionState: PermissionState = rememberPermissionState(
       Manifest.permission.ACCESS_FINE_LOCATION
@@ -138,7 +155,10 @@ fun MapScreen(
             }
          )
 
-         if (fetching.any { it.value }) {
+         androidx.compose.animation.AnimatedVisibility(
+            visible = fetchingVisibility,
+            exit = fadeOut()
+         ) {
             Column(
                modifier = Modifier
                   .fillMaxSize()
@@ -170,6 +190,39 @@ fun MapScreen(
                }
             }
          }
+
+//         if (fetchingVisibility) {
+//            Column(
+//               modifier = Modifier
+//                  .fillMaxSize()
+//                  .padding(top = 16.dp)
+//            ) {
+//               Row(
+//                  verticalAlignment = Alignment.CenterVertically,
+//                  modifier = Modifier
+//                     .align(Alignment.CenterHorizontally)
+//                     .height(40.dp)
+//                     .clip(RoundedCornerShape(20.dp))
+//                     .background(MaterialTheme.colors.primary)
+//                     .padding(horizontal = 16.dp)
+//               ) {
+//                  Box(Modifier.align(Alignment.CenterVertically)) {
+//                     CircularProgressIndicator(
+//                        color = MaterialTheme.colors.onPrimary,
+//                        strokeWidth = 2.dp,
+//                        modifier = Modifier
+//                           .padding(end = 8.dp)
+//                           .size(18.dp)
+//                     )
+//                  }
+//
+//                  Text(
+//                     text = "Loading Data",
+//                     style = MaterialTheme.typography.body2,
+//                     color = MaterialTheme.colors.onPrimary)
+//               }
+//            }
+//         }
 
          FloatingActionButton(
             onClick = { onMapSettings() },

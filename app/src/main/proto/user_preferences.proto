@@ -15,4 +15,5 @@ message UserPreferences {
   map<string, bool> mapped = 6;
   repeated string tabs = 7;
   repeated string nonTabs = 8;
+  map<string, int64> dataSourceSyncDate = 9;
 }

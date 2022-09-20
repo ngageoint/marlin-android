@@ -6,18 +6,32 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.repository.light.LightRepository
+import mil.nga.msi.repository.preferences.UserPreferencesRepository
+import java.time.Instant
+import java.time.temporal.ChronoUnit
 
 @HiltWorker
 class RefreshLightWorker @AssistedInject constructor(
    @Assisted context: Context,
    @Assisted params: WorkerParameters,
    private val repository: LightRepository,
+   private val userPreferencesRepository: UserPreferencesRepository
 ) : CoroutineWorker(context, params) {
    override suspend fun doWork(): Result = try {
-      repository.fetchLights(true)
+      val fetched = userPreferencesRepository.fetched(DataSource.LIGHT)
+      if (fetched == null || fetched.isBefore(Instant.now().minus(FETCH_INTERVAL_HOURS, ChronoUnit.HOURS))) {
+         repository.fetchLights(true)
+         userPreferencesRepository.setFetched(DataSource.LIGHT, Instant.now())
+      }
+
       Result.success()
    } catch (error: Throwable) {
       Result.failure()
+   }
+
+   companion object {
+      private const val FETCH_INTERVAL_HOURS = 24L
    }
 }
