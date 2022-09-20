@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.withContext
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.location.LocationPolicy
+import mil.nga.msi.repository.DataSourceRepository
 import mil.nga.msi.repository.asam.AsamRepository
 import mil.nga.msi.repository.dgpsstation.DgpsStationKey
 import mil.nga.msi.repository.dgpsstation.DgpsStationRepository
@@ -53,6 +54,7 @@ class MapViewModel @Inject constructor(
    private val beaconTileRepository: RadioBeaconTileRepository,
    private val dgpsStationRepository: DgpsStationRepository,
    private val dgpsStationTileRepository: DgpsStationTileRepository,
+   dataSourceRepository: DataSourceRepository,
    val locationPolicy: LocationPolicy,
    val userPreferencesRepository: UserPreferencesRepository,
    @Named("osmTileProvider") private val osmTileProvider: TileProvider,
@@ -62,6 +64,8 @@ class MapViewModel @Inject constructor(
 
    val baseMap = userPreferencesRepository.baseMapType.asLiveData()
    val mapLocation = userPreferencesRepository.mapLocation.asLiveData()
+   val fetching = dataSourceRepository.fetching
+
    private val _zoom = MutableLiveData<Int>()
    private val mapped = userPreferencesRepository.mapped.asLiveData()
 

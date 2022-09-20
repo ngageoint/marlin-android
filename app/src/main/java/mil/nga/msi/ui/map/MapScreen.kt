@@ -1,11 +1,10 @@
 package mil.nga.msi.ui.map
 
 import android.Manifest
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.ContentAlpha
-import androidx.compose.material.FloatingActionButton
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.outlined.LocationSearching
@@ -15,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -42,6 +42,7 @@ fun MapScreen(
    mapViewModel: MapViewModel = hiltViewModel()
 ) {
    val scope = rememberCoroutineScope()
+   val fetching by mapViewModel.fetching.observeAsState(emptyMap())
    val baseMap by mapViewModel.baseMap.observeAsState()
    val mapOrigin by mapViewModel.mapLocation.observeAsState()
    var destination by remember { mutableStateOf(mapDestination) }
@@ -72,7 +73,10 @@ fun MapScreen(
       override fun deactivate() {}
    }
 
-   Column(modifier = Modifier.fillMaxSize()) {
+   Column(
+      horizontalAlignment = Alignment.CenterHorizontally,
+      modifier = Modifier.fillMaxSize()
+   ) {
       TopBar(
          title = "Map",
          buttonIcon = Icons.Filled.Menu,
@@ -133,6 +137,39 @@ fun MapScreen(
                }
             }
          )
+
+         if (fetching.any { it.value }) {
+            Column(
+               modifier = Modifier
+                  .fillMaxSize()
+                  .padding(top = 16.dp)
+            ) {
+               Row(
+                  verticalAlignment = Alignment.CenterVertically,
+                  modifier = Modifier
+                     .align(Alignment.CenterHorizontally)
+                     .height(40.dp)
+                     .clip(RoundedCornerShape(20.dp))
+                     .background(MaterialTheme.colors.primary)
+                     .padding(horizontal = 16.dp)
+               ) {
+                  Box(Modifier.align(Alignment.CenterVertically)) {
+                     CircularProgressIndicator(
+                        color = MaterialTheme.colors.onPrimary,
+                        strokeWidth = 2.dp,
+                        modifier = Modifier
+                           .padding(end = 8.dp)
+                           .size(18.dp)
+                     )
+                  }
+
+                  Text(
+                     text = "Loading Data",
+                     style = MaterialTheme.typography.body2,
+                     color = MaterialTheme.colors.onPrimary)
+               }
+            }
+         }
 
          FloatingActionButton(
             onClick = { onMapSettings() },
