@@ -89,7 +89,7 @@ class AsamRepository @Inject constructor(
    }
 
    val fetching = workManager.getWorkInfosForUniqueWorkLiveData(FETCH_LATEST_ASAMS_TASK).map { workInfo ->
-      workInfo.first()?.state == WorkInfo.State.RUNNING
+      workInfo.any { it.state == WorkInfo.State.RUNNING }
    }
 
    companion object {

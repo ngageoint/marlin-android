@@ -13,6 +13,7 @@ import androidx.compose.material.icons.outlined.Map
 import androidx.compose.material.icons.outlined.MyLocation
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,10 +33,9 @@ import mil.nga.msi.type.MapLocation
 import mil.nga.msi.ui.location.LocationPermission
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.cluster.MapAnnotation
-import kotlin.time.ExperimentalTime
-import kotlin.time.seconds
+import kotlin.time.Duration.Companion.seconds
 
-@OptIn(ExperimentalPermissionsApi::class, ExperimentalTime::class)
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun MapScreen(
    mapDestination : MapLocation? = null,
@@ -47,7 +47,7 @@ fun MapScreen(
 ) {
    val scope = rememberCoroutineScope()
    val fetching by mapViewModel.fetching.observeAsState(emptyMap())
-   var fetchingVisibility by remember { mutableStateOf(true) }
+   var fetchingVisibility by rememberSaveable { mutableStateOf(true) }
    val baseMap by mapViewModel.baseMap.observeAsState()
    val mapOrigin by mapViewModel.mapLocation.observeAsState()
    var destination by remember { mutableStateOf(mapDestination) }
@@ -55,14 +55,9 @@ fun MapScreen(
    var located by remember { mutableStateOf(false) }
    val tileProviders by mapViewModel.tileProviders.observeAsState(emptyMap())
 
-   var ticks by remember { mutableStateOf(0) }
    LaunchedEffect(fetching) {
-      if(fetchingVisibility) {
+      if(fetching.none { it.value } && fetchingVisibility) {
          delay(1.seconds)
-         ticks++
-      }
-
-      if (ticks > 0) {
          fetchingVisibility = false
       }
    }
@@ -190,39 +185,6 @@ fun MapScreen(
                }
             }
          }
-
-//         if (fetchingVisibility) {
-//            Column(
-//               modifier = Modifier
-//                  .fillMaxSize()
-//                  .padding(top = 16.dp)
-//            ) {
-//               Row(
-//                  verticalAlignment = Alignment.CenterVertically,
-//                  modifier = Modifier
-//                     .align(Alignment.CenterHorizontally)
-//                     .height(40.dp)
-//                     .clip(RoundedCornerShape(20.dp))
-//                     .background(MaterialTheme.colors.primary)
-//                     .padding(horizontal = 16.dp)
-//               ) {
-//                  Box(Modifier.align(Alignment.CenterVertically)) {
-//                     CircularProgressIndicator(
-//                        color = MaterialTheme.colors.onPrimary,
-//                        strokeWidth = 2.dp,
-//                        modifier = Modifier
-//                           .padding(end = 8.dp)
-//                           .size(18.dp)
-//                     )
-//                  }
-//
-//                  Text(
-//                     text = "Loading Data",
-//                     style = MaterialTheme.typography.body2,
-//                     color = MaterialTheme.colors.onPrimary)
-//               }
-//            }
-//         }
 
          FloatingActionButton(
             onClick = { onMapSettings() },
