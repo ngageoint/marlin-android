@@ -3,8 +3,11 @@ package mil.nga.msi.repository.light
 import androidx.lifecycle.map
 import androidx.work.*
 import mil.nga.msi.MarlinNotification
+import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.light.Light
 import mil.nga.msi.datasource.light.PublicationVolume
+import mil.nga.msi.repository.preferences.UserPreferencesRepository
+import mil.nga.msi.work.light.LoadLightWorker
 import mil.nga.msi.work.light.RefreshLightWorker
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -13,7 +16,8 @@ class LightRepository @Inject constructor(
    private val workManager: WorkManager,
    private val localDataSource: LightLocalDataSource,
    private val remoteDataSource: LightRemoteDataSource,
-   private val notification: MarlinNotification
+   private val notification: MarlinNotification,
+   private val userPreferencesRepository: UserPreferencesRepository
 ) {
    val lightMapItems = localDataSource.observeLightMapItems()
    fun getLightListItems() = localDataSource.observeLightListItems()
@@ -47,12 +51,12 @@ class LightRepository @Inject constructor(
    suspend fun fetchLights(refresh: Boolean = false): List<Light> {
       if (refresh) {
          val newLights = mutableListOf<Light>()
-         val isEmpty = localDataSource.isEmpty()
+         val fetched = userPreferencesRepository.fetched(DataSource.LIGHT)
 
          PublicationVolume.values().forEach { volume ->
             val lights = remoteDataSource.fetchLights(volume)
 
-            if (!isEmpty) {
+            if (fetched == null) {
                newLights.addAll(lights.subtract(localDataSource.existingLights(lights.map { it.compositeKey() }).toSet()).toList())
             }
 
@@ -66,6 +70,7 @@ class LightRepository @Inject constructor(
    }
 
    fun fetchLights() {
+      val loadRequest = OneTimeWorkRequest.Builder(LoadLightWorker::class.java).build()
       val fetchRequest = OneTimeWorkRequest.Builder(RefreshLightWorker::class.java)
          .setConstraints(
             Constraints.Builder()
@@ -77,10 +82,9 @@ class LightRepository @Inject constructor(
          .build()
 
       workManager
-         .enqueueUniqueWork(
-            FETCH_LATEST_LIGHTS_TASK,
-            ExistingWorkPolicy.KEEP, fetchRequest
-         )
+         .beginUniqueWork(FETCH_LATEST_LIGHTS_TASK, ExistingWorkPolicy.KEEP, loadRequest)
+         .then(fetchRequest)
+         .enqueue()
    }
 
    fun fetchLightsPeriodically() {

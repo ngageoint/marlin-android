@@ -3,7 +3,10 @@ package mil.nga.msi.repository.port
 import androidx.lifecycle.map
 import androidx.work.*
 import mil.nga.msi.MarlinNotification
+import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.port.Port
+import mil.nga.msi.repository.preferences.UserPreferencesRepository
+import mil.nga.msi.work.port.LoadPortWorker
 import mil.nga.msi.work.port.RefreshPortWorker
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -12,7 +15,8 @@ class PortRepository @Inject constructor(
    private val workManager: WorkManager,
    private val localDataSource: PortLocalDataSource,
    private val remoteDataSource: PortRemoteDataSource,
-   private val notification: MarlinNotification
+   private val notification: MarlinNotification,
+   private val userPreferencesRepository: UserPreferencesRepository
 ) {
    val portMapItems = localDataSource.observePortMapItems()
    fun getPortListItems() = localDataSource.observePortListItems()
@@ -31,7 +35,8 @@ class PortRepository @Inject constructor(
       if (refresh) {
          val ports = remoteDataSource.fetchPorts()
 
-         if (!localDataSource.isEmpty()) {
+         val fetched = userPreferencesRepository.fetched(DataSource.PORT)
+         if (fetched == null) {
             val newPorts = ports.subtract(localDataSource.existingPorts(ports.map { it.portNumber }).toSet()).toList()
             notification.port(newPorts)
          }
@@ -43,6 +48,7 @@ class PortRepository @Inject constructor(
    }
 
    fun fetchPorts() {
+      val loadRequest = OneTimeWorkRequest.Builder(LoadPortWorker::class.java).build()
       val fetchRequest = OneTimeWorkRequest.Builder(RefreshPortWorker::class.java)
          .setConstraints(
             Constraints.Builder()
@@ -54,10 +60,9 @@ class PortRepository @Inject constructor(
          .build()
 
       workManager
-         .enqueueUniqueWork(
-            FETCH_LATEST_PORTS_TASK,
-            ExistingWorkPolicy.KEEP, fetchRequest
-         )
+         .beginUniqueWork(FETCH_LATEST_PORTS_TASK, ExistingWorkPolicy.KEEP, loadRequest)
+         .then(fetchRequest)
+         .enqueue()
    }
 
    fun fetchPortsPeriodically() {

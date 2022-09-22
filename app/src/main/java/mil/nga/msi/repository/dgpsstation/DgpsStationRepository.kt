@@ -3,8 +3,11 @@ package mil.nga.msi.repository.dgpsstation
 import androidx.lifecycle.map
 import androidx.work.*
 import mil.nga.msi.MarlinNotification
+import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.dgpsstation.DgpsStation
 import mil.nga.msi.datasource.light.PublicationVolume
+import mil.nga.msi.repository.preferences.UserPreferencesRepository
+import mil.nga.msi.work.dgpsstation.LoadDgpsStationWorker
 import mil.nga.msi.work.dgpsstation.RefreshDgpsStationWorker
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -13,6 +16,7 @@ class DgpsStationRepository @Inject constructor(
    private val workManager: WorkManager,
    private val localDataSource: DgpsStationLocalDataSource,
    private val remoteDataSource: DgpsStationRemoteDataSource,
+   private val userPreferencesRepository: UserPreferencesRepository,
    private val notification: MarlinNotification
 ) {
    fun getDgpsStationListItems() = localDataSource.observeDgpsStationListItems()
@@ -38,18 +42,17 @@ class DgpsStationRepository @Inject constructor(
    suspend fun fetchDgpsStations(refresh: Boolean = false): List<DgpsStation> {
       if (refresh) {
          val newStations = mutableListOf<DgpsStation>()
-         val isEmpty = localDataSource.isEmpty()
 
+         val fetched = userPreferencesRepository.fetched(DataSource.DGPS_STATION)
          PublicationVolume.values().forEach { volume ->
             val stations = remoteDataSource.fetchDgpsStations(volume)
 
-            if (!isEmpty) {
+            if (fetched == null) {
                newStations.addAll(stations.subtract(localDataSource.existingDgpsStations(stations.map { it.compositeKey() }).toSet()).toList())
             }
 
             localDataSource.insert(stations)
          }
-
 
          notification.dgpsStation(newStations)
       }
@@ -58,6 +61,7 @@ class DgpsStationRepository @Inject constructor(
    }
 
    fun fetchDgpsStations() {
+      val loadRequest = OneTimeWorkRequest.Builder(LoadDgpsStationWorker::class.java).build()
       val fetchRequest = OneTimeWorkRequest.Builder(RefreshDgpsStationWorker::class.java)
          .setConstraints(
             Constraints.Builder()
@@ -69,10 +73,9 @@ class DgpsStationRepository @Inject constructor(
          .build()
 
       workManager
-         .enqueueUniqueWork(
-            FETCH_LATEST_DGPS_STATIONS_TASK,
-            ExistingWorkPolicy.KEEP, fetchRequest
-         )
+         .beginUniqueWork(FETCH_LATEST_DGPS_STATIONS_TASK, ExistingWorkPolicy.KEEP, loadRequest)
+         .then(fetchRequest)
+         .enqueue()
    }
 
    fun fetchDgpsStationsPeriodically() {

@@ -3,8 +3,10 @@ package mil.nga.msi.repository.navigationalwarning
 import androidx.lifecycle.map
 import androidx.work.*
 import mil.nga.msi.MarlinNotification
+import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.navigationwarning.NavigationArea
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarning
+import mil.nga.msi.repository.preferences.UserPreferencesRepository
 import mil.nga.msi.work.navigationalwarning.RefreshNavigationalWarningWorker
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -14,7 +16,8 @@ class NavigationalWarningRepository @Inject constructor(
    private val workManager: WorkManager,
    private val localDataSource: NavigationalWarningLocalDataSource,
    private val remoteDataSource: NavigationalWarningRemoteDataSource,
-   private val notification: MarlinNotification
+   private val notification: MarlinNotification,
+   private val userPreferencesRepository: UserPreferencesRepository
 ) {
    fun getNavigationalWarningsByArea(navigationArea: NavigationArea?) = localDataSource.observeNavigationalWarningsByArea(navigationArea)
    fun getNavigationalWarningsByNavigationArea(
@@ -33,7 +36,8 @@ class NavigationalWarningRepository @Inject constructor(
       if (refresh) {
          val remoteWarnings = remoteDataSource.fetchNavigationalWarnings()
 
-         if (!localDataSource.isEmpty()) {
+         val fetched = userPreferencesRepository.fetched(DataSource.NAVIGATION_WARNING)
+         if (fetched == null) {
             val newWarnings = remoteWarnings.subtract(localDataSource.existingNavigationalWarnings(remoteWarnings.map { it.compositeKey() }).toSet()).toList()
             notification.navigationWarning(newWarnings)
          }
