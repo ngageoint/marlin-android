@@ -14,6 +14,7 @@ import mil.nga.msi.repository.light.LightLocalDataSource
 import mil.nga.msi.repository.map.*
 import mil.nga.msi.repository.modu.ModuLocalDataSource
 import mil.nga.msi.repository.port.PortLocalDataSource
+import mil.nga.msi.repository.preferences.UserPreferencesRepository
 import mil.nga.msi.repository.radiobeacon.RadioBeaconLocalDataSource
 import mil.nga.msi.ui.map.overlay.*
 import javax.inject.Named
@@ -60,8 +61,8 @@ class MapModule {
    @Singleton
    @Provides
    @Named("lightTileProvider")
-   fun provideLightTileProvider(application: Application, dataSource: LightLocalDataSource): TileProvider {
-      return LightTileProvider(application, LightTileRepository(dataSource))
+   fun provideLightTileProvider(application: Application, dataSource: LightLocalDataSource, userPreferencesRepository: UserPreferencesRepository): TileProvider {
+      return LightTileProvider(application, LightTileRepository(dataSource, userPreferencesRepository))
    }
 
    @Singleton

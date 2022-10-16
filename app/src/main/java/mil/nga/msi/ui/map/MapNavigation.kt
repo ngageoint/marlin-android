@@ -18,6 +18,7 @@ import mil.nga.msi.ui.asam.AsamRoute
 import mil.nga.msi.ui.dgpsstation.DgpsStationRoute
 import mil.nga.msi.ui.light.LightRoute
 import mil.nga.msi.ui.map.cluster.MapAnnotation
+import mil.nga.msi.ui.map.settings.MapLightSettingsScreen
 import mil.nga.msi.ui.map.settings.MapSettingsScreen
 import mil.nga.msi.ui.modu.ModuRoute
 import mil.nga.msi.ui.navigation.MapAnnotationsType
@@ -35,6 +36,7 @@ sealed class MapRoute(
 ): Route {
    object Map: MapRoute("map", "Map")
    object Settings: MapRoute("mapSettings", "Map Settings")
+   object LightSettings: MapRoute("lightSettings", "Light Settings")
    object PagerSheet: MapRoute("annotationPagerSheet", "Map")
 }
 
@@ -100,9 +102,24 @@ fun NavGraphBuilder.mapGraph(
    composable(MapRoute.Settings.name) {
       bottomBarVisibility(false)
 
-      MapSettingsScreen(onClose = {
-         navController.popBackStack()
-      })
+      MapSettingsScreen(
+         onLightSettings = {
+            navController.navigate(MapRoute.LightSettings.name)
+         },
+         onClose = {
+            navController.popBackStack()
+         }
+      )
+   }
+
+   composable(MapRoute.LightSettings.name) {
+      bottomBarVisibility(false)
+
+      MapLightSettingsScreen(
+         onClose = {
+            navController.popBackStack()
+         }
+      )
    }
 
    bottomSheet(

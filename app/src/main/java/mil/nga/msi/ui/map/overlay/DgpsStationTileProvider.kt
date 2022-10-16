@@ -9,6 +9,7 @@ import android.graphics.Rect
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.graphics.drawable.toBitmap
+import com.google.maps.android.geometry.Bounds
 import mil.nga.msi.R
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.dgpsstation.DgpsStation
@@ -27,7 +28,12 @@ class DgpsStationImage(
    override val longitude = dgpsStation.longitude
    override val dataSource = DataSource.DGPS_STATION
 
-   override fun image(context: Context, zoom: Int): List<Bitmap> {
+   override fun image(
+      context: Context,
+      zoom: Int,
+      tileBounds: Bounds,
+      tileSize: Double
+   ): List<Bitmap> {
       val image =  if (zoom < 13) {
          dgpsStationImage(context)
       } else {

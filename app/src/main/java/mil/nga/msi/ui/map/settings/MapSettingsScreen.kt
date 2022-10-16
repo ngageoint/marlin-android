@@ -10,14 +10,17 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
+import mil.nga.msi.R
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.BaseMapType
 
 @Composable
 fun MapSettingsScreen(
+   onLightSettings: () -> Unit,
    onClose: () -> Unit,
    viewModel: MapSettingsViewModel = hiltViewModel()
 ) {
@@ -44,6 +47,8 @@ fun MapSettingsScreen(
          onGarsToggled = { viewModel.setGARS(it) },
          onMgrsToggled = { viewModel.setMGRS(it) }
       )
+
+      DataSourceSettings(onLightSettings)
    }
 }
 
@@ -202,5 +207,52 @@ private fun GridLayers(
          checked = mgrs,
          onCheckedChange = null
       )
+   }
+}
+
+@Composable
+private fun DataSourceSettings(
+   onLightSettings: () -> Unit
+
+) {
+   LightSettings(
+      onSettings = onLightSettings
+   )
+}
+
+@Composable
+private fun LightSettings(
+   onSettings: () -> Unit
+) {
+   Column(Modifier.padding(horizontal = 32.dp)) {
+      Text(
+         text = "DATA SOURCE SETTINGS",
+         color = MaterialTheme.colors.secondary,
+         style = MaterialTheme.typography.subtitle1,
+         modifier = Modifier.padding(top = 16.dp)
+      )
+   }
+
+   Row(
+      verticalAlignment = Alignment.CenterVertically,
+      modifier = Modifier
+         .fillMaxWidth()
+         .clickable { onSettings() }
+         .padding(horizontal = 32.dp, vertical = 16.dp)
+   ) {
+      CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+         Icon(
+            painter = painterResource(id = R.drawable.ic_baseline_lightbulb_24),
+            modifier = Modifier.padding(end = 8.dp),
+            contentDescription = "Light Icon"
+         )
+      }
+
+      CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
+         Text(
+            text = "Light Settings",
+            style = MaterialTheme.typography.body1
+         )
+      }
    }
 }

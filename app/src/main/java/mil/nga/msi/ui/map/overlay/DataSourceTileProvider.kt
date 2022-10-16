@@ -11,6 +11,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.core.graphics.drawable.toBitmap
 import com.google.android.gms.maps.model.Tile
 import com.google.android.gms.maps.model.TileProvider
+import com.google.maps.android.geometry.Bounds
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.ui.location.webMercatorToWgs84
 import mil.nga.msi.ui.location.wgs84ToWebMercator
@@ -34,7 +35,9 @@ interface DataSourceImage {
 
    fun image(
       context: Context,
-      zoom: Int
+      zoom: Int,
+      tileBounds: Bounds,
+      tileSize: Double
    ): List<Bitmap>
 
    fun circleImage(
@@ -104,6 +107,13 @@ open class DataSourceTileProvider(
       val minQueryLat = swCornerTolerance.y
       val maxQueryLat = neCornerTolerance.y
 
+      val tileBounds = Bounds(
+         swCorner3857.x,
+         neCorner3857.x,
+         swCorner3857.y,
+         neCorner3857.y
+      )
+
       val items = repository.getTileableItems(
          minLatitude = minQueryLat,
          maxLatitude = maxQueryLat,
@@ -115,16 +125,19 @@ open class DataSourceTileProvider(
       val canvas = Canvas(bitmap)
 
       items.forEach { item ->
-         item.image(application, z).forEach { image ->
-            val webMercator = Point(item.longitude, item.latitude).wgs84ToWebMercator()
-            val xPosition = (((webMercator.x - minTileX) / (maxTileX - minTileX)) * width)
-            val yPosition = height - (((webMercator.y - minTileY) / (maxTileY - minTileY)) * height)
-            val destination = Rect(
-               xPosition.toInt() - image.width,
-               yPosition.toInt() - image.height,
-               xPosition.toInt() + image.width,
-               yPosition.toInt() + image.height
-            )
+         item.image(application, z, tileBounds, width.toDouble()).forEach { image ->
+            val translate = !(image.height == height && image.width == width)
+            val destination = if (translate) {
+               val webMercator = Point(item.longitude, item.latitude).wgs84ToWebMercator()
+               val xPosition = (((webMercator.x - minTileX) / (maxTileX - minTileX)) * width)
+               val yPosition = height - (((webMercator.y - minTileY) / (maxTileY - minTileY)) * height)
+               Rect(
+                  xPosition.toInt() - image.width,
+                  yPosition.toInt() - image.height,
+                  xPosition.toInt() + image.width,
+                  yPosition.toInt() + image.height
+               )
+            } else Rect(0, 0, width, height)
 
             canvas.drawBitmap(image, null, destination, null)
          }

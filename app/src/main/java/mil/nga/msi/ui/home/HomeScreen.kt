@@ -75,7 +75,6 @@ fun NavGraphBuilder.homeGraph(
 
    settingsGraph(
       navController = navController,
-      bottomBarVisibility = { bottomBarVisibility(false) },
-      openNavigationDrawer = { openNavigationDrawer() }
+      bottomBarVisibility = { bottomBarVisibility(false) }
    )
 }

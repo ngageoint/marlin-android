@@ -11,9 +11,11 @@ message UserPreferences {
   MapLocation mapLocation = 2;
   bool mgrs = 3;
   bool gars = 4;
-  map<string, NavigationalWarningKey> lastReadNavigationWarnings = 5;
-  map<string, bool> mapped = 6;
-  repeated string tabs = 7;
-  repeated string nonTabs = 8;
-  map<string, int64> dataSourceSyncDate = 9;
+  bool showLightSectorRanges = 5;
+  bool showLightRanges = 6;
+  map<string, NavigationalWarningKey> lastReadNavigationWarnings = 7;
+  map<string, bool> mapped = 8;
+  repeated string tabs = 9;
+  repeated string nonTabs = 10;
+  map<string, int64> dataSourceSyncDate = 11;
 }

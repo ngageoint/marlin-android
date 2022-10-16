@@ -151,12 +151,20 @@ data class RadioBeacon(
 
                val startDegrees = start
                if (startDegrees != null) {
-                  sectors.add(LightSector(startDegrees, end, DataSource.RADIO_BEACON.color))
+                  sectors.add(LightSector(
+                     startDegrees = startDegrees,
+                     endDegrees = end,
+                     color = DataSource.RADIO_BEACON.color)
+                  )
                } else {
                   if (end < previousEnd) {
                      end += 360.0
                   }
-                  sectors.add(LightSector(previousEnd, end, DataSource.RADIO_BEACON.color))
+                  sectors.add(LightSector(
+                     startDegrees = previousEnd,
+                     endDegrees = end,
+                     color = DataSource.RADIO_BEACON.color)
+                  )
                }
 
                previousEnd = end

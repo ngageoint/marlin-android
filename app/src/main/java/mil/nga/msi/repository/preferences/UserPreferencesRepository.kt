@@ -53,6 +53,30 @@ class UserPreferencesRepository @Inject constructor(
       }
    }
 
+   val showLightRanges: Flow<Boolean> = preferencesDataStore.data.map {
+      it.showLightRanges
+   }.distinctUntilChanged()
+
+   suspend fun setShowLightRanges(enabled: Boolean) {
+      preferencesDataStore.updateData {
+         it.toBuilder()
+            .setShowLightRanges(enabled)
+            .build()
+      }
+   }
+
+   val showSectorLightRanges: Flow<Boolean> = preferencesDataStore.data.map {
+      it.showLightSectorRanges
+   }.distinctUntilChanged()
+
+   suspend fun setShowSectorLightRanges(enabled: Boolean) {
+      preferencesDataStore.updateData {
+         it.toBuilder()
+            .setShowLightSectorRanges(enabled)
+            .build()
+      }
+   }
+
    val mapLocation = preferencesDataStore.data.map { it.mapLocation }.distinctUntilChanged()
 
    suspend fun setMapLocation(mapLocation: MapLocation) {

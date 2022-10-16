@@ -5,6 +5,8 @@ import android.content.Context
 import android.graphics.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import com.google.android.gms.maps.model.LatLngBounds
+import com.google.maps.android.geometry.Bounds
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.radiobeacon.RadioBeacon
 import mil.nga.msi.repository.map.RadioBeaconTileRepository
@@ -22,7 +24,12 @@ class RadioBeaconImage(
    override val longitude = beacon.longitude
    override val dataSource = DataSource.RADIO_BEACON
 
-   override fun image(context: Context, zoom: Int): List<Bitmap> {
+   override fun image(
+      context: Context,
+      zoom: Int,
+      tileBounds: Bounds,
+      tileSize: Double
+   ): List<Bitmap> {
       val image = if (zoom < 13) {
          radioBeaconSectorImageSmall(context)
       } else {

@@ -110,7 +110,7 @@ data class Light(
    var sectionHeader: String = ""
 
    @Transient
-   val dms = DMS.from(LatLng(latitude.toDouble(), longitude.toDouble()))
+   val dms = DMS.from(LatLng(latitude, longitude))
 
    fun isFogSignal(): Boolean {
       return remarks?.contains("bl.", ignoreCase = true) ?: false
@@ -170,29 +170,38 @@ data class Light(
    fun lightSectors(): List<LightSector> {
       val sectors = mutableListOf<LightSector>()
 
-      val regex = Regex("(?<visible>(Visible)?)((?<color>[A-Z]+)?)\\.?(?<unintensified>(\\(unintensified\\))?)( (?<startdeg>(\\d*))°)?((?<startminutes>[0-9]*)[\\`'])?(-(?<enddeg>(\\d*))°)(?<endminutes>[0-9]*)[\\`']?")
-
-
+      val regex = Regex("(?<visible>(Visible)?)(?<fullLightObscured>(Partially obscured)?)((?<color>[A-Z]+)?)\\.?(?<unintensified>(\\(unintensified\\))?)(?<obscured>(\\(partially obscured\\))?)( (?<startdeg>(\\d*))°)?((?<startminutes>[0-9]*)[\\`'])?(-(?<enddeg>(\\d*))°)(?<endminutes>[0-9]*)[\\`']?")
       remarks?.let { remarks ->
          var previousEnd = 0.0
 
          regex.findAll(remarks).forEach {  matchResult ->
-            val groups =  matchResult.groups as? MatchNamedGroupCollection
+            val groups = matchResult.groups as? MatchNamedGroupCollection
 
             if (groups != null) {
                var end = 0.0
                var start: Double? = null
                var color = ""
                var visibleColor: Color? = null
-
-               arrayOf("visible", "color", "startdeg", "startminutes", "enddeg", "endminutes").forEach { name ->
-                  val component = groups[name]
-                  if (component != null) {
+               var obscured = false
+               var fullLightObscured = false
+               arrayOf("visible", "fullLightObscured", "color", "unintensified", "obscured", "startdeg", "startminutes", "enddeg", "endminutes").forEach { name ->
+                  val component: MatchGroup? = groups[name]
+                  if (component?.value?.isNotEmpty() == true) {
                      if (name == "visible") {
                         visibleColor = lightColors().firstOrNull()
-                     } else if (name == "color") {
+                     }
+
+                     else if (name == "fullLightObscured") {
+                        visibleColor = lightColors().firstOrNull()
+                        fullLightObscured = true
+                     }
+                     else if (name == "color") {
                         color = remarks.substring(component.range)
-                     } else if (name == "startdeg") {
+                     }
+                     else if (name == "obscured") {
+                        obscured = true
+                     }
+                     else if (name == "startdeg") {
                         start = (start ?: 0.0) + (remarks.substring(component.range).toDoubleOrNull() ?: 0.0)
                      } else if (name == "startminutes") {
                         start = (start ?: 0.0) + ((remarks.substring(component.range).toDoubleOrNull() ?: 0.0)  / 60)
@@ -204,21 +213,66 @@ data class Light(
                   }
                }
 
-               val uiColor = when(color) {
-                  "W" -> LightColor.WHITE.color
-                  "R" -> LightColor.RED.color
-                  "G" -> LightColor.GREEN.color
+               val uiColor = when {
+                  obscured || fullLightObscured -> {
+                     visibleColor ?: (lightColors().getOrNull(0) ?: Color.Black)
+                  }
+                  color == "W" -> LightColor.WHITE.color
+                  color == "R" -> LightColor.RED.color
+                  color == "G" -> LightColor.GREEN.color
                   else -> visibleColor ?: Color.Transparent
+               }
+
+               var sectorRange: Double? = null
+               range?.split("/n")?.forEach { split ->
+                  val rangePart = split.trim().filterNot { it.isWhitespace() }
+                  if (rangePart.startsWith(color)) {
+                     val rangeRegex = Regex("[0-9]+$")
+                     val match = rangeRegex.find(rangePart)
+                     match?.range?.let { matchRange ->
+                        val colorRange = rangePart.substring(matchRange)
+                        if (colorRange.isNotEmpty()) {
+                           sectorRange = colorRange.toDoubleOrNull()
+                        }
+                     }
+                  }
                }
 
                val startDegrees = start
                if (startDegrees != null) {
-                  sectors.add(LightSector(startDegrees, end, uiColor, color))
+                  sectors.add(LightSector(
+                     startDegrees = startDegrees,
+                     endDegrees = end,
+                     range = sectorRange,
+                     color = uiColor,
+                     text = color,
+                     obscured = obscured || fullLightObscured, characteristicNumber)
+                  )
                } else {
                   if (end < previousEnd) {
                      end += 360.0
                   }
-                  sectors.add(LightSector(previousEnd, end, uiColor, color))
+                  sectors.add(LightSector(
+                     startDegrees = previousEnd,
+                     endDegrees = end,
+                     range = sectorRange,
+                     color = uiColor,
+                     text = color,
+                     obscured = obscured || fullLightObscured, characteristicNumber)
+                  )
+               }
+
+               if (fullLightObscured) {
+                  // add the sector for the part of the light which is not obscured
+                  sectors.add(
+                     LightSector(
+                        startDegrees = end,
+                        endDegrees = (start ?: 0.0) + 360.0,
+                        range = sectorRange,
+                        color = visibleColor ?: (lightColors().getOrNull(0) ?: Color.Transparent),
+                        characteristicNumber = characteristicNumber
+                     )
+                  )
                }
 
                previousEnd = end

@@ -21,10 +21,8 @@ sealed class SettingsRoute(
 
 fun NavGraphBuilder.settingsGraph(
    navController: NavController,
-   bottomBarVisibility: (Boolean) -> Unit,
-   openNavigationDrawer: () -> Unit
+   bottomBarVisibility: (Boolean) -> Unit
 ) {
-
    navigation(
       route = SettingsRoute.Main.name,
       startDestination = SettingsRoute.List.name
