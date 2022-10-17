@@ -11,8 +11,8 @@ import mil.nga.msi.datasource.light.LightColor
 fun buoyImage(
    context: Context
 ): Bitmap {
-   val size = (context.resources.displayMetrics.density * 16).toInt()
-   val stroke = (context.resources.displayMetrics.density * 2)
+   val size = (context.resources.displayMetrics.density * 8).toInt()
+   val stroke = (context.resources.displayMetrics.density * 1)
 
    val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
    val canvas = Canvas(bitmap)
@@ -41,11 +41,11 @@ fun buoyImage(
    canvas.drawCircle(
       size / 2f,
       size / 2f,
-      (context.resources.displayMetrics.density * 1f),
+      (context.resources.displayMetrics.density * .5f),
       Paint().apply {
          color = Color.Black.toArgb()
          style = Paint.Style.FILL
-         strokeWidth = (context.resources.displayMetrics.density * 1)
+         strokeWidth = (context.resources.displayMetrics.density * .5f)
       }
    )
 

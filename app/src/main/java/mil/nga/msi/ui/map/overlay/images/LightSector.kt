@@ -71,7 +71,7 @@ fun sectorRangeImage(
          path.close()
 
          canvas.drawPath(path, Paint().apply {
-            strokeWidth = 12f
+            strokeWidth = 6f
             color = sector.color.toArgb()
             style = Paint.Style.STROKE
          })
@@ -89,7 +89,7 @@ private fun sectorImageSmall(
    context: Context,
    sectors: List<LightSector>
 ): Bitmap {
-   val size = (context.resources.displayMetrics.density * 16).toInt()
+   val size = (context.resources.displayMetrics.density * 8).toInt()
    val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
    val canvas = Canvas(bitmap)
 
@@ -121,7 +121,7 @@ private fun sectorImageLarge(
    context: Context,
    sectors: List<LightSector>
 ): Bitmap {
-   val size = (context.resources.displayMetrics.density * 256).toInt()
+   val size = (context.resources.displayMetrics.density * 128).toInt()
    val center = PointF(size / 2f, size / 2f)
    val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
 
@@ -138,7 +138,7 @@ private fun sectorImageLarge(
 
       val arcSize = size / 2f
       val characteristicNumber = sector.characteristicNumber ?: 1
-      val offset = ((16 * context.resources.displayMetrics.density) * (characteristicNumber - 1))
+      val offset = ((8 * context.resources.displayMetrics.density) * (characteristicNumber - 1))
       val radius = (arcSize / 2f) - offset
       val oval = RectF(
          arcSize - radius,
@@ -155,7 +155,7 @@ private fun sectorImageLarge(
       )
 
       val sectorPaint = if (sector.obscured) {
-         val stroke = (context.resources.displayMetrics.density * 4)
+         val stroke = (context.resources.displayMetrics.density * 2)
          Paint().apply {
             isAntiAlias = true
             style = Paint.Style.STROKE
@@ -164,7 +164,7 @@ private fun sectorImageLarge(
             pathEffect = DashPathEffect(floatArrayOf(stroke, stroke), 0f)
          }
       } else {
-         val stroke = (context.resources.displayMetrics.density * 6)
+         val stroke = (context.resources.displayMetrics.density * 3)
          Paint().apply {
             isAntiAlias = true
             style = Paint.Style.STROKE
@@ -181,12 +181,12 @@ private fun sectorImageLarge(
          sectorPaint
       )
 
-      val sectorDashLength = (context.resources.displayMetrics.density * 128).toInt()
-      val sectorDashInterval = (context.resources.displayMetrics.density * 2)
+      val sectorDashLength = (context.resources.displayMetrics.density * 64).toInt()
+      val sectorDashInterval = (context.resources.displayMetrics.density * 1)
       val paint = Paint().apply {
          color = Color(0x33000000).toArgb()
          style = Paint.Style.STROKE
-         strokeWidth = (context.resources.displayMetrics.density * 1)
+         strokeWidth = (context.resources.displayMetrics.density * .5f)
          pathEffect = DashPathEffect(floatArrayOf(sectorDashInterval, sectorDashInterval), 0f)
       }
 
@@ -203,7 +203,7 @@ private fun sectorImageLarge(
       canvas.drawPath(path2, paint)
 
       sector.text?.let { text ->
-         val stroke = (context.resources.displayMetrics.density * 6)
+         val stroke = (context.resources.displayMetrics.density * 3)
          val midPointAngle = (sector.startDegrees) + (sector.endDegrees - sector.startDegrees) / 2.0
          canvas.translate(
             (size / 2f) - (paint.measureText(sector.text) / 2),
@@ -218,7 +218,7 @@ private fun sectorImageLarge(
 
          canvas.drawText(text, 0f, 0f, Paint().apply {
             isAntiAlias = true
-            textSize = (context.resources.displayMetrics.density * 8)
+            textSize = (context.resources.displayMetrics.density * 4)
             color = Color.Black.toArgb() // TODO adjust for filled circle
             typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
          })

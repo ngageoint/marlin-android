@@ -81,8 +81,8 @@ open class DataSourceTileProvider(
    override fun getTile(x: Int, y: Int, z: Int): Tile {
       if (z < 3) return TileProvider.NO_TILE
 
-      val width = (application.resources.displayMetrics.density * 512).toInt()
-      val height = (application.resources.displayMetrics.density * 512).toInt()
+      val width = (application.resources.displayMetrics.density * 256).toInt()
+      val height = (application.resources.displayMetrics.density * 256).toInt()
 
       val minTileLon = longitude(x = x, zoom = z)
       val maxTileLon = longitude(x = x + 1, zoom = z)
@@ -97,7 +97,7 @@ open class DataSourceTileProvider(
       val maxTileY = neCorner3857.y
 
       // Border tile by 40 miles, biggest light in MSI.
-      // Border has to be at least 512 pixels as well
+      // Border has to be at least 256 pixels as well
       val tolerance = max(40.0 * 1609.344, ((maxTileX - minTileX) / (width / 2)) * 40)
 
       val neCornerTolerance = Point(maxTileX + tolerance, maxTileY + tolerance).webMercatorToWgs84()

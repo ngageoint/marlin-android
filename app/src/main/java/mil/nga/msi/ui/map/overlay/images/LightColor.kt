@@ -55,20 +55,20 @@ fun colorRangeImage(
    path.close()
 
    canvas.drawPath(path, Paint().apply {
-      strokeWidth = 12f
+      strokeWidth = 6f
       color = lightColor.toArgb()
       style = Paint.Style.STROKE
    })
 
    canvas.drawPath(path, Paint().apply {
-      strokeWidth = 12f
+      strokeWidth = 6f
       color = lightColor.copy(alpha = .1f).toArgb()
       style = Paint.Style.FILL
    })
 
-   // dot in the middle
+   // dot in the middle TODO size
    val middlePixel = toPixel(latLng, tileBounds, tileSize)
-   val radius = zoomLevel / 3.0 * context.resources.displayMetrics.density * 1.5
+   val radius = zoomLevel / 3.0 * context.resources.displayMetrics.density * .75
    canvas.drawCircle(
       middlePixel.x.toFloat(),
       middlePixel.y.toFloat(),
@@ -86,7 +86,7 @@ private fun colorImageSmall(
    context: Context,
    colors: List<Color>
 ): Bitmap {
-   val size = (context.resources.displayMetrics.density * 8).toInt()
+   val size = (context.resources.displayMetrics.density * 4).toInt()
 
    val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
    val canvas = Canvas(bitmap)
@@ -121,8 +121,8 @@ private fun colorImageLarge(
    context: Context,
    colors: List<Color>
 ): Bitmap {
-   val size = (context.resources.displayMetrics.density * 48).toInt()
-   val stroke = (context.resources.displayMetrics.density * 4).toInt()
+   val size = (context.resources.displayMetrics.density * 24).toInt()
+   val stroke = (context.resources.displayMetrics.density * 2).toInt()
 
    val arcSize = size / 2
    val center = PointF(size / 2f, size / 2f)

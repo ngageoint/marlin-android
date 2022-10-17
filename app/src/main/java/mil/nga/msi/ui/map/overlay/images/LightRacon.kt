@@ -22,8 +22,8 @@ fun raconImage(
 private fun raconImageSmall(
    context: Context
 ): Bitmap {
-   val size = (context.resources.displayMetrics.density * 20).toInt()
-   val stroke = (context.resources.displayMetrics.density * 2)
+   val size = (context.resources.displayMetrics.density * 10).toInt()
+   val stroke = (context.resources.displayMetrics.density * 1)
    val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
    val canvas = Canvas(bitmap)
 
@@ -44,7 +44,7 @@ private fun raconImageSmall(
 private fun raconImageLarge(
    context: Context
 ): Bitmap {
-   val size = (context.resources.displayMetrics.density * 120).toInt()
+   val size = (context.resources.displayMetrics.density * 60).toInt()
 
    val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
    val canvas = Canvas(bitmap)
@@ -56,17 +56,6 @@ private fun raconImageLarge(
       Paint().apply {
          color = LightColor.RACON.color.toArgb()
          style = Paint.Style.STROKE
-         strokeWidth = (context.resources.displayMetrics.density * 4)
-      }
-   )
-
-   canvas.drawCircle(
-      size / 2f,
-      size / 2f,
-      (context.resources.displayMetrics.density * 4),
-      Paint().apply {
-         color = Color.Black.toArgb()
-         style = Paint.Style.STROKE
          strokeWidth = (context.resources.displayMetrics.density * 2)
       }
    )
@@ -74,11 +63,22 @@ private fun raconImageLarge(
    canvas.drawCircle(
       size / 2f,
       size / 2f,
-      (context.resources.displayMetrics.density * 1f),
+      (context.resources.displayMetrics.density * 2),
+      Paint().apply {
+         color = Color.Black.toArgb()
+         style = Paint.Style.STROKE
+         strokeWidth = (context.resources.displayMetrics.density * 1)
+      }
+   )
+
+   canvas.drawCircle(
+      size / 2f,
+      size / 2f,
+      (context.resources.displayMetrics.density * .5f),
       Paint().apply {
          color = Color.Black.toArgb()
          style = Paint.Style.FILL
-         strokeWidth = (context.resources.displayMetrics.density * 1)
+         strokeWidth = (context.resources.displayMetrics.density * .5f)
       }
    )
 
