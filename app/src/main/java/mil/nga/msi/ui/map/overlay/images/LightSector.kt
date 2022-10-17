@@ -242,22 +242,22 @@ private fun sectorCoordinates(
 
    val startRadial = Math.toRadians(startDegrees)
    val startLatitudeRadians = asin(sin(centerLatitudeRadians) * cos(dRadians) + cos(centerLatitudeRadians) * sin(dRadians) * cos(startRadial))
-   val startDLongitudeRadians = atan2(sin(startRadial) * sin(dRadians) * cos(centerLatitudeRadians), cos(dRadians) - sin(centerLatitudeRadians) * sin(dRadians))
+   val startDLongitudeRadians = atan2(sin(startRadial) * sin(dRadians) * cos(centerLatitudeRadians), cos(dRadians) - sin(centerLatitudeRadians) * sin(startLatitudeRadians))
    val startLongitudeRadians = ((centerLongitudeRadians + startDLongitudeRadians + Math.PI) % (2.0 * Math.PI)) - Math.PI
    coordinates.add(LatLng(startLatitudeRadians.toDegrees(), startLongitudeRadians.toDegrees()))
 
    for (i in startDegrees.toInt()..endDegrees.toInt()) {
       val radial = Math.toRadians(i.toDouble())
       val latitudeRadians = asin(sin(centerLatitudeRadians) * cos(dRadians) + cos(centerLatitudeRadians) * sin(dRadians) * cos(radial))
-      val dLongitudeRadians = atan2(sin(radial) * sin(dRadians) * cos(centerLatitudeRadians), cos(dRadians) - sin(centerLatitudeRadians) * sin(dRadians))
-      val longitudeRadians = ((centerLongitudeRadians + dLongitudeRadians + Math.PI) % (2.0 * Math.PI)) - Math.PI
+      val dLongitudeRadians = atan2(sin(radial) * sin(dRadians) * cos(centerLatitudeRadians), cos(dRadians) - sin(centerLatitudeRadians) * sin(latitudeRadians))
+      val longitudeRadians = ((centerLongitudeRadians + dLongitudeRadians + PI) % (2.0 * PI)) - PI
       coordinates.add(LatLng(latitudeRadians.toDegrees(), longitudeRadians.toDegrees()))
    }
 
    val endRadial = Math.toRadians(endDegrees)
    val endLatitudeRadians = asin(sin(centerLatitudeRadians) * cos(dRadians) + cos(centerLatitudeRadians) * sin(dRadians) * cos(endRadial))
-   val endDLongitudeRadians = atan2(sin(endRadial) * sin(dRadians) * cos(centerLatitudeRadians), cos(dRadians) - sin(centerLatitudeRadians) * sin(dRadians))
-   val endLongitudeRadians = ((centerLongitudeRadians + endDLongitudeRadians + Math.PI) % (2.0 * Math.PI)) - Math.PI
+   val endDLongitudeRadians = atan2(sin(endRadial) * sin(dRadians) * cos(centerLatitudeRadians), cos(dRadians) - sin(centerLatitudeRadians) * sin(endLatitudeRadians))
+   val endLongitudeRadians = ((centerLongitudeRadians + endDLongitudeRadians + PI) % (2.0 * PI)) - PI
    coordinates.add(LatLng(endLatitudeRadians.toDegrees(), endLongitudeRadians.toDegrees()))
 
    return coordinates

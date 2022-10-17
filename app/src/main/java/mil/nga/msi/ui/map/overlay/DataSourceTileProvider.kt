@@ -96,9 +96,9 @@ open class DataSourceTileProvider(
       val maxTileX = neCorner3857.x
       val maxTileY = neCorner3857.y
 
-      // Border tile by 20 miles, biggest light in MSI.
-      // Border has to be at least 256 pixels as well
-      val tolerance = max(20.0 * 1609.344, ((maxTileX - minTileX) / (width / 2)) * 20)
+      // Border tile by 40 miles, biggest light in MSI.
+      // Border has to be at least 512 pixels as well
+      val tolerance = max(40.0 * 1609.344, ((maxTileX - minTileX) / (width / 2)) * 40)
 
       val neCornerTolerance = Point(maxTileX + tolerance, maxTileY + tolerance).webMercatorToWgs84()
       val swCornerTolerance = Point(minTileX - tolerance, minTileY - tolerance).webMercatorToWgs84()

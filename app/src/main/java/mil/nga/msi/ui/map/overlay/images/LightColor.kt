@@ -39,6 +39,7 @@ fun colorRangeImage(
    val canvas = Canvas(bitmap)
 
    val latLng = LatLng(light.latitude, light.longitude)
+   val lightColor = colors.first()
    val nauticalMiles = light.range?.toDoubleOrNull() ?: return null
    val nauticalMilesMeasurement = nauticalMiles * METERS_IN_NAUTICAL_MILE
 
@@ -55,13 +56,13 @@ fun colorRangeImage(
 
    canvas.drawPath(path, Paint().apply {
       strokeWidth = 12f
-      color = colors.first().toArgb()
+      color = lightColor.toArgb()
       style = Paint.Style.STROKE
    })
 
    canvas.drawPath(path, Paint().apply {
       strokeWidth = 12f
-      color = colors.first().copy(alpha = .1f).toArgb()
+      color = lightColor.copy(alpha = .1f).toArgb()
       style = Paint.Style.FILL
    })
 
@@ -73,7 +74,7 @@ fun colorRangeImage(
       middlePixel.y.toFloat(),
       radius.toFloat(),
       Paint().apply {
-         color = Color.Yellow.toArgb()
+         color = lightColor.toArgb()
          style = Paint.Style.FILL
       }
    )
