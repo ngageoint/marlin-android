@@ -10,6 +10,22 @@ Marlin adheres to [Semantic Versioning](http://semver.org/).
 ##### Bug Fixes
 
 ---
+## 0.7.0
+
+### Summary
+This release includes the following MSI data sources
+* ASAMs
+* MODUS
+* Navigational Warnings
+* Lights
+* World Ports
+* Radio Beacons
+* Differential GPS Stations
+
+##### Features
+* Radio Beacons
+* Differential GPS Stations
+
 ## 0.5.0
 
 ### Summary
@@ -21,7 +37,7 @@ This release includes the following MSI data sources
 * World Ports
 
 ##### Features
-  * World Ports
+* World Ports
 
 ## 0.4.0
 
@@ -33,4 +49,4 @@ This release includes the following MSI data sources
 * Lights
 
 ##### Features
-  * Lights
+* Lights
