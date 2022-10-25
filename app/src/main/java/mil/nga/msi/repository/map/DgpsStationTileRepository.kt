@@ -8,7 +8,7 @@ import javax.inject.Inject
 class DgpsStationTileRepository @Inject constructor(
    private val localDataSource: DgpsStationLocalDataSource,
 ): TileRepository {
-   override fun getTileableItems(
+   override suspend fun getTileableItems(
       minLatitude: Double,
       maxLatitude: Double,
       minLongitude: Double,

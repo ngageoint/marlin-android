@@ -10,7 +10,7 @@ open class LightTileRepository @Inject constructor(
    private val localDataSource: LightLocalDataSource,
    private val userPreferencesRepository: UserPreferencesRepository
 ): TileRepository {
-   override fun getTileableItems(
+   override suspend fun getTileableItems(
       minLatitude: Double,
       maxLatitude: Double,
       minLongitude: Double,

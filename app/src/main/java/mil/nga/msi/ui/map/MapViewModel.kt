@@ -154,7 +154,7 @@ class MapViewModel @Inject constructor(
          value = providers
       }
 
-      addSource(asamRepository.asamMapItems.distinctUntilChanged().asLiveData()) {
+      addSource(asamRepository.observeAsamMapItems().distinctUntilChanged().asLiveData()) {
          if (mapped.value?.get(DataSource.ASAM) == true) {
             val providers = value?.toMutableMap() ?: mutableMapOf()
             asamTileProvider = AsamTileProvider(application, asamTileRepository)
@@ -273,6 +273,6 @@ class MapViewModel @Inject constructor(
             }
       } else emptyList()
 
-      asams + modus + lights + ports + beacons + dgps
+     asams + modus + lights + ports + beacons + dgps
    }
 }

@@ -9,8 +9,10 @@ import javax.inject.Singleton
 class LocationPolicy @Inject constructor(val locationProvider: LocationProvider) {
 
     var bestLocationProvider: MediatorLiveData<Location> = MediatorLiveData()
+    var filterLocationProvider: MediatorLiveData<Location> = MediatorLiveData()
 
     var bestLocation: Location? = null
+    var filterLocation: Location? = null
 
     private val bestLocationObserver = { location: Location ->
         if (isBetterLocation(location, bestLocation)) {
@@ -19,8 +21,16 @@ class LocationPolicy @Inject constructor(val locationProvider: LocationProvider)
         }
     }
 
+    private val filterLocationObserver = { location: Location ->
+        if (updateFilterLocation(location, bestLocation)) {
+            filterLocation = location
+            filterLocationProvider.setValue(location)
+        }
+    }
+
     init {
         bestLocationProvider.addSource(locationProvider, bestLocationObserver)
+        filterLocationProvider.addSource(locationProvider, filterLocationObserver)
     }
 
     fun requestLocationUpdates() {
@@ -68,9 +78,14 @@ class LocationPolicy @Inject constructor(val locationProvider: LocationProvider)
         } else provider1 == provider2
     }
 
+    private fun updateFilterLocation(location: Location, currentFilterLocation: Location?): Boolean {
+        if (currentFilterLocation == null) return true
+        return currentFilterLocation.distanceTo(location) > FILTER_CHANGE_DISTANCE_METERS
+    }
 
     companion object {
         private const val LOCATION_STALE_INTERVAL = 1000 * 60 * 2
         private const val LOCATION_ACCURACY_THRESHOLD = 200
+        private const val FILTER_CHANGE_DISTANCE_METERS = 10 * 1000
     }
 }

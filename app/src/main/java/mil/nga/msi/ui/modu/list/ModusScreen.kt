@@ -45,8 +45,8 @@ fun ModusScreen(
    Column(modifier = Modifier.fillMaxSize()) {
       TopBar(
          title = ModuRoute.List.title,
-         buttonIcon = Icons.Filled.Menu,
-         onButtonClicked = { openDrawer() }
+         navigationIcon = Icons.Filled.Menu,
+         onNavigationClicked = { openDrawer() }
       )
       Modus(
          viewModel.modus,

@@ -12,6 +12,7 @@ import androidx.core.graphics.drawable.toBitmap
 import com.google.android.gms.maps.model.Tile
 import com.google.android.gms.maps.model.TileProvider
 import com.google.maps.android.geometry.Bounds
+import kotlinx.coroutines.runBlocking
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.ui.location.webMercatorToWgs84
 import mil.nga.msi.ui.location.wgs84ToWebMercator
@@ -20,7 +21,7 @@ import java.io.ByteArrayOutputStream
 import kotlin.math.*
 
 interface TileRepository {
-   fun getTileableItems(
+   suspend fun getTileableItems(
       minLatitude: Double,
       maxLatitude: Double,
       minLongitude: Double,
@@ -114,12 +115,14 @@ open class DataSourceTileProvider(
          neCorner3857.y
       )
 
-      val items = repository.getTileableItems(
-         minLatitude = minQueryLat,
-         maxLatitude = maxQueryLat,
-         minLongitude = minQueryLon,
-         maxLongitude = maxQueryLon
-      )
+      val items = runBlocking() {
+         repository.getTileableItems(
+            minLatitude = minQueryLat,
+            maxLatitude = maxQueryLat,
+            minLongitude = minQueryLon,
+            maxLongitude = maxQueryLon
+         )
+      }
 
       val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
       val canvas = Canvas(bitmap)

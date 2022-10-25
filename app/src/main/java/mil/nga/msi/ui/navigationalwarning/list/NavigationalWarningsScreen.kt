@@ -50,8 +50,8 @@ fun NavigationalWarningsScreen(
    Column(modifier = Modifier.fillMaxSize()) {
       TopBar(
          title = NavigationWarningRoute.List.title,
-         buttonIcon = Icons.Default.ArrowBack,
-         onButtonClicked = { close() }
+         navigationIcon = Icons.Default.ArrowBack,
+         onNavigationClicked = { close() }
       )
 
       val items by viewModel.navigationalWarningsByArea.observeAsState(emptyList())

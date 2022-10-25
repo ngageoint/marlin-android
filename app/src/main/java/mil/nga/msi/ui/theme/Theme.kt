@@ -38,3 +38,6 @@ fun MsiTheme(
 }
 
 val Colors.screenBackground: Color @Composable get() = Color(0x09000000)
+val Colors.add: Color @Composable get() = Add
+val Colors.remove: Color @Composable get() = Remove
+

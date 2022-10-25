@@ -23,8 +23,8 @@ fun AboutScreen(
    Column(modifier = Modifier.fillMaxSize()) {
       TopBar(
          title = SettingsRoute.About.title,
-         buttonIcon = Icons.Filled.ArrowBack,
-         onButtonClicked = { close() }
+         navigationIcon = Icons.Filled.ArrowBack,
+         onNavigationClicked = { close() }
       )
 
       Column(

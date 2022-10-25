@@ -1,7 +1,10 @@
 package mil.nga.msi.repository.asam
 
+import androidx.paging.PagingSource
+import androidx.sqlite.db.SimpleSQLiteQuery
 import mil.nga.msi.datasource.asam.Asam
 import mil.nga.msi.datasource.asam.AsamDao
+import mil.nga.msi.datasource.asam.AsamListItem
 import javax.inject.Inject
 
 class AsamLocalDataSource @Inject constructor(
@@ -9,8 +12,8 @@ class AsamLocalDataSource @Inject constructor(
 ) {
    fun observeAsams() = dao.observeAsams()
    fun observeAsam(reference: String) = dao.observeAsam(reference)
-   fun observeAsamMapItems() = dao.observeAsamMapItems()
-   fun observeAsamListItems() = dao.getAsamListItems()
+   fun observeAsamMapItems(query: SimpleSQLiteQuery) = dao.observeAsamMapItems(query)
+   fun observeAsamListItems(query: SimpleSQLiteQuery): PagingSource<Int, AsamListItem> = dao.getAsamListItems(query)
 
    fun isEmpty() = dao.count() == 0
 
@@ -20,12 +23,7 @@ class AsamLocalDataSource @Inject constructor(
 
    suspend fun existingAsams(references: List<String>) = dao.existingAsams(references)
 
-   fun getAsams(
-      minLatitude: Double,
-      maxLatitude: Double,
-      minLongitude: Double,
-      maxLongitude: Double
-   ) = dao.getAsams(minLatitude, maxLatitude, minLongitude, maxLongitude)
+   fun getAsams(query: SimpleSQLiteQuery) = dao.getAsams(query)
 
    suspend fun insert(asams: List<Asam>) = dao.insert(asams)
 }

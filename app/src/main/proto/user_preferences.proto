@@ -3,6 +3,7 @@ syntax = "proto3";
 option java_package = "mil.nga.msi.type";
 option java_multiple_files = true;
 
+import "filter.proto";
 import "map_location.proto";
 import "navigational_warning_key.proto";
 
@@ -18,4 +19,5 @@ message UserPreferences {
   repeated string tabs = 9;
   repeated string nonTabs = 10;
   map<string, int64> dataSourceSyncDate = 11;
+  map<string, Filters> filters = 12;
 }

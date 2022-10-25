@@ -46,8 +46,8 @@ fun RadioBeaconDetailScreen(
    Column {
       TopBar(
          title = RadioBeaconRoute.Detail.title,
-         buttonIcon = Icons.Default.ArrowBack,
-         onButtonClicked = { close() }
+         navigationIcon = Icons.Default.ArrowBack,
+         onNavigationClicked = { close() }
       )
 
       RadioBeaconDetailContent(

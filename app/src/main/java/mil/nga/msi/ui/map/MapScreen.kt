@@ -68,10 +68,6 @@ fun MapScreen(
 
    LocationPermission(locationPermissionState)
 
-   if (locationPermissionState.status.isGranted) {
-      mapViewModel.locationPolicy.requestLocationUpdates()
-   }
-
    var origin by remember { mutableStateOf(mapOrigin) }
    if (origin == null) {
       origin = mapOrigin
@@ -91,8 +87,8 @@ fun MapScreen(
    ) {
       TopBar(
          title = "Map",
-         buttonIcon = Icons.Filled.Menu,
-         onButtonClicked = { openDrawer() }
+         navigationIcon = Icons.Filled.Menu,
+         onNavigationClicked = { openDrawer() }
       )
 
       Box(Modifier.fillMaxWidth()) {

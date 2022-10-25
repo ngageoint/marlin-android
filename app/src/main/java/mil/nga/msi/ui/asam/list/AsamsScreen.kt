@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.GpsFixed
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Share
@@ -36,6 +37,7 @@ import java.util.*
 @Composable
 fun AsamsScreen(
    openDrawer: () -> Unit,
+   openFilter: () -> Unit,
    onTap: (String) -> Unit,
    onAction: (AsamAction) -> Unit,
    viewModel: AsamsViewModel = hiltViewModel()
@@ -45,8 +47,13 @@ fun AsamsScreen(
    Column(modifier = Modifier.fillMaxSize()) {
       TopBar(
          title = AsamRoute.List.title,
-         buttonIcon = Icons.Filled.Menu,
-         onButtonClicked = { openDrawer() }
+         navigationIcon = Icons.Default.Menu,
+         onNavigationClicked = { openDrawer() },
+         actions = {
+            IconButton(onClick = { openFilter() } ) {
+               Icon(Icons.Default.FilterList, contentDescription = "Filter ASAMs")
+            }
+         }
       )
 
       Asams(

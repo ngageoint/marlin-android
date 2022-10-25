@@ -57,8 +57,8 @@ fun LightDetailScreen(
    Column {
       TopBar(
          title = LightRoute.Detail.title,
-         buttonIcon = Icons.Default.ArrowBack,
-         onButtonClicked = { close() }
+         navigationIcon = Icons.Default.ArrowBack,
+         onNavigationClicked = { close() }
       )
 
       LightDetailContent(

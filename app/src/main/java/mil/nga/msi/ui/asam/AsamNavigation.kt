@@ -12,6 +12,7 @@ import com.google.accompanist.navigation.material.bottomSheet
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import mil.nga.msi.ui.asam.detail.AsamDetailScreen
+import mil.nga.msi.ui.asam.filter.AsamFilterScreen
 import mil.nga.msi.ui.asam.list.AsamsScreen
 import mil.nga.msi.ui.asam.sheet.AsamSheetScreen
 import mil.nga.msi.ui.map.MapRoute
@@ -28,6 +29,7 @@ sealed class AsamRoute(
    object Detail: AsamRoute("asams/detail", "Anti-Shipping Activity Message Details", "ASAM Details")
    object List: AsamRoute("asams/list", "Anti-Shipping Activity Messages", "ASAMs")
    object Sheet: AsamRoute("asams/sheet", "Anti-Shipping Activity Message Sheet", "ASAM Sheet")
+   object Filter: AsamRoute("asams/filter", "Anti-Shipping Activity Message Filter", "ASAM Filters")
 }
 
 @OptIn(ExperimentalMaterialNavigationApi::class)
@@ -59,6 +61,9 @@ fun NavGraphBuilder.asamGraph(
 
          AsamsScreen(
             openDrawer = { openNavigationDrawer() },
+            openFilter = {
+               navController.navigate(AsamRoute.Filter.name)
+            },
             onTap = { reference ->
                navController.navigate("${AsamRoute.Detail.name}?reference=$reference")
             },
@@ -94,6 +99,13 @@ fun NavGraphBuilder.asamGraph(
                navController.navigate("${AsamRoute.Detail.name}?reference=$reference")
             })
          }
+      }
+      bottomSheet(AsamRoute.Filter.name) {
+         AsamFilterScreen(
+            close = {
+               navController.popBackStack()
+            }
+         )
       }
    }
 }

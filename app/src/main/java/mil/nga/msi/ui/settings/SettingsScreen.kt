@@ -25,8 +25,8 @@ fun SettingsScreen(
    Column(modifier = Modifier.fillMaxSize()) {
       TopBar(
          title = SettingsRoute.Main.title,
-         buttonIcon = Icons.Filled.Close,
-         onButtonClicked = { close() }
+         navigationIcon = Icons.Filled.Close,
+         onNavigationClicked = { close() }
       )
 
       Settings(

@@ -14,6 +14,7 @@ import mil.nga.msi.repository.light.LightLocalDataSource
 import mil.nga.msi.repository.map.*
 import mil.nga.msi.repository.modu.ModuLocalDataSource
 import mil.nga.msi.repository.port.PortLocalDataSource
+import mil.nga.msi.repository.preferences.FilterRepository
 import mil.nga.msi.repository.preferences.UserPreferencesRepository
 import mil.nga.msi.repository.radiobeacon.RadioBeaconLocalDataSource
 import mil.nga.msi.ui.map.overlay.*
@@ -47,8 +48,8 @@ class MapModule {
    @Singleton
    @Provides
    @Named("asamTileProvider")
-   fun provideAsamTileProvider(application: Application, dataSource: AsamLocalDataSource): TileProvider {
-      return AsamTileProvider(application, AsamTileRepository(dataSource))
+   fun provideAsamTileProvider(application: Application, dataSource: AsamLocalDataSource, filterRepository: FilterRepository): TileProvider {
+      return AsamTileProvider(application, AsamTileRepository(dataSource, filterRepository))
    }
 
    @Singleton

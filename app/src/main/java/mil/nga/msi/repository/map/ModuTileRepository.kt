@@ -8,7 +8,7 @@ import javax.inject.Inject
 class ModuTileRepository @Inject constructor(
    private val localDataSource: ModuLocalDataSource,
 ): TileRepository {
-   override fun getTileableItems(
+   override suspend fun getTileableItems(
       minLatitude: Double,
       maxLatitude: Double,
       minLongitude: Double,

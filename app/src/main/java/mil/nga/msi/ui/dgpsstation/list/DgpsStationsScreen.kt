@@ -44,8 +44,8 @@ fun DgpsStationsScreen(
    Column(modifier = Modifier.fillMaxSize()) {
       TopBar(
          title = DgpsStationRoute.List.title,
-         buttonIcon = Icons.Filled.Menu,
-         onButtonClicked = { openDrawer() }
+         navigationIcon = Icons.Filled.Menu,
+         onNavigationClicked = { openDrawer() }
       )
 
       DgpsStations(

@@ -59,7 +59,7 @@ class LightImage(
             sectorImage(context, sectors, zoom < 8)
          }
 
-         image?.let { images.add(it) }
+         image.let { images.add(it) }
       } else if(colors.isNotEmpty()) {
          val image = if (showLightRanges) {
             colorRangeImage(context, light, colors, zoom, tileBounds, tileSize)

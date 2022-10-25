@@ -8,7 +8,7 @@ import javax.inject.Inject
 class PortTileRepository @Inject constructor(
    private val localDataSource: PortLocalDataSource,
 ): TileRepository {
-   override fun getTileableItems(
+   override suspend fun getTileableItems(
       minLatitude: Double,
       maxLatitude: Double,
       minLongitude: Double,

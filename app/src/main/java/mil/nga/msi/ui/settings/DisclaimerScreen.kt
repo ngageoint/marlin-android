@@ -26,8 +26,8 @@ fun DisclaimerScreen(
    Column(modifier = Modifier.fillMaxSize()) {
       TopBar(
          title = SettingsRoute.Disclaimer.title,
-         buttonIcon = Icons.Default.ArrowBack,
-         onButtonClicked = { close() }
+         navigationIcon = Icons.Default.ArrowBack,
+         onNavigationClicked = { close() }
       )
 
       Column(

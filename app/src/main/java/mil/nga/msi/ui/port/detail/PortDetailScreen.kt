@@ -53,8 +53,8 @@ fun PortDetailScreen(
    Column {
       TopBar(
          title = "Port",
-         buttonIcon = Icons.Default.ArrowBack,
-         onButtonClicked = { close() }
+         navigationIcon = Icons.Default.ArrowBack,
+         onNavigationClicked = { close() }
       )
 
       PortDetailContent(

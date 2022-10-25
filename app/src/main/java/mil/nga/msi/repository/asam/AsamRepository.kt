@@ -1,13 +1,25 @@
 package mil.nga.msi.repository.asam
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.map
+import androidx.paging.PagingSource
 import androidx.work.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
 import mil.nga.msi.MarlinNotification
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.asam.Asam
+import mil.nga.msi.datasource.asam.AsamListItem
+import mil.nga.msi.datasource.asam.AsamMapItem
+import mil.nga.msi.datasource.filter.ComparatorType
+import mil.nga.msi.datasource.filter.QueryBuilder
+import mil.nga.msi.repository.preferences.FilterRepository
 import mil.nga.msi.repository.preferences.UserPreferencesRepository
+import mil.nga.msi.ui.asam.filter.AsamFilter
+import mil.nga.msi.ui.asam.filter.AsamParameter
+import mil.nga.msi.ui.asam.filter.ParameterType
 import mil.nga.msi.work.asam.LoadAsamWorker
 import mil.nga.msi.work.asam.RefreshAsamWorker
 import java.util.concurrent.TimeUnit
@@ -19,30 +31,96 @@ class AsamRepository @Inject constructor(
    private val localDataSource: AsamLocalDataSource,
    private val remoteDataSource: AsamRemoteDataSource,
    private val notification: MarlinNotification,
+   private val filterRepository: FilterRepository,
    private val userPreferencesRepository: UserPreferencesRepository
 ) {
    val asams = localDataSource.observeAsams()
-   val asamMapItems = localDataSource.observeAsamMapItems()
-   fun getAsamListItems() = localDataSource.observeAsamListItems()
 
    fun observeAsam(reference: String) = localDataSource.observeAsam(reference)
    suspend fun getAsam(reference: String) = localDataSource.getAsam(reference)
 
-   fun getAsams(
+   @OptIn(ExperimentalCoroutinesApi::class)
+   fun observeAsamMapItems(): Flow<List<AsamMapItem>> {
+      return filterRepository.filters.flatMapLatest { entry ->
+         val filters = entry[DataSource.ASAM] ?: emptyList()
+         val query = QueryBuilder("asams", filters).buildQuery()
+         localDataSource.observeAsamMapItems(query)
+      }
+   }
+
+   fun observeAsamListItems(filters: List<AsamFilter>): PagingSource<Int, AsamListItem> {
+      val query = QueryBuilder("asams", filters).buildQuery()
+      return localDataSource.observeAsamListItems(query)
+   }
+
+   suspend fun getAsams(
       minLatitude: Double,
       maxLatitude: Double,
       minLongitude: Double,
       maxLongitude: Double
-   ) = localDataSource.getAsams(minLatitude, maxLatitude, minLongitude, maxLongitude)
+   ): List<Asam>  {
+      val filters = filterRepository.filters.first()[DataSource.ASAM] ?: emptyList()
+
+      val filtersWithBounds = filters.toMutableList().apply {
+         add(
+            AsamFilter(
+               parameter = AsamParameter(
+                  type = ParameterType.DOUBLE,
+                  title = "Min Latitude",
+                  name =  "latitude",
+               ),
+               comparator = ComparatorType.GREATER_THAN_OR_EQUAL,
+               value = minLatitude
+            )
+         )
+
+         add(
+            AsamFilter(
+               parameter = AsamParameter(
+                  type = ParameterType.DOUBLE,
+                  title = "Min Longitude",
+                  name =  "longitude",
+               ),
+               comparator = ComparatorType.GREATER_THAN_OR_EQUAL,
+               value = minLongitude
+            )
+         )
+
+         add(
+            AsamFilter(
+               parameter = AsamParameter(
+                  type = ParameterType.DOUBLE,
+                  title = "Max Latitude",
+                  name =  "latitude",
+               ),
+               comparator = ComparatorType.LESS_THAN_OR_EQUAL,
+               value = maxLatitude
+            )
+         )
+
+         add(
+            AsamFilter(
+               parameter = AsamParameter(
+                  type = ParameterType.DOUBLE,
+                  title = "Max Longitude",
+                  name =  "longitude",
+               ),
+               comparator = ComparatorType.LESS_THAN_OR_EQUAL,
+               value = maxLongitude
+            )
+         )
+      }
+
+      val query = QueryBuilder("asams", filtersWithBounds).buildQuery()
+      return localDataSource.getAsams(query)
+   }
 
    suspend fun fetchAsams(refresh: Boolean = false): List<Asam> {
       if (refresh) {
          val asams = remoteDataSource.fetchAsams()
 
          val fetched = userPreferencesRepository.fetched(DataSource.ASAM)
-         Log.i("billy", "fetched ASAMs $fetched")
          if (fetched != null) {
-            Log.i("billy", "send ASAM notification because $fetched")
             val newAsams = asams.subtract(localDataSource.existingAsams(asams.map { it.reference }).toSet()).toList()
             notification.asam(newAsams)
          }

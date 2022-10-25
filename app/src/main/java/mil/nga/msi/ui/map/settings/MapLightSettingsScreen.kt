@@ -38,8 +38,8 @@ fun MapLightSettingsScreen(
    Column {
       TopBar(
          title = "Light Settings",
-         buttonIcon = Icons.Default.ArrowBack,
-         onButtonClicked = { onClose() }
+         navigationIcon = Icons.Default.ArrowBack,
+         onNavigationClicked = { onClose() }
       )
 
       Map(

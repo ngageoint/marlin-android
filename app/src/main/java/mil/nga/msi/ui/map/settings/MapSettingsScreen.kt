@@ -31,8 +31,8 @@ fun MapSettingsScreen(
    Column {
       TopBar(
          title = "Map Settings",
-         buttonIcon = Icons.Default.Close,
-         onButtonClicked = { onClose() }
+         navigationIcon = Icons.Default.Close,
+         onNavigationClicked = { onClose() }
       )
 
       baseMap?.let {

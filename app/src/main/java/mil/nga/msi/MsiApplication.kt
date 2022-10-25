@@ -1,18 +1,23 @@
 package mil.nga.msi
 
+import android.Manifest
 import android.app.Application
 import android.app.NotificationManager
 import android.content.Context
-import android.os.Build
+import android.content.Intent
+import android.content.pm.PackageManager
+import androidx.core.content.ContextCompat
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import dagger.hilt.android.HiltAndroidApp
+import mil.nga.msi.location.LocationFilterService
+import mil.nga.msi.location.LocationPolicy
 import javax.inject.Inject
 
 @HiltAndroidApp
 class MsiApplication: Application(), Configuration.Provider {
-   @Inject
-   lateinit var workerFactory: HiltWorkerFactory
+   @Inject lateinit var workerFactory: HiltWorkerFactory
+   @Inject lateinit var locationPolicy: LocationPolicy
 
    override fun getWorkManagerConfiguration() =
       Configuration.Builder()
@@ -21,14 +26,27 @@ class MsiApplication: Application(), Configuration.Provider {
 
    override fun onCreate() {
       super.onCreate()
+
+      requestLocationUpdates()
+      startFilterService()
       createNotificationChannel()
    }
 
-   private fun createNotificationChannel() {
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-         val channel = MarlinNotificationChannel.create()
-         val notificationManager: NotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-         notificationManager.createNotificationChannel(channel)
+   private fun requestLocationUpdates() {
+      if (ContextCompat.checkSelfPermission(applicationContext, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
+         ContextCompat.checkSelfPermission(applicationContext, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+         locationPolicy.requestLocationUpdates()
       }
+   }
+
+   private fun startFilterService() {
+      val serviceIntent = Intent(applicationContext, LocationFilterService::class.java)
+      startService(serviceIntent)
+   }
+
+   private fun createNotificationChannel() {
+      val channel = MarlinNotificationChannel.create()
+      val notificationManager: NotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+      notificationManager.createNotificationChannel(channel)
    }
 }

@@ -48,8 +48,8 @@ fun PortsScreen(
    Column(modifier = Modifier.fillMaxSize()) {
       TopBar(
          title = PortRoute.List.title,
-         buttonIcon = Icons.Filled.Menu,
-         onButtonClicked = { openDrawer() }
+         navigationIcon = Icons.Filled.Menu,
+         onNavigationClicked = { openDrawer() }
       )
 
       Ports(

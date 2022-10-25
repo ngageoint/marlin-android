@@ -3,6 +3,7 @@ package mil.nga.msi.datasource.asam
 import androidx.lifecycle.LiveData
 import androidx.paging.PagingSource
 import androidx.room.*
+import androidx.sqlite.db.SupportSQLiteQuery
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -20,7 +21,7 @@ interface AsamDao {
    fun count(): Int
 
    @Query("SELECT * FROM asams")
-   fun observeAsams(): Flow<List<Asam>>
+   fun observeAsams(): PagingSource<Int, AsamListItem>
 
    @Query("SELECT * FROM asams WHERE reference = :reference")
    fun observeAsam(reference: String): LiveData<Asam>
@@ -28,13 +29,9 @@ interface AsamDao {
    @Query("SELECT * FROM asams")
    suspend fun getAsams(): List<Asam>
 
-   @Query("SELECT * FROM asams WHERE latitude >= :minLatitude AND latitude <= :maxLatitude AND longitude >= :minLongitude AND longitude <= :maxLongitude")
-   fun getAsams(
-      minLatitude: Double,
-      maxLatitude: Double,
-      minLongitude: Double,
-      maxLongitude: Double
-   ): List<Asam>
+   @RawQuery(observedEntities = [Asam::class])
+   @RewriteQueriesToDropUnusedColumns
+   fun getAsams(query: SupportSQLiteQuery): List<Asam>
 
    @Query("SELECT * FROM asams WHERE reference = :reference")
    suspend fun getAsam(reference: String): Asam?
@@ -46,9 +43,12 @@ interface AsamDao {
    @RewriteQueriesToDropUnusedColumns
    fun getAsamListItems(): PagingSource<Int, AsamListItem>
 
-   @Query("SELECT * FROM asams ORDER BY reference")
+   @RawQuery(observedEntities = [Asam::class])
+   fun getAsamListItems(query: SupportSQLiteQuery): PagingSource<Int, AsamListItem>
+
+   @RawQuery(observedEntities = [Asam::class])
    @RewriteQueriesToDropUnusedColumns
-   fun observeAsamMapItems(): Flow<List<AsamMapItem>>
+   fun observeAsamMapItems(query: SupportSQLiteQuery): Flow<List<AsamMapItem>>
 
    @Query("SELECT * FROM asams WHERE reference IN (:references)")
    suspend fun existingAsams(references: List<String>): List<Asam>

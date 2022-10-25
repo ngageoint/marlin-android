@@ -45,8 +45,8 @@ fun RadioBeaconsScreen(
    Column(modifier = Modifier.fillMaxSize()) {
       TopBar(
          title = RadioBeaconRoute.List.title,
-         buttonIcon = Icons.Filled.Menu,
-         onButtonClicked = { openDrawer() }
+         navigationIcon = Icons.Filled.Menu,
+         onNavigationClicked = { openDrawer() }
       )
 
       RadioBeacons(
