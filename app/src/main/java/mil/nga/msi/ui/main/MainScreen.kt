@@ -27,9 +27,9 @@ import com.google.accompanist.navigation.material.ExperimentalMaterialNavigation
 import com.google.accompanist.navigation.material.ModalBottomSheetLayout
 import kotlinx.coroutines.launch
 import mil.nga.msi.R
-import mil.nga.msi.ui.asam.AsamRoute
 import mil.nga.msi.ui.home.homeGraph
 import mil.nga.msi.ui.map.MapRoute
+import mil.nga.msi.ui.modu.ModuRoute
 import mil.nga.msi.ui.navigation.NavigationDrawer
 
 @OptIn(ExperimentalMaterialNavigationApi::class, ExperimentalMaterialApi::class)
@@ -171,7 +171,7 @@ fun MainScreen(
 
                // TODO placeholder for app setup routes
                LaunchedEffect(null) {
-                  navController.navigate(AsamRoute.List.name)
+                  navController.navigate(ModuRoute.List.name)
                }
             }
 

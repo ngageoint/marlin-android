@@ -17,7 +17,7 @@ import javax.inject.Inject
 @HiltViewModel
 class AsamsViewModel @Inject constructor(
    private val repository: AsamRepository,
-   private val filterRepository: FilterRepository
+   filterRepository: FilterRepository
 ): ViewModel() {
    suspend fun getAsam(reference: String): Asam? {
       return repository.getAsam(reference)

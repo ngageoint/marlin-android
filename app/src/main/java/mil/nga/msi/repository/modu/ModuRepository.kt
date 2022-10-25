@@ -1,10 +1,19 @@
 package mil.nga.msi.repository.modu
 
 import androidx.lifecycle.map
+import androidx.paging.PagingSource
 import androidx.work.*
+import kotlinx.coroutines.flow.first
 import mil.nga.msi.MarlinNotification
 import mil.nga.msi.datasource.DataSource
+import mil.nga.msi.datasource.filter.ComparatorType
+import mil.nga.msi.datasource.filter.QueryBuilder
 import mil.nga.msi.datasource.modu.Modu
+import mil.nga.msi.datasource.modu.ModuListItem
+import mil.nga.msi.filter.Filter
+import mil.nga.msi.filter.FilterParameter
+import mil.nga.msi.filter.FilterParameterType
+import mil.nga.msi.repository.preferences.FilterRepository
 import mil.nga.msi.repository.preferences.UserPreferencesRepository
 import mil.nga.msi.work.modu.LoadModuWorker
 import mil.nga.msi.work.modu.RefreshModuWorker
@@ -16,21 +25,80 @@ class ModuRepository @Inject constructor(
    private val localDataSource: ModuLocalDataSource,
    private val remoteDataSource: ModuRemoteDataSource,
    private val notification: MarlinNotification,
+   private val filterRepository: FilterRepository,
    private val userPreferencesRepository: UserPreferencesRepository
 ) {
    val modus = localDataSource.observeModus()
    val moduMapItems = localDataSource.observeModuMapItems()
-   fun getModuListItems() = localDataSource.observeModuListItems()
-
    fun observeModu(name: String) = localDataSource.observeModu(name)
    suspend fun getModu(name: String) = localDataSource.getModu(name)
 
-   fun getModus(
+   fun observeModuListItems(filters: List<Filter>): PagingSource<Int, ModuListItem> {
+      val query = QueryBuilder("modus", filters).buildQuery()
+      return localDataSource.observeModuListItems(query)
+   }
+
+   suspend fun getModus(
       minLatitude: Double,
       maxLatitude: Double,
       minLongitude: Double,
       maxLongitude: Double
-   ) = localDataSource.getModus(minLatitude, maxLatitude, minLongitude, maxLongitude)
+   ): List<Modu>  {
+      val filters = filterRepository.filters.first()[DataSource.MODU] ?: emptyList()
+
+      val filtersWithBounds = filters.toMutableList().apply {
+         add(
+            Filter(
+               parameter = FilterParameter(
+                  type = FilterParameterType.DOUBLE,
+                  title = "Min Latitude",
+                  name =  "latitude",
+               ),
+               comparator = ComparatorType.GREATER_THAN_OR_EQUAL,
+               value = minLatitude
+            )
+         )
+
+         add(
+            Filter(
+               parameter = FilterParameter(
+                  type = FilterParameterType.DOUBLE,
+                  title = "Min Longitude",
+                  name =  "longitude",
+               ),
+               comparator = ComparatorType.GREATER_THAN_OR_EQUAL,
+               value = minLongitude
+            )
+         )
+
+         add(
+            Filter(
+               parameter = FilterParameter(
+                  type = FilterParameterType.DOUBLE,
+                  title = "Max Latitude",
+                  name =  "latitude",
+               ),
+               comparator = ComparatorType.LESS_THAN_OR_EQUAL,
+               value = maxLatitude
+            )
+         )
+
+         add(
+            Filter(
+               parameter = FilterParameter(
+                  type = FilterParameterType.DOUBLE,
+                  title = "Max Longitude",
+                  name =  "longitude",
+               ),
+               comparator = ComparatorType.LESS_THAN_OR_EQUAL,
+               value = maxLongitude
+            )
+         )
+      }
+
+      val query = QueryBuilder("modus", filtersWithBounds).buildQuery()
+      return localDataSource.getModus(query)
+   }
 
    suspend fun fetchModus(refresh: Boolean = false): List<Modu> {
       if (refresh) {

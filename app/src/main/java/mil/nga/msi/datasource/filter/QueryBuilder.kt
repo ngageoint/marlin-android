@@ -1,9 +1,10 @@
 package mil.nga.msi.datasource.filter
 
+import android.util.Log
 import androidx.sqlite.db.SimpleSQLiteQuery
 import mil.nga.grid.features.Bounds
-import mil.nga.msi.ui.asam.filter.AsamFilter
-import mil.nga.msi.ui.asam.filter.ParameterType
+import mil.nga.msi.filter.Filter
+import mil.nga.msi.filter.FilterParameterType
 import mil.nga.sf.util.GeometryUtils
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -15,22 +16,22 @@ private const val METERS_IN_NAUTICAL_MILE = 1852
 
 class QueryBuilder(
    val table: String,
-   val filters: List<AsamFilter>
+   val filters: List<Filter>
 ) {
    fun buildQuery(): SimpleSQLiteQuery {
       val filterStrings = mutableListOf<String>()
       filters.forEach { filter ->
          val filterString: String? = when (filter.parameter.type) {
-            ParameterType.DATE -> {
+            FilterParameterType.DATE -> {
                dateQuery(filter)
             }
-            ParameterType.DOUBLE -> {
+            FilterParameterType.DOUBLE -> {
                doubleQuery(filter)
             }
-            ParameterType.LOCATION -> {
+            FilterParameterType.LOCATION -> {
                locationQuery(filter)
             }
-            ParameterType.STRING -> {
+            FilterParameterType.STRING -> {
                stringQuery(filter)
             }
             else -> null
@@ -39,10 +40,11 @@ class QueryBuilder(
       }
 
       val condition = if (filterStrings.isNotEmpty()) {" WHERE ${filterStrings.joinToString(" AND ")}"} else ""
+      Log.i("Billy", "table $table condition $condition")
       return SimpleSQLiteQuery("SELECT * FROM $table $condition")
    }
 
-   private fun dateQuery(filter: AsamFilter): String? {
+   private fun dateQuery(filter: Filter): String? {
       val epoch = try {
          val dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd")
          val date: LocalDateTime = LocalDate.parse(filter.value.toString(), dateFormat).atTime(0, 0)
@@ -86,7 +88,7 @@ class QueryBuilder(
       }
    }
 
-   private fun doubleQuery(filter: AsamFilter): String? {
+   private fun doubleQuery(filter: Filter): String? {
       return filter.value?.toString()?.toDoubleOrNull()?.let{ value ->
          when(filter.comparator) {
             ComparatorType.EQUALS -> {
@@ -112,7 +114,7 @@ class QueryBuilder(
       }
    }
 
-   private fun locationQuery(filter: AsamFilter): String? {
+   private fun locationQuery(filter: Filter): String? {
       val bounds: Bounds? = when (filter.comparator) {
          ComparatorType.CLOSE_TO,
          ComparatorType.NEAR_ME -> {
@@ -138,7 +140,7 @@ class QueryBuilder(
       }
    }
 
-   private fun stringQuery(filter: AsamFilter): String? {
+   private fun stringQuery(filter: Filter): String? {
       return when(filter.comparator) {
          ComparatorType.EQUALS -> {
             "${filter.parameter.name} = '${filter.value}'"

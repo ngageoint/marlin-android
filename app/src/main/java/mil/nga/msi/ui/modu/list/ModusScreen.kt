@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.GpsFixed
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Share
@@ -36,6 +37,7 @@ import java.util.*
 @Composable
 fun ModusScreen(
    openDrawer: () -> Unit,
+   openFilter: () -> Unit,
    onTap: (String) -> Unit,
    onAction: (ModuAction) -> Unit,
    viewModel: ModusViewModel = hiltViewModel()
@@ -46,7 +48,12 @@ fun ModusScreen(
       TopBar(
          title = ModuRoute.List.title,
          navigationIcon = Icons.Filled.Menu,
-         onNavigationClicked = { openDrawer() }
+         onNavigationClicked = { openDrawer() },
+         actions = {
+            IconButton(onClick = { openFilter() } ) {
+               Icon(Icons.Default.FilterList, contentDescription = "Filter MODUs")
+            }
+         }
       )
       Modus(
          viewModel.modus,

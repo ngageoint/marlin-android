@@ -1,4 +1,4 @@
-package mil.nga.msi.ui.asam.filter
+package mil.nga.msi.ui.modu.filter
 
 import android.app.DatePickerDialog
 import android.widget.DatePicker
@@ -23,31 +23,31 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import mil.nga.msi.datasource.filter.ComparatorType
-import mil.nga.msi.filter.FilterParameter
 import mil.nga.msi.filter.Filter
+import mil.nga.msi.filter.FilterParameter
 import mil.nga.msi.filter.FilterParameterType
-import mil.nga.msi.ui.asam.AsamRoute
 import mil.nga.msi.ui.main.TopBar
+import mil.nga.msi.ui.modu.ModuRoute
 import mil.nga.msi.ui.theme.add
 import mil.nga.msi.ui.theme.remove
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 @Composable
-fun AsamFilterScreen(
+fun ModuFilterScreen(
    close: () -> Unit,
-   viewModel: AsamFilterViewModel = hiltViewModel()
+   viewModel: ModuFilterViewModel = hiltViewModel()
 ) {
    val filters by viewModel.filters.observeAsState(emptyList())
 
    Column(Modifier.fillMaxSize()) {
       TopBar(
-         title = AsamRoute.Filter.shortTitle,
+         title = ModuRoute.Filter.shortTitle,
          navigationIcon = Icons.Default.Close,
          onNavigationClicked = { close() }
       )
 
-      AsamFilters(
+      Filters(
          filters = filters,
          removeFilter = {
             val removed = filters.toMutableList()
@@ -56,7 +56,7 @@ fun AsamFilterScreen(
          }
       )
 
-      AsamFilterHeader(
+      FilterHeader(
          addFilter = {
             val added = filters.toMutableList()
             added.add(it)
@@ -67,7 +67,7 @@ fun AsamFilterScreen(
 }
 
 @Composable
-private fun AsamFilters(
+private fun Filters(
    filters: List<Filter>,
    removeFilter: (Filter) -> Unit
 ) {
@@ -153,10 +153,10 @@ private fun stringValue(
 }
 
 @Composable
-private fun AsamFilterHeader(
+private fun FilterHeader(
    addFilter: (Filter) -> Unit
 ) {
-   val defaultParameter = AsamFilterParameters().parameters.first()
+   val defaultParameter = ModuFilterParameters().parameters.first()
    val defaultComparator = defaultParameter.type.comparators.first()
    var parameter by remember { mutableStateOf(defaultParameter) }
    var comparator by remember { mutableStateOf(defaultComparator) }
@@ -249,7 +249,7 @@ private fun ParameterSelection(
 ) {
    var expanded by remember { mutableStateOf(false) }
 
-   val parameters = AsamFilterParameters()
+   val parameters = ModuFilterParameters()
 
    Column(modifier = modifier) {
       Row(

@@ -1,11 +1,9 @@
-package mil.nga.msi.ui.asam.filter
+package mil.nga.msi.filter
 
 import mil.nga.msi.datasource.filter.ComparatorType
 
-class Asam
-
-data class AsamFilter(
-   val parameter: AsamParameter,
+data class Filter(
+   val parameter: FilterParameter,
    val comparator: ComparatorType,
    val value: Any?
 )

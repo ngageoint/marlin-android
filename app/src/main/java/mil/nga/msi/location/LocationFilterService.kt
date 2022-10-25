@@ -8,9 +8,10 @@ import androidx.lifecycle.Observer
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import mil.nga.msi.datasource.filter.ComparatorType
+import mil.nga.msi.filter.Filter
+import mil.nga.msi.filter.FilterParameterType
 import mil.nga.msi.repository.preferences.FilterRepository
-import mil.nga.msi.ui.asam.filter.AsamFilter
-import mil.nga.msi.ui.asam.filter.ParameterType
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -38,7 +39,7 @@ open class LocationFilterService : LifecycleService(), Observer<Location> {
       val filters = runBlocking { filterRepository.filters.first() }
 
       filters.forEach { entry ->
-         val locationFilter = entry.value.find { it.parameter.type == ParameterType.LOCATION }
+         val locationFilter = entry.value.find { it.parameter.type == FilterParameterType.LOCATION && it.comparator.name == ComparatorType.NEAR_ME.name }
          val newFilters = entry.value.toMutableList()
          newFilters.remove(locationFilter)
 
@@ -47,7 +48,7 @@ open class LocationFilterService : LifecycleService(), Observer<Location> {
             val values = if (value.isNotEmpty()) value.split(",") else emptyList()
             val distance = values.getOrNull(2) ?: ""
 
-            val newFilter = AsamFilter(
+            val newFilter = Filter(
                parameter = filter.parameter,
                comparator = filter.comparator,
                value = "${location.latitude},${location.longitude},${distance}"

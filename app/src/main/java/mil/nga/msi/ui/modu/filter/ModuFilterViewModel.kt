@@ -1,4 +1,4 @@
-package mil.nga.msi.ui.asam.filter
+package mil.nga.msi.ui.modu.filter
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
@@ -12,17 +12,17 @@ import mil.nga.msi.repository.preferences.FilterRepository
 import javax.inject.Inject
 
 @HiltViewModel
-class AsamFilterViewModel @Inject constructor(
+class ModuFilterViewModel @Inject constructor(
    private val filterRepository: FilterRepository,
 ): ViewModel() {
    val filters = filterRepository.filters.transform { filters ->
-      val asamFilters = filters[DataSource.ASAM] ?: emptyList()
+      val asamFilters = filters[DataSource.MODU] ?: emptyList()
       emit(asamFilters)
    }.asLiveData()
 
    fun setFilters(filters: List<Filter>) {
       viewModelScope.launch {
-         filterRepository.setFilter(DataSource.ASAM, filters)
+         filterRepository.setFilter(DataSource.MODU, filters)
       }
    }
 }

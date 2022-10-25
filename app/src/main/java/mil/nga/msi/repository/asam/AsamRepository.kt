@@ -15,11 +15,11 @@ import mil.nga.msi.datasource.asam.AsamListItem
 import mil.nga.msi.datasource.asam.AsamMapItem
 import mil.nga.msi.datasource.filter.ComparatorType
 import mil.nga.msi.datasource.filter.QueryBuilder
+import mil.nga.msi.filter.Filter
+import mil.nga.msi.filter.FilterParameter
+import mil.nga.msi.filter.FilterParameterType
 import mil.nga.msi.repository.preferences.FilterRepository
 import mil.nga.msi.repository.preferences.UserPreferencesRepository
-import mil.nga.msi.ui.asam.filter.AsamFilter
-import mil.nga.msi.ui.asam.filter.AsamParameter
-import mil.nga.msi.ui.asam.filter.ParameterType
 import mil.nga.msi.work.asam.LoadAsamWorker
 import mil.nga.msi.work.asam.RefreshAsamWorker
 import java.util.concurrent.TimeUnit
@@ -48,7 +48,7 @@ class AsamRepository @Inject constructor(
       }
    }
 
-   fun observeAsamListItems(filters: List<AsamFilter>): PagingSource<Int, AsamListItem> {
+   fun observeAsamListItems(filters: List<Filter>): PagingSource<Int, AsamListItem> {
       val query = QueryBuilder("asams", filters).buildQuery()
       return localDataSource.observeAsamListItems(query)
    }
@@ -63,9 +63,9 @@ class AsamRepository @Inject constructor(
 
       val filtersWithBounds = filters.toMutableList().apply {
          add(
-            AsamFilter(
-               parameter = AsamParameter(
-                  type = ParameterType.DOUBLE,
+            Filter(
+               parameter = FilterParameter(
+                  type = FilterParameterType.DOUBLE,
                   title = "Min Latitude",
                   name =  "latitude",
                ),
@@ -75,9 +75,9 @@ class AsamRepository @Inject constructor(
          )
 
          add(
-            AsamFilter(
-               parameter = AsamParameter(
-                  type = ParameterType.DOUBLE,
+            Filter(
+               parameter = FilterParameter(
+                  type = FilterParameterType.DOUBLE,
                   title = "Min Longitude",
                   name =  "longitude",
                ),
@@ -87,9 +87,9 @@ class AsamRepository @Inject constructor(
          )
 
          add(
-            AsamFilter(
-               parameter = AsamParameter(
-                  type = ParameterType.DOUBLE,
+            Filter(
+               parameter = FilterParameter(
+                  type = FilterParameterType.DOUBLE,
                   title = "Max Latitude",
                   name =  "latitude",
                ),
@@ -99,9 +99,9 @@ class AsamRepository @Inject constructor(
          )
 
          add(
-            AsamFilter(
-               parameter = AsamParameter(
-                  type = ParameterType.DOUBLE,
+            Filter(
+               parameter = FilterParameter(
+                  type = FilterParameterType.DOUBLE,
                   title = "Max Longitude",
                   name =  "longitude",
                ),

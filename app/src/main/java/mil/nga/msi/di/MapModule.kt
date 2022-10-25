@@ -55,8 +55,8 @@ class MapModule {
    @Singleton
    @Provides
    @Named("moduTileProvider")
-   fun provideModuTileProvider(application: Application, dataSource: ModuLocalDataSource): TileProvider {
-      return ModuTileProvider(application, ModuTileRepository(dataSource))
+   fun provideModuTileProvider(application: Application, dataSource: ModuLocalDataSource, filterRepository: FilterRepository): TileProvider {
+      return ModuTileProvider(application, ModuTileRepository(dataSource, filterRepository))
    }
 
    @Singleton
