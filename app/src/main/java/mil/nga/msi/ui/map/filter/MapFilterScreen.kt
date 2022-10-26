@@ -4,6 +4,7 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -13,6 +14,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -117,14 +119,19 @@ private fun DataSource(
             }
 
             if (dataSourceModel.numberOfFilters > 0) {
-               Badge(
-                  modifier = Modifier.padding(end = 16.dp),
-                  backgroundColor = MaterialTheme.colors.primary
+               Box(
+                  contentAlignment = Alignment.Center,
+                  modifier = Modifier
+                     .padding(end = 16.dp)
+                     .clip(CircleShape)
+                     .height(24.dp)
+                     .background(MaterialTheme.colors.primary)
                ) {
                   Text(
                      text = dataSourceModel.numberOfFilters.toString(),
-                     style = MaterialTheme.typography.body1,
-                     modifier = Modifier.padding(horizontal = 2.dp)
+                     style = MaterialTheme.typography.body2,
+                     modifier = Modifier.padding(horizontal = 8.dp),
+                     color = MaterialTheme.colors.onPrimary
                   )
                }
             }
