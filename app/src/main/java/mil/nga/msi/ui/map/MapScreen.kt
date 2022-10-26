@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.outlined.LocationSearching
 import androidx.compose.material.icons.outlined.Map
@@ -42,6 +43,7 @@ fun MapScreen(
    onAnnotationClick: (MapAnnotation) -> Unit,
    onAnnotationsClick: (Collection<MapAnnotation>) -> Unit,
    onMapSettings: () -> Unit,
+   openFilter: () -> Unit,
    openDrawer: () -> Unit,
    mapViewModel: MapViewModel = hiltViewModel()
 ) {
@@ -88,7 +90,12 @@ fun MapScreen(
       TopBar(
          title = "Map",
          navigationIcon = Icons.Filled.Menu,
-         onNavigationClicked = { openDrawer() }
+         onNavigationClicked = { openDrawer() },
+         actions = {
+            IconButton(onClick = { openFilter() } ) {
+               Icon(Icons.Default.FilterList, contentDescription = "Filter Map")
+            }
+         }
       )
 
       Box(Modifier.fillMaxWidth()) {

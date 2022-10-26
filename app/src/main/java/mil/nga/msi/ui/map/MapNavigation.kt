@@ -11,6 +11,7 @@ import com.google.accompanist.navigation.material.ExperimentalMaterialNavigation
 import com.google.accompanist.navigation.material.bottomSheet
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.repository.dgpsstation.DgpsStationKey
 import mil.nga.msi.repository.light.LightKey
 import mil.nga.msi.repository.radiobeacon.RadioBeaconKey
@@ -18,6 +19,7 @@ import mil.nga.msi.ui.asam.AsamRoute
 import mil.nga.msi.ui.dgpsstation.DgpsStationRoute
 import mil.nga.msi.ui.light.LightRoute
 import mil.nga.msi.ui.map.cluster.MapAnnotation
+import mil.nga.msi.ui.map.filter.MapFilterScreen
 import mil.nga.msi.ui.map.settings.MapLightSettingsScreen
 import mil.nga.msi.ui.map.settings.MapSettingsScreen
 import mil.nga.msi.ui.modu.ModuRoute
@@ -38,6 +40,7 @@ sealed class MapRoute(
    object Settings: MapRoute("mapSettings", "Map Settings")
    object LightSettings: MapRoute("lightSettings", "Light Settings")
    object PagerSheet: MapRoute("annotationPagerSheet", "Map")
+   object Filter: MapRoute("mapFilter", "Filters", "Filters")
 }
 
 @OptIn(ExperimentalMaterialNavigationApi::class)
@@ -95,7 +98,10 @@ fun NavGraphBuilder.mapGraph(
          onMapSettings = {
             navController.navigate(MapRoute.Settings.name)
          },
-         openDrawer = { openNavigationDrawer() }
+         openDrawer = { openNavigationDrawer() },
+         openFilter = {
+            navController.navigate(MapRoute.Filter.name)
+         }
       )
    }
 
@@ -158,5 +164,23 @@ fun NavGraphBuilder.mapGraph(
             }
          }
       }
+   }
+
+   bottomSheet(MapRoute.Filter.name) {
+      MapFilterScreen(
+         onTap = {
+            when (it) {
+              DataSource.ASAM -> { AsamRoute.Filter.name}
+              else -> null
+            }?.let { route ->
+               navController.navigate(route) {
+                  navController.popBackStack()
+               }
+            }
+         },
+         close = {
+            navController.popBackStack()
+         }
+      )
    }
 }
