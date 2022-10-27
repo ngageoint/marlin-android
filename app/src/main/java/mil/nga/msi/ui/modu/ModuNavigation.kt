@@ -11,9 +11,10 @@ import com.google.accompanist.navigation.material.ExperimentalMaterialNavigation
 import com.google.accompanist.navigation.material.bottomSheet
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import mil.nga.msi.datasource.DataSource
+import mil.nga.msi.ui.filter.FilterScreen
 import mil.nga.msi.ui.map.MapRoute
 import mil.nga.msi.ui.modu.detail.ModuDetailScreen
-import mil.nga.msi.ui.modu.filter.ModuFilterScreen
 import mil.nga.msi.ui.modu.list.ModusScreen
 import mil.nga.msi.ui.modu.sheet.ModuSheetScreen
 import mil.nga.msi.ui.navigation.Point
@@ -101,7 +102,8 @@ fun NavGraphBuilder.moduGraph(
          }
       }
       bottomSheet(ModuRoute.Filter.name) {
-         ModuFilterScreen(
+         FilterScreen(
+            dataSource = DataSource.MODU,
             close = {
                navController.popBackStack()
             }

@@ -1,11 +1,7 @@
 package mil.nga.msi.location
 
-import android.app.Service
-import android.content.Intent
 import android.location.Location
-import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.Observer
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import mil.nga.msi.datasource.filter.ComparatorType
@@ -13,26 +9,12 @@ import mil.nga.msi.filter.Filter
 import mil.nga.msi.filter.FilterParameterType
 import mil.nga.msi.repository.preferences.FilterRepository
 import javax.inject.Inject
+import javax.inject.Singleton
 
-@AndroidEntryPoint
-open class LocationFilterService : LifecycleService(), Observer<Location> {
-   @Inject protected lateinit var locationPolicy: LocationPolicy
-   @Inject protected lateinit var filterRepository: FilterRepository
-
-   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-      super.onStartCommand(intent, flags, startId)
-
-      locationPolicy.filterLocationProvider.observe(this, this)
-
-      return Service.START_STICKY
-   }
-
-   override fun onDestroy() {
-      super.onDestroy()
-
-      locationPolicy.filterLocationProvider.removeObserver(this)
-   }
-
+@Singleton
+open class LocationFilterService @Inject constructor(
+   val filterRepository: FilterRepository
+): Observer<Location> {
    override fun onChanged(location: Location?) {
       if (location == null) return
 

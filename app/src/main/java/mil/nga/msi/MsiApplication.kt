@@ -4,7 +4,6 @@ import android.Manifest
 import android.app.Application
 import android.app.NotificationManager
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
 import androidx.core.content.ContextCompat
 import androidx.hilt.work.HiltWorkerFactory
@@ -18,6 +17,7 @@ import javax.inject.Inject
 class MsiApplication: Application(), Configuration.Provider {
    @Inject lateinit var workerFactory: HiltWorkerFactory
    @Inject lateinit var locationPolicy: LocationPolicy
+   @Inject lateinit var locationFilterService: LocationFilterService
 
    override fun getWorkManagerConfiguration() =
       Configuration.Builder()
@@ -40,8 +40,7 @@ class MsiApplication: Application(), Configuration.Provider {
    }
 
    private fun startFilterService() {
-      val serviceIntent = Intent(applicationContext, LocationFilterService::class.java)
-      startService(serviceIntent)
+      locationPolicy.filterLocationProvider.observeForever(locationFilterService)
    }
 
    private fun createNotificationChannel() {

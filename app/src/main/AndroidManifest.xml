@@ -72,8 +72,6 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".location.LocationFilterService"/>
-
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/GOOGLE_MAPS_ANDROID_API_KEY" />

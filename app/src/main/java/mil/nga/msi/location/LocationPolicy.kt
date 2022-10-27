@@ -22,7 +22,7 @@ class LocationPolicy @Inject constructor(val locationProvider: LocationProvider)
     }
 
     private val filterLocationObserver = { location: Location ->
-        if (updateFilterLocation(location, bestLocation)) {
+        if (updateFilterLocation(location, filterLocation)) {
             filterLocation = location
             filterLocationProvider.setValue(location)
         }

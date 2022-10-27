@@ -11,10 +11,11 @@ import com.google.accompanist.navigation.material.ExperimentalMaterialNavigation
 import com.google.accompanist.navigation.material.bottomSheet
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.ui.asam.detail.AsamDetailScreen
-import mil.nga.msi.ui.asam.filter.AsamFilterScreen
 import mil.nga.msi.ui.asam.list.AsamsScreen
 import mil.nga.msi.ui.asam.sheet.AsamSheetScreen
+import mil.nga.msi.ui.filter.FilterScreen
 import mil.nga.msi.ui.map.MapRoute
 import mil.nga.msi.ui.navigation.Point
 import mil.nga.msi.ui.navigation.Route
@@ -101,7 +102,8 @@ fun NavGraphBuilder.asamGraph(
          }
       }
       bottomSheet(AsamRoute.Filter.name) {
-         AsamFilterScreen(
+         FilterScreen(
+            dataSource = DataSource.ASAM,
             close = {
                navController.popBackStack()
             }

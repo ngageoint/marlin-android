@@ -170,8 +170,9 @@ fun NavGraphBuilder.mapGraph(
       MapFilterScreen(
          onTap = {
             when (it) {
-              DataSource.ASAM -> { AsamRoute.Filter.name}
-              else -> null
+               DataSource.ASAM -> { AsamRoute.Filter.name}
+               DataSource.MODU -> { ModuRoute.Filter.name}
+               else -> null
             }?.let { route ->
                navController.navigate(route) {
                   navController.popBackStack()

@@ -1,4 +1,4 @@
-package mil.nga.msi.ui.modu.filter
+package mil.nga.msi.ui.filter
 
 import android.app.DatePickerDialog
 import android.widget.DatePicker
@@ -22,27 +22,32 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.filter.ComparatorType
 import mil.nga.msi.filter.Filter
 import mil.nga.msi.filter.FilterParameter
 import mil.nga.msi.filter.FilterParameterType
 import mil.nga.msi.ui.main.TopBar
-import mil.nga.msi.ui.modu.ModuRoute
 import mil.nga.msi.ui.theme.add
 import mil.nga.msi.ui.theme.remove
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 @Composable
-fun ModuFilterScreen(
+fun FilterScreen(
+   dataSource: DataSource,
    close: () -> Unit,
-   viewModel: ModuFilterViewModel = hiltViewModel()
+   viewModel: FilterViewModel = hiltViewModel()
 ) {
+   viewModel.setDataSource(dataSource)
+
+   val title by viewModel.title.observeAsState("")
    val filters by viewModel.filters.observeAsState(emptyList())
+   val filterParameters by viewModel.filterParameters.observeAsState(emptyList())
 
    Column(Modifier.fillMaxSize()) {
       TopBar(
-         title = ModuRoute.Filter.shortTitle,
+         title = title,
          navigationIcon = Icons.Default.Close,
          onNavigationClicked = { close() }
       )
@@ -52,17 +57,20 @@ fun ModuFilterScreen(
          removeFilter = {
             val removed = filters.toMutableList()
             removed.remove(it)
-            viewModel.setFilters(removed)
+            viewModel.setFilters(dataSource, removed)
          }
       )
 
-      FilterHeader(
-         addFilter = {
-            val added = filters.toMutableList()
-            added.add(it)
-            viewModel.setFilters(added)
-         }
-      )
+      if (filterParameters.isNotEmpty()) {
+         FilterHeader(
+            filterParameters = filterParameters,
+            addFilter = {
+               val added = filters.toMutableList()
+               added.add(it)
+               viewModel.setFilters(dataSource, added)
+            }
+         )
+      }
    }
 }
 
@@ -154,9 +162,10 @@ private fun stringValue(
 
 @Composable
 private fun FilterHeader(
+   filterParameters: List<FilterParameter>,
    addFilter: (Filter) -> Unit
 ) {
-   val defaultParameter = ModuFilterParameters().parameters.first()
+   val defaultParameter = filterParameters.first()
    val defaultComparator = defaultParameter.type.comparators.first()
    var parameter by remember { mutableStateOf(defaultParameter) }
    var comparator by remember { mutableStateOf(defaultComparator) }
@@ -179,6 +188,7 @@ private fun FilterHeader(
             modifier = Modifier.fillMaxWidth()
          ) {
             ParameterSelection(
+               filterParameters = filterParameters,
                selectedParameter = parameter,
                onSelectParameter = {
                   parameter = it
@@ -225,10 +235,10 @@ private fun FilterHeader(
          onClick = {
             addFilter(
                Filter(
-               parameter = parameter,
-               comparator = comparator,
-               value = value
-            )
+                  parameter = parameter,
+                  comparator = comparator,
+                  value = value
+               )
             )
          }
       ) {
@@ -243,13 +253,12 @@ private fun FilterHeader(
 
 @Composable
 private fun ParameterSelection(
+   filterParameters: List<FilterParameter>,
    selectedParameter: FilterParameter,
    onSelectParameter: (FilterParameter) -> Unit,
    modifier: Modifier = Modifier,
 ) {
    var expanded by remember { mutableStateOf(false) }
-
-   val parameters = ModuFilterParameters()
 
    Column(modifier = modifier) {
       Row(
@@ -273,7 +282,7 @@ private fun ParameterSelection(
          expanded = expanded,
          onDismissRequest = { expanded = false }
       ) {
-         parameters.parameters.forEach { parameter ->
+         filterParameters.forEach { parameter ->
             DropdownMenuItem(
                onClick = {
                   onSelectParameter(parameter)
@@ -583,3 +592,4 @@ private fun StringValue(
       }
    )
 }
+
