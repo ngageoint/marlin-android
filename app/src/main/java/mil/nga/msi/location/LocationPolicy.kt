@@ -14,15 +14,15 @@ class LocationPolicy @Inject constructor(val locationProvider: LocationProvider)
     var bestLocation: Location? = null
     var filterLocation: Location? = null
 
-    private val bestLocationObserver = { location: Location ->
-        if (isBetterLocation(location, bestLocation)) {
+    private val bestLocationObserver = { location: Location? ->
+        if (location != null && isBetterLocation(location, bestLocation)) {
             bestLocation = location
             bestLocationProvider.setValue(location)
         }
     }
 
-    private val filterLocationObserver = { location: Location ->
-        if (updateFilterLocation(location, filterLocation)) {
+    private val filterLocationObserver = { location: Location? ->
+        if (location != null && updateFilterLocation(location, filterLocation)) {
             filterLocation = location
             filterLocationProvider.setValue(location)
         }
