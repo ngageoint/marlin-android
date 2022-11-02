@@ -40,10 +40,7 @@ fun FilterScreen(
    viewModel: FilterViewModel = hiltViewModel()
 ) {
    viewModel.setDataSource(dataSource)
-
    val title by viewModel.title.observeAsState("")
-   val filters by viewModel.filters.observeAsState(emptyList())
-   val filterParameters by viewModel.filterParameters.observeAsState(emptyList())
 
    Column(Modifier.fillMaxSize()) {
       TopBar(
@@ -52,25 +49,37 @@ fun FilterScreen(
          onNavigationClicked = { close() }
       )
 
-      Filters(
-         filters = filters,
-         removeFilter = {
-            val removed = filters.toMutableList()
-            removed.remove(it)
-            viewModel.setFilters(dataSource, removed)
+      Filter(dataSource = dataSource)
+   }
+}
+
+@Composable
+fun Filter(
+   dataSource: DataSource,
+   viewModel: FilterViewModel = hiltViewModel()
+) {
+   viewModel.setDataSource(dataSource)
+   val filters by viewModel.filters.observeAsState(emptyList())
+   val filterParameters by viewModel.filterParameters.observeAsState(emptyList())
+
+   Filters(
+      filters = filters,
+      removeFilter = {
+         val removed = filters.toMutableList()
+         removed.remove(it)
+         viewModel.setFilters(dataSource, removed)
+      }
+   )
+
+   if (filterParameters.isNotEmpty()) {
+      FilterHeader(
+         filterParameters = filterParameters,
+         addFilter = {
+            val added = filters.toMutableList()
+            added.add(it)
+            viewModel.setFilters(dataSource, added)
          }
       )
-
-      if (filterParameters.isNotEmpty()) {
-         FilterHeader(
-            filterParameters = filterParameters,
-            addFilter = {
-               val added = filters.toMutableList()
-               added.add(it)
-               viewModel.setFilters(dataSource, added)
-            }
-         )
-      }
    }
 }
 

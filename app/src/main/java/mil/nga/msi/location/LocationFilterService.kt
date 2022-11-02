@@ -2,8 +2,10 @@ package mil.nga.msi.location
 
 import android.location.Location
 import androidx.lifecycle.Observer
+import androidx.lifecycle.asLiveData
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.filter.ComparatorType
 import mil.nga.msi.filter.Filter
 import mil.nga.msi.filter.FilterParameterType
@@ -15,10 +17,23 @@ import javax.inject.Singleton
 open class LocationFilterService @Inject constructor(
    val filterRepository: FilterRepository
 ): Observer<Location> {
-   override fun onChanged(location: Location?) {
-      if (location == null) return
 
+   private var location: Location? = null
+
+   init {
+      filterRepository.filters.asLiveData().observeForever { filters ->
+         updateLocationFilter(location, filters)
+      }
+   }
+
+   override fun onChanged(location: Location?) {
       val filters = runBlocking { filterRepository.filters.first() }
+      updateLocationFilter(location, filters)
+   }
+
+   private fun updateLocationFilter(location: Location?, filters: Map<DataSource, List<Filter>>) {
+      if (location == null) return
+      this.location = location
 
       filters.forEach { entry ->
          val locationFilter = entry.value.find { it.parameter.type == FilterParameterType.LOCATION && it.comparator.name == ComparatorType.NEAR_ME.name }

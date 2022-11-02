@@ -1,7 +1,6 @@
 package mil.nga.msi.work.asam
 
 import android.content.Context
-import android.util.Log
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
@@ -23,9 +22,7 @@ class RefreshAsamWorker @AssistedInject constructor(
    override suspend fun doWork(): Result = try {
       val fetched = userPreferencesRepository.fetched(DataSource.ASAM)
       if (fetched == null || fetched.isBefore(Instant.now().minus(FETCH_INTERVAL_HOURS, ChronoUnit.HOURS))) {
-         Log.i("billy", "worker fetched ASAMs $fetched")
          repository.fetchAsams(true)
-         Log.i("billy", "worker set fetched time for ASAMs")
          userPreferencesRepository.setFetched(DataSource.ASAM, Instant.now())
       }
 

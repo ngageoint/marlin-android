@@ -29,7 +29,6 @@ import kotlinx.coroutines.launch
 import mil.nga.msi.R
 import mil.nga.msi.ui.home.homeGraph
 import mil.nga.msi.ui.map.MapRoute
-import mil.nga.msi.ui.modu.ModuRoute
 import mil.nga.msi.ui.navigation.NavigationDrawer
 
 @OptIn(ExperimentalMaterialNavigationApi::class, ExperimentalMaterialApi::class)
@@ -169,9 +168,9 @@ fun MainScreen(
             composable("main") {
                bottomBarVisibility = false
 
-               // TODO placeholder for app setup routes
+               // TODO LaunchedEffect placeholder for app setup routes
                LaunchedEffect(null) {
-                  navController.navigate(ModuRoute.List.name)
+                  navController.navigate(MapRoute.Map.name)
                }
             }
 

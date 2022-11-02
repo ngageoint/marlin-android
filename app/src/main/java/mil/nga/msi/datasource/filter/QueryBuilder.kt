@@ -1,6 +1,5 @@
 package mil.nga.msi.datasource.filter
 
-import android.util.Log
 import androidx.sqlite.db.SimpleSQLiteQuery
 import mil.nga.grid.features.Bounds
 import mil.nga.msi.filter.Filter
@@ -40,7 +39,6 @@ class QueryBuilder(
       }
 
       val condition = if (filterStrings.isNotEmpty()) {" WHERE ${filterStrings.joinToString(" AND ")}"} else ""
-      Log.i("Billy", "table $table condition $condition")
       return SimpleSQLiteQuery("SELECT * FROM $table $condition")
    }
 

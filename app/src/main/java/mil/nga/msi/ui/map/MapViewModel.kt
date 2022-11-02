@@ -1,6 +1,7 @@
 package mil.nga.msi.ui.map
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.*
 import com.google.android.gms.maps.model.TileProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
