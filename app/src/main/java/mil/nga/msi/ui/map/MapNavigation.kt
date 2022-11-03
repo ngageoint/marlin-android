@@ -11,7 +11,6 @@ import com.google.accompanist.navigation.material.ExperimentalMaterialNavigation
 import com.google.accompanist.navigation.material.bottomSheet
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.repository.dgpsstation.DgpsStationKey
 import mil.nga.msi.repository.light.LightKey
 import mil.nga.msi.repository.radiobeacon.RadioBeaconKey
@@ -168,17 +167,6 @@ fun NavGraphBuilder.mapGraph(
 
    bottomSheet(MapRoute.Filter.name) {
       MapFilterScreen(
-         onTap = {
-            when (it) {
-               DataSource.ASAM -> { AsamRoute.Filter.name}
-               DataSource.MODU -> { ModuRoute.Filter.name}
-               else -> null
-            }?.let { route ->
-               navController.navigate(route) {
-                  navController.popBackStack()
-               }
-            }
-         },
          close = {
             navController.popBackStack()
          }

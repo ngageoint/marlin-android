@@ -33,7 +33,6 @@ import mil.nga.msi.ui.theme.screenBackground
 
 @Composable
 fun MapFilterScreen(
-   onTap: (DataSource) -> Unit,
    close: () -> Unit,
    viewModel: MapFilterViewModel = hiltViewModel()
 ) {

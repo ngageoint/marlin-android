@@ -1,14 +1,19 @@
 package mil.nga.msi.repository.light
 
+import androidx.paging.PagingSource
+import androidx.sqlite.db.SimpleSQLiteQuery
 import mil.nga.msi.datasource.light.Light
 import mil.nga.msi.datasource.light.LightDao
+import mil.nga.msi.datasource.light.LightListItem
 import javax.inject.Inject
 
 class LightLocalDataSource @Inject constructor(
    private val dao: LightDao
 ) {
    fun observeLightMapItems() = dao.observeLightMapItems()
-   fun observeLightListItems() = dao.observeLightListItems()
+   fun observeLightListItems(query: SimpleSQLiteQuery): PagingSource<Int, LightListItem> = dao.getLightListItems(query)
+
+   fun getLights(query: SimpleSQLiteQuery) = dao.getLights(query)
 
    fun isEmpty() = dao.count() == 0
    suspend fun existingLights(ids: List<String>) = dao.existingLights(ids)

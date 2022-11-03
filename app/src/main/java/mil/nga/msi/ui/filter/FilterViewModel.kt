@@ -10,6 +10,7 @@ import mil.nga.msi.filter.FilterParameter
 import mil.nga.msi.filter.FilterParameterType
 import mil.nga.msi.repository.preferences.FilterRepository
 import mil.nga.msi.ui.asam.AsamRoute
+import mil.nga.msi.ui.light.LightRoute
 import mil.nga.msi.ui.modu.ModuRoute
 import javax.inject.Inject
 
@@ -26,6 +27,7 @@ class FilterViewModel @Inject constructor(
       when(dataSource) {
          DataSource.ASAM -> AsamRoute.Filter.shortTitle
          DataSource.MODU -> ModuRoute.Filter.shortTitle
+         DataSource.LIGHT -> LightRoute.Filter.shortTitle
          else -> ""
       }
    }
@@ -72,6 +74,27 @@ class FilterViewModel @Inject constructor(
          FilterParameter(title = "Special Status", name = "special_status", type = FilterParameterType.STRING),
          FilterParameter(title = "Rig Status", name = "rig_status", type = FilterParameterType.STRING),
          FilterParameter(title = "Navigation Area", name = "navigation_area", type = FilterParameterType.STRING))
+      )
+
+      put(DataSource.LIGHT, listOf(
+         FilterParameter(title = "Name", name ="name", type = FilterParameterType.STRING),
+         FilterParameter(title = "Location", name = "location", type = FilterParameterType.LOCATION),
+         FilterParameter(title = "Latitude", name = "latitude", type = FilterParameterType.DOUBLE),
+         FilterParameter(title = "Longitude", name = "longitude", type = FilterParameterType.DOUBLE),
+         FilterParameter(title = "Feature Number", name = "feature_number", type = FilterParameterType.STRING),
+         FilterParameter(title = "Volume Number", name = "volume_number", type = FilterParameterType.STRING),
+         FilterParameter(title = "International Feature Number", name = "international_feature", type = FilterParameterType.STRING),
+         FilterParameter(title = "Structure", name = "structure", type = FilterParameterType.STRING),
+         FilterParameter(title = "Focal Plane Elevation (ft)", name = "height_feet", type = FilterParameterType.STRING),
+         FilterParameter(title = "Focal Plane Elevation (ft)", name = "height_meters", type = FilterParameterType.STRING),
+         FilterParameter(title = "Range (nm)", name = "range", type = FilterParameterType.STRING),
+         FilterParameter(title = "Remarks", name = "remarks", type = FilterParameterType.STRING),
+         FilterParameter(title = "Characteristic", name = "characteristic", type = FilterParameterType.STRING),
+         FilterParameter(title = "Notice Number", name = "notice_number", type = FilterParameterType.INT),
+         FilterParameter(title = "Notice Week", name = "notice_week", type = FilterParameterType.STRING),
+         FilterParameter(title = "Notice Year", name = "notice_year", type = FilterParameterType.STRING),
+         FilterParameter(title = "Preceding Note", name = "preceding_note", type = FilterParameterType.STRING),
+         FilterParameter(title = "Post Note", name = "post_note", type = FilterParameterType.STRING))
       )
    }
 }

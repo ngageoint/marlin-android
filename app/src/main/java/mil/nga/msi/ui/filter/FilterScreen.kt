@@ -135,6 +135,7 @@ private fun valueString(
    return when (parameter.type) {
       FilterParameterType.DATE -> { dateValue(value = value) }
       FilterParameterType.DOUBLE -> { doubleValue(value) }
+      FilterParameterType.INT -> { intValue(value) }
       FilterParameterType.LOCATION -> { locationValue(value) }
       FilterParameterType.STRING -> { stringValue(value ) }
       else -> { "" }
@@ -151,6 +152,12 @@ private fun doubleValue(
    value: Any?
 ): String {
    return value?.toString()?.toDoubleOrNull().toString()
+}
+
+private fun intValue(
+   value: Any?
+): String {
+   return value?.toString()?.toIntOrNull().toString()
 }
 
 private fun locationValue(
@@ -402,6 +409,12 @@ private fun ValueSelection(
             onValueChanged = { onValueChanged(it) }
          )
       }
+      FilterParameterType.INT -> {
+         IntValue(
+            value = value?.toString().orEmpty(),
+            onValueChanged = { onValueChanged(it) }
+         )
+      }
       FilterParameterType.LOCATION -> {
          LocationValue(
             comparator = comparator,
@@ -415,9 +428,6 @@ private fun ValueSelection(
             onValueChanged = { onValueChanged(it) }
          )
       }
-//      ParameterType.INT -> {
-//
-//      }
 //      ParameterType.FLOAT -> {
 //
 //      }
@@ -524,6 +534,23 @@ private fun DateValue(
 
 @Composable
 fun DoubleValue(
+   value: String,
+   onValueChanged: (Any) -> Unit,
+) {
+   val focusManager = LocalFocusManager.current
+
+   Column {
+      TextField(
+         value = value,
+         onValueChange = { onValueChanged(it) },
+         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+         keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() })
+      )
+   }
+}
+
+@Composable
+fun IntValue(
    value: String,
    onValueChanged: (Any) -> Unit,
 ) {

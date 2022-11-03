@@ -62,8 +62,8 @@ class MapModule {
    @Singleton
    @Provides
    @Named("lightTileProvider")
-   fun provideLightTileProvider(application: Application, dataSource: LightLocalDataSource, userPreferencesRepository: UserPreferencesRepository): TileProvider {
-      return LightTileProvider(application, LightTileRepository(dataSource, userPreferencesRepository))
+   fun provideLightTileProvider(application: Application, dataSource: LightLocalDataSource, filterRepository: FilterRepository, userPreferencesRepository: UserPreferencesRepository): TileProvider {
+      return LightTileProvider(application, LightTileRepository(dataSource, filterRepository, userPreferencesRepository))
    }
 
    @Singleton

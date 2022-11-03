@@ -1,11 +1,20 @@
 package mil.nga.msi.repository.light
 
 import androidx.lifecycle.map
+import androidx.paging.PagingSource
 import androidx.work.*
+import kotlinx.coroutines.flow.first
 import mil.nga.msi.MarlinNotification
 import mil.nga.msi.datasource.DataSource
+import mil.nga.msi.datasource.filter.ComparatorType
+import mil.nga.msi.datasource.filter.QueryBuilder
 import mil.nga.msi.datasource.light.Light
+import mil.nga.msi.datasource.light.LightListItem
 import mil.nga.msi.datasource.light.PublicationVolume
+import mil.nga.msi.filter.Filter
+import mil.nga.msi.filter.FilterParameter
+import mil.nga.msi.filter.FilterParameterType
+import mil.nga.msi.repository.preferences.FilterRepository
 import mil.nga.msi.repository.preferences.UserPreferencesRepository
 import mil.nga.msi.work.light.LoadLightWorker
 import mil.nga.msi.work.light.RefreshLightWorker
@@ -17,10 +26,15 @@ class LightRepository @Inject constructor(
    private val localDataSource: LightLocalDataSource,
    private val remoteDataSource: LightRemoteDataSource,
    private val notification: MarlinNotification,
+   private val filterRepository: FilterRepository,
    private val userPreferencesRepository: UserPreferencesRepository
 ) {
    val lightMapItems = localDataSource.observeLightMapItems()
-   fun getLightListItems() = localDataSource.observeLightListItems()
+
+   fun observeLightListItems(filters: List<Filter>): PagingSource<Int, LightListItem> {
+      val query = QueryBuilder("lights", filters).buildQuery()
+      return localDataSource.observeLightListItems(query)
+   }
 
    fun observeLight(
       volumeNumber: String,
@@ -37,16 +51,71 @@ class LightRepository @Inject constructor(
       minLatitude: Double,
       maxLatitude: Double,
       minLongitude: Double,
-      maxLongitude: Double
-   ) = localDataSource.getLights(minLatitude, maxLatitude, minLongitude, maxLongitude)
-
-   fun getLights(
-      minLatitude: Double,
-      maxLatitude: Double,
-      minLongitude: Double,
       maxLongitude: Double,
       characteristicNumber: Int
    ) = localDataSource.getLights(minLatitude, maxLatitude, minLongitude, maxLongitude, characteristicNumber)
+
+   suspend fun getLights(
+      minLatitude: Double,
+      maxLatitude: Double,
+      minLongitude: Double,
+      maxLongitude: Double
+   ): List<Light>  {
+      val filters = filterRepository.filters.first()[DataSource.LIGHT] ?: emptyList()
+
+      val filtersWithBounds = filters.toMutableList().apply {
+         add(
+            Filter(
+               parameter = FilterParameter(
+                  type = FilterParameterType.DOUBLE,
+                  title = "Min Latitude",
+                  name =  "latitude",
+               ),
+               comparator = ComparatorType.GREATER_THAN_OR_EQUAL,
+               value = minLatitude
+            )
+         )
+
+         add(
+            Filter(
+               parameter = FilterParameter(
+                  type = FilterParameterType.DOUBLE,
+                  title = "Min Longitude",
+                  name =  "longitude",
+               ),
+               comparator = ComparatorType.GREATER_THAN_OR_EQUAL,
+               value = minLongitude
+            )
+         )
+
+         add(
+            Filter(
+               parameter = FilterParameter(
+                  type = FilterParameterType.DOUBLE,
+                  title = "Max Latitude",
+                  name =  "latitude",
+               ),
+               comparator = ComparatorType.LESS_THAN_OR_EQUAL,
+               value = maxLatitude
+            )
+         )
+
+         add(
+            Filter(
+               parameter = FilterParameter(
+                  type = FilterParameterType.DOUBLE,
+                  title = "Max Longitude",
+                  name =  "longitude",
+               ),
+               comparator = ComparatorType.LESS_THAN_OR_EQUAL,
+               value = maxLongitude
+            )
+         )
+      }
+
+      val query = QueryBuilder("lights", filtersWithBounds).buildQuery()
+      return localDataSource.getLights(query)
+   }
 
    suspend fun fetchLights(refresh: Boolean = false): List<Light> {
       if (refresh) {

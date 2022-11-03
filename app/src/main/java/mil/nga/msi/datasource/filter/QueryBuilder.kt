@@ -1,5 +1,6 @@
 package mil.nga.msi.datasource.filter
 
+import android.util.Log
 import androidx.sqlite.db.SimpleSQLiteQuery
 import mil.nga.grid.features.Bounds
 import mil.nga.msi.filter.Filter
@@ -27,6 +28,9 @@ class QueryBuilder(
             FilterParameterType.DOUBLE -> {
                doubleQuery(filter)
             }
+            FilterParameterType.INT -> {
+               intQuery(filter)
+            }
             FilterParameterType.LOCATION -> {
                locationQuery(filter)
             }
@@ -39,6 +43,8 @@ class QueryBuilder(
       }
 
       val condition = if (filterStrings.isNotEmpty()) {" WHERE ${filterStrings.joinToString(" AND ")}"} else ""
+      Log.i("Billy", "query condition  is $condition")
+
       return SimpleSQLiteQuery("SELECT * FROM $table $condition")
    }
 
@@ -88,6 +94,32 @@ class QueryBuilder(
 
    private fun doubleQuery(filter: Filter): String? {
       return filter.value?.toString()?.toDoubleOrNull()?.let{ value ->
+         when(filter.comparator) {
+            ComparatorType.EQUALS -> {
+               "${filter.parameter.name} = $value"
+            }
+            ComparatorType.NOT_EQUALS -> {
+               "${filter.parameter.name} != $value"
+            }
+            ComparatorType.GREATER_THAN -> {
+               "${filter.parameter.name} > $value"
+            }
+            ComparatorType.GREATER_THAN_OR_EQUAL -> {
+               "${filter.parameter.name} >= $value"
+            }
+            ComparatorType.LESS_THAN -> {
+               "${filter.parameter.name} < $value"
+            }
+            ComparatorType.LESS_THAN_OR_EQUAL -> {
+               "${filter.parameter.name} <= $value"
+            }
+            else -> null
+         }
+      }
+   }
+
+   private fun intQuery(filter: Filter): String? {
+      return filter.value?.toString()?.toIntOrNull()?.let{ value ->
          when(filter.comparator) {
             ComparatorType.EQUALS -> {
                "${filter.parameter.name} = $value"

@@ -20,8 +20,22 @@ enum class FilterParameterType(val comparators: List<ComparatorType>) {
       ComparatorType.LESS_THAN,
       ComparatorType.LESS_THAN_OR_EQUAL)
    ),
-   INT(listOf()),
-   FLOAT(listOf()),
+   FLOAT(listOf(
+      ComparatorType.EQUALS,
+      ComparatorType.NOT_EQUALS,
+      ComparatorType.GREATER_THAN,
+      ComparatorType.GREATER_THAN_OR_EQUAL,
+      ComparatorType.LESS_THAN,
+      ComparatorType.LESS_THAN_OR_EQUAL)
+   ),
+   INT(listOf(
+      ComparatorType.EQUALS,
+      ComparatorType.NOT_EQUALS,
+      ComparatorType.GREATER_THAN,
+      ComparatorType.GREATER_THAN_OR_EQUAL,
+      ComparatorType.LESS_THAN,
+      ComparatorType.LESS_THAN_OR_EQUAL)
+   ),
    DOUBLE(listOf(
       ComparatorType.EQUALS,
       ComparatorType.NOT_EQUALS,
