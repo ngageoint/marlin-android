@@ -39,10 +39,6 @@ interface AsamDao {
    @Query("SELECT * FROM asams ORDER BY date DESC LIMIT 1")
    suspend fun getLatestAsam(): Asam?
 
-   @Query("SELECT * FROM asams ORDER BY date DESC")
-   @RewriteQueriesToDropUnusedColumns
-   fun getAsamListItems(): PagingSource<Int, AsamListItem>
-
    @RawQuery(observedEntities = [Asam::class])
    fun getAsamListItems(query: SupportSQLiteQuery): PagingSource<Int, AsamListItem>
 

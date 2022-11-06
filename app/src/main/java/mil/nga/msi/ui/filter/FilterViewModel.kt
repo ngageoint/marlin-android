@@ -5,13 +5,17 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.launch
 import mil.nga.msi.datasource.DataSource
+import mil.nga.msi.datasource.filter.AsamFilter
+import mil.nga.msi.datasource.filter.LightFilter
+import mil.nga.msi.datasource.filter.ModuFilter
+import mil.nga.msi.datasource.filter.PortFilter
 import mil.nga.msi.filter.Filter
 import mil.nga.msi.filter.FilterParameter
-import mil.nga.msi.filter.FilterParameterType
 import mil.nga.msi.repository.preferences.FilterRepository
 import mil.nga.msi.ui.asam.AsamRoute
 import mil.nga.msi.ui.light.LightRoute
 import mil.nga.msi.ui.modu.ModuRoute
+import mil.nga.msi.ui.port.PortRoute
 import javax.inject.Inject
 
 @HiltViewModel
@@ -28,6 +32,7 @@ class FilterViewModel @Inject constructor(
          DataSource.ASAM -> AsamRoute.Filter.shortTitle
          DataSource.MODU -> ModuRoute.Filter.shortTitle
          DataSource.LIGHT -> LightRoute.Filter.shortTitle
+         DataSource.PORT -> PortRoute.Filter.shortTitle
          else -> ""
       }
    }
@@ -49,52 +54,9 @@ class FilterViewModel @Inject constructor(
    }
 
    private val filterParameterMap = mutableMapOf<DataSource, List<FilterParameter>>().apply {
-      put(DataSource.ASAM, listOf(
-         FilterParameter(title = "Date", name = "date", type = FilterParameterType.DATE),
-         FilterParameter(title = "Location", name = "date", type = FilterParameterType.LOCATION),
-         FilterParameter(title = "Reference", name = "reference", type = FilterParameterType.STRING),
-         FilterParameter(title = "Latitude", name = "latitude", type = FilterParameterType.DOUBLE),
-         FilterParameter(title = "Longitude", name = "longitude", type = FilterParameterType.DOUBLE),
-         FilterParameter(title = "Navigation Area", name = "navigation_area", type = FilterParameterType.STRING),
-         FilterParameter(title = "Subregion", name = "subregion", type = FilterParameterType.STRING),
-         FilterParameter(title = "Description", name = "description", type = FilterParameterType.STRING),
-         FilterParameter(title = "Hostility", name = "hostility", type = FilterParameterType.STRING),
-         FilterParameter(title = "Victim", name ="victim", type = FilterParameterType.STRING))
-      )
-
-      put(DataSource.MODU, listOf(
-         FilterParameter(title = "Date", name ="date", type = FilterParameterType.DATE),
-         FilterParameter(title = "Name", name ="name", type = FilterParameterType.STRING),
-         FilterParameter(title = "Location", name = "location", type = FilterParameterType.LOCATION),
-         FilterParameter(title = "Latitude", name = "latitude", type = FilterParameterType.DOUBLE),
-         FilterParameter(title = "Longitude", name = "longitude", type = FilterParameterType.DOUBLE),
-         FilterParameter(title = "Region", name = "region", type = FilterParameterType.STRING),
-         FilterParameter(title = "Subregion", name = "subregion", type = FilterParameterType.STRING),
-         FilterParameter(title = "Distance", name = "distance", type = FilterParameterType.DOUBLE),
-         FilterParameter(title = "Special Status", name = "special_status", type = FilterParameterType.STRING),
-         FilterParameter(title = "Rig Status", name = "rig_status", type = FilterParameterType.STRING),
-         FilterParameter(title = "Navigation Area", name = "navigation_area", type = FilterParameterType.STRING))
-      )
-
-      put(DataSource.LIGHT, listOf(
-         FilterParameter(title = "Name", name ="name", type = FilterParameterType.STRING),
-         FilterParameter(title = "Location", name = "location", type = FilterParameterType.LOCATION),
-         FilterParameter(title = "Latitude", name = "latitude", type = FilterParameterType.DOUBLE),
-         FilterParameter(title = "Longitude", name = "longitude", type = FilterParameterType.DOUBLE),
-         FilterParameter(title = "Feature Number", name = "feature_number", type = FilterParameterType.STRING),
-         FilterParameter(title = "Volume Number", name = "volume_number", type = FilterParameterType.STRING),
-         FilterParameter(title = "International Feature Number", name = "international_feature", type = FilterParameterType.STRING),
-         FilterParameter(title = "Structure", name = "structure", type = FilterParameterType.STRING),
-         FilterParameter(title = "Focal Plane Elevation (ft)", name = "height_feet", type = FilterParameterType.STRING),
-         FilterParameter(title = "Focal Plane Elevation (ft)", name = "height_meters", type = FilterParameterType.STRING),
-         FilterParameter(title = "Range (nm)", name = "range", type = FilterParameterType.STRING),
-         FilterParameter(title = "Remarks", name = "remarks", type = FilterParameterType.STRING),
-         FilterParameter(title = "Characteristic", name = "characteristic", type = FilterParameterType.STRING),
-         FilterParameter(title = "Notice Number", name = "notice_number", type = FilterParameterType.INT),
-         FilterParameter(title = "Notice Week", name = "notice_week", type = FilterParameterType.STRING),
-         FilterParameter(title = "Notice Year", name = "notice_year", type = FilterParameterType.STRING),
-         FilterParameter(title = "Preceding Note", name = "preceding_note", type = FilterParameterType.STRING),
-         FilterParameter(title = "Post Note", name = "post_note", type = FilterParameterType.STRING))
-      )
+      put(DataSource.ASAM, AsamFilter.parameters)
+      put(DataSource.MODU, ModuFilter.parameters)
+      put(DataSource.LIGHT, LightFilter.parameters)
+      put(DataSource.PORT, PortFilter.parameters)
    }
 }

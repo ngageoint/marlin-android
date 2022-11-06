@@ -69,8 +69,8 @@ class MapModule {
    @Singleton
    @Provides
    @Named("portTileProvider")
-   fun providePortTileProvider(application: Application, dataSource: PortLocalDataSource): TileProvider {
-      return PortTileProvider(application, PortTileRepository(dataSource))
+   fun providePortTileProvider(application: Application, dataSource: PortLocalDataSource, filterRepository: FilterRepository,): TileProvider {
+      return PortTileProvider(application, PortTileRepository(dataSource, filterRepository))
    }
 
    @Singleton

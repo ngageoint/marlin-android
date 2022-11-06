@@ -22,7 +22,7 @@ class MapFilterViewModel @Inject constructor(
       DataSource.ASAM,
       DataSource.MODU,
       DataSource.LIGHT,
-//      DataSource.PORT,
+      DataSource.PORT,
 //      DataSource.RADIO_BEACON,
 //      DataSource.DGPS_STATION
    )

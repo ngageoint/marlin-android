@@ -1,12 +1,12 @@
 package mil.nga.msi.ui.map
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.*
 import com.google.android.gms.maps.model.TileProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.location.LocationPolicy
@@ -19,6 +19,7 @@ import mil.nga.msi.repository.light.LightRepository
 import mil.nga.msi.repository.map.*
 import mil.nga.msi.repository.modu.ModuRepository
 import mil.nga.msi.repository.port.PortRepository
+import mil.nga.msi.repository.preferences.FilterRepository
 import mil.nga.msi.repository.preferences.UserPreferencesRepository
 import mil.nga.msi.repository.radiobeacon.RadioBeaconKey
 import mil.nga.msi.repository.radiobeacon.RadioBeaconRepository
@@ -43,6 +44,7 @@ enum class TileProviderType {
 @HiltViewModel
 class MapViewModel @Inject constructor(
    private val application: Application,
+   private val filterRepository: FilterRepository,
    private val asamRepository: AsamRepository,
    private val asamTileRepository: AsamTileRepository,
    private val moduRepository: ModuRepository,
@@ -248,8 +250,10 @@ class MapViewModel @Inject constructor(
       } else emptyList()
 
       val ports = if (dataSources[DataSource.PORT] == true) {
+         val entry = filterRepository.filters.first()
+         val filters = entry[DataSource.PORT] ?: emptyList()
          portRepository
-            .getPorts(minLatitude, maxLatitude, minLongitude, maxLongitude)
+            .getPorts(filters)
             .map { port ->
                val key = MapAnnotation.Key(port.portNumber.toString(), MapAnnotation.Type.PORT)
                MapAnnotation(key, port.latitude, port.longitude)

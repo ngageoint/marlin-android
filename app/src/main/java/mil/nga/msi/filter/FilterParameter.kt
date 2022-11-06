@@ -1,6 +1,22 @@
 package mil.nga.msi.filter
 
-import mil.nga.msi.datasource.filter.ComparatorType
+import mil.nga.msi.datasource.port.types.EnumerationType
+
+enum class ComparatorType(val title: String) {
+   EQUALS(title = "="),
+   NOT_EQUALS(title = "!="),
+   GREATER_THAN(title = ">"),
+   GREATER_THAN_OR_EQUAL(title = ">="),
+   LESS_THAN(title = "<"),
+   LESS_THAN_OR_EQUAL(title = "<="),
+   CONTAINS(title = "contains"),
+   NOT_CONTAINS(title = "not contains"),
+   STARTS_WITH(title = "starts with"),
+   ENDS_WITH(title = "ends with"),
+   NEAR_ME(title = "near me"),
+   CLOSE_TO(title = "close to"),
+   WITHIN(title = "within")
+}
 
 enum class FilterParameterType(val comparators: List<ComparatorType>) {
    STRING(listOf(
@@ -48,11 +64,16 @@ enum class FilterParameterType(val comparators: List<ComparatorType>) {
    LOCATION(listOf(
       ComparatorType.CLOSE_TO,
       ComparatorType.NEAR_ME)
-   )
+   ),
+   ENUMERATION(listOf(
+      ComparatorType.EQUALS,
+      ComparatorType.NOT_EQUALS
+   ))
 }
 
 data class FilterParameter(
-   val type: FilterParameterType,
    val title: String,
-   val name: String,
+   val parameter: String,
+   val type: FilterParameterType,
+   val enumerationValues: List<EnumerationType> = emptyList()
 )

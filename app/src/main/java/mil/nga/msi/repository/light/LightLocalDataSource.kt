@@ -11,7 +11,7 @@ class LightLocalDataSource @Inject constructor(
    private val dao: LightDao
 ) {
    fun observeLightMapItems() = dao.observeLightMapItems()
-   fun observeLightListItems(query: SimpleSQLiteQuery): PagingSource<Int, LightListItem> = dao.getLightListItems(query)
+   fun observeLightListItems(query: SimpleSQLiteQuery): PagingSource<Int, LightListItem> = dao.observeLightListItems(query)
 
    fun getLights(query: SimpleSQLiteQuery) = dao.getLights(query)
 

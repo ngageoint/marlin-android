@@ -23,7 +23,8 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import mil.nga.msi.datasource.DataSource
-import mil.nga.msi.datasource.filter.ComparatorType
+import mil.nga.msi.datasource.port.types.EnumerationType
+import mil.nga.msi.filter.ComparatorType
 import mil.nga.msi.filter.Filter
 import mil.nga.msi.filter.FilterParameter
 import mil.nga.msi.filter.FilterParameterType
@@ -135,6 +136,7 @@ private fun valueString(
    return when (parameter.type) {
       FilterParameterType.DATE -> { dateValue(value = value) }
       FilterParameterType.DOUBLE -> { doubleValue(value) }
+      FilterParameterType.ENUMERATION -> { enumerationValue(value) }
       FilterParameterType.INT -> { intValue(value) }
       FilterParameterType.LOCATION -> { locationValue(value) }
       FilterParameterType.STRING -> { stringValue(value ) }
@@ -152,6 +154,12 @@ private fun doubleValue(
    value: Any?
 ): String {
    return value?.toString()?.toDoubleOrNull().toString()
+}
+
+private fun enumerationValue(
+   value: Any?
+): String {
+   return (value as? EnumerationType)?.title ?: ""
 }
 
 private fun intValue(
@@ -181,11 +189,21 @@ private fun FilterHeader(
    filterParameters: List<FilterParameter>,
    addFilter: (Filter) -> Unit
 ) {
+   val getDefaultValue: (FilterParameter) -> Any? = { parameter ->
+      when (parameter.type) {
+         FilterParameterType.DATE -> "last 30 days"
+         FilterParameterType.ENUMERATION -> {
+            parameter.enumerationValues.firstOrNull()
+         }
+         else -> ""
+      }
+   }
+
    val defaultParameter = filterParameters.first()
    val defaultComparator = defaultParameter.type.comparators.first()
    var parameter by remember { mutableStateOf(defaultParameter) }
    var comparator by remember { mutableStateOf(defaultComparator) }
-   var value by remember { mutableStateOf<Any?>("last 30 days") }
+   var value by remember { mutableStateOf(getDefaultValue(defaultParameter)) }
 
    Row(
       verticalAlignment = Alignment.CenterVertically,
@@ -208,8 +226,8 @@ private fun FilterHeader(
                selectedParameter = parameter,
                onSelectParameter = {
                   parameter = it
-                  value = if (parameter.type == FilterParameterType.DATE) "last 30 days" else ""
                   comparator = parameter.type.comparators.first()
+                  value = getDefaultValue(parameter)
                }
             )
 
@@ -394,6 +412,7 @@ private fun ValueSelection(
    value: Any?,
    onValueChanged: (Any) -> Unit
 ) {
+   var expanded by remember { mutableStateOf(false) }
 
    when(parameter.type) {
       FilterParameterType.DATE -> {
@@ -408,6 +427,54 @@ private fun ValueSelection(
             value = value?.toString().orEmpty(),
             onValueChanged = { onValueChanged(it) }
          )
+      }
+      FilterParameterType.ENUMERATION -> {
+         Row(
+            modifier = Modifier.clickable {
+               expanded = true
+            }
+         ) {
+            Text(
+               text = (value as EnumerationType).title,
+               style = MaterialTheme.typography.subtitle1,
+               color = MaterialTheme.colors.primary
+            )
+            Icon(
+               imageVector = Icons.Default.ExpandMore,
+               tint = MaterialTheme.colors.primary,
+               contentDescription = "Select new enumeration"
+            )
+         }
+
+         DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+         ) {
+            parameter.enumerationValues.forEach { enumeration ->
+               DropdownMenuItem(
+                  onClick = {
+                     onValueChanged(enumeration)
+                     expanded = false
+                  }
+               ) {
+                  Row {
+                     if (value == enumeration) {
+                        Icon(
+                           imageVector = Icons.Default.Check,
+                           contentDescription = "Selected Enumeration"
+                        )
+                     } else {
+                        Spacer(modifier = Modifier.size(24.dp))
+                     }
+
+                     Text(
+                        text = enumeration.title,
+                        modifier = Modifier.padding(start = 8.dp)
+                     )
+                  }
+               }
+            }
+         }
       }
       FilterParameterType.INT -> {
          IntValue(

@@ -18,12 +18,12 @@ class ModusViewModel @Inject constructor(
    private val repository: ModuRepository,
    filterRepository: FilterRepository
 ): ViewModel() {
-   suspend fun getModu(name: String) = repository.getModu(name)
-
    val modus: Flow<PagingData<ModuListItem>> = filterRepository.filters.flatMapLatest { entry ->
       val filters = entry[DataSource.MODU] ?: emptyList()
       Pager(PagingConfig(pageSize = 20), null) {
          repository.observeModuListItems(filters)
       }.flow
    }
+
+   suspend fun getModu(name: String) = repository.getModu(name)
 }

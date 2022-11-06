@@ -26,22 +26,6 @@ class LightsViewModel @Inject constructor(
    private val repository: LightRepository,
    filterRepository: FilterRepository,
 ): ViewModel() {
-   suspend fun getLight(
-      volumeNumber: String,
-      featureNumber: String,
-      characteristicNumber: Int
-   ): Light? {
-      return repository.getLight(volumeNumber, featureNumber, characteristicNumber)
-   }
-
-   suspend fun getLights(
-      minLatitude: Double,
-      maxLatitude: Double,
-      minLongitude: Double,
-      maxLongitude: Double,
-   ) = withContext(Dispatchers.IO) {
-      repository.getLights(minLatitude, maxLatitude, minLongitude, maxLongitude, characteristicNumber = 1)
-   }
 
    @OptIn(ExperimentalCoroutinesApi::class)
    val lights: Flow<PagingData<LightItem>> = filterRepository.filters.flatMapLatest { entry ->
@@ -57,5 +41,21 @@ class LightsViewModel @Inject constructor(
                } else null
             }
       }
+   }
+
+   suspend fun getLight(
+      volumeNumber: String,
+      featureNumber: String,
+      characteristicNumber: Int
+   ): Light? = repository.getLight(volumeNumber, featureNumber, characteristicNumber)
+
+
+   suspend fun getLights(
+      minLatitude: Double,
+      maxLatitude: Double,
+      minLongitude: Double,
+      maxLongitude: Double,
+   ) = withContext(Dispatchers.IO) {
+      repository.getLights(minLatitude, maxLatitude, minLongitude, maxLongitude, characteristicNumber = 1)
    }
 }

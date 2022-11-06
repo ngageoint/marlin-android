@@ -6,7 +6,7 @@ import androidx.lifecycle.asLiveData
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import mil.nga.msi.datasource.DataSource
-import mil.nga.msi.datasource.filter.ComparatorType
+import mil.nga.msi.filter.ComparatorType
 import mil.nga.msi.filter.Filter
 import mil.nga.msi.filter.FilterParameterType
 import mil.nga.msi.repository.preferences.FilterRepository

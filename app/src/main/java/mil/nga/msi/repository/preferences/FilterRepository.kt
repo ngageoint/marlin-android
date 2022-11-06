@@ -5,7 +5,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import mil.nga.msi.datasource.DataSource
-import mil.nga.msi.datasource.filter.ComparatorType
+import mil.nga.msi.datasource.port.types.EnumerationType
+import mil.nga.msi.filter.ComparatorType
+import mil.nga.msi.filter.FilterParameter
 import mil.nga.msi.filter.FilterParameterType
 import mil.nga.msi.type.Filters
 import mil.nga.msi.type.UserPreferences
@@ -39,28 +41,76 @@ class FilterRepository @Inject constructor(
    private fun serializeFilter(filter: mil.nga.msi.filter.Filter): mil.nga.msi.type.Filter {
       val parameter = mil.nga.msi.type.FilterParameter.newBuilder()
          .setType(filter.parameter.type.name)
-         .setName(filter.parameter.name)
+         .setName(filter.parameter.parameter)
          .setTitle(filter.parameter.title)
          .build()
 
       return mil.nga.msi.type.Filter.newBuilder()
          .setParameter(parameter)
          .setComparator(filter.comparator.name)
-         .setValue(filter.value.toString())
+         .setValue(serializeValue(filter.parameter, filter.value))
          .build()
    }
 
    private fun deserializeFilter(filter: mil.nga.msi.type.Filter): mil.nga.msi.filter.Filter {
-      val parameter = mil.nga.msi.filter.FilterParameter(
+      val parameter = FilterParameter(
          type = FilterParameterType.valueOf(filter.parameter.type),
          title = filter.parameter.title,
-         name = filter.parameter.name
+         parameter = filter.parameter.name
       )
 
       return mil.nga.msi.filter.Filter(
          parameter = parameter,
          comparator = ComparatorType.valueOf(filter.comparator),
-         value = filter.value
+         value = deserializeValue(parameter, filter.value)
       )
+   }
+
+   private fun serializeValue(
+      parameter: FilterParameter,
+      value: Any?
+   ): String? {
+      return when (parameter.type) {
+         FilterParameterType.BOOLEAN -> value?.toString()
+         FilterParameterType.DATE -> {
+            value?.toString() // TODO convert to ISO date
+         }
+         FilterParameterType.DOUBLE -> value?.toString()
+         FilterParameterType.ENUMERATION -> serializeEnumeration(value)
+         FilterParameterType.FLOAT -> value?.toString()
+         FilterParameterType.INT -> value?.toString()
+         FilterParameterType.LOCATION -> value?.toString()
+         FilterParameterType.STRING -> value?.toString()
+      }
+   }
+
+   private fun deserializeValue(
+      parameter: FilterParameter,
+      value: String?
+   ): Any? {
+      return when (parameter.type) {
+         FilterParameterType.BOOLEAN -> value?.toBooleanStrictOrNull()
+         FilterParameterType.DATE -> value // TODO convert to ISO date
+         FilterParameterType.DOUBLE -> value?.toDoubleOrNull()
+         FilterParameterType.ENUMERATION -> deserializeEnumeration(value)
+         FilterParameterType.FLOAT -> value?.toFloatOrNull()
+         FilterParameterType.INT -> value?.toIntOrNull()
+         FilterParameterType.LOCATION -> value
+         FilterParameterType.STRING -> value
+      }
+   }
+
+   private fun serializeEnumeration(
+      value: Any?
+   ): String? {
+      return (value as? EnumerationType)?.let { type ->
+         EnumerationType.toString(type)
+      }
+   }
+
+   private fun deserializeEnumeration(
+      value: String?
+   ): EnumerationType? {
+      return EnumerationType.fromString(value)
    }
 }

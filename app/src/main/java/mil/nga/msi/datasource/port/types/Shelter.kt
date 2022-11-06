@@ -1,18 +1,32 @@
 package mil.nga.msi.datasource.port.types
 
-enum class Shelter(val value: String? = null, val title: String) {
-   EXCELLENT("E", "Excellent"),
-   GOOD("G", "Good"),
-   FAIR("F", "Fair"),
-   POOR("P", "Poor"),
-   NONE("N", "None"),
-   UNKNOWN(title = "Unknown");
+enum class Shelter: EnumerationType {
+   E {
+      override val title = "Excellent"
+   },
+   G {
+      override val title = "Good"
+   },
+   F {
+      override val title = "Fair"
+   },
+   P {
+      override val title = "Poor"
+   },
+   N {
+      override val title = "None"
+   },
+   UNKNOWN {
+      override val title = "Unknown"
+   };
 
    companion object {
       fun fromValue(value: String?): Shelter {
-         return values().find {
-            value == it.name
-         } ?: UNKNOWN
+         return try {
+            valueOf(value!!)
+         } catch (e: Exception) {
+            UNKNOWN
+         }
       }
    }
 }

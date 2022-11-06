@@ -3,6 +3,8 @@ package mil.nga.msi.datasource.filter
 import android.util.Log
 import androidx.sqlite.db.SimpleSQLiteQuery
 import mil.nga.grid.features.Bounds
+import mil.nga.msi.datasource.port.types.EnumerationType
+import mil.nga.msi.filter.ComparatorType
 import mil.nga.msi.filter.Filter
 import mil.nga.msi.filter.FilterParameterType
 import mil.nga.sf.util.GeometryUtils
@@ -28,6 +30,9 @@ class QueryBuilder(
             FilterParameterType.DOUBLE -> {
                doubleQuery(filter)
             }
+            FilterParameterType.ENUMERATION -> {
+               enumerationQuery(filter)
+            }
             FilterParameterType.INT -> {
                intQuery(filter)
             }
@@ -43,8 +48,7 @@ class QueryBuilder(
       }
 
       val condition = if (filterStrings.isNotEmpty()) {" WHERE ${filterStrings.joinToString(" AND ")}"} else ""
-      Log.i("Billy", "query condition  is $condition")
-
+      Log.i("Billy", "query condition is $condition")
       return SimpleSQLiteQuery("SELECT * FROM $table $condition")
    }
 
@@ -68,25 +72,25 @@ class QueryBuilder(
                   ZonedDateTime.now(ZoneOffset.UTC).minusDays(365).toInstant().toEpochMilli()
                }
                else -> null
-            }?.let { "${filter.parameter.name} > $it" }
+            }?.let { "${filter.parameter.parameter} > $it" }
          }
          ComparatorType.EQUALS -> {
-            epoch?.let { "${filter.parameter.name} = $epoch" }
+            epoch?.let { "${filter.parameter.parameter} = $epoch" }
          }
          ComparatorType.NOT_EQUALS -> {
-            epoch?.let { "${filter.parameter.name} != $epoch" }
+            epoch?.let { "${filter.parameter.parameter} != $epoch" }
          }
          ComparatorType.GREATER_THAN -> {
-            epoch?.let { "${filter.parameter.name} > $epoch" }
+            epoch?.let { "${filter.parameter.parameter} > $epoch" }
          }
          ComparatorType.GREATER_THAN_OR_EQUAL -> {
-            epoch?.let { "${filter.parameter.name} >= $epoch" }
+            epoch?.let { "${filter.parameter.parameter} >= $epoch" }
          }
          ComparatorType.LESS_THAN -> {
-            epoch?.let { "${filter.parameter.name} < $epoch" }
+            epoch?.let { "${filter.parameter.parameter} < $epoch" }
          }
          ComparatorType.LESS_THAN_OR_EQUAL -> {
-            epoch?.let { "${filter.parameter.name} <= $epoch" }
+            epoch?.let { "${filter.parameter.parameter} <= $epoch" }
          }
          else -> null
       }
@@ -96,22 +100,37 @@ class QueryBuilder(
       return filter.value?.toString()?.toDoubleOrNull()?.let{ value ->
          when(filter.comparator) {
             ComparatorType.EQUALS -> {
-               "${filter.parameter.name} = $value"
+               "${filter.parameter.parameter} = $value"
             }
             ComparatorType.NOT_EQUALS -> {
-               "${filter.parameter.name} != $value"
+               "${filter.parameter.parameter} != $value"
             }
             ComparatorType.GREATER_THAN -> {
-               "${filter.parameter.name} > $value"
+               "${filter.parameter.parameter} > $value"
             }
             ComparatorType.GREATER_THAN_OR_EQUAL -> {
-               "${filter.parameter.name} >= $value"
+               "${filter.parameter.parameter} >= $value"
             }
             ComparatorType.LESS_THAN -> {
-               "${filter.parameter.name} < $value"
+               "${filter.parameter.parameter} < $value"
             }
             ComparatorType.LESS_THAN_OR_EQUAL -> {
-               "${filter.parameter.name} <= $value"
+               "${filter.parameter.parameter} <= $value"
+            }
+            else -> null
+         }
+      }
+   }
+
+   private fun enumerationQuery(filter: Filter): String? {
+      val enumeration = filter.value as? EnumerationType
+      return enumeration?.name?.let { name ->
+         when(filter.comparator) {
+            ComparatorType.EQUALS -> {
+               "${filter.parameter.parameter} = '${name}'"
+            }
+            ComparatorType.NOT_EQUALS -> {
+               "${filter.parameter.parameter} != '${name}'"
             }
             else -> null
          }
@@ -122,22 +141,22 @@ class QueryBuilder(
       return filter.value?.toString()?.toIntOrNull()?.let{ value ->
          when(filter.comparator) {
             ComparatorType.EQUALS -> {
-               "${filter.parameter.name} = $value"
+               "${filter.parameter.parameter} = $value"
             }
             ComparatorType.NOT_EQUALS -> {
-               "${filter.parameter.name} != $value"
+               "${filter.parameter.parameter} != $value"
             }
             ComparatorType.GREATER_THAN -> {
-               "${filter.parameter.name} > $value"
+               "${filter.parameter.parameter} > $value"
             }
             ComparatorType.GREATER_THAN_OR_EQUAL -> {
-               "${filter.parameter.name} >= $value"
+               "${filter.parameter.parameter} >= $value"
             }
             ComparatorType.LESS_THAN -> {
-               "${filter.parameter.name} < $value"
+               "${filter.parameter.parameter} < $value"
             }
             ComparatorType.LESS_THAN_OR_EQUAL -> {
-               "${filter.parameter.name} <= $value"
+               "${filter.parameter.parameter} <= $value"
             }
             else -> null
          }
@@ -173,22 +192,22 @@ class QueryBuilder(
    private fun stringQuery(filter: Filter): String? {
       return when(filter.comparator) {
          ComparatorType.EQUALS -> {
-            "${filter.parameter.name} = '${filter.value}'"
+            "${filter.parameter.parameter} = '${filter.value}'"
          }
          ComparatorType.NOT_EQUALS -> {
-            "${filter.parameter.name} != '${filter.value}'"
+            "${filter.parameter.parameter} != '${filter.value}'"
          }
          ComparatorType.CONTAINS -> {
-            "${filter.parameter.name} LIKE '%${filter.value}%'"
+            "${filter.parameter.parameter} LIKE '%${filter.value}%'"
          }
          ComparatorType.NOT_CONTAINS -> {
-            "${filter.parameter.name} NOT LIKE '%${filter.value}%'"
+            "${filter.parameter.parameter} NOT LIKE '%${filter.value}%'"
          }
          ComparatorType.STARTS_WITH -> {
-            "${filter.parameter.name} LIKE '${filter.value}%'"
+            "${filter.parameter.parameter} LIKE '${filter.value}%'"
          }
          ComparatorType.ENDS_WITH -> {
-            "${filter.parameter.name} LIKE '%${filter.value}'"
+            "${filter.parameter.parameter} LIKE '%${filter.value}'"
          }
          else -> null
       }

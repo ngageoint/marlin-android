@@ -53,11 +53,7 @@ interface LightDao {
    fun observeLight(volumeNumber: String, featureNumber: String): Flow<List<Light>>
 
    @RawQuery(observedEntities = [Light::class])
-   fun getLightListItems(query: SupportSQLiteQuery): PagingSource<Int, LightListItem>
-
-   @Query("SELECT * FROM lights ORDER BY section_header ASC, feature_number ASC")
-   @RewriteQueriesToDropUnusedColumns
-   fun observeLightListItems(): PagingSource<Int, LightListItem>
+   fun observeLightListItems(query: SupportSQLiteQuery): PagingSource<Int, LightListItem>
 
    @Query("SELECT * FROM lights ORDER BY volume_number, feature_number, characteristic_number")
    @RewriteQueriesToDropUnusedColumns

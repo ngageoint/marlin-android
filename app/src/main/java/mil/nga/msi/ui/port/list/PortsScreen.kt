@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.GpsFixed
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Share
@@ -38,6 +39,7 @@ import mil.nga.msi.ui.theme.screenBackground
 @Composable
 fun PortsScreen(
    openDrawer: () -> Unit,
+   openFilter: () -> Unit,
    onTap: (Int) -> Unit,
    onAction: (PortAction) -> Unit,
    viewModel: PortsViewModel = hiltViewModel()
@@ -49,7 +51,12 @@ fun PortsScreen(
       TopBar(
          title = PortRoute.List.title,
          navigationIcon = Icons.Filled.Menu,
-         onNavigationClicked = { openDrawer() }
+         onNavigationClicked = { openDrawer() },
+         actions = {
+            IconButton(onClick = { openFilter() } ) {
+               Icon(Icons.Default.FilterList, contentDescription = "Filter World Ports")
+            }
+         }
       )
 
       Ports(

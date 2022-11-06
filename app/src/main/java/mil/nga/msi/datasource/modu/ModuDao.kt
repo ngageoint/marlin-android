@@ -40,7 +40,7 @@ interface ModuDao {
    suspend fun getLatestModu(): Modu?
 
    @RawQuery(observedEntities = [Modu::class])
-   fun getModuListItems(query: SupportSQLiteQuery): PagingSource<Int, ModuListItem>
+   fun observeModuListItems(query: SupportSQLiteQuery): PagingSource<Int, ModuListItem>
 
    @Query("SELECT * FROM modus ORDER BY name")
    @RewriteQueriesToDropUnusedColumns

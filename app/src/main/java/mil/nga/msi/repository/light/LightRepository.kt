@@ -6,11 +6,11 @@ import androidx.work.*
 import kotlinx.coroutines.flow.first
 import mil.nga.msi.MarlinNotification
 import mil.nga.msi.datasource.DataSource
-import mil.nga.msi.datasource.filter.ComparatorType
 import mil.nga.msi.datasource.filter.QueryBuilder
 import mil.nga.msi.datasource.light.Light
 import mil.nga.msi.datasource.light.LightListItem
 import mil.nga.msi.datasource.light.PublicationVolume
+import mil.nga.msi.filter.ComparatorType
 import mil.nga.msi.filter.Filter
 import mil.nga.msi.filter.FilterParameter
 import mil.nga.msi.filter.FilterParameterType
@@ -69,7 +69,7 @@ class LightRepository @Inject constructor(
                parameter = FilterParameter(
                   type = FilterParameterType.DOUBLE,
                   title = "Min Latitude",
-                  name =  "latitude",
+                  parameter =  "latitude",
                ),
                comparator = ComparatorType.GREATER_THAN_OR_EQUAL,
                value = minLatitude
@@ -81,7 +81,7 @@ class LightRepository @Inject constructor(
                parameter = FilterParameter(
                   type = FilterParameterType.DOUBLE,
                   title = "Min Longitude",
-                  name =  "longitude",
+                  parameter =  "longitude",
                ),
                comparator = ComparatorType.GREATER_THAN_OR_EQUAL,
                value = minLongitude
@@ -93,7 +93,7 @@ class LightRepository @Inject constructor(
                parameter = FilterParameter(
                   type = FilterParameterType.DOUBLE,
                   title = "Max Latitude",
-                  name =  "latitude",
+                  parameter =  "latitude",
                ),
                comparator = ComparatorType.LESS_THAN_OR_EQUAL,
                value = maxLatitude
@@ -105,7 +105,7 @@ class LightRepository @Inject constructor(
                parameter = FilterParameter(
                   type = FilterParameterType.DOUBLE,
                   title = "Max Longitude",
-                  name =  "longitude",
+                  parameter =  "longitude",
                ),
                comparator = ComparatorType.LESS_THAN_OR_EQUAL,
                value = maxLongitude

@@ -13,6 +13,9 @@ class AsamRemoteDataSource @Inject constructor(
    suspend fun fetchAsams(): List<Asam> {
       val asams = mutableListOf<Asam>()
 
+      // TODO
+      // Cannot query this way, potential that older asams are created in MSI
+      // and they currently don't flag as newer since last query
       val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
       val minDate = localDataSource.getLatestAsam()?.date?.let {
          dateFormat.format(it)

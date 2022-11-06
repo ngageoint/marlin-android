@@ -1,7 +1,10 @@
 package mil.nga.msi.repository.port
 
+import androidx.paging.PagingSource
+import androidx.sqlite.db.SimpleSQLiteQuery
 import mil.nga.msi.datasource.port.Port
 import mil.nga.msi.datasource.port.PortDao
+import mil.nga.msi.datasource.port.PortListItem
 import javax.inject.Inject
 
 class PortLocalDataSource @Inject constructor(
@@ -9,7 +12,9 @@ class PortLocalDataSource @Inject constructor(
 ) {
    fun observePort(portNumber: Int) = dao.observePort(portNumber)
    fun observePortMapItems() = dao.observePortMapItems()
-   fun observePortListItems() = dao.observePortListItems()
+   fun observePortListItems(query: SimpleSQLiteQuery): PagingSource<Int, PortListItem> = dao.observePortListItems(query)
+
+   fun getPorts(query: SimpleSQLiteQuery) = dao.getPorts(query)
 
    fun isEmpty() = dao.count() == 0
 

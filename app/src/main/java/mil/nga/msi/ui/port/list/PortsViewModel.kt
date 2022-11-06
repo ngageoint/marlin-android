@@ -3,35 +3,33 @@ package mil.nga.msi.ui.port.list
 import androidx.lifecycle.ViewModel
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import mil.nga.msi.datasource.port.Port
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flatMapLatest
+import mil.nga.msi.datasource.DataSource
+import mil.nga.msi.datasource.port.PortListItem
 import mil.nga.msi.location.LocationPolicy
 import mil.nga.msi.repository.port.PortRepository
+import mil.nga.msi.repository.preferences.FilterRepository
 import javax.inject.Inject
 
 @HiltViewModel
 class PortsViewModel @Inject constructor(
-   private val repository: PortRepository,
-   locationPolicy: LocationPolicy
+   locationPolicy: LocationPolicy,
+   filterRepository: FilterRepository,
+   private val repository: PortRepository
 ): ViewModel() {
    val locationProvider = locationPolicy.bestLocationProvider
 
-   suspend fun getPort(portNumber: Int): Port? {
-      return repository.getPort(portNumber)
+   @OptIn(ExperimentalCoroutinesApi::class)
+   val ports: Flow<PagingData<PortListItem>> = filterRepository.filters.flatMapLatest { entry ->
+      val filters = entry[DataSource.PORT] ?: emptyList()
+      Pager(PagingConfig(pageSize = 20), null) {
+         repository.observePortListItems(filters)
+      }.flow
    }
 
-   suspend fun getPorts(
-      minLatitude: Double,
-      maxLatitude: Double,
-      minLongitude: Double,
-      maxLongitude: Double,
-   ) = withContext(Dispatchers.IO) {
-      repository.getPorts(minLatitude, maxLatitude, minLongitude, maxLongitude)
-   }
-
-   val ports = Pager(PagingConfig(pageSize = 20), null) {
-      repository.getPortListItems()
-   }.flow
+   suspend fun getPort(portNumber: Int) = repository.getPort(portNumber)
 }

@@ -19,13 +19,6 @@ sealed class DgpsStationItem {
 class DgpsStationsViewModel @Inject constructor(
    private val repository: DgpsStationRepository
 ): ViewModel() {
-   suspend fun getDgpsStation(
-      volumeNumber: String,
-      featureNumber: Float
-   ): DgpsStation? {
-      return repository.getDgpsStation(volumeNumber, featureNumber)
-   }
-
    val radioBeacons: Flow<PagingData<DgpsStationItem>> = Pager(PagingConfig(pageSize = 20), null) {
       repository.getDgpsStationListItems()
    }.flow
@@ -38,4 +31,9 @@ class DgpsStationsViewModel @Inject constructor(
                } else null
             }
       }
+
+   suspend fun getDgpsStation(
+      volumeNumber: String,
+      featureNumber: Float
+   ): DgpsStation? = repository.getDgpsStation(volumeNumber, featureNumber)
 }

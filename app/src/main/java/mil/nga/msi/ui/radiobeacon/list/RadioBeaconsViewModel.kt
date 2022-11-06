@@ -19,12 +19,6 @@ sealed class RadioBeaconItem {
 class RadioBeaconsViewModel @Inject constructor(
    private val repository: RadioBeaconRepository
 ): ViewModel() {
-   suspend fun getRadioBeacon(
-      volumeNumber: String,
-      featureNumber: String
-   ): RadioBeacon? {
-      return repository.getRadioBeacon(volumeNumber, featureNumber)
-   }
 
    val radioBeacons: Flow<PagingData<RadioBeaconItem>> = Pager(PagingConfig(pageSize = 20), null) {
       repository.getRadioBeaconListItems()
@@ -38,4 +32,9 @@ class RadioBeaconsViewModel @Inject constructor(
                } else null
             }
       }
+
+   suspend fun getRadioBeacon(
+      volumeNumber: String,
+      featureNumber: String
+   ): RadioBeacon? = repository.getRadioBeacon(volumeNumber, featureNumber)
 }

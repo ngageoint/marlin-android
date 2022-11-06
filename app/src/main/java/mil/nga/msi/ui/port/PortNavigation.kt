@@ -11,6 +11,8 @@ import com.google.accompanist.navigation.material.ExperimentalMaterialNavigation
 import com.google.accompanist.navigation.material.bottomSheet
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import mil.nga.msi.datasource.DataSource
+import mil.nga.msi.ui.filter.FilterScreen
 import mil.nga.msi.ui.map.MapRoute
 import mil.nga.msi.ui.navigation.Point
 import mil.nga.msi.ui.navigation.Route
@@ -28,6 +30,7 @@ sealed class PortRoute(
    object Detail: PortRoute("ports/detail", "World Port Details", "Port Details")
    object List: PortRoute("ports/list", "World Ports", "Ports")
    object Sheet: PortRoute("ports/sheet", "World Port Sheet", "Port Sheet")
+   object Filter: PortRoute("ports/filter", "World Port Filter", "Port Filters")
 }
 
 @OptIn(ExperimentalMaterialNavigationApi::class)
@@ -59,6 +62,9 @@ fun NavGraphBuilder.portGraph(
 
          PortsScreen(
             openDrawer = { openNavigationDrawer() },
+            openFilter = {
+               navController.navigate(PortRoute.Filter.name)
+            },
             onTap = { portNumber ->
                navController.navigate("${PortRoute.Detail.name}?portNumber=$portNumber")
             },
@@ -94,6 +100,14 @@ fun NavGraphBuilder.portGraph(
                navController.navigate("${PortRoute.Detail.name}?portNumber=$portNumber")
             })
          }
+      }
+      bottomSheet(PortRoute.Filter.name) {
+         FilterScreen(
+            dataSource = DataSource.PORT,
+            close = {
+               navController.popBackStack()
+            }
+         )
       }
    }
 }

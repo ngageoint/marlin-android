@@ -1,10 +1,14 @@
 package mil.nga.msi.repository.port
 
 import androidx.lifecycle.map
+import androidx.paging.PagingSource
 import androidx.work.*
 import mil.nga.msi.MarlinNotification
 import mil.nga.msi.datasource.DataSource
+import mil.nga.msi.datasource.filter.QueryBuilder
 import mil.nga.msi.datasource.port.Port
+import mil.nga.msi.datasource.port.PortListItem
+import mil.nga.msi.filter.Filter
 import mil.nga.msi.repository.preferences.UserPreferencesRepository
 import mil.nga.msi.work.port.LoadPortWorker
 import mil.nga.msi.work.port.RefreshPortWorker
@@ -19,14 +23,16 @@ class PortRepository @Inject constructor(
    private val userPreferencesRepository: UserPreferencesRepository
 ) {
    val portMapItems = localDataSource.observePortMapItems()
-   fun getPortListItems() = localDataSource.observePortListItems()
 
-   fun getPorts(
-      minLatitude: Double,
-      maxLatitude: Double,
-      minLongitude: Double,
-      maxLongitude: Double
-   ) = localDataSource.getPorts(minLatitude, maxLatitude, minLongitude, maxLongitude)
+   fun observePortListItems(filters: List<Filter>): PagingSource<Int, PortListItem> {
+      val query = QueryBuilder("ports", filters).buildQuery()
+      return localDataSource.observePortListItems(query)
+   }
+
+   fun getPorts(filters: List<Filter>): List<Port> {
+      val query = QueryBuilder("ports", filters).buildQuery()
+      return localDataSource.getPorts(query)
+   }
 
    fun observePort(portNumber: Int) = localDataSource.observePort(portNumber)
    suspend fun getPort(portNumber: Int) = localDataSource.getPort(portNumber)

@@ -2,6 +2,7 @@ package mil.nga.msi.datasource.port
 
 import androidx.paging.PagingSource
 import androidx.room.*
+import androidx.sqlite.db.SupportSQLiteQuery
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -24,6 +25,10 @@ interface PortDao {
    @Query("SELECT * FROM ports")
    suspend fun getPorts(): List<Port>
 
+   @RawQuery(observedEntities = [Port::class])
+   @RewriteQueriesToDropUnusedColumns
+   fun getPorts(query: SupportSQLiteQuery): List<Port>
+
    @Query("SELECT * FROM ports WHERE port_number = :portNumber")
    suspend fun getPort(portNumber: Int): Port?
 
@@ -35,9 +40,8 @@ interface PortDao {
       maxLongitude: Double
    ): List<Port>
 
-   @Query("SELECT * FROM ports ORDER BY port_name ASC")
-   @RewriteQueriesToDropUnusedColumns
-   fun observePortListItems(): PagingSource<Int, PortListItem>
+   @RawQuery(observedEntities = [Port::class])
+   fun observePortListItems(query: SupportSQLiteQuery): PagingSource<Int, PortListItem>
 
    @Query("SELECT * FROM ports ORDER BY port_number")
    fun observePortMapItems(): Flow<List<PortMapItem>>

@@ -1,17 +1,29 @@
 package mil.nga.msi.datasource.port.types
 
-enum class Size(val value: String? = null, val title: String? = null) {
-   VERY_SMALL("V", "Very Small"),
-   SMALL("S", "Small"),
-   MEDIUM("M", "Medium"),
-   LARGE("L", "Large"),
-   UNKNOWN;
+enum class Size: EnumerationType {
+   V {
+      override val title = "Very Small"
+   },
+   S {
+      override val title = "Small"
+   },
+   M {
+      override val title = "Medium"
+   },
+   L {
+      override val title = "Large"
+   },
+   UNKNOWN {
+      override val title = "Unknown"
+   };
 
    companion object {
       fun fromValue(value: String?): Size {
-         return values().find {
-            value == it.name
-         } ?: UNKNOWN
+         return  try {
+            valueOf(value!!)
+         } catch (e: Exception) {
+            UNKNOWN
+         }
       }
    }
 }
