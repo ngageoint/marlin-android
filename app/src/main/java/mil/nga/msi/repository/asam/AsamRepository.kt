@@ -53,6 +53,11 @@ class AsamRepository @Inject constructor(
       return localDataSource.observeAsamListItems(query)
    }
 
+   fun getAsams(filters: List<Filter>): List<Asam> {
+      val query = QueryBuilder("asams", filters).buildQuery()
+      return localDataSource.getAsams(query)
+   }
+
    suspend fun getAsams(
       minLatitude: Double,
       maxLatitude: Double,

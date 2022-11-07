@@ -47,6 +47,11 @@ class LightRepository @Inject constructor(
       characteristicNumber: Int
    ) = localDataSource.getLight(volumeNumber, featureNumber, characteristicNumber)
 
+   fun getLights(filters: List<Filter>): List<Light> {
+      val query = QueryBuilder("lights", filters).buildQuery()
+      return localDataSource.getLights(query)
+   }
+
    fun getLights(
       minLatitude: Double,
       maxLatitude: Double,

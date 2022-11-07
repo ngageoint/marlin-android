@@ -38,6 +38,11 @@ class ModuRepository @Inject constructor(
       return localDataSource.observeModuListItems(query)
    }
 
+   fun getModus(filters: List<Filter>): List<Modu> {
+      val query = QueryBuilder("modus", filters).buildQuery()
+      return localDataSource.getModus(query)
+   }
+
    suspend fun getModus(
       minLatitude: Double,
       maxLatitude: Double,

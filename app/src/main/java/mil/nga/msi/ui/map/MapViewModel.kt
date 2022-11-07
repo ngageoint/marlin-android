@@ -9,6 +9,11 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import mil.nga.msi.datasource.DataSource
+import mil.nga.msi.datasource.filter.MapBoundsFilter
+import mil.nga.msi.filter.ComparatorType
+import mil.nga.msi.filter.Filter
+import mil.nga.msi.filter.FilterParameter
+import mil.nga.msi.filter.FilterParameterType
 import mil.nga.msi.location.LocationPolicy
 import mil.nga.msi.repository.DataSourceRepository
 import mil.nga.msi.repository.asam.AsamRepository
@@ -214,6 +219,7 @@ class MapViewModel @Inject constructor(
       }
    }
 
+   // TODO need to filter on min/max box, that is surounding click
    suspend fun getMapAnnotations(
       minLongitude: Double,
       maxLongitude: Double,
@@ -221,10 +227,19 @@ class MapViewModel @Inject constructor(
       maxLatitude: Double
    ) = withContext(Dispatchers.IO) {
       val dataSources = mapped.value ?: emptyMap()
+      val boundsFilters = MapBoundsFilter.filtersForBounds(
+         minLongitude = minLongitude,
+         maxLongitude = maxLongitude,
+         minLatitude = minLatitude,
+         maxLatitude = maxLatitude
+      )
 
       val asams = if (dataSources[DataSource.ASAM] == true) {
+         val entry = filterRepository.filters.first()
+         val asamFilters = entry[DataSource.ASAM] ?: emptyList()
+         val filters = boundsFilters.toMutableList().apply { addAll(asamFilters) }
          asamRepository
-            .getAsams(minLatitude, maxLatitude, minLongitude, maxLongitude)
+            .getAsams(filters)
             .map { asam ->
                val key = MapAnnotation.Key(asam.reference, MapAnnotation.Type.ASAM)
                MapAnnotation(key, asam.latitude, asam.longitude)
@@ -232,8 +247,11 @@ class MapViewModel @Inject constructor(
       } else emptyList()
 
       val modus = if (dataSources[DataSource.MODU] == true) {
+         val entry = filterRepository.filters.first()
+         val moduFilters = entry[DataSource.MODU] ?: emptyList()
+         val filters = boundsFilters.toMutableList().apply { addAll(moduFilters) }
          moduRepository
-            .getModus(minLatitude, maxLatitude, minLongitude, maxLongitude)
+            .getModus(filters)
             .map { modu ->
                val key = MapAnnotation.Key(modu.name, MapAnnotation.Type.MODU)
                MapAnnotation(key, modu.latitude, modu.longitude)
@@ -241,8 +259,25 @@ class MapViewModel @Inject constructor(
       } else emptyList()
 
       val lights = if (dataSources[DataSource.LIGHT] == true) {
+         val entry = filterRepository.filters.first()
+         val lightFilters = entry[DataSource.LIGHT] ?: emptyList()
+         val filters = boundsFilters.toMutableList().apply {
+            addAll(lightFilters)
+            add(
+              Filter(
+                 parameter = FilterParameter(
+                    type = FilterParameterType.INT,
+                    title = "Characteristic Number",
+                    parameter = "characteristic_number",
+                 ),
+                 comparator = ComparatorType.EQUALS,
+                 value = 1
+              )
+            )
+         }
+
          lightRepository
-            .getLights(minLatitude, maxLatitude, minLongitude, maxLongitude)
+            .getLights(filters)
             .map { light ->
                val key = MapAnnotation.Key(LightKey.fromLight(light).id(), MapAnnotation.Type.LIGHT)
                MapAnnotation(key, light.latitude, light.longitude)
@@ -251,7 +286,8 @@ class MapViewModel @Inject constructor(
 
       val ports = if (dataSources[DataSource.PORT] == true) {
          val entry = filterRepository.filters.first()
-         val filters = entry[DataSource.PORT] ?: emptyList()
+         val portFilters = entry[DataSource.PORT] ?: emptyList()
+         val filters = boundsFilters.toMutableList().apply { addAll(portFilters) }
          portRepository
             .getPorts(filters)
             .map { port ->
@@ -262,7 +298,8 @@ class MapViewModel @Inject constructor(
 
       val beacons = if (dataSources[DataSource.RADIO_BEACON] == true) {
          val entry = filterRepository.filters.first()
-         val filters = entry[DataSource.RADIO_BEACON] ?: emptyList()
+         val beaconsFilters = entry[DataSource.RADIO_BEACON] ?: emptyList()
+         val filters = boundsFilters.toMutableList().apply { addAll(beaconsFilters) }
          beaconRepository
             .getRadioBeacons(filters)
             .map { beacon ->
@@ -273,7 +310,8 @@ class MapViewModel @Inject constructor(
 
       val dgps = if (dataSources[DataSource.DGPS_STATION] == true) {
          val entry = filterRepository.filters.first()
-         val filters = entry[DataSource.DGPS_STATION] ?: emptyList()
+         val dgpsFilters = entry[DataSource.DGPS_STATION] ?: emptyList()
+         val filters = boundsFilters.toMutableList().apply { addAll(dgpsFilters) }
          dgpsStationRepository
             .getDgpsStations(filters)
             .map { dgps ->
