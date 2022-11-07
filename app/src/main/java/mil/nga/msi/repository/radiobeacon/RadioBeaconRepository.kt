@@ -1,11 +1,20 @@
 package mil.nga.msi.repository.radiobeacon
 
 import androidx.lifecycle.map
+import androidx.paging.PagingSource
 import androidx.work.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flatMapLatest
 import mil.nga.msi.MarlinNotification
 import mil.nga.msi.datasource.DataSource
+import mil.nga.msi.datasource.filter.QueryBuilder
 import mil.nga.msi.datasource.light.PublicationVolume
 import mil.nga.msi.datasource.radiobeacon.RadioBeacon
+import mil.nga.msi.datasource.radiobeacon.RadioBeaconListItem
+import mil.nga.msi.datasource.radiobeacon.RadioBeaconMapItem
+import mil.nga.msi.filter.Filter
+import mil.nga.msi.repository.preferences.FilterRepository
 import mil.nga.msi.repository.preferences.UserPreferencesRepository
 import mil.nga.msi.work.radiobeacon.LoadRadioBeaconWorker
 import mil.nga.msi.work.radiobeacon.RefreshRadioBeaconWorker
@@ -17,10 +26,22 @@ class RadioBeaconRepository @Inject constructor(
    private val localDataSource: RadioBeaconLocalDataSource,
    private val remoteDataSource: RadioBeaconRemoteDataSource,
    private val notification: MarlinNotification,
+   private val filterRepository: FilterRepository,
    private val userPreferencesRepository: UserPreferencesRepository
 ) {
-   val radioBeaconMapItems = localDataSource.observeRadioBeaconMapItems()
-   fun getRadioBeaconListItems() = localDataSource.observeRadioBeaconListItems()
+   @OptIn(ExperimentalCoroutinesApi::class)
+   fun observeRadioBeaconMapItems(): Flow<List<RadioBeaconMapItem>> {
+      return filterRepository.filters.flatMapLatest { entry ->
+         val filters = entry[DataSource.RADIO_BEACON] ?: emptyList()
+         val query = QueryBuilder("radio_beacons", filters).buildQuery()
+         localDataSource.observeRadioBeaconMapItems(query)
+      }
+   }
+
+   fun observeRadioBeaconListItems(filters: List<Filter>): PagingSource<Int, RadioBeaconListItem> {
+      val query = QueryBuilder("radio_beacons", filters).buildQuery()
+      return localDataSource.observeRadioBeaconListItems(query)
+   }
 
    fun observeRadioBeacon(
       volumeNumber: String,
@@ -32,12 +53,10 @@ class RadioBeaconRepository @Inject constructor(
       featureNumber: String
    ) = localDataSource.getRadioBeacon(volumeNumber, featureNumber)
 
-   fun getRadioBeacons(
-      minLatitude: Double,
-      maxLatitude: Double,
-      minLongitude: Double,
-      maxLongitude: Double
-   ) = localDataSource.getRadioBeacons(minLatitude, maxLatitude, minLongitude, maxLongitude)
+   fun getRadioBeacons(filters: List<Filter>): List<RadioBeacon> {
+      val query = QueryBuilder("radio_beacons", filters).buildQuery()
+      return localDataSource.getRadioBeacons(query)
+   }
 
    suspend fun fetchRadioBeacons(refresh: Boolean = false): List<RadioBeacon> {
       if (refresh) {

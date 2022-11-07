@@ -2,6 +2,7 @@ package mil.nga.msi.datasource.radiobeacon
 
 import androidx.paging.PagingSource
 import androidx.room.*
+import androidx.sqlite.db.SupportSQLiteQuery
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -21,13 +22,9 @@ interface RadioBeaconDao {
    @Query("SELECT * FROM radio_beacons")
    suspend fun getRadioBeacons(): List<RadioBeacon>
 
-   @Query("SELECT * FROM radio_beacons WHERE latitude >= :minLatitude AND latitude <= :maxLatitude AND longitude >= :minLongitude AND longitude <= :maxLongitude")
-   fun getRadioBeacons(
-      minLatitude: Double,
-      maxLatitude: Double,
-      minLongitude: Double,
-      maxLongitude: Double
-   ): List<RadioBeacon>
+   @RawQuery(observedEntities = [RadioBeacon::class])
+   @RewriteQueriesToDropUnusedColumns
+   fun getRadioBeacons(query: SupportSQLiteQuery): List<RadioBeacon>
 
    @Query("SELECT * FROM radio_beacons WHERE volume_number = :volumeNumber ORDER BY notice_number DESC LIMIT 1")
    suspend fun getLatestRadioBeacon(volumeNumber: String): RadioBeacon?
@@ -38,13 +35,12 @@ interface RadioBeaconDao {
    @Query("SELECT * FROM radio_beacons WHERE volume_number = :volumeNumber AND feature_number = :featureNumber ORDER BY feature_number")
    fun observeRadioBeacon(volumeNumber: String, featureNumber: String): Flow<RadioBeacon>
 
-   @Query("SELECT * FROM radio_beacons ORDER BY section_header ASC, feature_number ASC")
-   @RewriteQueriesToDropUnusedColumns
-   fun observeRadioBeaconListItems(): PagingSource<Int, RadioBeaconListItem>
+   @RawQuery(observedEntities = [RadioBeacon::class])
+   fun observeRadioBeaconListItems(query: SupportSQLiteQuery): PagingSource<Int, RadioBeaconListItem>
 
-   @Query("SELECT * FROM radio_beacons ORDER BY volume_number, feature_number")
+   @RawQuery(observedEntities = [RadioBeacon::class])
    @RewriteQueriesToDropUnusedColumns
-   fun observeRadioBeaconMapItems(): Flow<List<RadioBeaconMapItem>>
+   fun observeRadioBeaconMapItems(query: SupportSQLiteQuery): Flow<List<RadioBeaconMapItem>>
 
    @Query("SELECT * FROM radio_beacons WHERE id IN (:ids)")
    suspend fun existingRadioBeacons(ids: List<String>): List<RadioBeacon>

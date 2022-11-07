@@ -195,7 +195,7 @@ class MapViewModel @Inject constructor(
          }
       }
 
-      addSource(beaconRepository.radioBeaconMapItems.distinctUntilChanged().asLiveData()) {
+      addSource(beaconRepository.observeRadioBeaconMapItems().distinctUntilChanged().asLiveData()) {
          if (mapped.value?.get(DataSource.RADIO_BEACON) == true) {
             val providers = value?.toMutableMap() ?: mutableMapOf()
             beaconTileProvider = RadioBeaconTileProvider(application, beaconTileRepository)
@@ -261,8 +261,10 @@ class MapViewModel @Inject constructor(
       } else emptyList()
 
       val beacons = if (dataSources[DataSource.RADIO_BEACON] == true) {
+         val entry = filterRepository.filters.first()
+         val filters = entry[DataSource.RADIO_BEACON] ?: emptyList()
          beaconRepository
-            .getRadioBeacons(minLatitude, maxLatitude, minLongitude, maxLongitude)
+            .getRadioBeacons(filters)
             .map { beacon ->
                val key = MapAnnotation.Key(RadioBeaconKey.fromRadioBeacon(beacon).id(), MapAnnotation.Type.RADIO_BEACON)
                MapAnnotation(key, beacon.latitude, beacon.longitude)

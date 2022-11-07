@@ -1,14 +1,17 @@
 package mil.nga.msi.repository.radiobeacon
 
+import androidx.paging.PagingSource
+import androidx.sqlite.db.SimpleSQLiteQuery
 import mil.nga.msi.datasource.radiobeacon.RadioBeacon
 import mil.nga.msi.datasource.radiobeacon.RadioBeaconDao
+import mil.nga.msi.datasource.radiobeacon.RadioBeaconListItem
 import javax.inject.Inject
 
 class RadioBeaconLocalDataSource @Inject constructor(
    private val dao: RadioBeaconDao
 ) {
-   fun observeRadioBeaconMapItems() = dao.observeRadioBeaconMapItems()
-   fun observeRadioBeaconListItems() = dao.observeRadioBeaconListItems()
+   fun observeRadioBeaconMapItems(query: SimpleSQLiteQuery) = dao.observeRadioBeaconMapItems(query)
+   fun observeRadioBeaconListItems(query: SimpleSQLiteQuery): PagingSource<Int, RadioBeaconListItem> = dao.observeRadioBeaconListItems(query)
 
    fun isEmpty() = dao.count() == 0
    suspend fun existingRadioBeacons(ids: List<String>) = dao.existingRadioBeacons(ids)
@@ -23,12 +26,7 @@ class RadioBeaconLocalDataSource @Inject constructor(
       featureNumber: String
    ) = dao.getRadioBeacon(volumeNumber, featureNumber)
 
-   fun getRadioBeacons(
-      minLatitude: Double,
-      maxLatitude: Double,
-      minLongitude: Double,
-      maxLongitude: Double
-   ) = dao.getRadioBeacons(minLatitude, maxLatitude, minLongitude, maxLongitude)
+   fun getRadioBeacons(query: SimpleSQLiteQuery) = dao.getRadioBeacons(query)
 
    suspend fun getRadioBeacons(): List<RadioBeacon> = dao.getRadioBeacons()
    suspend fun getLatestRadioBeacon(volumeNumber: String) = dao.getLatestRadioBeacon(volumeNumber)

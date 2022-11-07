@@ -69,15 +69,15 @@ class MapModule {
    @Singleton
    @Provides
    @Named("portTileProvider")
-   fun providePortTileProvider(application: Application, dataSource: PortLocalDataSource, filterRepository: FilterRepository,): TileProvider {
+   fun providePortTileProvider(application: Application, dataSource: PortLocalDataSource, filterRepository: FilterRepository): TileProvider {
       return PortTileProvider(application, PortTileRepository(dataSource, filterRepository))
    }
 
    @Singleton
    @Provides
    @Named("radioBeaconTileProvider")
-   fun provideRadioBeaconProvider(application: Application, dataSource: RadioBeaconLocalDataSource): TileProvider {
-      return RadioBeaconTileProvider(application, RadioBeaconTileRepository(dataSource))
+   fun provideRadioBeaconProvider(application: Application, dataSource: RadioBeaconLocalDataSource, filterRepository: FilterRepository,): TileProvider {
+      return RadioBeaconTileProvider(application, RadioBeaconTileRepository(dataSource, filterRepository))
    }
 
    @Singleton

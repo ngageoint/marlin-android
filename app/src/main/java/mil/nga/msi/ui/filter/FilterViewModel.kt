@@ -5,10 +5,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.launch
 import mil.nga.msi.datasource.DataSource
-import mil.nga.msi.datasource.filter.AsamFilter
-import mil.nga.msi.datasource.filter.LightFilter
-import mil.nga.msi.datasource.filter.ModuFilter
-import mil.nga.msi.datasource.filter.PortFilter
+import mil.nga.msi.datasource.filter.*
 import mil.nga.msi.filter.Filter
 import mil.nga.msi.filter.FilterParameter
 import mil.nga.msi.repository.preferences.FilterRepository
@@ -16,6 +13,7 @@ import mil.nga.msi.ui.asam.AsamRoute
 import mil.nga.msi.ui.light.LightRoute
 import mil.nga.msi.ui.modu.ModuRoute
 import mil.nga.msi.ui.port.PortRoute
+import mil.nga.msi.ui.radiobeacon.RadioBeaconRoute
 import javax.inject.Inject
 
 @HiltViewModel
@@ -33,6 +31,7 @@ class FilterViewModel @Inject constructor(
          DataSource.MODU -> ModuRoute.Filter.shortTitle
          DataSource.LIGHT -> LightRoute.Filter.shortTitle
          DataSource.PORT -> PortRoute.Filter.shortTitle
+         DataSource.RADIO_BEACON -> RadioBeaconRoute.Filter.shortTitle
          else -> ""
       }
    }
@@ -58,5 +57,6 @@ class FilterViewModel @Inject constructor(
       put(DataSource.MODU, ModuFilter.parameters)
       put(DataSource.LIGHT, LightFilter.parameters)
       put(DataSource.PORT, PortFilter.parameters)
+      put(DataSource.RADIO_BEACON, RadioBeaconFilter.parameters)
    }
 }

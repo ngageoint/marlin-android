@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.GpsFixed
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Share
@@ -36,6 +37,7 @@ import mil.nga.msi.ui.theme.screenBackground
 @Composable
 fun RadioBeaconsScreen(
    openDrawer: () -> Unit,
+   openFilter: () -> Unit,
    onTap: (RadioBeaconKey) -> Unit,
    onAction: (RadioBeaconAction) -> Unit,
    viewModel: RadioBeaconsViewModel = hiltViewModel()
@@ -46,7 +48,12 @@ fun RadioBeaconsScreen(
       TopBar(
          title = RadioBeaconRoute.List.title,
          navigationIcon = Icons.Filled.Menu,
-         onNavigationClicked = { openDrawer() }
+         onNavigationClicked = { openDrawer() },
+         actions = {
+            IconButton(onClick = { openFilter() } ) {
+               Icon(Icons.Default.FilterList, contentDescription = "Filter Radio Beacons")
+            }
+         }
       )
 
       RadioBeacons(

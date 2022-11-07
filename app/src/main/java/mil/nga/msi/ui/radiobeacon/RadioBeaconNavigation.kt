@@ -8,7 +8,9 @@ import com.google.accompanist.navigation.material.ExperimentalMaterialNavigation
 import com.google.accompanist.navigation.material.bottomSheet
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.repository.radiobeacon.RadioBeaconKey
+import mil.nga.msi.ui.filter.FilterScreen
 import mil.nga.msi.ui.map.MapRoute
 import mil.nga.msi.ui.navigation.Point
 import mil.nga.msi.ui.navigation.RadioBeacon
@@ -27,6 +29,7 @@ sealed class RadioBeaconRoute(
    object Detail: RadioBeaconRoute("radioBeacons/detail", "Radio Beacon Details", "Beacon Details")
    object List: RadioBeaconRoute("radioBeacons/list", "Radio Beacons", "Beacons")
    object Sheet: RadioBeaconRoute("radioBeacons/sheet", "Radio Beacon Sheet", "Beacon Sheet")
+   object Filter: RadioBeaconRoute("radioBeacons/filter", "Radio Beacon Filter", "Radio Beacon Filters")
 }
 
 @OptIn(ExperimentalMaterialNavigationApi::class)
@@ -58,6 +61,9 @@ fun NavGraphBuilder.radioBeaconGraph(
 
          RadioBeaconsScreen(
             openDrawer = { openNavigationDrawer() },
+            openFilter = {
+               navController.navigate(RadioBeaconRoute.Filter.name)
+            },
             onTap = { key ->
                val encoded = Uri.encode(Json.encodeToString(key))
                navController.navigate( "${RadioBeaconRoute.Detail.name}?key=$encoded")
@@ -103,6 +109,15 @@ fun NavGraphBuilder.radioBeaconGraph(
                navController.navigate( "${RadioBeaconRoute.Detail.name}?key=$encoded")
             })
          }
+      }
+
+      bottomSheet(RadioBeaconRoute.Filter.name) {
+         FilterScreen(
+            dataSource = DataSource.RADIO_BEACON,
+            close = {
+               navController.popBackStack()
+            }
+         )
       }
    }
 }
