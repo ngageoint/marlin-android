@@ -32,6 +32,9 @@ class QueryBuilder(
             FilterParameterType.ENUMERATION -> {
                enumerationQuery(filter)
             }
+            FilterParameterType.FLOAT -> {
+               floatQuery(filter)
+            }
             FilterParameterType.INT -> {
                intQuery(filter)
             }
@@ -41,7 +44,6 @@ class QueryBuilder(
             FilterParameterType.STRING -> {
                stringQuery(filter)
             }
-            else -> null
          }
          filterString?.let { filterStrings.add(it) }
       }
@@ -129,6 +131,32 @@ class QueryBuilder(
             }
             ComparatorType.NOT_EQUALS -> {
                "${filter.parameter.parameter} != '${name}'"
+            }
+            else -> null
+         }
+      }
+   }
+
+   private fun floatQuery(filter: Filter): String? {
+      return filter.value?.toString()?.toFloatOrNull()?.let{ value ->
+         when(filter.comparator) {
+            ComparatorType.EQUALS -> {
+               "${filter.parameter.parameter} = $value"
+            }
+            ComparatorType.NOT_EQUALS -> {
+               "${filter.parameter.parameter} != $value"
+            }
+            ComparatorType.GREATER_THAN -> {
+               "${filter.parameter.parameter} > $value"
+            }
+            ComparatorType.GREATER_THAN_OR_EQUAL -> {
+               "${filter.parameter.parameter} >= $value"
+            }
+            ComparatorType.LESS_THAN -> {
+               "${filter.parameter.parameter} < $value"
+            }
+            ComparatorType.LESS_THAN_OR_EQUAL -> {
+               "${filter.parameter.parameter} <= $value"
             }
             else -> null
          }

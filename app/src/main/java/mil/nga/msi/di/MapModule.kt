@@ -76,14 +76,14 @@ class MapModule {
    @Singleton
    @Provides
    @Named("radioBeaconTileProvider")
-   fun provideRadioBeaconProvider(application: Application, dataSource: RadioBeaconLocalDataSource, filterRepository: FilterRepository,): TileProvider {
+   fun provideRadioBeaconProvider(application: Application, dataSource: RadioBeaconLocalDataSource, filterRepository: FilterRepository): TileProvider {
       return RadioBeaconTileProvider(application, RadioBeaconTileRepository(dataSource, filterRepository))
    }
 
    @Singleton
    @Provides
    @Named("dgpsStationTileProvider")
-   fun provideDgpsStationProvider(application: Application, dataSource: DgpsStationLocalDataSource): TileProvider {
-      return DgpsStationTileProvider(application, DgpsStationTileRepository(dataSource))
+   fun provideDgpsStationProvider(application: Application, dataSource: DgpsStationLocalDataSource, filterRepository: FilterRepository): TileProvider {
+      return DgpsStationTileProvider(application, DgpsStationTileRepository(dataSource, filterRepository))
    }
 }

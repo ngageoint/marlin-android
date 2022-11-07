@@ -71,7 +71,6 @@ class FilterRepository @Inject constructor(
       value: Any?
    ): String? {
       return when (parameter.type) {
-         FilterParameterType.BOOLEAN -> value?.toString()
          FilterParameterType.DATE -> {
             value?.toString() // TODO convert to ISO date
          }
@@ -89,7 +88,6 @@ class FilterRepository @Inject constructor(
       value: String?
    ): Any? {
       return when (parameter.type) {
-         FilterParameterType.BOOLEAN -> value?.toBooleanStrictOrNull()
          FilterParameterType.DATE -> value // TODO convert to ISO date
          FilterParameterType.DOUBLE -> value?.toDoubleOrNull()
          FilterParameterType.ENUMERATION -> deserializeEnumeration(value)

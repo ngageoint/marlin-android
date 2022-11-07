@@ -24,7 +24,7 @@ class MapFilterViewModel @Inject constructor(
       DataSource.LIGHT,
       DataSource.PORT,
       DataSource.RADIO_BEACON,
-//      DataSource.DGPS_STATION
+      DataSource.DGPS_STATION
    )
 
    val dataSources: LiveData<List<DataSourceModel>> = MediatorLiveData<List<DataSourceModel>>().apply {

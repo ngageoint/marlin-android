@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.GpsFixed
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Share
@@ -35,6 +36,7 @@ import mil.nga.msi.ui.theme.screenBackground
 @Composable
 fun DgpsStationsScreen(
    openDrawer: () -> Unit,
+   openFilter: () -> Unit,
    onTap: (DgpsStationKey) -> Unit,
    onAction: (DgpsStationAction) -> Unit,
    viewModel: DgpsStationsViewModel = hiltViewModel()
@@ -45,11 +47,16 @@ fun DgpsStationsScreen(
       TopBar(
          title = DgpsStationRoute.List.title,
          navigationIcon = Icons.Filled.Menu,
-         onNavigationClicked = { openDrawer() }
+         onNavigationClicked = { openDrawer() },
+         actions = {
+            IconButton(onClick = { openFilter() } ) {
+               Icon(Icons.Default.FilterList, contentDescription = "Filter DGPS Stations")
+            }
+         }
       )
 
       DgpsStations(
-         pagingState = viewModel.radioBeacons,
+         pagingState = viewModel.dgpsStations,
          onTap = { onTap(DgpsStationKey.fromDgpsStation(it)) },
          onCopyLocation = { onAction(DgpsStationAction.Location(it)) },
          onZoom = { onAction(DgpsStationAction.Zoom(it)) },

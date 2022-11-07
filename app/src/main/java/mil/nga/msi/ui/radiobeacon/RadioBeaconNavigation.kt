@@ -29,7 +29,7 @@ sealed class RadioBeaconRoute(
    object Detail: RadioBeaconRoute("radioBeacons/detail", "Radio Beacon Details", "Beacon Details")
    object List: RadioBeaconRoute("radioBeacons/list", "Radio Beacons", "Beacons")
    object Sheet: RadioBeaconRoute("radioBeacons/sheet", "Radio Beacon Sheet", "Beacon Sheet")
-   object Filter: RadioBeaconRoute("radioBeacons/filter", "Radio Beacon Filter", "Radio Beacon Filters")
+   object Filter: RadioBeaconRoute("radioBeacons/filter", "Radio Beacon Filter", "Radio Beacon Filter")
 }
 
 @OptIn(ExperimentalMaterialNavigationApi::class)

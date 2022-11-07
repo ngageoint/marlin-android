@@ -8,10 +8,12 @@ import com.google.accompanist.navigation.material.ExperimentalMaterialNavigation
 import com.google.accompanist.navigation.material.bottomSheet
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.repository.dgpsstation.DgpsStationKey
 import mil.nga.msi.ui.dgpsstation.detail.DgpsStationDetailScreen
 import mil.nga.msi.ui.dgpsstation.list.DgpsStationsScreen
 import mil.nga.msi.ui.dgpsstation.sheet.DgpsStationSheetScreen
+import mil.nga.msi.ui.filter.FilterScreen
 import mil.nga.msi.ui.map.MapRoute
 import mil.nga.msi.ui.navigation.DgpsStation
 import mil.nga.msi.ui.navigation.Point
@@ -27,6 +29,7 @@ sealed class DgpsStationRoute(
    object Detail: DgpsStationRoute("dgpsStations/detail", "Differential GPS Station Details", "DGPS Details")
    object List: DgpsStationRoute("dgpsStations/list", "Differential GPS Stations", "DGPS Stations")
    object Sheet: DgpsStationRoute("dgpsStations/sheet", "Differential GPS Station Sheet", "DGPS Station Sheet")
+   object Filter: DgpsStationRoute("dgpsStations/filter", "Differential GPS Station Filter", "DGPS Station Filter")
 }
 
 @OptIn(ExperimentalMaterialNavigationApi::class)
@@ -58,6 +61,9 @@ fun NavGraphBuilder.dgpsStationGraph(
 
          DgpsStationsScreen(
             openDrawer = { openNavigationDrawer() },
+            openFilter = {
+               navController.navigate(DgpsStationRoute.Filter.name)
+            },
             onTap = { key ->
                val encoded = Uri.encode(Json.encodeToString(key))
                navController.navigate( "${DgpsStationRoute.Detail.name}?key=$encoded")
@@ -103,6 +109,15 @@ fun NavGraphBuilder.dgpsStationGraph(
                navController.navigate( "${DgpsStationRoute.Detail.name}?key=$encoded")
             })
          }
+      }
+
+      bottomSheet(DgpsStationRoute.Filter.name) {
+         FilterScreen(
+            dataSource = DataSource.DGPS_STATION,
+            close = {
+               navController.popBackStack()
+            }
+         )
       }
    }
 }

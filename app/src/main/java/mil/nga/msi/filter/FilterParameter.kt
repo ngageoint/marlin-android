@@ -60,7 +60,6 @@ enum class FilterParameterType(val comparators: List<ComparatorType>) {
       ComparatorType.LESS_THAN,
       ComparatorType.LESS_THAN_OR_EQUAL)
    ),
-   BOOLEAN(listOf()),
    LOCATION(listOf(
       ComparatorType.CLOSE_TO,
       ComparatorType.NEAR_ME)

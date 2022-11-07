@@ -204,7 +204,7 @@ class MapViewModel @Inject constructor(
          }
       }
 
-      addSource(dgpsStationRepository.dgpsStationMapItems.distinctUntilChanged().asLiveData()) {
+      addSource(dgpsStationRepository.observeDgpsStationMapItems().distinctUntilChanged().asLiveData()) {
          if (mapped.value?.get(DataSource.DGPS_STATION) == true) {
             val providers = value?.toMutableMap() ?: mutableMapOf()
             dgpsTileProvider = DgpsStationTileProvider(application, dgpsStationTileRepository)
@@ -272,8 +272,10 @@ class MapViewModel @Inject constructor(
       } else emptyList()
 
       val dgps = if (dataSources[DataSource.DGPS_STATION] == true) {
+         val entry = filterRepository.filters.first()
+         val filters = entry[DataSource.DGPS_STATION] ?: emptyList()
          dgpsStationRepository
-            .getDgpsStations(minLatitude, maxLatitude, minLongitude, maxLongitude)
+            .getDgpsStations(filters)
             .map { dgps ->
                val key = MapAnnotation.Key(DgpsStationKey.fromDgpsStation(dgps).id(), MapAnnotation.Type.DGPS_STATION)
                MapAnnotation(key, dgps.latitude, dgps.longitude)

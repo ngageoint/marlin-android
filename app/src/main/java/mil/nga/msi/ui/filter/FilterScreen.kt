@@ -137,10 +137,10 @@ private fun valueString(
       FilterParameterType.DATE -> { dateValue(value = value) }
       FilterParameterType.DOUBLE -> { doubleValue(value) }
       FilterParameterType.ENUMERATION -> { enumerationValue(value) }
+      FilterParameterType.FLOAT -> { floatValue(value) }
       FilterParameterType.INT -> { intValue(value) }
       FilterParameterType.LOCATION -> { locationValue(value) }
       FilterParameterType.STRING -> { stringValue(value ) }
-      else -> { "" }
    }
 }
 
@@ -160,6 +160,12 @@ private fun enumerationValue(
    value: Any?
 ): String {
    return (value as? EnumerationType)?.title ?: ""
+}
+
+private fun floatValue(
+   value: Any?
+): String {
+   return value?.toString()?.toFloatOrNull().toString()
 }
 
 private fun intValue(
@@ -476,6 +482,12 @@ private fun ValueSelection(
             }
          }
       }
+      FilterParameterType.FLOAT -> {
+         DoubleValue(
+            value = value?.toString().orEmpty(),
+            onValueChanged = { onValueChanged(it) }
+         )
+      }
       FilterParameterType.INT -> {
          IntValue(
             value = value?.toString().orEmpty(),
@@ -494,18 +506,6 @@ private fun ValueSelection(
             value = value?.toString() ?: "",
             onValueChanged = { onValueChanged(it) }
          )
-      }
-//      ParameterType.FLOAT -> {
-//
-//      }
-//      ParameterType.BOOLEAN -> {
-//
-//      }
-//      ParameterType.ENUMERATION -> {
-//
-//      }
-      else -> {
-
       }
    }
 }

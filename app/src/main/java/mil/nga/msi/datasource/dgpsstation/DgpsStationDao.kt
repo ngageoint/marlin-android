@@ -2,6 +2,7 @@ package mil.nga.msi.datasource.dgpsstation
 
 import androidx.paging.PagingSource
 import androidx.room.*
+import androidx.sqlite.db.SupportSQLiteQuery
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -21,13 +22,9 @@ interface DgpsStationDao {
    @Query("SELECT * FROM dgps_stations")
    suspend fun getDgpsStations(): List<DgpsStation>
 
-   @Query("SELECT * FROM dgps_stations WHERE latitude >= :minLatitude AND latitude <= :maxLatitude AND longitude >= :minLongitude AND longitude <= :maxLongitude")
-   fun getDgpsStations(
-      minLatitude: Double,
-      maxLatitude: Double,
-      minLongitude: Double,
-      maxLongitude: Double
-   ): List<DgpsStation>
+   @RawQuery(observedEntities = [DgpsStation::class])
+   @RewriteQueriesToDropUnusedColumns
+   fun getDgpsStations(query: SupportSQLiteQuery): List<DgpsStation>
 
    @Query("SELECT * FROM dgps_stations WHERE volume_number = :volumeNumber ORDER BY notice_number DESC LIMIT 1")
    suspend fun getLatestDgpsStation(volumeNumber: String): DgpsStation?
@@ -38,13 +35,12 @@ interface DgpsStationDao {
    @Query("SELECT * FROM dgps_stations WHERE volume_number = :volumeNumber AND feature_number = :featureNumber ORDER BY feature_number")
    fun observeDgpsStation(volumeNumber: String, featureNumber: Float): Flow<DgpsStation>
 
-   @Query("SELECT * FROM dgps_stations ORDER BY section_header ASC, feature_number ASC")
-   @RewriteQueriesToDropUnusedColumns
-   fun getDgpsListItems(): PagingSource<Int, DgpsStationListItem>
+   @RawQuery(observedEntities = [DgpsStation::class])
+   fun observeDgpsStationListItems(query: SupportSQLiteQuery): PagingSource<Int, DgpsStationListItem>
 
-   @Query("SELECT * FROM dgps_stations ORDER BY volume_number ASC, feature_number ASC")
+   @RawQuery(observedEntities = [DgpsStation::class])
    @RewriteQueriesToDropUnusedColumns
-   fun getDgpsMapItems(): Flow<List<DgpsStationMapItem>>
+   fun observeDgpsStationMapItems(query: SupportSQLiteQuery): Flow<List<DgpsStationMapItem>>
 
    @Query("SELECT * FROM dgps_stations WHERE id IN (:ids)")
    suspend fun existingDgpsStations(ids: List<String>): List<DgpsStation>

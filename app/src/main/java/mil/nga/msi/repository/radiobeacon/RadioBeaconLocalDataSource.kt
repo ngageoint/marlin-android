@@ -1,17 +1,15 @@
 package mil.nga.msi.repository.radiobeacon
 
-import androidx.paging.PagingSource
 import androidx.sqlite.db.SimpleSQLiteQuery
 import mil.nga.msi.datasource.radiobeacon.RadioBeacon
 import mil.nga.msi.datasource.radiobeacon.RadioBeaconDao
-import mil.nga.msi.datasource.radiobeacon.RadioBeaconListItem
 import javax.inject.Inject
 
 class RadioBeaconLocalDataSource @Inject constructor(
    private val dao: RadioBeaconDao
 ) {
    fun observeRadioBeaconMapItems(query: SimpleSQLiteQuery) = dao.observeRadioBeaconMapItems(query)
-   fun observeRadioBeaconListItems(query: SimpleSQLiteQuery): PagingSource<Int, RadioBeaconListItem> = dao.observeRadioBeaconListItems(query)
+   fun observeRadioBeaconListItems(query: SimpleSQLiteQuery) = dao.observeRadioBeaconListItems(query)
 
    fun isEmpty() = dao.count() == 0
    suspend fun existingRadioBeacons(ids: List<String>) = dao.existingRadioBeacons(ids)

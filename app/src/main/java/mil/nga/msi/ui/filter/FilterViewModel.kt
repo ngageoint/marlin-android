@@ -10,6 +10,7 @@ import mil.nga.msi.filter.Filter
 import mil.nga.msi.filter.FilterParameter
 import mil.nga.msi.repository.preferences.FilterRepository
 import mil.nga.msi.ui.asam.AsamRoute
+import mil.nga.msi.ui.dgpsstation.DgpsStationRoute
 import mil.nga.msi.ui.light.LightRoute
 import mil.nga.msi.ui.modu.ModuRoute
 import mil.nga.msi.ui.port.PortRoute
@@ -32,6 +33,7 @@ class FilterViewModel @Inject constructor(
          DataSource.LIGHT -> LightRoute.Filter.shortTitle
          DataSource.PORT -> PortRoute.Filter.shortTitle
          DataSource.RADIO_BEACON -> RadioBeaconRoute.Filter.shortTitle
+         DataSource.DGPS_STATION -> DgpsStationRoute.Filter.shortTitle
          else -> ""
       }
    }
@@ -58,5 +60,6 @@ class FilterViewModel @Inject constructor(
       put(DataSource.LIGHT, LightFilter.parameters)
       put(DataSource.PORT, PortFilter.parameters)
       put(DataSource.RADIO_BEACON, RadioBeaconFilter.parameters)
+      put(DataSource.DGPS_STATION, DgpsStationFilter.parameters)
    }
 }
