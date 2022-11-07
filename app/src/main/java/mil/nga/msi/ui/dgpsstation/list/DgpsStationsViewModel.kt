@@ -1,6 +1,7 @@
 package mil.nga.msi.ui.dgpsstation.list
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.paging.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -40,6 +41,10 @@ class DgpsStationsViewModel @Inject constructor(
             }
       }
    }
+
+   val dgpsStationFilters = filterRepository.filters.map { entry ->
+      entry[DataSource.DGPS_STATION] ?: emptyList()
+   }.asLiveData()
 
    suspend fun getDgpsStation(
       volumeNumber: String,

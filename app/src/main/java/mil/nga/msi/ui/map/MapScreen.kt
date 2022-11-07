@@ -4,6 +4,7 @@ import android.Manifest
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -48,6 +49,7 @@ fun MapScreen(
    mapViewModel: MapViewModel = hiltViewModel()
 ) {
    val scope = rememberCoroutineScope()
+   val filterCount by mapViewModel.filterCount.observeAsState(0)
    val fetching by mapViewModel.fetching.observeAsState(emptyMap())
    var fetchingVisibility by rememberSaveable { mutableStateOf(true) }
    val baseMap by mapViewModel.baseMap.observeAsState()
@@ -92,8 +94,28 @@ fun MapScreen(
          navigationIcon = Icons.Filled.Menu,
          onNavigationClicked = { openDrawer() },
          actions = {
-            IconButton(onClick = { openFilter() } ) {
-               Icon(Icons.Default.FilterList, contentDescription = "Filter Map")
+            Box {
+               IconButton(onClick = { openFilter() } ) {
+                  Icon(Icons.Default.FilterList, contentDescription = "Filter Map")
+               }
+
+               if (filterCount > 0) {
+                  Box(
+                     contentAlignment = Alignment.Center,
+                     modifier = Modifier
+                        .clip(CircleShape)
+                        .height(24.dp)
+                        .background(MaterialTheme.colors.secondary)
+                        .align(Alignment.TopEnd)
+                  ) {
+                     Text(
+                        text = "$filterCount",
+                        style = MaterialTheme.typography.body2,
+                        modifier = Modifier.padding(horizontal = 8.dp),
+                        color = MaterialTheme.colors.onPrimary
+                     )
+                  }
+               }
             }
          }
       )
@@ -198,7 +220,7 @@ fun MapScreen(
                .size(40.dp)
          ) {
             Icon(Icons.Outlined.Map,
-               tint = MaterialTheme.colors.secondary,
+               tint = MaterialTheme.colors.primary,
                contentDescription = "Map Settings"
             )
          }

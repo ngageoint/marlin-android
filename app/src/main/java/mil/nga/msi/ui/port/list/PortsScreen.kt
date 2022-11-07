@@ -1,9 +1,11 @@
 package mil.nga.msi.ui.port.list
 
 import android.location.Location
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FilterList
@@ -17,6 +19,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -46,6 +49,7 @@ fun PortsScreen(
 ) {
    val scope = rememberCoroutineScope()
    val location by viewModel.locationProvider.observeAsState()
+   val filters by viewModel.portFilters.observeAsState(emptyList())
 
    Column(modifier = Modifier.fillMaxSize()) {
       TopBar(
@@ -53,8 +57,28 @@ fun PortsScreen(
          navigationIcon = Icons.Filled.Menu,
          onNavigationClicked = { openDrawer() },
          actions = {
-            IconButton(onClick = { openFilter() } ) {
-               Icon(Icons.Default.FilterList, contentDescription = "Filter World Ports")
+            Box {
+               IconButton(onClick = { openFilter() } ) {
+                  Icon(Icons.Default.FilterList, contentDescription = "Filter World Ports")
+               }
+
+               if (filters.isNotEmpty()) {
+                  Box(
+                     contentAlignment = Alignment.Center,
+                     modifier = Modifier
+                        .clip(CircleShape)
+                        .height(24.dp)
+                        .background(MaterialTheme.colors.secondary)
+                        .align(Alignment.TopEnd)
+                  ) {
+                     Text(
+                        text = "${filters.size}",
+                        style = MaterialTheme.typography.body2,
+                        modifier = Modifier.padding(horizontal = 8.dp),
+                        color = MaterialTheme.colors.onPrimary
+                     )
+                  }
+               }
             }
          }
       )

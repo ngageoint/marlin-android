@@ -138,7 +138,7 @@ private fun DataSource(
                            .padding(end = 16.dp)
                            .clip(CircleShape)
                            .height(24.dp)
-                           .background(MaterialTheme.colors.primary)
+                           .background(MaterialTheme.colors.secondary)
                      ) {
                         Text(
                            text = dataSourceModel.numberOfFilters.toString(),

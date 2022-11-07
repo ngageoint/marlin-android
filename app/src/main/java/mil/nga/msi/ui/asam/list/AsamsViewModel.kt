@@ -1,6 +1,7 @@
 package mil.nga.msi.ui.asam.list
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
@@ -8,6 +9,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.asam.AsamListItem
 import mil.nga.msi.repository.asam.AsamRepository
@@ -27,6 +29,10 @@ class AsamsViewModel @Inject constructor(
          repository.observeAsamListItems(filters)
       }.flow
    }
+
+   val asamFilters = filterRepository.filters.map { entry ->
+      entry[DataSource.ASAM] ?: emptyList()
+   }.asLiveData()
 
    suspend fun getAsam(reference: String) = repository.getAsam(reference)
 }

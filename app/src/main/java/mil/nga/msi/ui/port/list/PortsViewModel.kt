@@ -1,6 +1,7 @@
 package mil.nga.msi.ui.port.list
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
@@ -8,6 +9,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.port.PortListItem
 import mil.nga.msi.location.LocationPolicy
@@ -30,6 +32,10 @@ class PortsViewModel @Inject constructor(
          repository.observePortListItems(filters)
       }.flow
    }
+
+   val portFilters = filterRepository.filters.map { entry ->
+      entry[DataSource.PORT] ?: emptyList()
+   }.asLiveData()
 
    suspend fun getPort(portNumber: Int) = repository.getPort(portNumber)
 }

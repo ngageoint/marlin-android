@@ -1,6 +1,7 @@
 package mil.nga.msi.ui.light.list
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.paging.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -42,6 +43,10 @@ class LightsViewModel @Inject constructor(
             }
       }
    }
+
+   val lightFilters = filterRepository.filters.map { entry ->
+      entry[DataSource.LIGHT] ?: emptyList()
+   }.asLiveData()
 
    suspend fun getLight(
       volumeNumber: String,

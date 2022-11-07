@@ -1,8 +1,10 @@
 package mil.nga.msi.ui.light.list
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FilterList
@@ -11,9 +13,12 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -42,6 +47,7 @@ fun LightsScreen(
    viewModel: LightsViewModel = hiltViewModel()
 ) {
    val scope = rememberCoroutineScope()
+   val filters by viewModel.lightFilters.observeAsState(emptyList())
 
    Column(modifier = Modifier.fillMaxSize()) {
       TopBar(
@@ -49,8 +55,28 @@ fun LightsScreen(
          navigationIcon = Icons.Filled.Menu,
          onNavigationClicked = { openDrawer() },
          actions = {
-            IconButton(onClick = { openFilter() } ) {
-               Icon(Icons.Default.FilterList, contentDescription = "Filter Lights")
+            Box {
+               IconButton(onClick = { openFilter() } ) {
+                  Icon(Icons.Default.FilterList, contentDescription = "Filter Lights")
+               }
+
+               if (filters.isNotEmpty()) {
+                  Box(
+                     contentAlignment = Alignment.Center,
+                     modifier = Modifier
+                        .clip(CircleShape)
+                        .height(24.dp)
+                        .background(MaterialTheme.colors.secondary)
+                        .align(Alignment.TopEnd)
+                  ) {
+                     Text(
+                        text = "${filters.size}",
+                        style = MaterialTheme.typography.body2,
+                        modifier = Modifier.padding(horizontal = 8.dp),
+                        color = MaterialTheme.colors.onPrimary
+                     )
+                  }
+               }
             }
          }
       )
