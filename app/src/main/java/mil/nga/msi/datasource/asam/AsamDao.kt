@@ -36,9 +36,6 @@ interface AsamDao {
    @Query("SELECT * FROM asams WHERE reference = :reference")
    suspend fun getAsam(reference: String): Asam?
 
-   @Query("SELECT * FROM asams ORDER BY date DESC LIMIT 1")
-   suspend fun getLatestAsam(): Asam?
-
    @RawQuery(observedEntities = [Asam::class])
    fun getAsamListItems(query: SupportSQLiteQuery): PagingSource<Int, AsamListItem>
 
