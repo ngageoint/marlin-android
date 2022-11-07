@@ -171,7 +171,7 @@ class MapViewModel @Inject constructor(
          }
       }
 
-      addSource(moduRepository.moduMapItems.distinctUntilChanged().asLiveData()) {
+      addSource(moduRepository.observeModuMapItems().distinctUntilChanged().asLiveData()) {
          if (mapped.value?.get(DataSource.MODU) == true) {
             if (mapped.value?.get(DataSource.MODU) == true) {
                val providers = value?.toMutableMap() ?: mutableMapOf()
@@ -182,7 +182,7 @@ class MapViewModel @Inject constructor(
          }
       }
 
-      addSource(lightRepository.lightMapItems.distinctUntilChanged().asLiveData()) {
+      addSource(lightRepository.observeLightMapItems().distinctUntilChanged().asLiveData()) {
          if (mapped.value?.get(DataSource.LIGHT) == true) {
             val providers = value?.toMutableMap() ?: mutableMapOf()
             lightTileProvider = LightTileProvider(application, lightTileRepository)
@@ -191,7 +191,7 @@ class MapViewModel @Inject constructor(
          }
       }
 
-      addSource(portRepository.portMapItems.distinctUntilChanged().asLiveData()) {
+      addSource(portRepository.observePortMapItems().distinctUntilChanged().asLiveData()) {
          if (mapped.value?.get(DataSource.PORT) == true) {
             val providers = value?.toMutableMap() ?: mutableMapOf()
             portTileProvider = PortTileProvider(application, portTileRepository)

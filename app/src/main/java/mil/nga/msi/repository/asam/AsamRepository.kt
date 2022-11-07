@@ -6,7 +6,6 @@ import androidx.paging.PagingSource
 import androidx.work.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import mil.nga.msi.MarlinNotification
 import mil.nga.msi.datasource.DataSource
@@ -14,10 +13,7 @@ import mil.nga.msi.datasource.asam.Asam
 import mil.nga.msi.datasource.asam.AsamListItem
 import mil.nga.msi.datasource.asam.AsamMapItem
 import mil.nga.msi.datasource.filter.QueryBuilder
-import mil.nga.msi.filter.ComparatorType
 import mil.nga.msi.filter.Filter
-import mil.nga.msi.filter.FilterParameter
-import mil.nga.msi.filter.FilterParameterType
 import mil.nga.msi.repository.preferences.FilterRepository
 import mil.nga.msi.repository.preferences.UserPreferencesRepository
 import mil.nga.msi.work.asam.LoadAsamWorker
@@ -55,68 +51,6 @@ class AsamRepository @Inject constructor(
 
    fun getAsams(filters: List<Filter>): List<Asam> {
       val query = QueryBuilder("asams", filters).buildQuery()
-      return localDataSource.getAsams(query)
-   }
-
-   suspend fun getAsams(
-      minLatitude: Double,
-      maxLatitude: Double,
-      minLongitude: Double,
-      maxLongitude: Double
-   ): List<Asam>  {
-      val filters = filterRepository.filters.first()[DataSource.ASAM] ?: emptyList()
-
-      val filtersWithBounds = filters.toMutableList().apply {
-         add(
-            Filter(
-               parameter = FilterParameter(
-                  type = FilterParameterType.DOUBLE,
-                  title = "Min Latitude",
-                  parameter =  "latitude",
-               ),
-               comparator = ComparatorType.GREATER_THAN_OR_EQUAL,
-               value = minLatitude
-            )
-         )
-
-         add(
-            Filter(
-               parameter = FilterParameter(
-                  type = FilterParameterType.DOUBLE,
-                  title = "Min Longitude",
-                  parameter =  "longitude",
-               ),
-               comparator = ComparatorType.GREATER_THAN_OR_EQUAL,
-               value = minLongitude
-            )
-         )
-
-         add(
-            Filter(
-               parameter = FilterParameter(
-                  type = FilterParameterType.DOUBLE,
-                  title = "Max Latitude",
-                  parameter =  "latitude",
-               ),
-               comparator = ComparatorType.LESS_THAN_OR_EQUAL,
-               value = maxLatitude
-            )
-         )
-
-         add(
-            Filter(
-               parameter = FilterParameter(
-                  type = FilterParameterType.DOUBLE,
-                  title = "Max Longitude",
-                  parameter =  "longitude",
-               ),
-               comparator = ComparatorType.LESS_THAN_OR_EQUAL,
-               value = maxLongitude
-            )
-         )
-      }
-
-      val query = QueryBuilder("asams", filtersWithBounds).buildQuery()
       return localDataSource.getAsams(query)
    }
 

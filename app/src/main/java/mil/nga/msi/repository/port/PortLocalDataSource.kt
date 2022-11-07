@@ -11,7 +11,7 @@ class PortLocalDataSource @Inject constructor(
    private val dao: PortDao
 ) {
    fun observePort(portNumber: Int) = dao.observePort(portNumber)
-   fun observePortMapItems() = dao.observePortMapItems()
+   fun observePortMapItems(query: SimpleSQLiteQuery) = dao.observePortMapItems(query)
    fun observePortListItems(query: SimpleSQLiteQuery): PagingSource<Int, PortListItem> = dao.observePortListItems(query)
 
    fun getPorts(query: SimpleSQLiteQuery) = dao.getPorts(query)

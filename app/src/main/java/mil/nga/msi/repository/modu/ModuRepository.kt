@@ -3,16 +3,16 @@ package mil.nga.msi.repository.modu
 import androidx.lifecycle.map
 import androidx.paging.PagingSource
 import androidx.work.*
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flatMapLatest
 import mil.nga.msi.MarlinNotification
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.filter.QueryBuilder
 import mil.nga.msi.datasource.modu.Modu
 import mil.nga.msi.datasource.modu.ModuListItem
-import mil.nga.msi.filter.ComparatorType
+import mil.nga.msi.datasource.modu.ModuMapItem
 import mil.nga.msi.filter.Filter
-import mil.nga.msi.filter.FilterParameter
-import mil.nga.msi.filter.FilterParameterType
 import mil.nga.msi.repository.preferences.FilterRepository
 import mil.nga.msi.repository.preferences.UserPreferencesRepository
 import mil.nga.msi.work.modu.LoadModuWorker
@@ -29,9 +29,17 @@ class ModuRepository @Inject constructor(
    private val userPreferencesRepository: UserPreferencesRepository
 ) {
    val modus = localDataSource.observeModus()
-   val moduMapItems = localDataSource.observeModuMapItems()
    fun observeModu(name: String) = localDataSource.observeModu(name)
    suspend fun getModu(name: String) = localDataSource.getModu(name)
+
+   @OptIn(ExperimentalCoroutinesApi::class)
+   fun observeModuMapItems(): Flow<List<ModuMapItem>> {
+      return filterRepository.filters.flatMapLatest { entry ->
+         val filters = entry[DataSource.MODU] ?: emptyList()
+         val query = QueryBuilder("modus", filters).buildQuery()
+         localDataSource.observeModuMapItems(query)
+      }
+   }
 
    fun observeModuListItems(filters: List<Filter>): PagingSource<Int, ModuListItem> {
       val query = QueryBuilder("modus", filters).buildQuery()
@@ -40,68 +48,6 @@ class ModuRepository @Inject constructor(
 
    fun getModus(filters: List<Filter>): List<Modu> {
       val query = QueryBuilder("modus", filters).buildQuery()
-      return localDataSource.getModus(query)
-   }
-
-   suspend fun getModus(
-      minLatitude: Double,
-      maxLatitude: Double,
-      minLongitude: Double,
-      maxLongitude: Double
-   ): List<Modu>  {
-      val filters = filterRepository.filters.first()[DataSource.MODU] ?: emptyList()
-
-      val filtersWithBounds = filters.toMutableList().apply {
-         add(
-            Filter(
-               parameter = FilterParameter(
-                  type = FilterParameterType.DOUBLE,
-                  title = "Min Latitude",
-                  parameter =  "latitude",
-               ),
-               comparator = ComparatorType.GREATER_THAN_OR_EQUAL,
-               value = minLatitude
-            )
-         )
-
-         add(
-            Filter(
-               parameter = FilterParameter(
-                  type = FilterParameterType.DOUBLE,
-                  title = "Min Longitude",
-                  parameter =  "longitude",
-               ),
-               comparator = ComparatorType.GREATER_THAN_OR_EQUAL,
-               value = minLongitude
-            )
-         )
-
-         add(
-            Filter(
-               parameter = FilterParameter(
-                  type = FilterParameterType.DOUBLE,
-                  title = "Max Latitude",
-                  parameter =  "latitude",
-               ),
-               comparator = ComparatorType.LESS_THAN_OR_EQUAL,
-               value = maxLatitude
-            )
-         )
-
-         add(
-            Filter(
-               parameter = FilterParameter(
-                  type = FilterParameterType.DOUBLE,
-                  title = "Max Longitude",
-                  parameter =  "longitude",
-               ),
-               comparator = ComparatorType.LESS_THAN_OR_EQUAL,
-               value = maxLongitude
-            )
-         )
-      }
-
-      val query = QueryBuilder("modus", filtersWithBounds).buildQuery()
       return localDataSource.getModus(query)
    }
 

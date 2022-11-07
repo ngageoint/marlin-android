@@ -3,12 +3,17 @@ package mil.nga.msi.repository.port
 import androidx.lifecycle.map
 import androidx.paging.PagingSource
 import androidx.work.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flatMapLatest
 import mil.nga.msi.MarlinNotification
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.filter.QueryBuilder
 import mil.nga.msi.datasource.port.Port
 import mil.nga.msi.datasource.port.PortListItem
+import mil.nga.msi.datasource.port.PortMapItem
 import mil.nga.msi.filter.Filter
+import mil.nga.msi.repository.preferences.FilterRepository
 import mil.nga.msi.repository.preferences.UserPreferencesRepository
 import mil.nga.msi.work.port.LoadPortWorker
 import mil.nga.msi.work.port.RefreshPortWorker
@@ -20,9 +25,18 @@ class PortRepository @Inject constructor(
    private val localDataSource: PortLocalDataSource,
    private val remoteDataSource: PortRemoteDataSource,
    private val notification: MarlinNotification,
+   private val filterRepository: FilterRepository,
    private val userPreferencesRepository: UserPreferencesRepository
 ) {
-   val portMapItems = localDataSource.observePortMapItems()
+
+   @OptIn(ExperimentalCoroutinesApi::class)
+   fun observePortMapItems(): Flow<List<PortMapItem>> {
+      return filterRepository.filters.flatMapLatest { entry ->
+         val filters = entry[DataSource.PORT] ?: emptyList()
+         val query = QueryBuilder("ports", filters).buildQuery()
+         localDataSource.observePortMapItems(query)
+      }
+   }
 
    fun observePortListItems(filters: List<Filter>): PagingSource<Int, PortListItem> {
       val query = QueryBuilder("ports", filters).buildQuery()

@@ -55,9 +55,9 @@ interface LightDao {
    @RawQuery(observedEntities = [Light::class])
    fun observeLightListItems(query: SupportSQLiteQuery): PagingSource<Int, LightListItem>
 
-   @Query("SELECT * FROM lights ORDER BY volume_number, feature_number, characteristic_number")
+   @RawQuery(observedEntities = [Light::class])
    @RewriteQueriesToDropUnusedColumns
-   fun observeLightMapItems(): Flow<List<LightMapItem>>
+   fun observeLightMapItems(query: SupportSQLiteQuery): Flow<List<LightMapItem>>
 
    @Query("SELECT * FROM lights WHERE id IN (:ids)")
    suspend fun existingLights(ids: List<String>): List<Light>

@@ -43,8 +43,9 @@ interface PortDao {
    @RawQuery(observedEntities = [Port::class])
    fun observePortListItems(query: SupportSQLiteQuery): PagingSource<Int, PortListItem>
 
-   @Query("SELECT * FROM ports ORDER BY port_number")
-   fun observePortMapItems(): Flow<List<PortMapItem>>
+   @RawQuery(observedEntities = [Port::class])
+   @RewriteQueriesToDropUnusedColumns
+   fun observePortMapItems(query: SupportSQLiteQuery): Flow<List<PortMapItem>>
 
    @Query("SELECT * FROM ports WHERE port_number IN (:portNumbers)")
    suspend fun existingPorts(portNumbers: List<Int>): List<Port>

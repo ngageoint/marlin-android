@@ -10,7 +10,7 @@ class ModuLocalDataSource @Inject constructor(
 ) {
    fun observeModus() = dao.observeModus()
    fun observeModu(name: String) = dao.observeModu(name)
-   fun observeModuMapItems() = dao.observeModuMapItems()
+   fun observeModuMapItems(query: SimpleSQLiteQuery) = dao.observeModuMapItems(query)
    fun observeModuListItems(query: SimpleSQLiteQuery) = dao.observeModuListItems(query)
 
    fun isEmpty() = dao.count() == 0

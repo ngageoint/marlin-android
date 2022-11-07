@@ -3,17 +3,17 @@ package mil.nga.msi.repository.light
 import androidx.lifecycle.map
 import androidx.paging.PagingSource
 import androidx.work.*
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flatMapLatest
 import mil.nga.msi.MarlinNotification
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.filter.QueryBuilder
 import mil.nga.msi.datasource.light.Light
 import mil.nga.msi.datasource.light.LightListItem
+import mil.nga.msi.datasource.light.LightMapItem
 import mil.nga.msi.datasource.light.PublicationVolume
-import mil.nga.msi.filter.ComparatorType
 import mil.nga.msi.filter.Filter
-import mil.nga.msi.filter.FilterParameter
-import mil.nga.msi.filter.FilterParameterType
 import mil.nga.msi.repository.preferences.FilterRepository
 import mil.nga.msi.repository.preferences.UserPreferencesRepository
 import mil.nga.msi.work.light.LoadLightWorker
@@ -29,7 +29,15 @@ class LightRepository @Inject constructor(
    private val filterRepository: FilterRepository,
    private val userPreferencesRepository: UserPreferencesRepository
 ) {
-   val lightMapItems = localDataSource.observeLightMapItems()
+
+   @OptIn(ExperimentalCoroutinesApi::class)
+   fun observeLightMapItems(): Flow<List<LightMapItem>> {
+      return filterRepository.filters.flatMapLatest { entry ->
+         val filters = entry[DataSource.LIGHT] ?: emptyList()
+         val query = QueryBuilder("lights", filters).buildQuery()
+         localDataSource.observeLightMapItems(query)
+      }
+   }
 
    fun observeLightListItems(filters: List<Filter>): PagingSource<Int, LightListItem> {
       val query = QueryBuilder("lights", filters).buildQuery()
@@ -59,68 +67,6 @@ class LightRepository @Inject constructor(
       maxLongitude: Double,
       characteristicNumber: Int
    ) = localDataSource.getLights(minLatitude, maxLatitude, minLongitude, maxLongitude, characteristicNumber)
-
-   suspend fun getLights(
-      minLatitude: Double,
-      maxLatitude: Double,
-      minLongitude: Double,
-      maxLongitude: Double
-   ): List<Light>  {
-      val filters = filterRepository.filters.first()[DataSource.LIGHT] ?: emptyList()
-
-      val filtersWithBounds = filters.toMutableList().apply {
-         add(
-            Filter(
-               parameter = FilterParameter(
-                  type = FilterParameterType.DOUBLE,
-                  title = "Min Latitude",
-                  parameter =  "latitude",
-               ),
-               comparator = ComparatorType.GREATER_THAN_OR_EQUAL,
-               value = minLatitude
-            )
-         )
-
-         add(
-            Filter(
-               parameter = FilterParameter(
-                  type = FilterParameterType.DOUBLE,
-                  title = "Min Longitude",
-                  parameter =  "longitude",
-               ),
-               comparator = ComparatorType.GREATER_THAN_OR_EQUAL,
-               value = minLongitude
-            )
-         )
-
-         add(
-            Filter(
-               parameter = FilterParameter(
-                  type = FilterParameterType.DOUBLE,
-                  title = "Max Latitude",
-                  parameter =  "latitude",
-               ),
-               comparator = ComparatorType.LESS_THAN_OR_EQUAL,
-               value = maxLatitude
-            )
-         )
-
-         add(
-            Filter(
-               parameter = FilterParameter(
-                  type = FilterParameterType.DOUBLE,
-                  title = "Max Longitude",
-                  parameter =  "longitude",
-               ),
-               comparator = ComparatorType.LESS_THAN_OR_EQUAL,
-               value = maxLongitude
-            )
-         )
-      }
-
-      val query = QueryBuilder("lights", filtersWithBounds).buildQuery()
-      return localDataSource.getLights(query)
-   }
 
    suspend fun fetchLights(refresh: Boolean = false): List<Light> {
       if (refresh) {

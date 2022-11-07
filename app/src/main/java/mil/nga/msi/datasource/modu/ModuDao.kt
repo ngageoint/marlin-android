@@ -42,9 +42,9 @@ interface ModuDao {
    @RawQuery(observedEntities = [Modu::class])
    fun observeModuListItems(query: SupportSQLiteQuery): PagingSource<Int, ModuListItem>
 
-   @Query("SELECT * FROM modus ORDER BY name")
+   @RawQuery(observedEntities = [Modu::class])
    @RewriteQueriesToDropUnusedColumns
-   fun observeModuMapItems(): Flow<List<ModuMapItem>>
+   fun observeModuMapItems(query: SupportSQLiteQuery): Flow<List<ModuMapItem>>
 
    @Query("SELECT * FROM modus WHERE latitude >= :minLatitude AND latitude <= :maxLatitude AND longitude >= :minLongitude AND longitude <= :maxLongitude")
    fun getModus(
