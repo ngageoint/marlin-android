@@ -83,7 +83,7 @@ android {
 
     protobuf {
         protoc {
-            artifact = 'com.google.protobuf:protoc:3.14.0'
+            artifact = 'com.google.protobuf:protoc:3.21.1'
         }
 
         sourceSets.all {
@@ -104,6 +104,7 @@ android {
             }
         }
     }
+    namespace 'mil.nga.msi'
 }
 
 dependencies {
