@@ -57,7 +57,7 @@ class MarlinNotification @Inject constructor(
       }
    }
 
-   fun modo(modus: List<Modu>) {
+   fun modu(modus: List<Modu>) {
       if (modus.isNotEmpty()) {
          val name = if (modus.size == 1) "MODU" else "MODUs"
          notification(

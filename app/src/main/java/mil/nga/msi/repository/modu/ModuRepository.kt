@@ -58,7 +58,7 @@ class ModuRepository @Inject constructor(
          val fetched = userPreferencesRepository.fetched(DataSource.MODU)
          if (fetched == null) {
             val newModus = modus.subtract(localDataSource.existingModus(modus.map { it.name }).toSet()).toList()
-            notification.modo(newModus)
+            notification.modu(newModus)
          }
 
          localDataSource.insert(modus)
