@@ -91,7 +91,7 @@ class MapViewModel @Inject constructor(
    private var dgpsTileProvider = DgpsStationTileProvider(application, dgpsStationTileRepository)
 
    val filterCount = filterRepository.filters.map { entry ->
-      entry.values.reduce { acc, filters -> acc.toMutableList().apply { addAll(filters) } }.size
+      entry.values.fold(0) { count, filters -> count + filters.size }
    }.asLiveData()
 
    val tileProviders: LiveData<Map<TileProviderType, TileProvider>> = MediatorLiveData<Map<TileProviderType, TileProvider>>().apply {

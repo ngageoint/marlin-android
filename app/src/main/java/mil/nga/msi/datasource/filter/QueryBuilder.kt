@@ -6,6 +6,7 @@ import mil.nga.msi.datasource.port.types.EnumerationType
 import mil.nga.msi.filter.ComparatorType
 import mil.nga.msi.filter.Filter
 import mil.nga.msi.filter.FilterParameterType
+import mil.nga.msi.sort.SortParameter
 import mil.nga.sf.util.GeometryUtils
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -17,7 +18,8 @@ private const val METERS_IN_NAUTICAL_MILE = 1852
 
 class QueryBuilder(
    val table: String,
-   val filters: List<Filter>
+   val filters: List<Filter> = emptyList(),
+   val sort: List<SortParameter> = emptyList()
 ) {
    fun buildQuery(): SimpleSQLiteQuery {
       val filterStrings = mutableListOf<String>()
@@ -48,8 +50,14 @@ class QueryBuilder(
          filterString?.let { filterStrings.add(it) }
       }
 
+      val sortStrings = mutableListOf<String>()
+      sort.forEach { sort ->
+         sortStrings.add("${sort.parameter.parameter}  ${sort.direction.name}")
+      }
+
       val condition = if (filterStrings.isNotEmpty()) {" WHERE ${filterStrings.joinToString(" AND ")}"} else ""
-      return SimpleSQLiteQuery("SELECT * FROM $table $condition")
+      val sort = if (sortStrings.isNotEmpty()) {" ORDER BY  ${sortStrings.joinToString(",")}"} else ""
+      return SimpleSQLiteQuery("SELECT * FROM $table $condition $sort")
    }
 
    private fun dateQuery(filter: Filter): String? {

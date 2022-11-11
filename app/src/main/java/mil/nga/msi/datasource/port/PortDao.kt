@@ -41,7 +41,7 @@ interface PortDao {
    ): List<Port>
 
    @RawQuery(observedEntities = [Port::class])
-   fun observePortListItems(query: SupportSQLiteQuery): PagingSource<Int, PortListItem>
+   fun observePortListItems(query: SupportSQLiteQuery): PagingSource<Int, Port>
 
    @RawQuery(observedEntities = [Port::class])
    @RewriteQueriesToDropUnusedColumns

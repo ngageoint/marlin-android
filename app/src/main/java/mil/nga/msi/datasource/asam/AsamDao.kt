@@ -37,7 +37,7 @@ interface AsamDao {
    suspend fun getAsam(reference: String): Asam?
 
    @RawQuery(observedEntities = [Asam::class])
-   fun getAsamListItems(query: SupportSQLiteQuery): PagingSource<Int, AsamListItem>
+   fun getAsamListItems(query: SupportSQLiteQuery): PagingSource<Int, Asam>
 
    @RawQuery(observedEntities = [Asam::class])
    @RewriteQueriesToDropUnusedColumns

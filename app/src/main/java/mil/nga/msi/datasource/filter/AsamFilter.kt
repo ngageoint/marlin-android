@@ -7,7 +7,7 @@ class AsamFilter {
    companion object {
       val parameters = listOf(
          FilterParameter(title = "Date", parameter = "date", type = FilterParameterType.DATE),
-         FilterParameter(title = "Location", parameter = "date", type = FilterParameterType.LOCATION),
+         FilterParameter(title = "Location", parameter = "location", type = FilterParameterType.LOCATION),
          FilterParameter(title = "Reference", parameter = "reference", type = FilterParameterType.STRING),
          FilterParameter(title = "Latitude", parameter = "latitude", type = FilterParameterType.DOUBLE),
          FilterParameter(title = "Longitude", parameter = "longitude", type = FilterParameterType.DOUBLE),

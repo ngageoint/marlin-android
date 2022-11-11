@@ -19,6 +19,7 @@ import mil.nga.msi.ui.navigation.Route
 import mil.nga.msi.ui.port.detail.PortDetailScreen
 import mil.nga.msi.ui.port.list.PortsScreen
 import mil.nga.msi.ui.port.sheet.PortSheetScreen
+import mil.nga.msi.ui.sort.SortScreen
 
 sealed class PortRoute(
    override val name: String,
@@ -31,6 +32,7 @@ sealed class PortRoute(
    object List: PortRoute("ports/list", "World Ports", "Ports")
    object Sheet: PortRoute("ports/sheet", "World Port Sheet", "Port Sheet")
    object Filter: PortRoute("ports/filter", "World Port Filter", "Port Filters")
+   object Sort: PortRoute("ports/sort", "World Port Sort", "Port Sort")
 }
 
 @OptIn(ExperimentalMaterialNavigationApi::class)
@@ -64,6 +66,9 @@ fun NavGraphBuilder.portGraph(
             openDrawer = { openNavigationDrawer() },
             openFilter = {
                navController.navigate(PortRoute.Filter.name)
+            },
+            openSort = {
+               navController.navigate(PortRoute.Sort.name)
             },
             onTap = { portNumber ->
                navController.navigate("${PortRoute.Detail.name}?portNumber=$portNumber")
@@ -103,6 +108,14 @@ fun NavGraphBuilder.portGraph(
       }
       bottomSheet(PortRoute.Filter.name) {
          FilterScreen(
+            dataSource = DataSource.PORT,
+            close = {
+               navController.popBackStack()
+            }
+         )
+      }
+      bottomSheet(PortRoute.Sort.name) {
+         SortScreen(
             dataSource = DataSource.PORT,
             close = {
                navController.popBackStack()

@@ -6,16 +6,6 @@ import mil.nga.msi.filter.FilterParameterType
 
 class PortFilter {
    companion object {
-      // TODO cannot find these in iOS
-      //   @ColumnInfo(name = "us_representative")
-      //   var usRepresentative: String? = null
-      //
-      //   @ColumnInfo(name = "global_id")
-      //   var globalId: String? = null
-      //
-      //   @ColumnInfo(name = "s_121_water_body")
-      //   var s121WaterBody: String? = null
-
       val parameters = listOf(
          FilterParameter(
             title = "Main Port Name",
@@ -177,7 +167,7 @@ class PortFilter {
 
          FilterParameter(
             title = "Harbor Type",
-            parameter = "harbor_size",
+            parameter = "harbor_type",
             type = FilterParameterType.ENUMERATION,
             enumerationValues = HarborType.values().toList()
          ),
@@ -635,7 +625,22 @@ class PortFilter {
             parameter = "railway",
             type = FilterParameterType.ENUMERATION,
             enumerationValues = Decision.values().toList()
-         )
+         ),
+         FilterParameter(
+            title = "US Representative",
+            parameter = "us_representative",
+            type = FilterParameterType.STRING
+         ),
+         FilterParameter(
+            title = "Global Id",
+            parameter = "global_id",
+            type = FilterParameterType.STRING
+         ),
+         FilterParameter(
+            title = "121 Water Body",
+            parameter = "s_121_water_body",
+            type = FilterParameterType.STRING
+         ),
       )
    }
 }

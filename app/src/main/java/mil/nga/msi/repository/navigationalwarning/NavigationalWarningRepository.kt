@@ -1,15 +1,15 @@
 package mil.nga.msi.repository.navigationalwarning
 
 import androidx.lifecycle.map
-import androidx.work.*
+import androidx.work.WorkInfo
+import androidx.work.WorkManager
 import mil.nga.msi.MarlinNotification
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.navigationwarning.NavigationArea
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarning
 import mil.nga.msi.repository.preferences.UserPreferencesRepository
-import mil.nga.msi.work.navigationalwarning.RefreshNavigationalWarningWorker
+import mil.nga.msi.startup.navigationalwarning.NavigationalWarningInitializer.Companion.FETCH_LATEST_NAVIGATIONAL_WARNINGS_TASK
 import java.util.*
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class NavigationalWarningRepository @Inject constructor(
@@ -53,48 +53,7 @@ class NavigationalWarningRepository @Inject constructor(
       return localDataSource.getNavigationalWarnings()
    }
 
-   fun fetchNavigationalWarnings() {
-      val fetchRequest = OneTimeWorkRequest.Builder(RefreshNavigationalWarningWorker::class.java)
-         .setConstraints(
-            Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .build()
-         )
-         .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
-         .setBackoffCriteria(BackoffPolicy.LINEAR, 15, TimeUnit.SECONDS)
-         .build()
-
-      workManager
-         .enqueueUniqueWork(
-            FETCH_LATEST_NAVIGATIONAL_WARNINGS_TASK,
-            ExistingWorkPolicy.KEEP, fetchRequest
-         )
-   }
-
-   fun fetchNavigationalWarningsPeriodically() {
-      val fetchRequest = PeriodicWorkRequestBuilder<RefreshNavigationalWarningWorker>(
-         REFRESH_RATE_HOURS, TimeUnit.HOURS
-      ).setConstraints(
-         Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .setRequiresCharging(true)
-            .build()
-      ).addTag(TAG_FETCH_LATEST_NAVIGATIONAL_WARNINGS)
-
-      workManager.enqueueUniquePeriodicWork(
-         FETCH_LATEST_NAVIGATIONAL_WARNINGS_TASK,
-         ExistingPeriodicWorkPolicy.KEEP,
-         fetchRequest.build()
-      )
-   }
-
    val fetching = workManager.getWorkInfosForUniqueWorkLiveData(FETCH_LATEST_NAVIGATIONAL_WARNINGS_TASK).map { workInfo ->
       workInfo.any { it.state == WorkInfo.State.RUNNING }
-   }
-
-   companion object {
-      private const val REFRESH_RATE_HOURS = 24L
-      private const val FETCH_LATEST_NAVIGATIONAL_WARNINGS_TASK = "FetchLatestNavigationalWarningsTask"
-      private const val TAG_FETCH_LATEST_NAVIGATIONAL_WARNINGS = "FetchLatestNavigationalWarningTaskTag"
    }
 }

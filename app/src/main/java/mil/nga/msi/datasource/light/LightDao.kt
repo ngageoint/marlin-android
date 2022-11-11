@@ -53,7 +53,7 @@ interface LightDao {
    fun observeLight(volumeNumber: String, featureNumber: String): Flow<List<Light>>
 
    @RawQuery(observedEntities = [Light::class])
-   fun observeLightListItems(query: SupportSQLiteQuery): PagingSource<Int, LightListItem>
+   fun observeLightListItems(query: SupportSQLiteQuery): PagingSource<Int, Light>
 
    @RawQuery(observedEntities = [Light::class])
    @RewriteQueriesToDropUnusedColumns

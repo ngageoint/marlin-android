@@ -18,6 +18,7 @@ import mil.nga.msi.ui.map.MapRoute
 import mil.nga.msi.ui.navigation.LightKey
 import mil.nga.msi.ui.navigation.Point
 import mil.nga.msi.ui.navigation.Route
+import mil.nga.msi.ui.sort.SortScreen
 
 sealed class LightRoute(
    override val name: String,
@@ -30,6 +31,7 @@ sealed class LightRoute(
    object List: LightRoute("lights/list", "Lights")
    object Sheet: LightRoute("lights/sheet", "Light Sheet")
    object Filter: LightRoute("lights/filter", "Light Filters", "Light Filters")
+   object Sort: LightRoute("lights/sort", "Light Sort", "Light Sort")
 }
 
 @OptIn(ExperimentalMaterialNavigationApi::class)
@@ -63,6 +65,9 @@ fun NavGraphBuilder.lightGraph(
             openDrawer = { openNavigationDrawer() },
             openFilter = {
                navController.navigate(LightRoute.Filter.name)
+            },
+            openSort = {
+               navController.navigate(LightRoute.Sort.name)
             },
             onTap = { key ->
                val encoded = Uri.encode(Json.encodeToString(key))
@@ -113,6 +118,15 @@ fun NavGraphBuilder.lightGraph(
 
       bottomSheet(LightRoute.Filter.name) {
          FilterScreen(
+            dataSource = DataSource.LIGHT,
+            close = {
+               navController.popBackStack()
+            }
+         )
+      }
+
+      bottomSheet(LightRoute.Sort.name) {
+         SortScreen(
             dataSource = DataSource.LIGHT,
             close = {
                navController.popBackStack()

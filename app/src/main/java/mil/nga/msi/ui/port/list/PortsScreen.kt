@@ -8,10 +8,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.FilterList
-import androidx.compose.material.icons.filled.GpsFixed
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -30,7 +27,7 @@ import androidx.paging.compose.items
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import mil.nga.msi.coordinate.DMS
-import mil.nga.msi.datasource.port.PortListItem
+import mil.nga.msi.datasource.port.Port
 import mil.nga.msi.ui.location.LocationTextButton
 import mil.nga.msi.ui.location.generalDirection
 import mil.nga.msi.ui.main.TopBar
@@ -43,6 +40,7 @@ import mil.nga.msi.ui.theme.screenBackground
 fun PortsScreen(
    openDrawer: () -> Unit,
    openFilter: () -> Unit,
+   openSort: () -> Unit,
    onTap: (Int) -> Unit,
    onAction: (PortAction) -> Unit,
    viewModel: PortsViewModel = hiltViewModel()
@@ -57,6 +55,10 @@ fun PortsScreen(
          navigationIcon = Icons.Filled.Menu,
          onNavigationClicked = { openDrawer() },
          actions = {
+            IconButton(onClick = { openSort() } ) {
+               Icon(Icons.Default.SwapVert, contentDescription = "Sort World Ports")
+            }
+
             Box {
                IconButton(onClick = { openFilter() } ) {
                   Icon(Icons.Default.FilterList, contentDescription = "Filter World Ports")
@@ -119,14 +121,27 @@ private fun Ports(
          contentPadding = PaddingValues(top = 16.dp)
       ) {
          items(lazyItems) { item ->
-            PortCard(
-               item = item,
-               location = location,
-               onTap = onTap,
-               onCopyLocation = { onCopyLocation(it) },
-               onZoom = { item?.let { onZoom(Point(it.latitude, it.longitude)) }  },
-               onShare = { item?.portNumber?.let { onShare(it) } }
-            )
+            when (item) {
+               is PortListItem.PortItem -> {
+                  PortCard(
+                     port = item.port,
+                     location = location,
+                     onTap = onTap,
+                     onCopyLocation = { onCopyLocation(it) },
+                     onZoom = { onZoom(Point(item.port.latitude, item.port.longitude)) },
+                     onShare = { onShare(item.port.portNumber) }
+                  )
+               }
+               is PortListItem.HeaderItem -> {
+                  Text(
+                     text = item.header,
+                     fontWeight = FontWeight.Medium,
+                     style = MaterialTheme.typography.caption,
+                     modifier = Modifier.padding(vertical = 8.dp)
+                  )
+               }
+               else -> { /* TODO item is null */}
+            }
          }
       }
    }
@@ -134,28 +149,26 @@ private fun Ports(
 
 @Composable
 private fun PortCard(
-   item: PortListItem?,
+   port: Port,
    location: Location?,
    onTap: (Int) -> Unit,
    onShare: () -> Unit,
    onZoom: () -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
-   if (item != null) {
-      Card(
-         Modifier
-            .fillMaxWidth()
-            .padding(bottom = 8.dp)
-            .clickable { onTap(item.portNumber) }
-      ) {
-         PortContent(item, location, onShare, onZoom, onCopyLocation)
-      }
+   Card(
+      Modifier
+         .fillMaxWidth()
+         .padding(bottom = 8.dp)
+         .clickable { onTap(port.portNumber) }
+   ) {
+      PortContent(port, location, onShare, onZoom, onCopyLocation)
    }
 }
 
 @Composable
 private fun PortContent(
-   item: PortListItem,
+   port: Port,
    location: Location?,
    onShare: () -> Unit,
    onZoom: () -> Unit,
@@ -170,7 +183,7 @@ private fun PortContent(
          ) {
             CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
                Text(
-                  text = item.portName,
+                  text = port.portName,
                   fontWeight = FontWeight.SemiBold,
                   style = MaterialTheme.typography.h6,
                   maxLines = 1,
@@ -179,7 +192,7 @@ private fun PortContent(
             }
 
             CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-               item.alternateName?.let {
+               port.alternateName?.let {
                   Text(
                      text = it,
                      style = MaterialTheme.typography.body2,
@@ -192,8 +205,8 @@ private fun PortContent(
          location?.let { location ->
             Row {
                val portLocation = Location("port").apply {
-                  latitude = item.latitude
-                  longitude = item.longitude
+                  latitude = port.latitude
+                  longitude = port.longitude
                }
 
                val distance = location.distanceTo(portLocation) / 1000
@@ -211,7 +224,7 @@ private fun PortContent(
       }
 
       PortFooter(
-         item = item,
+         port = port,
          onShare = onShare,
          onZoom = onZoom,
          onCopyLocation = onCopyLocation
@@ -221,7 +234,7 @@ private fun PortContent(
 
 @Composable
 private fun PortFooter(
-   item: PortListItem,
+   port: Port,
    onShare: () -> Unit,
    onZoom: () -> Unit,
    onCopyLocation: (String) -> Unit
@@ -233,7 +246,7 @@ private fun PortFooter(
          .fillMaxWidth()
          .padding(top = 8.dp)
    ) {
-      PortLocation(item.dms, onCopyLocation)
+      PortLocation(port.dms, onCopyLocation)
       PortActions(onShare, onZoom)
    }
 }

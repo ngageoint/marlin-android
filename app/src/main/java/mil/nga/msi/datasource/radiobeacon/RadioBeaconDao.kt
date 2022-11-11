@@ -36,7 +36,7 @@ interface RadioBeaconDao {
    fun observeRadioBeacon(volumeNumber: String, featureNumber: String): Flow<RadioBeacon>
 
    @RawQuery(observedEntities = [RadioBeacon::class])
-   fun observeRadioBeaconListItems(query: SupportSQLiteQuery): PagingSource<Int, RadioBeaconListItem>
+   fun observeRadioBeaconListItems(query: SupportSQLiteQuery): PagingSource<Int, RadioBeacon>
 
    @RawQuery(observedEntities = [RadioBeacon::class])
    @RewriteQueriesToDropUnusedColumns

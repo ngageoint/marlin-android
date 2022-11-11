@@ -2,7 +2,8 @@ package mil.nga.msi.repository.radiobeacon
 
 import androidx.lifecycle.map
 import androidx.paging.PagingSource
-import androidx.work.*
+import androidx.work.WorkInfo
+import androidx.work.WorkManager
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
@@ -11,14 +12,12 @@ import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.filter.QueryBuilder
 import mil.nga.msi.datasource.light.PublicationVolume
 import mil.nga.msi.datasource.radiobeacon.RadioBeacon
-import mil.nga.msi.datasource.radiobeacon.RadioBeaconListItem
 import mil.nga.msi.datasource.radiobeacon.RadioBeaconMapItem
 import mil.nga.msi.filter.Filter
 import mil.nga.msi.repository.preferences.FilterRepository
 import mil.nga.msi.repository.preferences.UserPreferencesRepository
-import mil.nga.msi.work.radiobeacon.LoadRadioBeaconWorker
-import mil.nga.msi.work.radiobeacon.RefreshRadioBeaconWorker
-import java.util.concurrent.TimeUnit
+import mil.nga.msi.sort.SortParameter
+import mil.nga.msi.startup.radiobeacon.RadioBeaconInitializer.Companion.FETCH_LATEST_RADIO_BEACONS_TASK
 import javax.inject.Inject
 
 class RadioBeaconRepository @Inject constructor(
@@ -38,8 +37,13 @@ class RadioBeaconRepository @Inject constructor(
       }
    }
 
-   fun observeRadioBeaconListItems(filters: List<Filter>): PagingSource<Int, RadioBeaconListItem> {
-      val query = QueryBuilder("radio_beacons", filters).buildQuery()
+   fun observeRadioBeaconListItems(filters: List<Filter>, sort: List<SortParameter>): PagingSource<Int, RadioBeacon> {
+      val query = QueryBuilder(
+         table = "radio_beacons",
+         filters = filters,
+         sort = sort
+      ).buildQuery()
+
       return localDataSource.observeRadioBeaconListItems(query)
    }
 
@@ -79,48 +83,7 @@ class RadioBeaconRepository @Inject constructor(
       return localDataSource.getRadioBeacons()
    }
 
-   fun fetchRadioBeacons() {
-      val loadRequest = OneTimeWorkRequest.Builder(LoadRadioBeaconWorker::class.java).build()
-      val fetchRequest = OneTimeWorkRequest.Builder(RefreshRadioBeaconWorker::class.java)
-         .setConstraints(
-            Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .build()
-         )
-         .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
-         .setBackoffCriteria(BackoffPolicy.LINEAR, 15, TimeUnit.SECONDS)
-         .build()
-
-      workManager
-         .beginUniqueWork(FETCH_LATEST_RADIO_BEACONS_TASK, ExistingWorkPolicy.KEEP, loadRequest)
-         .then(fetchRequest)
-         .enqueue()
-   }
-
-   fun fetchRadioBeaconsPeriodically() {
-      val fetchRequest = PeriodicWorkRequestBuilder<RefreshRadioBeaconWorker>(
-         REFRESH_RATE_HOURS, TimeUnit.HOURS
-      ).setConstraints(
-         Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .setRequiresCharging(true)
-            .build()
-      ).addTag(TAG_FETCH_LATEST_RADIO_BEACONS)
-
-      workManager.enqueueUniquePeriodicWork(
-         FETCH_LATEST_RADIO_BEACONS_TASK,
-         ExistingPeriodicWorkPolicy.KEEP,
-         fetchRequest.build()
-      )
-   }
-
    val fetching = workManager.getWorkInfosForUniqueWorkLiveData(FETCH_LATEST_RADIO_BEACONS_TASK).map { workInfo ->
       workInfo.any { it.state == WorkInfo.State.RUNNING }
-   }
-
-   companion object {
-      private const val REFRESH_RATE_HOURS = 24L
-      private const val FETCH_LATEST_RADIO_BEACONS_TASK = "FetchLatestRadioBeaconsTask"
-      private const val TAG_FETCH_LATEST_RADIO_BEACONS = "FetchLatestRadioBeaconsTaskTag"
    }
 }

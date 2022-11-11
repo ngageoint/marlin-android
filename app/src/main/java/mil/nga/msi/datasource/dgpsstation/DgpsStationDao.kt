@@ -36,7 +36,7 @@ interface DgpsStationDao {
    fun observeDgpsStation(volumeNumber: String, featureNumber: Float): Flow<DgpsStation>
 
    @RawQuery(observedEntities = [DgpsStation::class])
-   fun observeDgpsStationListItems(query: SupportSQLiteQuery): PagingSource<Int, DgpsStationListItem>
+   fun observeDgpsStationListItems(query: SupportSQLiteQuery): PagingSource<Int, DgpsStation>
 
    @RawQuery(observedEntities = [DgpsStation::class])
    @RewriteQueriesToDropUnusedColumns

@@ -18,6 +18,7 @@ import mil.nga.msi.ui.map.MapRoute
 import mil.nga.msi.ui.navigation.DgpsStation
 import mil.nga.msi.ui.navigation.Point
 import mil.nga.msi.ui.navigation.Route
+import mil.nga.msi.ui.sort.SortScreen
 
 sealed class DgpsStationRoute(
    override val name: String,
@@ -30,6 +31,7 @@ sealed class DgpsStationRoute(
    object List: DgpsStationRoute("dgpsStations/list", "Differential GPS Stations", "DGPS Stations")
    object Sheet: DgpsStationRoute("dgpsStations/sheet", "Differential GPS Station Sheet", "DGPS Station Sheet")
    object Filter: DgpsStationRoute("dgpsStations/filter", "Differential GPS Station Filter", "DGPS Station Filter")
+   object Sort: DgpsStationRoute("dgpsStations/sort", "Differential GPS Station Sort", "DGPS Station Sort")
 }
 
 @OptIn(ExperimentalMaterialNavigationApi::class)
@@ -63,6 +65,9 @@ fun NavGraphBuilder.dgpsStationGraph(
             openDrawer = { openNavigationDrawer() },
             openFilter = {
                navController.navigate(DgpsStationRoute.Filter.name)
+            },
+            openSort = {
+               navController.navigate(DgpsStationRoute.Sort.name)
             },
             onTap = { key ->
                val encoded = Uri.encode(Json.encodeToString(key))
@@ -113,6 +118,14 @@ fun NavGraphBuilder.dgpsStationGraph(
 
       bottomSheet(DgpsStationRoute.Filter.name) {
          FilterScreen(
+            dataSource = DataSource.DGPS_STATION,
+            close = {
+               navController.popBackStack()
+            }
+         )
+      }
+      bottomSheet(DgpsStationRoute.Sort.name) {
+         SortScreen(
             dataSource = DataSource.DGPS_STATION,
             close = {
                navController.popBackStack()

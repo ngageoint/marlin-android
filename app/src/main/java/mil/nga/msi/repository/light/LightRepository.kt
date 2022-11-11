@@ -2,7 +2,8 @@ package mil.nga.msi.repository.light
 
 import androidx.lifecycle.map
 import androidx.paging.PagingSource
-import androidx.work.*
+import androidx.work.WorkInfo
+import androidx.work.WorkManager
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
@@ -10,15 +11,13 @@ import mil.nga.msi.MarlinNotification
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.filter.QueryBuilder
 import mil.nga.msi.datasource.light.Light
-import mil.nga.msi.datasource.light.LightListItem
 import mil.nga.msi.datasource.light.LightMapItem
 import mil.nga.msi.datasource.light.PublicationVolume
 import mil.nga.msi.filter.Filter
 import mil.nga.msi.repository.preferences.FilterRepository
 import mil.nga.msi.repository.preferences.UserPreferencesRepository
-import mil.nga.msi.work.light.LoadLightWorker
-import mil.nga.msi.work.light.RefreshLightWorker
-import java.util.concurrent.TimeUnit
+import mil.nga.msi.sort.SortParameter
+import mil.nga.msi.startup.light.LightInitializer.Companion.FETCH_LATEST_LIGHTS_TASK
 import javax.inject.Inject
 
 class LightRepository @Inject constructor(
@@ -39,8 +38,13 @@ class LightRepository @Inject constructor(
       }
    }
 
-   fun observeLightListItems(filters: List<Filter>): PagingSource<Int, LightListItem> {
-      val query = QueryBuilder("lights", filters).buildQuery()
+   fun observeLightListItems(filters: List<Filter>, sort: List<SortParameter>): PagingSource<Int, Light> {
+      val query = QueryBuilder(
+         table = "lights",
+         filters = filters,
+         sort = sort
+      ).buildQuery()
+
       return localDataSource.observeLightListItems(query)
    }
 
@@ -89,48 +93,7 @@ class LightRepository @Inject constructor(
       return localDataSource.getLights()
    }
 
-   fun fetchLights() {
-      val loadRequest = OneTimeWorkRequest.Builder(LoadLightWorker::class.java).build()
-      val fetchRequest = OneTimeWorkRequest.Builder(RefreshLightWorker::class.java)
-         .setConstraints(
-            Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .build()
-         )
-         .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
-         .setBackoffCriteria(BackoffPolicy.LINEAR, 15, TimeUnit.SECONDS)
-         .build()
-
-      workManager
-         .beginUniqueWork(FETCH_LATEST_LIGHTS_TASK, ExistingWorkPolicy.KEEP, loadRequest)
-         .then(fetchRequest)
-         .enqueue()
-   }
-
-   fun fetchLightsPeriodically() {
-      val fetchRequest = PeriodicWorkRequestBuilder<RefreshLightWorker>(
-         REFRESH_RATE_HOURS, TimeUnit.HOURS
-      ).setConstraints(
-         Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .setRequiresCharging(true)
-            .build()
-      ).addTag(TAG_FETCH_LATEST_LIGHTS)
-
-      workManager.enqueueUniquePeriodicWork(
-         FETCH_LATEST_LIGHTS_TASK,
-         ExistingPeriodicWorkPolicy.KEEP,
-         fetchRequest.build()
-      )
-   }
-
    val fetching = workManager.getWorkInfosForUniqueWorkLiveData(FETCH_LATEST_LIGHTS_TASK).map { workInfo ->
       workInfo.any { it.state == WorkInfo.State.RUNNING }
-   }
-
-   companion object {
-      private const val REFRESH_RATE_HOURS = 24L
-      private const val FETCH_LATEST_LIGHTS_TASK = "FetchLatestLightsTask"
-      private const val TAG_FETCH_LATEST_LIGHTS = "FetchLatestLightsTaskTag"
    }
 }
