@@ -64,7 +64,7 @@ class MarlinNotification @Inject constructor(
             notificationId = ModuNotificationId,
             title = "New $name",
             description = "You have ${modus.size} new $name",
-            icon = R.drawable.ic_modu_24dp,
+            icon = DataSource.MODU.icon,
             uri = "marlin://${ModuRoute.List.name}".toUri()
          )
       }
@@ -77,7 +77,7 @@ class MarlinNotification @Inject constructor(
             notificationId = NavigationWarningNotificationId,
             title = "New $name",
             description = "You have ${warnings.size} new $name",
-            icon = R.drawable.ic_round_warning_24,
+            icon = DataSource.NAVIGATION_WARNING.icon,
             uri = "marlin://${NavigationWarningRoute.Group.name}".toUri()
          )
       }
@@ -90,7 +90,7 @@ class MarlinNotification @Inject constructor(
             notificationId = LightNotificationId,
             title = "New $name",
             description = "You have ${lights.size} new $name",
-            icon = R.drawable.ic_baseline_lightbulb_24,
+            icon = DataSource.LIGHT.icon,
             uri = "marlin://${LightRoute.List.name}".toUri()
          )
       }
@@ -103,7 +103,7 @@ class MarlinNotification @Inject constructor(
             notificationId = PortNotificationId,
             title = "New $name",
             description = "You have ${ports.size} new $name",
-            icon = R.drawable.ic_baseline_anchor_24,
+            icon = DataSource.PORT.icon,
             uri = "marlin://${PortRoute.List.name}".toUri()
          )
       }
@@ -116,7 +116,7 @@ class MarlinNotification @Inject constructor(
             notificationId = RadioBeaconNotificationId,
             title = "New $name",
             description = "You have ${beacons.size} new $name",
-            icon = R.drawable.ic_baseline_settings_input_antenna_24,
+            icon = DataSource.RADIO_BEACON.icon,
             uri = "marlin://${RadioBeaconRoute.List.name}".toUri()
          )
       }
@@ -129,7 +129,7 @@ class MarlinNotification @Inject constructor(
             notificationId = DgpsStationsNotificationId,
             title = "New $name",
             description = "You have ${stations.size} new $name",
-            icon = R.drawable.ic_dgps_icon_24,
+            icon = DataSource.DGPS_STATION.icon,
             uri = "marlin://${DgpsStationRoute.List.name}".toUri()
          )
       }
