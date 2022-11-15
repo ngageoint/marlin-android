@@ -46,15 +46,16 @@ data class Asam(
 
    override fun toString(): String {
       val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
-      return "ASAM\n\n" +
-              "Reference: $reference\n" +
-              "Date: ${dateFormat.format(date)}\n" +
-              "Latitude: $latitude\n" +
-              "Longitude: $longitude\n" +
-              "Navigate Area: $navigationArea\n" +
-              "Subregion: $subregion\n" +
-              "Description: $description\n" +
-              "Hostility: $hostility\n" +
-              "Victim: $victim\n"
+      return "ASAM {\n" +
+              "  Reference: $reference\n" +
+              "  Date: ${dateFormat.format(date)}\n" +
+              "  Latitude: $latitude\n" +
+              "  Longitude: $longitude\n" +
+              "  Navigate Area: $navigationArea\n" +
+              "  Subregion: $subregion\n" +
+              "  Description: $description\n" +
+              "  Hostility: $hostility\n" +
+              "  Victim: $victim\n" +
+              "}"
    }
 }
