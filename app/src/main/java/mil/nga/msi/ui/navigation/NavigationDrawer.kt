@@ -141,9 +141,7 @@ fun NavigationDrawer(
                   isMapped = isMapped,
                   isDragging = isDragging,
                   onMapClicked = {
-                     scope.launch {
-                        viewModel.toggleOnMap(tab)
-                     }
+                     viewModel.toggleOnMap(tab)
                   },
                   onDestinationClicked = {
                      onDestinationClicked(it.name)

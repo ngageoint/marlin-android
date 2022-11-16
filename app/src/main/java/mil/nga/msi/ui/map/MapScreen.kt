@@ -1,6 +1,7 @@
 package mil.nga.msi.ui.map
 
 import android.Manifest
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -19,7 +20,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.core.graphics.drawable.toBitmap
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
@@ -31,6 +36,7 @@ import com.google.android.gms.maps.model.*
 import com.google.maps.android.compose.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.type.MapLocation
 import mil.nga.msi.ui.location.LocationPermission
 import mil.nga.msi.ui.main.TopBar
@@ -58,6 +64,7 @@ fun MapScreen(
    val location by mapViewModel.locationPolicy.bestLocationProvider.observeAsState()
    var located by remember { mutableStateOf(false) }
    val tileProviders by mapViewModel.tileProviders.observeAsState(emptyMap())
+   val mapped by mapViewModel.mapped.observeAsState(emptyMap())
 
    LaunchedEffect(fetching) {
       if(fetching.none { it.value } && fetchingVisibility) {
@@ -257,6 +264,18 @@ fun MapScreen(
                )
             }
          }
+
+         Box(
+            modifier = Modifier
+               .align(Alignment.BottomStart)
+               .padding(start = 8.dp, bottom = 32.dp)
+         ) {
+            DataSources(
+               mapped = mapped
+            ) {
+               mapViewModel.toggleOnMap(it)
+            }
+         }
       }
    }
 }
@@ -342,6 +361,37 @@ private fun Map(
 
          map.setOnMapClickListener { latLng ->
             onMapClick(latLng, map.cameraPosition.zoom, map.projection.visibleRegion)
+         }
+      }
+   }
+}
+
+@Composable
+private fun DataSources(
+   mapped: Map<DataSource, Boolean>,
+   onDataSourceToggle: (DataSource) -> Unit,
+) {
+   Column {
+      DataSource.values().filter { it.mappable }.forEach { dataSource ->
+         var tint =  MaterialTheme.colors.onPrimary
+         var background = dataSource.color
+         val bitmap = AppCompatResources.getDrawable(LocalContext.current, dataSource.icon)!!.toBitmap().asImageBitmap()
+
+         if (mapped[dataSource] == false) {
+            tint =  Color(0xFF999999)
+            background = Color(0xFFDDDDDD)
+         }
+         FloatingActionButton(
+            onClick = { onDataSourceToggle(dataSource) },
+            backgroundColor = background,
+            modifier = Modifier
+               .padding(4.dp)
+         ) {
+            Icon(
+               bitmap = bitmap,
+               tint = tint,
+               contentDescription = "${dataSource.route.title} map toggle"
+            )
          }
       }
    }

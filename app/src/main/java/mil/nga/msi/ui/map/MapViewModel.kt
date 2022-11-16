@@ -8,6 +8,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.filter.MapBoundsFilter
@@ -74,9 +75,9 @@ class MapViewModel @Inject constructor(
    val baseMap = userPreferencesRepository.baseMapType.asLiveData()
    val mapLocation = userPreferencesRepository.mapLocation.asLiveData()
    val fetching = dataSourceRepository.fetching
+   val mapped = userPreferencesRepository.mapped.asLiveData()
 
    private val _zoom = MutableLiveData<Int>()
-   private val mapped = userPreferencesRepository.mapped.asLiveData()
 
    suspend fun setMapLocation(mapLocation: MapLocation, zoom: Int) {
       _zoom.value = zoom
@@ -89,6 +90,12 @@ class MapViewModel @Inject constructor(
    private var beaconTileProvider = RadioBeaconTileProvider(application, beaconTileRepository)
    private var lightTileProvider = LightTileProvider(application, lightTileRepository)
    private var dgpsTileProvider = DgpsStationTileProvider(application, dgpsStationTileRepository)
+
+   fun toggleOnMap(dataSource: DataSource) {
+      viewModelScope.launch {
+         userPreferencesRepository.setMapped(dataSource)
+      }
+   }
 
    val filterCount = filterRepository.filters.map { entry ->
       entry.values.fold(0) { count, filters -> count + filters.size }
