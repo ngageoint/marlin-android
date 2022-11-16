@@ -371,7 +371,9 @@ private fun DataSources(
    mapped: Map<DataSource, Boolean>,
    onDataSourceToggle: (DataSource) -> Unit,
 ) {
-   Column {
+   Column(
+      Modifier.padding(horizontal = 8.dp)
+   ) {
       DataSource.values().filter { it.mappable }.forEach { dataSource ->
          var tint =  MaterialTheme.colors.onPrimary
          var background = dataSource.color
@@ -381,15 +383,18 @@ private fun DataSources(
             tint =  Color(0xFF999999)
             background = Color(0xFFDDDDDD)
          }
+
          FloatingActionButton(
             onClick = { onDataSourceToggle(dataSource) },
             backgroundColor = background,
             modifier = Modifier
-               .padding(4.dp)
+               .padding(bottom = 8.dp)
+               .size(40.dp)
          ) {
             Icon(
                bitmap = bitmap,
                tint = tint,
+               modifier = Modifier.size(20.dp),
                contentDescription = "${dataSource.route.title} map toggle"
             )
          }
