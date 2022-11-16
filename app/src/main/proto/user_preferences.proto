@@ -3,23 +3,25 @@ syntax = "proto3";
 option java_package = "mil.nga.msi.type";
 option java_multiple_files = true;
 
+import "embark.proto";
 import "sort.proto";
 import "filter.proto";
 import "map_location.proto";
 import "navigational_warning_key.proto";
 
 message UserPreferences {
-  int32 mapLayer = 1;
-  MapLocation mapLocation = 2;
-  bool mgrs = 3;
-  bool gars = 4;
-  bool showLightSectorRanges = 5;
-  bool showLightRanges = 6;
-  map<string, NavigationalWarningKey> lastReadNavigationWarnings = 7;
-  map<string, bool> mapped = 8;
-  repeated string tabs = 9;
-  repeated string nonTabs = 10;
-  map<string, int64> dataSourceSyncDate = 11;
-  map<string, Filters> filters = 12;
-  map<string, Sort> sort = 13;
+  Embark embark = 1;
+  int32 mapLayer = 2;
+  MapLocation mapLocation = 3;
+  bool mgrs = 4;
+  bool gars = 5;
+  bool showLightSectorRanges = 6;
+  bool showLightRanges = 7;
+  map<string, NavigationalWarningKey> lastReadNavigationWarnings = 8;
+  map<string, bool> mapped = 9;
+  repeated string tabs = 10;
+  repeated string nonTabs = 11;
+  map<string, int64> dataSourceSyncDate = 12;
+  map<string, Filters> filters = 13;
+  map<string, Sort> sort = 14;
 }

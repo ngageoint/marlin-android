@@ -27,6 +27,7 @@ import com.google.accompanist.navigation.material.ExperimentalMaterialNavigation
 import com.google.accompanist.navigation.material.ModalBottomSheetLayout
 import kotlinx.coroutines.launch
 import mil.nga.msi.R
+import mil.nga.msi.ui.embark.EmbarkRoute
 import mil.nga.msi.ui.home.homeGraph
 import mil.nga.msi.ui.map.MapRoute
 import mil.nga.msi.ui.navigation.NavigationDrawer
@@ -49,8 +50,9 @@ fun MainScreen(
    val scope = rememberCoroutineScope()
    val scaffoldState = rememberScaffoldState()
    val navController = rememberNavController(bottomSheetNavigator)
-   var bottomBarVisibility by remember { (mutableStateOf(true)) }
+   var bottomBarVisibility by remember { (mutableStateOf(false)) }
 
+   val embark by viewModel.embark.observeAsState()
    val tabs by viewModel.tabs.observeAsState(emptyList())
 
    val openDrawer = {
@@ -168,9 +170,14 @@ fun MainScreen(
             composable("main") {
                bottomBarVisibility = false
 
-               // TODO LaunchedEffect placeholder for app setup routes
-               LaunchedEffect(null) {
-                  navController.navigate(MapRoute.Map.name)
+               embark?.let { embark ->
+                  if (embark) {
+                     navController.navigate(MapRoute.Map.name)
+                  } else {
+                     navController.navigate(EmbarkRoute.Welcome.name) {
+                        launchSingleTop = true
+                     }
+                  }
                }
             }
 

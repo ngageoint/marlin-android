@@ -4,6 +4,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import mil.nga.msi.ui.asam.asamGraph
 import mil.nga.msi.ui.dgpsstation.dgpsStationGraph
+import mil.nga.msi.ui.embark.embarkGraph
 import mil.nga.msi.ui.light.lightGraph
 import mil.nga.msi.ui.map.mapGraph
 import mil.nga.msi.ui.modu.moduGraph
@@ -19,6 +20,11 @@ fun NavGraphBuilder.homeGraph(
    showSnackbar: (String) -> Unit,
    openNavigationDrawer: () -> Unit
 ) {
+   embarkGraph(
+      navController = navController,
+      bottomBarVisibility = { bottomBarVisibility(it) }
+   )
+
    mapGraph(
       navController = navController,
       bottomBarVisibility = { bottomBarVisibility(it) },
