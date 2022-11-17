@@ -388,13 +388,13 @@ private fun DataSources(
             onClick = { onDataSourceToggle(dataSource) },
             backgroundColor = background,
             modifier = Modifier
-               .padding(bottom = 8.dp)
+               .padding(bottom = 12.dp)
                .size(40.dp)
          ) {
             Icon(
                bitmap = bitmap,
                tint = tint,
-               modifier = Modifier.size(20.dp),
+               modifier = Modifier.size(24.dp),
                contentDescription = "${dataSource.route.title} map toggle"
             )
          }
