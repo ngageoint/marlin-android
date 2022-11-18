@@ -170,12 +170,14 @@ fun MainScreen(
             composable("main") {
                bottomBarVisibility = false
 
-               embark?.let { embark ->
-                  if (embark) {
-                     navController.navigate(MapRoute.Map.name)
-                  } else {
-                     navController.navigate(EmbarkRoute.Welcome.name) {
-                        launchSingleTop = true
+               LaunchedEffect(embark) {
+                  embark?.let { embark ->
+                     if (embark) {
+                        navController.navigate(MapRoute.Map.name)
+                     } else {
+                        navController.navigate(EmbarkRoute.Welcome.name) {
+                           launchSingleTop = true
+                        }
                      }
                   }
                }
