@@ -264,7 +264,7 @@ private fun NavigationRow(
                .fillMaxSize()
                .background(MaterialTheme.colors.background)
                .clickable {
-                  onDestinationClicked(tab.route)
+                  onDestinationClicked(mainRouteFor(tab))
                }
          ) {
             Box(
@@ -308,7 +308,7 @@ private fun NavigationRow(
                ) {
                   CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
                      Text(
-                        text = tab.route.title,
+                        text = mainRouteFor(tab).title,
                         style = MaterialTheme.typography.body2,
                         fontWeight = FontWeight.Medium
                      )

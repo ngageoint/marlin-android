@@ -23,7 +23,7 @@ sealed class LightRoute(
    override val name: String,
    override val title: String,
    override val shortTitle: String = title,
-   override val color: Color = Color(0xFFFFC500)
+   override val color: Color = DataSource.LIGHT.color
 ): Route {
    object Main: LightRoute("lights", "Lights")
    object Detail: LightRoute("lights/detail", "Light Details")

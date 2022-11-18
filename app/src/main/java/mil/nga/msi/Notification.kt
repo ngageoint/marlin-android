@@ -153,6 +153,7 @@ class MarlinNotification @Inject constructor(
          DataSource.PORT -> PortFetchNotificationId
          DataSource.RADIO_BEACON -> RadioBeaconFetchNotificationId
          DataSource.DGPS_STATION -> DgpsStationsFetchNotificationId
+         DataSource.ELECTRONIC_PUBLICATION -> ElectronicPublicationFetchNotificationId
       }
    }
 
@@ -205,5 +206,7 @@ class MarlinNotification @Inject constructor(
       private const val RadioBeaconFetchNotificationId = 60
       private const val DgpsStationsNotificationId = 7
       private const val DgpsStationsFetchNotificationId = 70
+      private const val ElectronicPublicationNotificationId = 8
+      private const val ElectronicPublicationFetchNotificationId = 80
    }
 }

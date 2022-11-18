@@ -24,7 +24,7 @@ sealed class PortRoute(
    override val name: String,
    override val title: String,
    override val shortTitle: String,
-   override val color: Color = Color(0xFF5856d6)
+   override val color: Color = DataSource.PORT.color
 ): Route {
    object Main: PortRoute("ports", "World Ports", "Ports")
    object Detail: PortRoute("ports/detail", "World Port Details", "Port Details")

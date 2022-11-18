@@ -24,7 +24,7 @@ sealed class AsamRoute(
    override val name: String,
    override val title: String,
    override val shortTitle: String,
-   override val color: Color = Color(0xFF000000)
+   override val color: Color = DataSource.ASAM.color
 ): Route {
    object Main: AsamRoute("asams", "Anti-Shipping Activity Messages", "ASAMs")
    object Detail: AsamRoute("asams/detail", "Anti-Shipping Activity Message Details", "ASAM Details")

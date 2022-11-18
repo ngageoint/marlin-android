@@ -10,7 +10,5 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor(
    userPreferencesRepository: UserPreferencesRepository
 ): ViewModel() {
-
    val tabs = userPreferencesRepository.tabs.asLiveData()
-
 }

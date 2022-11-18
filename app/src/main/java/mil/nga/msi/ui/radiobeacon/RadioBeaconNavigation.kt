@@ -23,7 +23,7 @@ sealed class RadioBeaconRoute(
    override val name: String,
    override val title: String,
    override val shortTitle: String,
-   override val color: Color = Color(0xFF007BFF)
+   override val color: Color = DataSource.RADIO_BEACON.color
 ): Route {
    object Main: RadioBeaconRoute("radioBeacons", "Radio Beacons", "Beacons")
    object Detail: RadioBeaconRoute("radioBeacons/detail", "Radio Beacon Details", "Beacon Details")
