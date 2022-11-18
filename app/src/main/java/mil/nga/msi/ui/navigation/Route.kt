@@ -7,5 +7,4 @@ interface Route {
    val title: String
    val shortTitle: String
    val color: Color
-
 }

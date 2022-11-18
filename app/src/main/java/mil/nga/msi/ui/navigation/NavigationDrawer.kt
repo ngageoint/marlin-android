@@ -14,6 +14,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOff
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.NoteAdd
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -32,6 +33,7 @@ import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.ui.drag.DraggableItem
 import mil.nga.msi.ui.drag.dragContainer
 import mil.nga.msi.ui.drag.rememberDragDropState
+import mil.nga.msi.ui.report.ReportRoute
 import mil.nga.msi.ui.settings.SettingsRoute
 import mil.nga.msi.ui.theme.screenBackground
 
@@ -189,7 +191,56 @@ fun NavigationDrawer(
             Column(
                Modifier
                   .padding(top = 32.dp)
-                  .height(72.dp)
+                  .height(56.dp)
+                  .fillMaxWidth()
+            ) {
+               Row(
+                  verticalAlignment = Alignment.CenterVertically,
+                  modifier = Modifier
+                     .fillMaxSize()
+                     .background(MaterialTheme.colors.background)
+                     .clickable {
+                        onDestinationClicked(ReportRoute.Main.name)
+                     }
+               ) {
+
+                  CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                     Icon(
+                        Icons.Filled.NoteAdd,
+                        modifier = Modifier.padding(start = 8.dp),
+                        contentDescription = "Submit Report to NGA"
+                     )
+                  }
+
+                  Column(
+                     verticalArrangement = Arrangement.Center,
+                     modifier = Modifier.fillMaxWidth()
+                  ) {
+                     Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier
+                           .height(72.dp)
+                           .fillMaxWidth()
+                           .weight(1f)
+                           .padding(horizontal = 8.dp)
+                     ) {
+                        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
+                           Text(
+                              text = ReportRoute.Main.title,
+                              style = MaterialTheme.typography.body2,
+                              fontWeight = FontWeight.Medium
+                           )
+                        }
+                     }
+                  }
+               }
+            }
+
+            Column(
+               Modifier
+                  .padding(top = 32.dp)
+                  .height(56.dp)
                   .fillMaxWidth()
             ) {
                Row(
@@ -253,7 +304,7 @@ private fun NavigationRow(
    Surface(elevation = elevation) {
       Column(
          Modifier
-            .height(72.dp)
+            .height(56.dp)
             .fillMaxWidth()
       ) {
          Row(
