@@ -5,6 +5,7 @@ import androidx.lifecycle.*
 import com.google.android.gms.maps.model.TileProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -21,6 +22,7 @@ import mil.nga.msi.repository.DataSourceRepository
 import mil.nga.msi.repository.asam.AsamRepository
 import mil.nga.msi.repository.dgpsstation.DgpsStationKey
 import mil.nga.msi.repository.dgpsstation.DgpsStationRepository
+import mil.nga.msi.repository.geocoder.GeocoderRemoteDataSource
 import mil.nga.msi.repository.light.LightKey
 import mil.nga.msi.repository.light.LightRepository
 import mil.nga.msi.repository.map.*
@@ -67,9 +69,10 @@ class MapViewModel @Inject constructor(
    dataSourceRepository: DataSourceRepository,
    val locationPolicy: LocationPolicy,
    val userPreferencesRepository: UserPreferencesRepository,
+   private val geocoderRemoteDataSource: GeocoderRemoteDataSource,
    @Named("osmTileProvider") private val osmTileProvider: TileProvider,
    @Named("mgrsTileProvider") private val mgrsTileProvider: TileProvider,
-   @Named("garsTileProvider") private val garsTileProvider: TileProvider,
+   @Named("garsTileProvider") private val garsTileProvider: TileProvider
 ): ViewModel() {
 
    val baseMap = userPreferencesRepository.baseMapType.asLiveData()
@@ -90,6 +93,20 @@ class MapViewModel @Inject constructor(
    private var beaconTileProvider = RadioBeaconTileProvider(application, beaconTileRepository)
    private var lightTileProvider = LightTileProvider(application, lightTileRepository)
    private var dgpsTileProvider = DgpsStationTileProvider(application, dgpsStationTileRepository)
+
+   private val searchText = MutableStateFlow("")
+   fun search(text: String) {
+      searchText.value = text
+   }
+
+   val searchResults = searchText
+      .map {
+         val stuff = if (it.isNotEmpty()) {
+            geocoderRemoteDataSource.geocode(it)
+         } else emptyList()
+
+         stuff
+      }.asLiveData()
 
    fun toggleOnMap(dataSource: DataSource) {
       viewModelScope.launch {

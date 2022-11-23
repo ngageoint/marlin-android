@@ -2,15 +2,20 @@ package mil.nga.msi.ui.map
 
 import android.Manifest
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
+import androidx.compose.material.TextFieldDefaults.indicatorLine
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.FilterList
-import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.LocationSearching
 import androidx.compose.material.icons.outlined.Map
 import androidx.compose.material.icons.outlined.MyLocation
@@ -20,9 +25,14 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.drawable.toBitmap
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -36,17 +46,24 @@ import com.google.android.gms.maps.model.*
 import com.google.maps.android.compose.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import mil.nga.msi.R
 import mil.nga.msi.datasource.DataSource
+import mil.nga.msi.repository.geocoder.GeocoderState
 import mil.nga.msi.type.MapLocation
 import mil.nga.msi.ui.location.LocationPermission
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.cluster.MapAnnotation
 import kotlin.time.Duration.Companion.seconds
 
+data class MapPosition(
+   val location: MapLocation,
+   val name: String? = null
+)
+
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun MapScreen(
-   mapDestination : MapLocation? = null,
+   mapDestination : MapPosition? = null,
    onAnnotationClick: (MapAnnotation) -> Unit,
    onAnnotationsClick: (Collection<MapAnnotation>) -> Unit,
    onMapSettings: () -> Unit,
@@ -55,6 +72,8 @@ fun MapScreen(
    mapViewModel: MapViewModel = hiltViewModel()
 ) {
    val scope = rememberCoroutineScope()
+   var searchExpanded by remember { mutableStateOf(false) }
+   val searchResults by mapViewModel.searchResults.observeAsState(emptyList())
    val filterCount by mapViewModel.filterCount.observeAsState(0)
    val fetching by mapViewModel.fetching.observeAsState(emptyMap())
    var fetchingVisibility by rememberSaveable { mutableStateOf(true) }
@@ -135,6 +154,7 @@ fun MapScreen(
             locationSource,
             locationPermissionState.status.isGranted,
             tileProviders,
+            searchResults,
             onMapMove = { position, reason ->
                if (reason == com.google.android.gms.maps.GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE) {
                   located = false
@@ -166,11 +186,13 @@ fun MapScreen(
                         mapAnnotations.forEach { this.include(LatLng(it.latitude, it.longitude)) }
                      }.build()
 
-                     destination = MapLocation.newBuilder()
-                        .setLatitude(bounds.center.latitude)
-                        .setLongitude(bounds.center.longitude)
-                        .setZoom(if (mapAnnotations.size == 1) 17.0 else zoom.toDouble())
-                        .build()
+                     destination = MapPosition(
+                        location = MapLocation.newBuilder()
+                           .setLatitude(bounds.center.latitude)
+                           .setLongitude(bounds.center.longitude)
+                           .setZoom(if (mapAnnotations.size == 1) 17.0 else zoom.toDouble())
+                           .build()
+                     )
 
                      if (mapAnnotations.size == 1) {
                         onAnnotationClick(mapAnnotations.first())
@@ -218,51 +240,62 @@ fun MapScreen(
             }
          }
 
-         FloatingActionButton(
-            onClick = { onMapSettings() },
-            backgroundColor = MaterialTheme.colors.background,
-            modifier = Modifier
+         Box(
+            Modifier
                .align(Alignment.TopEnd)
                .padding(16.dp)
-               .size(40.dp)
          ) {
-            Icon(Icons.Outlined.Map,
-               tint = MaterialTheme.colors.primary,
-               contentDescription = "Map Settings"
-            )
+            Settings {
+               onMapSettings()
+            }
          }
 
          if (locationPermissionState.status.isGranted) {
-            FloatingActionButton(
-               onClick = {
-                  location?.let {
-                     located = true
-                     scope.launch {
-                        destination = MapLocation.newBuilder()
-                           .setLatitude(it.latitude)
-                           .setLongitude(it.longitude)
-                           .setZoom(17.0)
-                           .build()
-                     }
-                  }
-               },
-               backgroundColor = MaterialTheme.colors.background,
+            Box(
                modifier = Modifier
                   .align(Alignment.BottomEnd)
                   .padding(16.dp)
             ) {
-               var icon = Icons.Outlined.LocationSearching
-               var tint =  MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.disabled)
-               if (located) {
-                  icon = Icons.Outlined.MyLocation
-                  tint = MaterialTheme.colors.secondary
+               Zoom(located) {
+                  located = true
+                  scope.launch {
+                     destination = MapPosition(
+                        location = MapLocation.newBuilder()
+                           .setLatitude(location?.latitude ?: 0.0)
+                           .setLongitude(location?.longitude ?: 0.0)
+                           .setZoom(17.0)
+                           .build()
+                     )
+                  }
                }
-               Icon(
-                  imageVector = icon,
-                  tint = tint,
-                  contentDescription = "Zoom to location"
-               )
             }
+         }
+
+         Box(
+            modifier = Modifier
+               .align(Alignment.TopStart)
+               .padding(16.dp)
+         ) {
+            Search(
+               expanded = searchExpanded,
+               results = searchResults,
+               onExpand = {
+                  searchExpanded = !searchExpanded
+               },
+               onTextChanged = {
+                  mapViewModel.search(it)
+               },
+               onLocationTap = {
+                  destination = MapPosition(
+                     name = "Hello Map",
+                     location = MapLocation.newBuilder()
+                        .setLatitude(it.latitude)
+                        .setLongitude(it.longitude)
+                        .setZoom(12.0)
+                        .build()
+                  )
+               }
+            )
          }
 
          Box(
@@ -284,15 +317,17 @@ fun MapScreen(
 @Composable
 private fun Map(
    origin: MapLocation?,
-   destination: MapLocation?,
+   destination: MapPosition?,
    baseMap: BaseMapType?,
    locationSource: LocationSource,
    locationEnabled: Boolean,
    tileProviders: Map<TileProviderType, TileProvider>,
+   searchResults: List<GeocoderState>,
    onMapMove: (CameraPosition, Int) -> Unit,
    onMapClick: (LatLng, Float, VisibleRegion) -> Unit
 ) {
    val scope = rememberCoroutineScope()
+   val context = LocalContext.current
 
    var isMapLoaded by remember { mutableStateOf(false) }
    val cameraPositionState: CameraPositionState = rememberCameraPositionState {}
@@ -334,7 +369,12 @@ private fun Map(
          LaunchedEffect(destination) {
             destination?.let { destination ->
                scope.launch {
-                  val update = CameraUpdateFactory.newLatLngZoom(LatLng(destination.latitude, destination.longitude), destination.zoom.toFloat())
+                  val update = CameraUpdateFactory.newLatLngZoom(
+                     LatLng(
+                        destination.location.latitude,
+                        destination.location.longitude
+                     ), destination.location.zoom.toFloat()
+                  )
                   cameraPositionState.animate(update)
                }
             }
@@ -350,7 +390,14 @@ private fun Map(
          dgpsStationTileProvider?.let { TileOverlay(tileProvider = it)}
       }
 
-      MapEffect(null) { map ->
+      searchResults.forEach { result ->
+         Marker(
+            state = MarkerState(LatLng(result.location.latitude, result.location.longitude)),
+            icon = BitmapDescriptorFactory.fromResource(context, R.drawable.ic_round_location_on_24, result.name)
+         )
+      }
+
+      MapEffect(destination) { map ->
          map.setOnCameraMoveStartedListener { reason ->
             cameraMoveReason = reason
          }
@@ -365,6 +412,196 @@ private fun Map(
       }
    }
 }
+
+@Composable
+private fun Settings(
+   onTap: () -> Unit
+) {
+   FloatingActionButton(
+      onClick = { onTap() },
+      backgroundColor = MaterialTheme.colors.background,
+      modifier = Modifier.size(40.dp)
+   ) {
+      Icon(Icons.Outlined.Map,
+         tint = MaterialTheme.colors.primary,
+         contentDescription = "Map Settings"
+      )
+   }
+}
+
+@Composable
+private fun Zoom(
+   located: Boolean,
+   onZoom: () -> Unit
+) {
+   FloatingActionButton(
+      onClick = {
+         onZoom()
+      },
+      backgroundColor = MaterialTheme.colors.background
+   ) {
+      var icon = Icons.Outlined.LocationSearching
+      var tint =  MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.disabled)
+      if (located) {
+         icon = Icons.Outlined.MyLocation
+         tint = MaterialTheme.colors.primary
+      }
+      Icon(
+         imageVector = icon,
+         tint = tint,
+         contentDescription = "Zoom to location"
+      )
+   }
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+private fun Search(
+   expanded: Boolean,
+   results: List<GeocoderState> = emptyList(),
+   onExpand: () -> Unit,
+   onTextChanged: (String) -> Unit,
+   onLocationTap: (LatLng) -> Unit
+) {
+   val focusRequester = remember { FocusRequester() }
+   val configuration = LocalConfiguration.current
+   val colors = TextFieldDefaults.textFieldColors()
+   val interactionSource = remember { MutableInteractionSource() }
+   var text by remember { mutableStateOf("") }
+   val width = if (expanded) configuration.screenWidthDp.dp.minus(88.dp) else 40.dp
+
+   LaunchedEffect(expanded) {
+      if (expanded) {
+         focusRequester.requestFocus()
+      }
+   }
+
+   Surface(
+      elevation = 6.dp,
+      shape = RoundedCornerShape(20.dp)
+   ) {
+      Column {
+         BasicTextField(
+            value = text,
+            onValueChange = {
+               text = it
+               onTextChanged(it)
+            },
+            interactionSource = interactionSource,
+            enabled = expanded,
+            singleLine = true,
+            modifier = Modifier
+               .animateContentSize()
+               .background(
+                  color = MaterialTheme.colors.background,
+                  shape = RoundedCornerShape(6.dp)
+               )
+               .indicatorLine(
+                  enabled = expanded,
+                  isError = false,
+                  interactionSource = interactionSource,
+                  colors = colors,
+                  focusedIndicatorLineThickness = 0.dp,
+                  unfocusedIndicatorLineThickness = 0.dp
+               )
+               .height(40.dp)
+               .width(width)
+               .focusRequester(focusRequester)
+         ) {
+            TextFieldDefaults.TextFieldDecorationBox(
+               value = text,
+               innerTextField = it,
+               singleLine = true,
+               enabled = expanded,
+               leadingIcon = {
+                  IconButton(onClick = { onExpand() }) {
+                     Icon(
+                        imageVector = Icons.Default.Search,
+                        tint = MaterialTheme.colors.primary,
+                        contentDescription = "Search"
+                     )
+                  }
+               },
+               trailingIcon = {
+                  IconButton(
+                     onClick = {
+                        text = ""
+                        onTextChanged("")
+                     }
+                  ) {
+                     Icon(
+                        imageVector = Icons.Default.Close,
+                        modifier = Modifier.size(18.dp),
+                        contentDescription = "Search Clear"
+                     )
+                  }
+               },
+               visualTransformation = VisualTransformation.None,
+               placeholder = {
+                  Text(text = "Search")
+               },
+               interactionSource = interactionSource,
+               contentPadding = TextFieldDefaults.textFieldWithoutLabelPadding(top = 0.dp, bottom = 0.dp),
+            )
+         }
+
+         if (results.isNotEmpty()) {
+            val scrollState = rememberScrollState()
+            val searchHeight = configuration.screenHeightDp.dp.div(3)
+
+            Column(
+               modifier = Modifier
+                  .width(width)
+                  .heightIn(0.dp, searchHeight)
+                  .verticalScroll(scrollState)
+            ) {
+               results.forEach { result ->
+                  Divider(Modifier.padding(horizontal = 8.dp))
+
+                  Row(
+                     verticalAlignment = Alignment.CenterVertically,
+                     modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 8.dp)
+                  ) {
+                     Column(Modifier.weight(1f)) {
+                        Text(
+                           text = result.name ?: "",
+                           style = MaterialTheme.typography.subtitle1,
+                           fontWeight = FontWeight.Medium
+                        )
+                        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
+                           Text(
+                              text = result.address ?: "",
+                              style = MaterialTheme.typography.subtitle2
+                           )
+                        }
+
+                        result.location?.let { location ->
+                           Text(
+                              text = "${"%.5f".format(location.latitude)}, ${"%.5f".format(location.longitude)}",
+                              color = MaterialTheme.colors.primary
+                           )
+                        }
+                     }
+
+                     result.location?.let {
+                        IconButton(
+                           onClick = { onLocationTap(it) }
+                        ) {
+                           Icon(
+                              imageVector = Icons.Default.LocationSearching,
+                              tint = MaterialTheme.colors.primary,
+                              contentDescription = "Zoom To Search Result"
+                           )
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      }
+   }
+}
+
 
 @Composable
 private fun DataSources(
