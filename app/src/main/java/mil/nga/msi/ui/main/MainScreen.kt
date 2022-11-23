@@ -2,6 +2,7 @@ package mil.nga.msi.ui.main
 
 import android.content.Context
 import android.content.Intent
+import android.os.Bundle
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -16,6 +17,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
@@ -37,6 +40,12 @@ import mil.nga.msi.ui.navigation.NavigationDrawer
 fun MainScreen(
    viewModel: MainViewModel = hiltViewModel()
 ) {
+   val context: Context = LocalContext.current
+   val scope = rememberCoroutineScope()
+   val embark by viewModel.embark.observeAsState()
+   val tabs by viewModel.tabs.observeAsState(emptyList())
+   var bottomBarVisibility by remember { (mutableStateOf(false)) }
+
    val bottomSheetState = rememberModalBottomSheetState(
       initialValue = ModalBottomSheetValue.Hidden,
       skipHalfExpanded = true
@@ -46,14 +55,11 @@ fun MainScreen(
       BottomSheetNavigator(sheetState = bottomSheetState)
    }
 
-   val context: Context = LocalContext.current
-   val scope = rememberCoroutineScope()
    val scaffoldState = rememberScaffoldState()
    val navController = rememberNavController(bottomSheetNavigator)
-   var bottomBarVisibility by remember { (mutableStateOf(false)) }
-
-   val embark by viewModel.embark.observeAsState()
-   val tabs by viewModel.tabs.observeAsState(emptyList())
+   navController.addOnDestinationChangedListener { _: NavController, destination: NavDestination, _: Bundle? ->
+      viewModel.track(destination)
+   }
 
    val openDrawer = {
       scope.launch { scaffoldState.drawerState.open() }

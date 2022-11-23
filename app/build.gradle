@@ -163,6 +163,8 @@ dependencies {
     implementation 'mil.nga.geopackage:geopackage-android:6.6.0'
     implementation 'mil.nga.geopackage.map:geopackage-android-map:6.6.0'
 
+    implementation 'com.github.matomo-org:matomo-sdk-android:4.1.4'
+
     implementation "com.google.accompanist:accompanist-navigation-material:$accompanist_version"
     implementation "com.google.accompanist:accompanist-pager:$accompanist_version"
     implementation "com.google.accompanist:accompanist-pager-indicators:$accompanist_version"

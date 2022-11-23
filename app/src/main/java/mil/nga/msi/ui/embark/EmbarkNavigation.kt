@@ -21,8 +21,6 @@ sealed class EmbarkRoute(
    object Map: EmbarkRoute("embark/map")
 }
 
-// TODO need something that handles how to navigate this graph
-
 fun NavGraphBuilder.embarkGraph(
    navController: NavController,
    bottomBarVisibility: (Boolean) -> Unit
