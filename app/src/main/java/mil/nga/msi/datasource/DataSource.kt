@@ -15,8 +15,7 @@ enum class DataSource(
    val route: Route,
    val mappable: Boolean,
    val color: Color,
-   val icon: Int,
-   val imageScale: Float = .75f
+   val icon: Int
 ) {
    ASAM(AsamRoute.Main, true, Color(0xFF000000), R.drawable.ic_asam_24dp),
    MODU(ModuRoute.Main,true, Color(0xFF0042A4), R.drawable.ic_modu_24dp),
