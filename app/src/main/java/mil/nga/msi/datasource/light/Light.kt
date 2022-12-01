@@ -126,7 +126,7 @@ data class Light(
    fun lightColors(): List<Color>  {
       val lightColors = mutableListOf<Color>()
 
-      characteristic?.let { characteristic->
+      characteristic?.let { characteristic ->
          if (characteristic.contains("W.")) {
             lightColors.add(LightColor.WHITE.color)
          }
