@@ -43,7 +43,7 @@ enum class ElectronicPublicationType(
 }
 
 @Entity(tableName = "epubs")
-class ElectronicPublication(
+data class ElectronicPublication(
     @PrimaryKey
     @ColumnInfo(name = "s3_key")
     val s3Key: String,
@@ -97,55 +97,6 @@ class ElectronicPublication(
     @ColumnInfo(name = "upload_time")
     val uploadTime: Instant? = null,
 ) {
-    constructor(
-        from: ElectronicPublication,
-        contentId: Int? = from.contentId,
-        downloadedBytes: Int = from.downloadedBytes,
-        fileExtension: String? = from.fileExtension,
-        filenameBase: String? = from.filenameBase,
-        fileSize: Int? = from.fileSize,
-        fullFilename: String? = from.fullFilename,
-        fullPubFlag: Boolean? = from.fullPubFlag,
-        internalPath: String? = from.internalPath,
-        isDownloaded: Boolean = from.isDownloaded,
-        isDownloading: Boolean = from.isDownloading,
-        odsEntryId: Int? = from.odsEntryId,
-        pubDownloadDisplayName: String? = from.pubDownloadDisplayName,
-        pubDownloadId: Int? = from.pubDownloadId,
-        pubDownloadOrder: Int? = from.pubDownloadOrder,
-        pubsecId: Int? = from.pubsecId,
-        pubsecLastModified: Instant? = from.pubsecLastModified,
-        pubTypeId: Int = from.pubTypeId,
-        sectionDisplayName: String? = from.sectionDisplayName,
-        sectionLastModified: Instant? = from.sectionLastModified,
-        sectionName: String? = from.sectionName,
-        sectionOrder: Int? = from.sectionOrder,
-        uploadTime: Instant? = from.uploadTime,
-    ) : this(
-        s3Key = from.s3Key,
-        contentId = contentId,
-        downloadedBytes = downloadedBytes,
-        fileExtension = fileExtension,
-        filenameBase = filenameBase,
-        fileSize = fileSize,
-        fullFilename = fullFilename,
-        fullPubFlag = fullPubFlag,
-        internalPath = internalPath,
-        isDownloaded = isDownloaded,
-        isDownloading = isDownloading,
-        odsEntryId = odsEntryId,
-        pubDownloadDisplayName = pubDownloadDisplayName,
-        pubDownloadId = pubDownloadId,
-        pubDownloadOrder = pubDownloadOrder,
-        pubsecId = pubsecId,
-        pubsecLastModified = pubsecLastModified,
-        pubTypeId = pubTypeId,
-        sectionDisplayName = sectionDisplayName,
-        sectionLastModified = sectionLastModified,
-        sectionName = sectionName,
-        sectionOrder = sectionOrder,
-        uploadTime = uploadTime,
-    )
 
     @Transient
     val pubType: ElectronicPublicationType = ElectronicPublicationType.fromTypeCode(pubTypeId)
