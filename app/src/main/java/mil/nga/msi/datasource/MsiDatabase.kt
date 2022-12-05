@@ -7,6 +7,8 @@ import mil.nga.msi.datasource.asam.Asam
 import mil.nga.msi.datasource.asam.AsamDao
 import mil.nga.msi.datasource.dgpsstation.DgpsStation
 import mil.nga.msi.datasource.dgpsstation.DgpsStationDao
+import mil.nga.msi.datasource.electronicpublication.ElectronicPublication
+import mil.nga.msi.datasource.electronicpublication.ElectronicPublicationDao
 import mil.nga.msi.datasource.light.Light
 import mil.nga.msi.datasource.light.LightDao
 import mil.nga.msi.datasource.modu.Modu
@@ -22,12 +24,13 @@ import mil.nga.msi.datasource.radiobeacon.RadioBeaconDao
    version = MsiDatabase.VERSION,
    entities = [
       Asam::class,
+      DgpsStation::class,
+      ElectronicPublication::class,
+      Light::class,
       Modu::class,
       NavigationalWarning::class,
-      Light::class,
       Port::class,
       RadioBeacon::class,
-      DgpsStation::class
    ]
 )
 @TypeConverters(
@@ -41,10 +44,11 @@ abstract class MsiDatabase : RoomDatabase() {
    }
 
    abstract fun asamDao(): AsamDao
+   abstract fun dgpsStationDao(): DgpsStationDao
+   abstract fun electronicPublicationDao(): ElectronicPublicationDao
+   abstract fun lightDao(): LightDao
    abstract fun moduDao(): ModuDao
    abstract fun navigationalWarning(): NavigationalWarningDao
-   abstract fun lightDao(): LightDao
    abstract fun portDao(): PortDao
    abstract fun radioBeaconDao(): RadioBeaconDao
-   abstract fun dgpsStationDao(): DgpsStationDao
 }

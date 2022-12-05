@@ -1,5 +1,6 @@
 package mil.nga.msi.network.electronicpublication
 
+import assertEPubsEqual
 import com.google.gson.stream.JsonReader
 import mil.nga.msi.ISO_OFFSET_DATE_TIME_MOD
 import mil.nga.msi.datasource.electronicpublication.ElectronicPublication
@@ -99,29 +100,3 @@ val ePub: ElectronicPublication = ElectronicPublication(
     uploadTime = Instant.from(ISO_OFFSET_DATE_TIME_MOD.parse("2019-09-20T14:02:18.929+0000"))
 )
 
-fun assertEPubsEqual(a: ElectronicPublication, b: ElectronicPublication) {
-    assertEquals(a, b)
-    assertEquals(a.contentId, b.contentId)
-    assertEquals(a.downloadedBytes, b.downloadedBytes)
-    assertEquals(a.fileExtension, b.fileExtension)
-    assertEquals(a.fileSize, b.fileSize)
-    assertEquals(a.filenameBase, b.filenameBase)
-    assertEquals(a.fullFilename, b.fullFilename)
-    assertEquals(a.fullPubFlag, b.fullPubFlag)
-    assertEquals(a.internalPath, b.internalPath)
-    assertEquals(a.isDownloaded, b.isDownloaded)
-    assertEquals(a.isDownloading, b.isDownloading)
-    assertEquals(a.odsEntryId, b.odsEntryId)
-    assertEquals(a.pubsecId, b.pubsecId)
-    assertEquals(a.pubsecLastModified, b.pubsecLastModified)
-    assertEquals(a.pubDownloadDisplayName, b.pubDownloadDisplayName)
-    assertEquals(a.pubDownloadId, b.pubDownloadId)
-    assertEquals(a.pubDownloadOrder, b.pubDownloadOrder)
-    assertEquals(a.pubTypeId, b.pubTypeId)
-    assertEquals(a.s3Key, b.s3Key)
-    assertEquals(a.sectionDisplayName, b.sectionDisplayName)
-    assertEquals(a.sectionLastModified, b.sectionLastModified)
-    assertEquals(a.sectionName, b.sectionName)
-    assertEquals(a.sectionOrder, b.sectionOrder)
-    assertEquals(a.uploadTime, b.uploadTime)
-}
