@@ -38,137 +38,65 @@ enum class ElectronicPublicationType(
         val typeCodeToType = buildMap {
             putAll(values().map { x -> x.typeCode to x })
         }
-        fun fromTypeCode(x: Int): ElectronicPublicationType = typeCodeToType[x] ?: Unknown
+        fun fromTypeCode(x: Int?): ElectronicPublicationType = typeCodeToType[x ?: Unknown.typeCode] ?: Unknown
     }
 }
 
 @Entity(tableName = "epubs")
-data class ElectronicPublication(
+class ElectronicPublication(
     @PrimaryKey
     @ColumnInfo(name = "s3_key")
-    val s3Key: String
-) {
+    val s3Key: String,
     @ColumnInfo(name = "content_id")
-    var contentId: Int? = null
-        private set
+    val contentId: Int? = null,
     @ColumnInfo(name = "downloaded_bytes")
-    var downloadedBytes: Int = 0
-        private set
+    val downloadedBytes: Int = 0,
     @ColumnInfo(name = "file_ext")
-    var fileExtension: String? = null
-        private set
+    val fileExtension: String? = null,
     @ColumnInfo(name = "file_name_base")
-    var filenameBase: String? = null
-        private set
+    val filenameBase: String? = null,
     @ColumnInfo(name = "file_size")
-    var fileSize: Int? = null
-        private set
+    val fileSize: Int? = null,
     @ColumnInfo(name = "full_filename")
-    var fullFilename: String? = null
-        private set
+    val fullFilename: String? = null,
     @ColumnInfo(name = "full_pub_flag")
-    var fullPubFlag: Boolean? = null
-        private set
+    val fullPubFlag: Boolean? = null,
     @ColumnInfo(name = "internal_path")
-    var internalPath: String? = null
-        private set
+    val internalPath: String? = null,
     @ColumnInfo(name = "is_downloaded")
-    var isDownloaded: Boolean = false
-        private set
+    val isDownloaded: Boolean = false,
     @ColumnInfo(name = "is_downloading")
-    var isDownloading: Boolean = false
-        private set
+    val isDownloading: Boolean = false,
     @ColumnInfo(name = "ods_entry_id")
-    var odsEntryId: Int? = null
-        private set
+    val odsEntryId: Int? = null,
     @ColumnInfo(name = "pub_download_display_name")
-    var pubDownloadDisplayName: String? = null
-        private set
+    val pubDownloadDisplayName: String? = null,
     @ColumnInfo(name = "pub_download_id")
-    var pubDownloadId: Int? = null
-        private set
+    val pubDownloadId: Int? = null,
     @ColumnInfo(name = "pub_download_order")
-    var pubDownloadOrder: Int? = null
-        private set
+    val pubDownloadOrder: Int? = null,
     @ColumnInfo(name = "pubsec_id")
-    var pubsecId: Int? = null
-        private set
+    val pubsecId: Int? = null,
     @ColumnInfo(name = "pubsec_last_modified")
-    var pubsecLastModified: Instant? = null
-        private set
+    val pubsecLastModified: Instant? = null,
     /**
      * This does not use a `TypeConverter` with the enum type so that if the server returns a type
      * code the enum does not have, the app will not overwrite the type code of the record to
      * `Unknown`.  Unaccounted type codes can be added to the enum in future releases.
      */
     @ColumnInfo(name = "pub_type_id")
-    var pubTypeId: Int = ElectronicPublicationType.Unknown.typeCode
-        private set
+    val pubTypeId: Int = ElectronicPublicationType.Unknown.typeCode,
     @ColumnInfo(name = "section_display_name")
-    var sectionDisplayName: String? = null
-        private set
+    val sectionDisplayName: String? = null,
     @ColumnInfo(name = "section_last_modified")
-    var sectionLastModified: Instant? = null
-        private set
+    val sectionLastModified: Instant? = null,
     @ColumnInfo(name = "section_name")
-    var sectionName: String? = null
-        private set
+    val sectionName: String? = null,
     @ColumnInfo(name = "section_order")
-    var sectionOrder: Int? = null
-        private set
+    val sectionOrder: Int? = null,
     @ColumnInfo(name = "upload_time")
-    var uploadTime: Instant? = null
-        private set
-
-    constructor(
-        s3Key: String,
-        contentId: Int? = null,
-        downloadedBytes: Int = 0,
-        fileExtension: String? = null,
-        filenameBase: String? = null,
-        fileSize: Int? = null,
-        fullFilename: String? = null,
-        fullPubFlag: Boolean? = null,
-        internalPath: String? = null,
-        isDownloaded: Boolean = false,
-        isDownloading: Boolean = false,
-        odsEntryId: Int? = null,
-        pubDownloadDisplayName: String? = null,
-        pubDownloadId: Int? = null,
-        pubDownloadOrder: Int? = null,
-        pubsecId: Int? = null,
-        pubsecLastModified: Instant? = null,
-        pubTypeId: Int = ElectronicPublicationType.Unknown.typeCode,
-        sectionDisplayName: String? = null,
-        sectionLastModified: Instant? = null,
-        sectionName: String? = null,
-        sectionOrder: Int? = null,
-        uploadTime: Instant? = null
-    ) : this(s3Key) {
-        this.contentId = contentId
-        this.downloadedBytes = downloadedBytes
-        this.fileExtension = fileExtension
-        this.filenameBase = filenameBase
-        this.fileSize = fileSize
-        this.fullFilename = fullFilename
-        this.fullPubFlag = fullPubFlag
-        this.internalPath = internalPath
-        this.isDownloaded = isDownloaded
-        this.isDownloading = isDownloading
-        this.odsEntryId = odsEntryId
-        this.pubDownloadDisplayName = pubDownloadDisplayName
-        this.pubDownloadId = pubDownloadId
-        this.pubDownloadOrder = pubDownloadOrder
-        this.pubsecId = pubsecId
-        this.pubsecLastModified = pubsecLastModified
-        this.pubTypeId = pubTypeId
-        this.sectionDisplayName = sectionDisplayName
-        this.sectionLastModified = sectionLastModified
-        this.sectionName = sectionName
-        this.sectionOrder = sectionOrder
-        this.uploadTime = uploadTime
-    }
-
+    val uploadTime: Instant? = null,
+) {
     constructor(
         from: ElectronicPublication,
         contentId: Int? = from.contentId,
@@ -216,20 +144,34 @@ data class ElectronicPublication(
         sectionLastModified = sectionLastModified,
         sectionName = sectionName,
         sectionOrder = sectionOrder,
-        uploadTime = uploadTime
+        uploadTime = uploadTime,
     )
 
     @Transient
     val pubType: ElectronicPublicationType = ElectronicPublicationType.fromTypeCode(pubTypeId)
+
+    override fun equals(other: Any?): Boolean {
+        return super.equals(other) ||
+                (other is ElectronicPublication && other.s3Key == s3Key)
+    }
+
+    override fun hashCode(): Int {
+        return s3Key.hashCode()
+    }
+
+    override fun toString(): String {
+        return "${this::class.simpleName}:$s3Key"
+    }
 }
 
 data class ElectronicPublicationListItem(
     @ColumnInfo(name = "s3_key")
     val s3Key: String,
     @ColumnInfo(name = "pub_type_id")
-    val pubTypeId: Int,
+    val pubTypeId: Int = ElectronicPublicationType.Unknown.typeCode,
     @ColumnInfo(name = "full_filename")
     val fullFilename: String?,
+) {
     @Transient
-    val pubType: ElectronicPublicationType = ElectronicPublicationType.fromTypeCode(pubTypeId),
-)
+    val pubType: ElectronicPublicationType = ElectronicPublicationType.fromTypeCode(pubTypeId)
+}
