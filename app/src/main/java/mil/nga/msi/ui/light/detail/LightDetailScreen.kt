@@ -373,7 +373,7 @@ private fun LightDetail(
                }
             }
 
-            val lightSectors = light.lightSectors()
+            val lightSectors = light.lightSectors
             if (lightSectors.isNotEmpty()) {
                LightImage(
                   lightSectors,

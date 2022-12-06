@@ -27,10 +27,8 @@ fun sectorImage(
 }
 
 fun sectorRangeImage(
-   context: Context,
    light: Light,
    sectors: List<LightSector>,
-   zoomLevel: Int,
    tileBounds: Bounds,
    tileSize: Double
 ): Bitmap {
