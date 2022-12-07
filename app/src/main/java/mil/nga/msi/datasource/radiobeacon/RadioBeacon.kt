@@ -170,6 +170,14 @@ data class RadioBeacon(
                previousEnd = end
             }
          }
+      } ?: run {
+         sectors.add(
+            LightSector(
+               startDegrees = 0.0,
+               endDegrees = 0.0,
+               color = DataSource.RADIO_BEACON.color
+            )
+         )
       }
 
       return sectors
