@@ -97,7 +97,7 @@ data class DgpsStation(
    )
 
    override fun toString(): String {
-      return "LIGHT\n\n" +
+      return "DGPS\n\n" +
          "Aid Type: ${aidType.orEmpty()}\n" +
          "Delete Flag: ${deleteFlag.orEmpty()}\n" +
          "Feature Number: ${featureNumber}\n" +
