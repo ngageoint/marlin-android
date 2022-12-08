@@ -40,8 +40,8 @@ fun NavGraphBuilder.dgpsStationGraph(
    share: (Pair<String, String>) -> Unit,
    showSnackbar: (String) -> Unit
 ) {
-   val shareLight: (String) -> Unit = {
-      share(Pair("Share Radio Beacon Information", it))
+   val shareDgps: (String) -> Unit = {
+      share(Pair("Share DGPS Information", it))
    }
 
    val zoomTo: (Point) -> Unit = { point ->
@@ -71,7 +71,7 @@ fun NavGraphBuilder.dgpsStationGraph(
             onAction = { action ->
                when(action) {
                   is DgpsStationAction.Zoom -> zoomTo(action.point)
-                  is DgpsStationAction.Share -> shareLight(action.text)
+                  is DgpsStationAction.Share -> shareDgps(action.text)
                   is DgpsStationAction.Location -> showSnackbar("${action.text} copied to clipboard")
                }
             }
@@ -91,7 +91,7 @@ fun NavGraphBuilder.dgpsStationGraph(
                onAction = { action ->
                   when(action) {
                      is DgpsStationAction.Zoom -> zoomTo(action.point)
-                     is DgpsStationAction.Share -> shareLight(action.text)
+                     is DgpsStationAction.Share -> shareDgps(action.text)
                      is DgpsStationAction.Location -> showSnackbar("${action.text} copied to clipboard")
                   }
                }
