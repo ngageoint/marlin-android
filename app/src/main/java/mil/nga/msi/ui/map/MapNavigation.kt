@@ -1,11 +1,16 @@
 package mil.nga.msi.ui.map
 
 import android.net.Uri
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import com.google.accompanist.navigation.material.bottomSheet
@@ -63,9 +68,27 @@ fun NavGraphBuilder.mapGraph(
          MapPosition(location)
       } else null
 
+      var mapAnnotation by remember { mutableStateOf<MapAnnotation?>(null) }
+
+      // TODO how to give map back the selected annotation on each page?
+      val navStackBackEntry by navController.currentBackStackEntryAsState()
+      val route = navStackBackEntry?.destination?.route
+      if (route?.startsWith(AsamRoute.Sheet.name) != true &&
+         route?.startsWith(ModuRoute.Sheet.name) != true &&
+         route?.startsWith(LightRoute.Sheet.name) != true &&
+         route?.startsWith(PortRoute.Sheet.name) != true &&
+         route?.startsWith(RadioBeaconRoute.Sheet.name) != true &&
+         route?.startsWith(DgpsStationRoute.Sheet.name) != true
+      ) {
+         mapAnnotation = null
+      }
+
       MapScreen(
+         annotation = mapAnnotation,
          mapDestination = destination,
          onAnnotationClick = { annotation ->
+            mapAnnotation = annotation
+
             when (annotation.key.type) {
                MapAnnotation.Type.ASAM ->  {
                   navController.navigate(AsamRoute.Sheet.name + "?reference=${annotation.key.id}")

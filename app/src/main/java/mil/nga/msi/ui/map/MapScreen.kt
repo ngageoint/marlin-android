@@ -1,6 +1,8 @@
 package mil.nga.msi.ui.map
 
 import android.Manifest
+import android.animation.ValueAnimator
+import android.graphics.Bitmap
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.fadeOut
@@ -34,6 +36,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.core.animation.doOnEnd
 import androidx.core.graphics.drawable.toBitmap
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -53,6 +56,7 @@ import mil.nga.msi.type.MapLocation
 import mil.nga.msi.ui.location.LocationPermission
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.cluster.MapAnnotation
+import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.seconds
 
 data class MapPosition(
@@ -64,6 +68,7 @@ data class MapPosition(
 @Composable
 fun MapScreen(
    mapDestination : MapPosition? = null,
+   annotation: MapAnnotation?,
    onAnnotationClick: (MapAnnotation) -> Unit,
    onAnnotationsClick: (Collection<MapAnnotation>) -> Unit,
    onMapSettings: () -> Unit,
@@ -155,6 +160,7 @@ fun MapScreen(
             locationPermissionState.status.isGranted,
             tileProviders,
             searchResults,
+            annotation,
             onMapMove = { position, reason ->
                if (reason == com.google.android.gms.maps.GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE) {
                   located = false
@@ -171,7 +177,7 @@ fun MapScreen(
                }
             },
             onMapClick = { latLng, zoom, region ->
-               val screenPercentage = 0.03
+               val screenPercentage = 0.04
                val tolerance = (region.farRight.longitude - region.farLeft.longitude) * screenPercentage
                scope.launch {
                   val mapAnnotations = mapViewModel.getMapAnnotations(
@@ -190,7 +196,7 @@ fun MapScreen(
                         location = MapLocation.newBuilder()
                            .setLatitude(bounds.center.latitude)
                            .setLongitude(bounds.center.longitude)
-                           .setZoom(if (mapAnnotations.size == 1) 17.0 else zoom.toDouble())
+                           .setZoom(zoom.toDouble())
                            .build()
                      )
 
@@ -323,6 +329,7 @@ private fun Map(
    locationEnabled: Boolean,
    tileProviders: Map<TileProviderType, TileProvider>,
    searchResults: List<GeocoderState>,
+   annotation: MapAnnotation?,
    onMapMove: (CameraPosition, Int) -> Unit,
    onMapClick: (LatLng, Float, VisibleRegion) -> Unit
 ) {
@@ -337,6 +344,17 @@ private fun Map(
       origin?.let { origin ->
          cameraPositionState.position = CameraPosition.fromLatLngZoom(LatLng(origin.latitude, origin.longitude), origin.zoom.toFloat())
       }
+   }
+
+   var selectedMarker by remember { mutableStateOf<Marker?>(null) }
+   var selectedAnimator by remember { mutableStateOf<ValueAnimator?>(null) }
+   if (annotation == null) {
+      selectedAnimator?.doOnEnd {
+         selectedMarker?.remove()
+         selectedMarker = null
+      }
+      selectedAnimator?.reverse()
+      selectedAnimator = null
    }
 
    val mgrsTileProvider = tileProviders[TileProviderType.MGRS]
@@ -397,7 +415,7 @@ private fun Map(
          )
       }
 
-      MapEffect(destination) { map ->
+      MapEffect(destination, annotation) { map ->
          map.setOnCameraMoveStartedListener { reason ->
             cameraMoveReason = reason
          }
@@ -408,6 +426,20 @@ private fun Map(
 
          map.setOnMapClickListener { latLng ->
             onMapClick(latLng, map.cameraPosition.zoom, map.projection.visibleRegion)
+         }
+
+         if (annotation != null) {
+            selectedAnimator = ValueAnimator.ofFloat(.5f, 2f)
+
+            val icon = AppCompatResources.getDrawable(context, annotation.key.type.icon)!!.toBitmap()
+            val options = MarkerOptions()
+               .position(LatLng(annotation.latitude, annotation.longitude))
+               .anchor(.5f, .5f)
+               .icon(com.google.android.gms.maps.model.BitmapDescriptorFactory.fromBitmap(icon))
+            selectedMarker = map.addMarker(options)?.apply {
+               tag = annotation
+            }
+            animateAnnotation(selectedMarker, icon, selectedAnimator)
          }
       }
    }
@@ -564,7 +596,7 @@ private fun Search(
                   ) {
                      Column(Modifier.weight(1f)) {
                         Text(
-                           text = result.name ?: "",
+                           text = result.name,
                            style = MaterialTheme.typography.subtitle1,
                            fontWeight = FontWeight.Medium
                         )
@@ -575,7 +607,7 @@ private fun Search(
                            )
                         }
 
-                        result.location?.let { location ->
+                        result.location.let { location ->
                            Text(
                               text = "${"%.5f".format(location.latitude)}, ${"%.5f".format(location.longitude)}",
                               color = MaterialTheme.colors.primary
@@ -583,7 +615,7 @@ private fun Search(
                         }
                      }
 
-                     result.location?.let {
+                     result.location.let {
                         IconButton(
                            onClick = { onLocationTap(it) }
                         ) {
@@ -637,4 +669,24 @@ private fun DataSources(
          }
       }
    }
+}
+
+private fun animateAnnotation(
+   marker: Marker?,
+   bitmap: Bitmap,
+   animator: ValueAnimator?
+) {
+   animator?.duration = 500
+   animator?.addUpdateListener { animation ->
+      val scale = animation.animatedValue as Float
+      val sizeX = (bitmap.width * scale).roundToInt()
+      val sizeY = (bitmap.height * scale).roundToInt()
+      val scaled = Bitmap.createScaledBitmap(bitmap, sizeX, sizeY, false)
+
+      if (marker?.tag != null) {
+         marker.setIcon(com.google.android.gms.maps.model.BitmapDescriptorFactory.fromBitmap(scaled))
+      }
+   }
+
+   animator?.start()
 }

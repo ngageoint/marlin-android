@@ -1,0 +1,15 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android" >
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="#FFC500"/>
+            <size
+                android:width="24dp"
+                android:height="24dp"/>
+        </shape>
+    </item>
+
+    <item android:drawable="@drawable/ic_baseline_lightbulb_24"
+        android:gravity="center"
+        android:width="18dp"
+        android:height="18dp"/>
+</layer-list>
