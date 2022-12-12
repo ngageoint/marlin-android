@@ -12,10 +12,10 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LocationOff
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.NoteAdd
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -34,7 +34,7 @@ import mil.nga.msi.ui.drag.DraggableItem
 import mil.nga.msi.ui.drag.dragContainer
 import mil.nga.msi.ui.drag.rememberDragDropState
 import mil.nga.msi.ui.report.ReportRoute
-import mil.nga.msi.ui.settings.SettingsRoute
+import mil.nga.msi.ui.settings.AboutRoute
 import mil.nga.msi.ui.theme.screenBackground
 
 private const val MAX_TABS = 4
@@ -249,15 +249,15 @@ fun NavigationDrawer(
                      .fillMaxSize()
                      .background(MaterialTheme.colors.background)
                      .clickable {
-                        onDestinationClicked(SettingsRoute.Main.name)
+                        onDestinationClicked(AboutRoute.Main.name)
                      }
                ) {
 
                   CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                      Icon(
-                        Icons.Default.Settings,
+                        Icons.Default.Info,
                         modifier = Modifier.padding(start = 8.dp),
-                        contentDescription = "Settings"
+                        contentDescription = "About"
                      )
                   }
 
@@ -276,7 +276,7 @@ fun NavigationDrawer(
                      ) {
                         CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
                            Text(
-                              text = SettingsRoute.Main.title,
+                              text = AboutRoute.Main.title,
                               style = MaterialTheme.typography.body2,
                               fontWeight = FontWeight.Medium
                            )

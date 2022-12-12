@@ -25,7 +25,7 @@ fun DisclaimerScreen(
    val scrollState = rememberScrollState()
    Column(modifier = Modifier.fillMaxSize()) {
       TopBar(
-         title = SettingsRoute.Disclaimer.title,
+         title = AboutRoute.Disclaimer.title,
          navigationIcon = Icons.Default.ArrowBack,
          onNavigationClicked = { close() }
       )
