@@ -24,7 +24,7 @@ sealed class DgpsStationRoute(
    override val name: String,
    override val title: String,
    override val shortTitle: String,
-   override val color: Color = Color(0xFFFFB300)
+   override val color: Color = Color(0xFF00E676)
 ): Route {
    object Main: DgpsStationRoute("dgpsStations", "Differential GPS Stations", "DGPS")
    object Detail: DgpsStationRoute("dgpsStations/detail", "Differential GPS Station Details", "DGPS Details")
