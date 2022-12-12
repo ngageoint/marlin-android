@@ -196,7 +196,8 @@ fun MainScreen(
                },
                share = { share(it) },
                showSnackbar = { showSnackbar(it) },
-               openNavigationDrawer = { openDrawer() }
+               openNavigationDrawer = { openDrawer() },
+               annotationProvider = viewModel.annotationProvider
             )
          }
       }

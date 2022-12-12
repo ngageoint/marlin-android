@@ -1,11 +1,7 @@
 package mil.nga.msi.ui.map
 
 import android.app.Application
-import android.graphics.Bitmap
-import androidx.appcompat.content.res.AppCompatResources
-import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.*
-import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.TileProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -15,7 +11,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import mil.nga.msi.R
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.filter.MapBoundsFilter
 import mil.nga.msi.filter.ComparatorType
@@ -55,11 +50,6 @@ enum class TileProviderType {
    DGPS_STATION
 }
 
-data class DataSourceMarker(
-   val position: LatLng,
-   val image: Bitmap
-)
-
 @HiltViewModel
 class MapViewModel @Inject constructor(
    private val application: Application,
@@ -79,6 +69,7 @@ class MapViewModel @Inject constructor(
    dataSourceRepository: DataSourceRepository,
    val locationPolicy: LocationPolicy,
    val userPreferencesRepository: UserPreferencesRepository,
+   val annotationProvider: AnnotationProvider,
    private val geocoderRemoteDataSource: GeocoderRemoteDataSource,
    @Named("osmTileProvider") private val osmTileProvider: TileProvider,
    @Named("mgrsTileProvider") private val mgrsTileProvider: TileProvider,

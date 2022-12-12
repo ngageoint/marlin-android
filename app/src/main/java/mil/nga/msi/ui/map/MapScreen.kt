@@ -3,6 +3,7 @@ package mil.nga.msi.ui.map
 import android.Manifest
 import android.animation.ValueAnimator
 import android.graphics.Bitmap
+import android.util.Log
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.fadeOut
@@ -68,7 +69,6 @@ data class MapPosition(
 @Composable
 fun MapScreen(
    mapDestination : MapPosition? = null,
-   annotation: MapAnnotation?,
    onAnnotationClick: (MapAnnotation) -> Unit,
    onAnnotationsClick: (Collection<MapAnnotation>) -> Unit,
    onMapSettings: () -> Unit,
@@ -89,6 +89,7 @@ fun MapScreen(
    var located by remember { mutableStateOf(false) }
    val tileProviders by mapViewModel.tileProviders.observeAsState(emptyMap())
    val mapped by mapViewModel.mapped.observeAsState(emptyMap())
+   val annotation by mapViewModel.annotationProvider.annotation.observeAsState()
 
    LaunchedEffect(fetching) {
       if(fetching.none { it.value } && fetchingVisibility) {
@@ -201,8 +202,9 @@ fun MapScreen(
                      )
 
                      if (mapAnnotations.size == 1) {
+                        mapViewModel.annotationProvider.setMapAnnotation(mapAnnotations.first())
                         onAnnotationClick(mapAnnotations.first())
-                     } else {
+                     } else if (mapAnnotations.isNotEmpty()) {
                         onAnnotationsClick(mapAnnotations)
                      }
                   }
@@ -348,14 +350,6 @@ private fun Map(
 
    var selectedMarker by remember { mutableStateOf<Marker?>(null) }
    var selectedAnimator by remember { mutableStateOf<ValueAnimator?>(null) }
-   if (annotation == null) {
-      selectedAnimator?.doOnEnd {
-         selectedMarker?.remove()
-         selectedMarker = null
-      }
-      selectedAnimator?.reverse()
-      selectedAnimator = null
-   }
 
    val mgrsTileProvider = tileProviders[TileProviderType.MGRS]
    val garsTileProvider = tileProviders[TileProviderType.GARS]
@@ -429,17 +423,53 @@ private fun Map(
          }
 
          if (annotation != null) {
-            selectedAnimator = ValueAnimator.ofFloat(.5f, 2f)
+            if (selectedAnimator != null) {
+               selectedAnimator?.doOnEnd {
+                  selectedMarker?.remove()
+                  selectedAnimator = ValueAnimator.ofFloat(.5f, 2f)
 
-            val icon = AppCompatResources.getDrawable(context, annotation.key.type.icon)!!.toBitmap()
-            val options = MarkerOptions()
-               .position(LatLng(annotation.latitude, annotation.longitude))
-               .anchor(.5f, .5f)
-               .icon(com.google.android.gms.maps.model.BitmapDescriptorFactory.fromBitmap(icon))
-            selectedMarker = map.addMarker(options)?.apply {
-               tag = annotation
+                  val icon = AppCompatResources.getDrawable(context, annotation.key.type.icon)!!.toBitmap()
+                  val position = LatLng(annotation.latitude, annotation.longitude)
+                  val options = MarkerOptions()
+                     .position(position)
+                     .anchor(.5f, .5f)
+                     .icon(com.google.android.gms.maps.model.BitmapDescriptorFactory.fromBitmap(icon))
+                  selectedMarker = map.addMarker(options)?.apply {
+                     tag = annotation
+                  }
+
+                  scope.launch {
+                     cameraPositionState.animate(CameraUpdateFactory.newLatLng(position))
+                  }
+
+                  animateAnnotation(selectedMarker, icon, selectedAnimator)
+               }
+               selectedAnimator?.reverse()
+            } else {
+               selectedAnimator = ValueAnimator.ofFloat(.5f, 2f)
+
+               val icon = AppCompatResources.getDrawable(context, annotation.key.type.icon)!!.toBitmap()
+               val position = LatLng(annotation.latitude, annotation.longitude)
+               val options = MarkerOptions()
+                  .position(position)
+                  .anchor(.5f, .5f)
+                  .icon(com.google.android.gms.maps.model.BitmapDescriptorFactory.fromBitmap(icon))
+               selectedMarker = map.addMarker(options)?.apply {
+                  tag = annotation
+               }
+               scope.launch {
+                  cameraPositionState.animate(CameraUpdateFactory.newLatLng(position))
+               }
+
+               animateAnnotation(selectedMarker, icon, selectedAnimator)
             }
-            animateAnnotation(selectedMarker, icon, selectedAnimator)
+         } else {
+            selectedAnimator?.doOnEnd {
+               selectedMarker?.remove()
+               selectedMarker = null
+            }
+            selectedAnimator?.reverse()
+            selectedAnimator = null
          }
       }
    }

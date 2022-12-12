@@ -6,6 +6,7 @@ import mil.nga.msi.ui.asam.asamGraph
 import mil.nga.msi.ui.dgpsstation.dgpsStationGraph
 import mil.nga.msi.ui.embark.embarkGraph
 import mil.nga.msi.ui.light.lightGraph
+import mil.nga.msi.ui.map.AnnotationProvider
 import mil.nga.msi.ui.map.mapGraph
 import mil.nga.msi.ui.modu.moduGraph
 import mil.nga.msi.ui.navigationalwarning.navigationalWarningGraph
@@ -19,7 +20,8 @@ fun NavGraphBuilder.homeGraph(
    bottomBarVisibility: (Boolean) -> Unit,
    share: (Pair<String, String>) -> Unit,
    showSnackbar: (String) -> Unit,
-   openNavigationDrawer: () -> Unit
+   openNavigationDrawer: () -> Unit,
+   annotationProvider: AnnotationProvider
 ) {
    embarkGraph(
       navController = navController,
@@ -29,7 +31,8 @@ fun NavGraphBuilder.homeGraph(
    mapGraph(
       navController = navController,
       bottomBarVisibility = { bottomBarVisibility(it) },
-      openNavigationDrawer = { openNavigationDrawer() }
+      openNavigationDrawer = { openNavigationDrawer() },
+      annotationProvider = annotationProvider
    )
    asamGraph(
       navController = navController,
