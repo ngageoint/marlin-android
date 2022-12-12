@@ -71,7 +71,7 @@ class NetworkModule {
    ): Retrofit {
       return Retrofit.Builder()
          .addConverterFactory(GsonConverterFactory.create(gson))
-         .baseUrl("https://msi.gs.mil/")
+         .baseUrl("https://msi.nga.mil/api/")
          .client(okHttpClient)
          .build()
    }
