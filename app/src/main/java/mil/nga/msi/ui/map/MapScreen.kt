@@ -3,7 +3,6 @@ package mil.nga.msi.ui.map
 import android.Manifest
 import android.animation.ValueAnimator
 import android.graphics.Bitmap
-import android.util.Log
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.fadeOut
@@ -354,6 +353,7 @@ private fun Map(
    val mgrsTileProvider = tileProviders[TileProviderType.MGRS]
    val garsTileProvider = tileProviders[TileProviderType.GARS]
    val osmTileProvider = tileProviders[TileProviderType.OSM]
+
    val asamTileProvider = tileProviders[TileProviderType.ASAM]
    val moduTileProvider = tileProviders[TileProviderType.MODU]
    val lightTileProvider = tileProviders[TileProviderType.LIGHT]
@@ -394,6 +394,7 @@ private fun Map(
          mgrsTileProvider?.let { TileOverlay(tileProvider = it)}
          garsTileProvider?.let { TileOverlay(tileProvider = it)}
          osmTileProvider?.let { TileOverlay(tileProvider = it)}
+
          asamTileProvider?.let { TileOverlay(tileProvider = it)}
          moduTileProvider?.let { TileOverlay(tileProvider = it)}
          lightTileProvider?.let { TileOverlay(tileProvider = it)}
