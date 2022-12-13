@@ -32,6 +32,7 @@ fun NavGraphBuilder.homeGraph(
       navController = navController,
       bottomBarVisibility = { bottomBarVisibility(it) },
       openNavigationDrawer = { openNavigationDrawer() },
+      showSnackbar = { showSnackbar(it) },
       annotationProvider = annotationProvider
    )
    asamGraph(

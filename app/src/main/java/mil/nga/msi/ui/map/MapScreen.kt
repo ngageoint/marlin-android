@@ -50,10 +50,12 @@ import com.google.maps.android.compose.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import mil.nga.msi.R
+import mil.nga.msi.coordinate.DMS
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.repository.geocoder.GeocoderState
 import mil.nga.msi.type.MapLocation
 import mil.nga.msi.ui.location.LocationPermission
+import mil.nga.msi.ui.location.LocationText
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.cluster.MapAnnotation
 import kotlin.math.roundToInt
@@ -73,6 +75,7 @@ fun MapScreen(
    onMapSettings: () -> Unit,
    openFilter: () -> Unit,
    openDrawer: () -> Unit,
+   locationCopy: (String) -> Unit,
    mapViewModel: MapViewModel = hiltViewModel()
 ) {
    val scope = rememberCoroutineScope()
@@ -301,7 +304,8 @@ fun MapScreen(
                         .setZoom(12.0)
                         .build()
                   )
-               }
+               },
+               onLocationCopy = locationCopy
             )
          }
 
@@ -524,7 +528,8 @@ private fun Search(
    results: List<GeocoderState> = emptyList(),
    onExpand: () -> Unit,
    onTextChanged: (String) -> Unit,
-   onLocationTap: (LatLng) -> Unit
+   onLocationTap: (LatLng) -> Unit,
+   onLocationCopy: (String) -> Unit
 ) {
    val focusRequester = remember { FocusRequester() }
    val configuration = LocalConfiguration.current
@@ -638,12 +643,10 @@ private fun Search(
                            )
                         }
 
-                        result.location.let { location ->
-                           Text(
-                              text = "${"%.5f".format(location.latitude)}, ${"%.5f".format(location.longitude)}",
-                              color = MaterialTheme.colors.primary
-                           )
-                        }
+                        LocationText(
+                           dms = DMS.from(result.location),
+                           onCopiedToClipboard = { onLocationCopy(it) }
+                        )
                      }
 
                      result.location.let {

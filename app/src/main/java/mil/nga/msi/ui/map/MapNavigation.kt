@@ -49,6 +49,7 @@ fun NavGraphBuilder.mapGraph(
    navController: NavController,
    bottomBarVisibility: (Boolean) -> Unit,
    openNavigationDrawer: () -> Unit,
+   showSnackbar: (String) -> Unit,
    annotationProvider: AnnotationProvider
 ) {
    composable(
@@ -112,13 +113,10 @@ fun NavGraphBuilder.mapGraph(
             val encoded = Uri.encode(Json.encodeToString(annotations))
             navController.navigate(MapRoute.PagerSheet.name + "?annotations=${encoded}")
          },
-         onMapSettings = {
-            navController.navigate(MapRoute.Settings.name)
-         },
+         onMapSettings = { navController.navigate(MapRoute.Settings.name) },
          openDrawer = { openNavigationDrawer() },
-         openFilter = {
-            navController.navigate(MapRoute.Filter.name)
-         }
+         openFilter = { navController.navigate(MapRoute.Filter.name) },
+         locationCopy = { showSnackbar(it) }
       )
    }
 
