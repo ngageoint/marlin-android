@@ -5,6 +5,8 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import assertEPubsEqual
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import mil.nga.msi.datasource.MsiDatabase
 import org.junit.After
@@ -15,6 +17,7 @@ import org.junit.runner.RunWith
 import java.io.IOException
 
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
 class ElectronicPublicationEntityTest {
 
@@ -57,5 +60,22 @@ class ElectronicPublicationEntityTest {
 
         assertEquals(read.size, 3)
         inserted.forEachIndexed { pos, epub -> assertEPubsEqual(read[pos], inserted[pos]) }
+    }
+
+    @Test
+    fun read_file_counts_by_type() = runTest {
+        dao.insert(listOf(
+            ElectronicPublication("epub.1", pubTypeId = ElectronicPublicationType.AmericanPracticalNavigator.typeCode),
+            ElectronicPublication("epub.2", pubTypeId = ElectronicPublicationType.AtlasOfPilotCharts.typeCode),
+            ElectronicPublication("epub.3", pubTypeId = ElectronicPublicationType.AtlasOfPilotCharts.typeCode),
+            ElectronicPublication("epub.4", pubTypeId = ElectronicPublicationType.ChartNo1.typeCode),
+        ))
+        val fileCountForType = dao.observeFileCountsByType().first()
+
+        assertEquals(fileCountForType, mapOf(
+            ElectronicPublicationType.AmericanPracticalNavigator to 1,
+            ElectronicPublicationType.AtlasOfPilotCharts to 2,
+            ElectronicPublicationType.ChartNo1 to 1
+        ))
     }
 }
