@@ -72,8 +72,6 @@ class RadioBeaconsViewModel @Inject constructor(
 
       return if (item1String == null && item2String != null) {
          RadioBeaconListItem.HeaderItem(item2String)
-      } else if (item2String == null && item1String != null) {
-         RadioBeaconListItem.HeaderItem(item1String)
       } else if (item1String != null && item2String != null && item1String != item2String) {
          RadioBeaconListItem.HeaderItem(item2String)
       } else null

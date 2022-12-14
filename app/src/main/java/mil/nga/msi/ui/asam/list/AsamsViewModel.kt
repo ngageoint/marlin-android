@@ -75,10 +75,8 @@ class AsamsViewModel @Inject constructor(
             val date2 = item2?.asam?.date?.toInstant()?.atZone(ZoneId.systemDefault())?.toLocalDate()
             val date2String = date2?.format(formatter)
 
-            if (date1String == null && date2String != null) {
+            return if (date1String == null && date2String != null) {
                AsamListItem.HeaderItem(date2String)
-            } else if (date2String == null && date1String != null) {
-               AsamListItem.HeaderItem(date1String)
             } else if (date1String != null && date2String != null && date1String != date2String) {
                AsamListItem.HeaderItem(date2String)
             } else null
@@ -87,10 +85,8 @@ class AsamsViewModel @Inject constructor(
             val item1String = parameterToName(sort.parameter.parameter, item1?.asam)
             val item2String = parameterToName(sort.parameter.parameter, item2?.asam)
 
-            if (item1String == null && item2String != null) {
+            return if (item1String == null && item2String != null) {
                AsamListItem.HeaderItem(item2String)
-            } else if (item2String == null && item1String != null) {
-               AsamListItem.HeaderItem(item1String)
             } else if (item1String != null && item2String != null && item1String != item2String) {
                AsamListItem.HeaderItem(item2String)
             } else null

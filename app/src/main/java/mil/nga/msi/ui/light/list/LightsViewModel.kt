@@ -84,8 +84,6 @@ class LightsViewModel @Inject constructor(
 
       return if (item1String == null && item2String != null) {
          LightListItem.HeaderItem(item2String)
-      } else if (item2String == null && item1String != null) {
-         LightListItem.HeaderItem(item1String)
       } else if (item1String != null && item2String != null && item1String != item2String) {
          LightListItem.HeaderItem(item2String)
       } else null

@@ -74,22 +74,19 @@ class ModusViewModel @Inject constructor(
             val date2 = item2?.modu?.date?.toInstant()?.atZone(ZoneId.systemDefault())?.toLocalDate()
             val date2String = date2?.format(formatter)
 
-            if (date1String == null && date2String != null) {
+            return if (date1String == null && date2String != null) {
                ModuListItem.HeaderItem(date2String)
-            } else if (date2String == null && date1String != null) {
-               ModuListItem.HeaderItem(date1String)
             } else if (date1String != null && date2String != null && date1String != date2String) {
                ModuListItem.HeaderItem(date2String)
             } else null
+
          }
          else -> {
             val item1String = parameterToName(sort.parameter.parameter, item1?.modu)
             val item2String = parameterToName(sort.parameter.parameter, item2?.modu)
 
-            if (item1String == null && item2String != null) {
+            return if (item1String == null && item2String != null) {
                ModuListItem.HeaderItem(item2String)
-            } else if (item2String == null && item1String != null) {
-               ModuListItem.HeaderItem(item1String)
             } else if (item1String != null && item2String != null && item1String != item2String) {
                ModuListItem.HeaderItem(item2String)
             } else null

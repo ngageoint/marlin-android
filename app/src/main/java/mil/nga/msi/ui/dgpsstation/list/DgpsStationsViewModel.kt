@@ -72,8 +72,6 @@ class DgpsStationsViewModel @Inject constructor(
 
       return if (item1String == null && item2String != null) {
          DgpsStationListItem.HeaderItem(item2String)
-      } else if (item2String == null && item1String != null) {
-         DgpsStationListItem.HeaderItem(item1String)
       } else if (item1String != null && item2String != null && item1String != item2String) {
          DgpsStationListItem.HeaderItem(item2String)
       } else null
