@@ -243,7 +243,7 @@ data class Light(
             }
 
             var sectorRange: Double? = null
-            range?.split("/n")?.forEach { split ->
+            range?.split(";","/n")?.forEach { split ->
                val rangePart = split.trim().filterNot { it.isWhitespace() }
                if (rangePart.startsWith(color)) {
                   val rangeRegex = Regex("[0-9]+$")
