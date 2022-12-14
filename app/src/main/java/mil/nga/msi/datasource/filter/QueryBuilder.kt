@@ -226,10 +226,10 @@ class QueryBuilder(
    private fun stringQuery(filter: Filter): String? {
       return when(filter.comparator) {
          ComparatorType.EQUALS -> {
-            "${filter.parameter.parameter} = '${filter.value}'"
+            "${filter.parameter.parameter} LIKE '${filter.value}'"
          }
          ComparatorType.NOT_EQUALS -> {
-            "${filter.parameter.parameter} != '${filter.value}'"
+            "${filter.parameter.parameter} NOT LIKE '${filter.value}'"
          }
          ComparatorType.CONTAINS -> {
             "${filter.parameter.parameter} LIKE '%${filter.value}%'"
