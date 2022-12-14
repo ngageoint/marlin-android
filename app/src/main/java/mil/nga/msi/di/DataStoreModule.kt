@@ -59,7 +59,7 @@ object DataStoreModule {
                .addAllTabs(
                   listOf(DataSource.ASAM, DataSource.MODU, DataSource.NAVIGATION_WARNING, DataSource.LIGHT).map { it.name }
                )
-               .addAllNonTabs(listOf(DataSource.PORT, DataSource.RADIO_BEACON, DataSource.DGPS_STATION).map { it.name })
+               .addAllNonTabs(listOf(DataSource.PORT, DataSource.RADIO_BEACON, DataSource.DGPS_STATION, DataSource.ELECTRONIC_PUBLICATION).map { it.name })
                .build()
 
          override suspend fun readFrom(input: InputStream): UserPreferences {
