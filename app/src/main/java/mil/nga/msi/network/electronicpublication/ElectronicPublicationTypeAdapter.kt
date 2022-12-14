@@ -20,7 +20,9 @@ class ElectronicPublicationTypeAdapter: TypeAdapter<ElectronicPublication>() {
 
     override fun read(jsonIn: JsonReader): ElectronicPublication? {
         jsonIn.beginObject()
-        return readEPubKeys(jsonIn)
+        val ePub = readEPubKeys(jsonIn)
+        jsonIn.endObject()
+        return ePub
     }
 }
 

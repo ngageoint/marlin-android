@@ -1,7 +1,10 @@
 package mil.nga.msi.network.electronicpublication
 
 import assertEPubsEqual
+import com.google.gson.GsonBuilder
+import com.google.gson.reflect.TypeToken
 import com.google.gson.stream.JsonReader
+import com.google.gson.stream.JsonToken
 import mil.nga.msi.ISO_OFFSET_DATE_TIME_MOD
 import mil.nga.msi.datasource.electronicpublication.ElectronicPublication
 import org.junit.Assert.*
@@ -27,7 +30,9 @@ class ElectronicPublicationTypeAdapterTest {
         val read = subject.read(jsonIn)
 
         assertEPubsEqual(read!!, ePub)
-        assertFalse(jsonIn.hasNext())
+        assertEquals(jsonIn.peek(), JsonToken.END_DOCUMENT)
+
+        jsonIn.close()
     }
 
     @Test
@@ -46,6 +51,18 @@ class ElectronicPublicationTypeAdapterTest {
         val read = subject.read(jsonIn)
 
         assertNull(read)
+    }
+
+    @Test
+    fun deserializes_an_array() {
+
+        val jsonIn = JsonReader(StringReader("""[ ${ePubJson}, ${ePubJson} ]""" ))
+        val gson = GsonBuilder().registerTypeAdapter(object: TypeToken<ElectronicPublication>() {}.type, ElectronicPublicationTypeAdapter()).create()
+        val read = gson.fromJson<List<ElectronicPublication>>(jsonIn, object: TypeToken<ArrayList<ElectronicPublication>>() {}.type)
+
+        assertEquals(read.size, 2)
+        assertEPubsEqual(ePub, read[0])
+        assertEPubsEqual(ePub, read[1])
     }
 }
 
@@ -71,8 +88,7 @@ const val ePubJson = """
     "uploadTime": "2019-09-20T14:02:18.929+0000",
     "fullFilename": "108dec.pdf",
     "pubsecLastModified": "2019-09-20T14:02:18.929685Z"
-}
-"""
+}"""
 
 val ePub: ElectronicPublication = ElectronicPublication(
     s3Key = "16693989/SFH00000/108dec.pdf",
