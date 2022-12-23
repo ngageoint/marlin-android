@@ -33,10 +33,13 @@ class DataStoreModule {
       val userPreferencesSerializer = object : Serializer<UserPreferences> {
          override val defaultValue: UserPreferences =
             UserPreferences.newBuilder()
-               .setMapLayer(BaseMapType.NORMAL.value)
-               .setMgrs(false)
-               .setGars(false)
-               .setMapLocation(MapLocation.getDefaultInstance())
+               .setMap(
+                  MapPreferences.newBuilder()
+                     .setMapLayer(BaseMapType.NORMAL.value)
+                     .setMapLocation(MapLocation.getDefaultInstance())
+                     .setMgrs(false)
+                     .setGars(false)
+               )
                .putAllLastReadNavigationWarnings(
                   mapOf<String, NavigationalWarningKey>(
                      NavigationArea.HYDROARC.code to NavigationalWarningKey.newBuilder().build(),

@@ -78,6 +78,7 @@ class MapViewModel @Inject constructor(
 
    val baseMap = userPreferencesRepository.baseMapType.asLiveData()
    val mapLocation = userPreferencesRepository.mapLocation.asLiveData()
+   val showLocation = userPreferencesRepository.showLocation.asLiveData()
    val fetching = dataSourceRepository.fetching
    val mapped = userPreferencesRepository.mapped.asLiveData()
 

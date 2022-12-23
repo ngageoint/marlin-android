@@ -18,75 +18,104 @@ class UserPreferencesRepository @Inject constructor(
    private val preferencesDataStore: DataStore<UserPreferences>,
 ) {
    val baseMapType: Flow<BaseMapType> = preferencesDataStore.data.map {
-      BaseMapType.fromValue(it.mapLayer)
+      BaseMapType.fromValue(it.map.mapLayer)
    }.distinctUntilChanged()
 
    suspend fun setBaseMapType(baseMapType: BaseMapType) {
       preferencesDataStore.updateData {
-         it.toBuilder()
+         val builder = it.toBuilder()
+         builder.map = builder.map.toBuilder()
             .setMapLayer(baseMapType.value)
             .build()
+
+         builder.build()
       }
    }
 
    val gars: Flow<Boolean> = preferencesDataStore.data.map {
-      it.gars
+      it.map.gars
    }.distinctUntilChanged()
 
    suspend fun setGARS(enabled: Boolean) {
       preferencesDataStore.updateData {
-         it.toBuilder()
+         val builder = it.toBuilder()
+         builder.map = builder.map.toBuilder()
             .setGars(enabled)
             .build()
+
+         builder.build()
       }
    }
 
    val mgrs: Flow<Boolean> = preferencesDataStore.data.map {
-      it.mgrs
+      it.map.mgrs
    }.distinctUntilChanged()
 
    suspend fun setMGRS(enabled: Boolean) {
       preferencesDataStore.updateData {
-         it.toBuilder()
+         val builder = it.toBuilder()
+         builder.map = builder.map.toBuilder()
             .setMgrs(enabled)
             .build()
+
+         builder.build()
       }
    }
 
    val showLightRanges: Flow<Boolean> = preferencesDataStore.data.map {
-      it.showLightRanges
+      it.map.showLightRanges
    }.distinctUntilChanged()
 
    suspend fun setShowLightRanges(enabled: Boolean) {
       preferencesDataStore.updateData {
-         it.toBuilder()
+         val builder = it.toBuilder()
+         builder.map = builder.map.toBuilder()
             .setShowLightRanges(enabled)
             .build()
+
+         builder.build()
       }
    }
 
    val showSectorLightRanges: Flow<Boolean> = preferencesDataStore.data.map {
-      it.showLightSectorRanges
+      it.map.showLightSectorRanges
    }.distinctUntilChanged()
 
    suspend fun setShowSectorLightRanges(enabled: Boolean) {
       preferencesDataStore.updateData {
-         it.toBuilder()
+         val builder = it.toBuilder()
+         builder.map = builder.map.toBuilder()
             .setShowLightSectorRanges(enabled)
             .build()
+
+         builder.build()
       }
    }
 
-   val mapLocation = preferencesDataStore.data.map { it.mapLocation }.distinctUntilChanged()
+   val showLocation: Flow<Boolean> = preferencesDataStore.data.map {
+      it.map.showLocation
+   }.distinctUntilChanged()
 
+   suspend fun setShowLocation(enabled: Boolean) {
+      preferencesDataStore.updateData {
+         val builder = it.toBuilder()
+         builder.map = builder.map.toBuilder()
+            .setShowLocation(enabled)
+            .build()
+
+         builder.build()
+      }
+   }
+
+   val mapLocation = preferencesDataStore.data.map { it.map.mapLocation }.distinctUntilChanged()
    suspend fun setMapLocation(mapLocation: MapLocation) {
       preferencesDataStore.updateData {
          val builder = it.toBuilder()
-         builder.mapLocation = builder.mapLocation.toBuilder()
+         builder.map.toBuilder().setMapLocation(builder.map.mapLocation.toBuilder()
             .setLatitude(mapLocation.latitude)
             .setLongitude(mapLocation.longitude)
             .setZoom(mapLocation.zoom)
-            .build()
+            .build())
 
          builder.build()
       }

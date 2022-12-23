@@ -13,3 +13,14 @@ message MapLocation {
   // The zoom level. It must be in the range [0.0, 18.0].
   double zoom = 3;
 }
+
+message MapPreferences {
+  int32 mapLayer = 2;
+  MapLocation mapLocation = 3;
+  bool mgrs = 4;
+  bool gars = 5;
+  bool showLightSectorRanges = 6;
+  bool showLightRanges = 7;
+  bool showLocation = 8;
+  map<string, bool> mapped = 10;
+}

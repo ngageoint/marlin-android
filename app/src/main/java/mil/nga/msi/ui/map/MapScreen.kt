@@ -7,6 +7,7 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -31,8 +32,11 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.ClipboardManager
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
@@ -76,22 +80,24 @@ fun MapScreen(
    openFilter: () -> Unit,
    openDrawer: () -> Unit,
    locationCopy: (String) -> Unit,
-   mapViewModel: MapViewModel = hiltViewModel()
+   viewModel: MapViewModel = hiltViewModel()
 ) {
    val scope = rememberCoroutineScope()
+   val showLocation by viewModel.showLocation.observeAsState(false)
    var searchExpanded by remember { mutableStateOf(false) }
-   val searchResults by mapViewModel.searchResults.observeAsState(emptyList())
-   val filterCount by mapViewModel.filterCount.observeAsState(0)
-   val fetching by mapViewModel.fetching.observeAsState(emptyMap())
+   val searchResults by viewModel.searchResults.observeAsState(emptyList())
+   val filterCount by viewModel.filterCount.observeAsState(0)
+   val fetching by viewModel.fetching.observeAsState(emptyMap())
    var fetchingVisibility by rememberSaveable { mutableStateOf(true) }
-   val baseMap by mapViewModel.baseMap.observeAsState()
-   val mapOrigin by mapViewModel.mapLocation.observeAsState()
+   val baseMap by viewModel.baseMap.observeAsState()
+   val mapOrigin by viewModel.mapLocation.observeAsState()
    var destination by remember { mutableStateOf(mapDestination) }
-   val location by mapViewModel.locationPolicy.bestLocationProvider.observeAsState()
+   val location by viewModel.locationPolicy.bestLocationProvider.observeAsState()
    var located by remember { mutableStateOf(false) }
-   val tileProviders by mapViewModel.tileProviders.observeAsState(emptyMap())
-   val mapped by mapViewModel.mapped.observeAsState(emptyMap())
-   val annotation by mapViewModel.annotationProvider.annotation.observeAsState()
+   val tileProviders by viewModel.tileProviders.observeAsState(emptyMap())
+   val mapped by viewModel.mapped.observeAsState(emptyMap())
+   val annotation by viewModel.annotationProvider.annotation.observeAsState()
+   val clipboardManager: ClipboardManager = LocalClipboardManager.current
 
    LaunchedEffect(fetching) {
       if(fetching.none { it.value } && fetchingVisibility) {
@@ -124,7 +130,7 @@ fun MapScreen(
       modifier = Modifier.fillMaxSize()
    ) {
       TopBar(
-         title = "Map",
+         title = "Marlin",
          navigationIcon = Icons.Filled.Menu,
          onNavigationClicked = { openDrawer() },
          actions = {
@@ -154,6 +160,28 @@ fun MapScreen(
          }
       )
 
+      if (showLocation && locationPermissionState.status.isGranted) {
+         val text = location?.let {
+            "${String.format("%.5f", it.latitude)}, ${String.format("%.5f", it.longitude)}"
+         }
+         Surface(color = MaterialTheme.colors.primarySurface) {
+            Row(
+               horizontalArrangement = Arrangement.Center,
+               modifier = Modifier
+                  .fillMaxWidth()
+                  .clickable {
+                     text?.let {
+                        clipboardManager.setText(AnnotatedString.Builder(it).toAnnotatedString())
+                        locationCopy(it)
+                     }
+                  }
+                  .padding(vertical = 8.dp)
+            ) {
+               Text(text = text ?: "Searching for your location...")
+            }
+         }
+      }
+
       Box(Modifier.fillMaxWidth()) {
          Map(
             origin,
@@ -176,14 +204,14 @@ fun MapScreen(
                      .setZoom(position.zoom.toDouble())
                      .build()
 
-                  mapViewModel.setMapLocation(mapLocation, position.zoom.toInt())
+                  viewModel.setMapLocation(mapLocation, position.zoom.toInt())
                }
             },
             onMapClick = { latLng, zoom, region ->
                val screenPercentage = 0.04
                val tolerance = (region.farRight.longitude - region.farLeft.longitude) * screenPercentage
                scope.launch {
-                  val mapAnnotations = mapViewModel.getMapAnnotations(
+                  val mapAnnotations = viewModel.getMapAnnotations(
                      minLongitude = latLng.longitude - tolerance,
                      maxLongitude = latLng.longitude + tolerance,
                      minLatitude = latLng.latitude - tolerance,
@@ -204,7 +232,7 @@ fun MapScreen(
                      )
 
                      if (mapAnnotations.size == 1) {
-                        mapViewModel.annotationProvider.setMapAnnotation(mapAnnotations.first())
+                        viewModel.annotationProvider.setMapAnnotation(mapAnnotations.first())
                         onAnnotationClick(mapAnnotations.first())
                      } else if (mapAnnotations.isNotEmpty()) {
                         onAnnotationsClick(mapAnnotations)
@@ -293,7 +321,7 @@ fun MapScreen(
                   searchExpanded = !searchExpanded
                },
                onTextChanged = {
-                  mapViewModel.search(it)
+                  viewModel.search(it)
                },
                onLocationTap = {
                   destination = MapPosition(
@@ -317,7 +345,7 @@ fun MapScreen(
             DataSources(
                mapped = mapped
             ) {
-               mapViewModel.toggleOnMap(it)
+               viewModel.toggleOnMap(it)
             }
          }
       }

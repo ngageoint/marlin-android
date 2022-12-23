@@ -116,7 +116,7 @@ fun NavGraphBuilder.mapGraph(
          onMapSettings = { navController.navigate(MapRoute.Settings.name) },
          openDrawer = { openNavigationDrawer() },
          openFilter = { navController.navigate(MapRoute.Filter.name) },
-         locationCopy = { showSnackbar(it) }
+         locationCopy = { showSnackbar("$it copied to clipboard") }
       )
    }
 

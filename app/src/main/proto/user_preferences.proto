@@ -4,24 +4,23 @@ option java_package = "mil.nga.msi.type";
 option java_multiple_files = true;
 
 import "embark.proto";
+import "map.proto";
 import "sort.proto";
 import "filter.proto";
-import "map_location.proto";
-import "navigational_warning_key.proto";
+
+message NavigationalWarningKey {
+  int64 number = 1;
+  int32 year = 2;
+}
 
 message UserPreferences {
   Embark embark = 1;
-  int32 mapLayer = 2;
-  MapLocation mapLocation = 3;
-  bool mgrs = 4;
-  bool gars = 5;
-  bool showLightSectorRanges = 6;
-  bool showLightRanges = 7;
-  map<string, NavigationalWarningKey> lastReadNavigationWarnings = 8;
-  map<string, bool> mapped = 9;
-  repeated string tabs = 10;
-  repeated string nonTabs = 11;
-  map<string, int64> dataSourceSyncDate = 12;
-  map<string, Filters> filters = 13;
-  map<string, Sort> sort = 14;
+  MapPreferences map = 2;
+  map<string, NavigationalWarningKey> lastReadNavigationWarnings = 3;
+  map<string, bool> mapped = 4;
+  repeated string tabs = 5;
+  repeated string nonTabs = 6;
+  map<string, int64> dataSourceSyncDate = 7;
+  map<string, Filters> filters = 8;
+  map<string, Sort> sort = 9;
 }
