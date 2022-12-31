@@ -104,6 +104,7 @@ android {
             }
         }
     }
+    namespace 'mil.nga.msi'
 }
 
 dependencies {
