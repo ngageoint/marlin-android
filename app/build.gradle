@@ -153,7 +153,7 @@ dependencies {
     implementation 'com.google.protobuf:protobuf-javalite:3.18.0'
     implementation 'androidx.datastore:datastore-preferences:1.0.0'
 
-    implementation 'com.google.maps.android:maps-compose:2.7.2'
+    implementation 'com.google.maps.android:maps-compose:2.8.0'
     implementation 'com.google.maps.android:maps-ktx:3.2.1'
     implementation 'com.google.android.gms:play-services-maps:18.1.0'
     implementation 'mil.nga.gars:gars-android:1.2.0'
@@ -161,8 +161,8 @@ dependencies {
 
     implementation 'com.google.android.gms:play-services-location:21.0.1'
 
-    implementation 'mil.nga.geopackage:geopackage-android:6.6.0'
-    implementation 'mil.nga.geopackage.map:geopackage-android-map:6.6.0'
+    implementation 'mil.nga.geopackage:geopackage-android:6.7.0'
+    implementation 'mil.nga.geopackage.map:geopackage-android-map:6.7.0'
 
     implementation 'com.github.matomo-org:matomo-sdk-android:4.1.4'
 
