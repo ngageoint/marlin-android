@@ -11,12 +11,15 @@ import com.google.accompanist.navigation.material.ExperimentalMaterialNavigation
 import com.google.accompanist.navigation.material.bottomSheet
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.ui.asam.detail.AsamDetailScreen
 import mil.nga.msi.ui.asam.list.AsamsScreen
 import mil.nga.msi.ui.asam.sheet.AsamSheetScreen
+import mil.nga.msi.ui.filter.FilterScreen
 import mil.nga.msi.ui.map.MapRoute
 import mil.nga.msi.ui.navigation.Point
 import mil.nga.msi.ui.navigation.Route
+import mil.nga.msi.ui.sort.SortScreen
 
 sealed class AsamRoute(
    override val name: String,
@@ -28,6 +31,8 @@ sealed class AsamRoute(
    object Detail: AsamRoute("asams/detail", "Anti-Shipping Activity Message Details", "ASAM Details")
    object List: AsamRoute("asams/list", "Anti-Shipping Activity Messages", "ASAMs")
    object Sheet: AsamRoute("asams/sheet", "Anti-Shipping Activity Message Sheet", "ASAM Sheet")
+   object Filter: AsamRoute("asams/filter", "Anti-Shipping Activity Message Filter", "ASAM Filters")
+   object Sort: AsamRoute("asams/sort", "Anti-Shipping Activity Message Sort", "ASAM Sort")
 }
 
 @OptIn(ExperimentalMaterialNavigationApi::class)
@@ -59,6 +64,12 @@ fun NavGraphBuilder.asamGraph(
 
          AsamsScreen(
             openDrawer = { openNavigationDrawer() },
+            openFilter = {
+               navController.navigate(AsamRoute.Filter.name)
+            },
+            openSort = {
+               navController.navigate(AsamRoute.Sort.name)
+            },
             onTap = { reference ->
                navController.navigate("${AsamRoute.Detail.name}?reference=$reference")
             },
@@ -94,6 +105,22 @@ fun NavGraphBuilder.asamGraph(
                navController.navigate("${AsamRoute.Detail.name}?reference=$reference")
             })
          }
+      }
+      bottomSheet(AsamRoute.Filter.name) {
+         FilterScreen(
+            dataSource = DataSource.ASAM,
+            close = {
+               navController.popBackStack()
+            }
+         )
+      }
+      bottomSheet(AsamRoute.Sort.name) {
+         SortScreen(
+            dataSource = DataSource.ASAM,
+            close = {
+               navController.popBackStack()
+            }
+         )
       }
    }
 }

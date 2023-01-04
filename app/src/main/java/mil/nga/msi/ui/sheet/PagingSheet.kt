@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
@@ -34,6 +35,7 @@ import mil.nga.msi.ui.radiobeacon.sheet.RadioBeaconSheetScreen
 fun PagingSheet(
    mapAnnotations: List<MapAnnotation>,
    onDetails: (MapAnnotation) -> Unit,
+   viewModel: PagingSheetViewModel = hiltViewModel()
 ) {
    val scope = rememberCoroutineScope()
    val pagerState = rememberPagerState()
@@ -54,8 +56,9 @@ fun PagingSheet(
             count = mapAnnotations.size,
             state = pagerState,
             modifier = Modifier.fillMaxWidth(),
-         ) { page ->
-            val annotation = mapAnnotations[page]
+         ) {
+            val annotation = mapAnnotations[pagerState.currentPage]
+            viewModel.annotationProvider.setMapAnnotation(annotation)
             badgeColor = annotation.key.type.route.color
 
             Column(modifier = Modifier.fillMaxWidth()) {

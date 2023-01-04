@@ -8,25 +8,30 @@ import com.google.accompanist.navigation.material.ExperimentalMaterialNavigation
 import com.google.accompanist.navigation.material.bottomSheet
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.repository.dgpsstation.DgpsStationKey
 import mil.nga.msi.ui.dgpsstation.detail.DgpsStationDetailScreen
 import mil.nga.msi.ui.dgpsstation.list.DgpsStationsScreen
 import mil.nga.msi.ui.dgpsstation.sheet.DgpsStationSheetScreen
+import mil.nga.msi.ui.filter.FilterScreen
 import mil.nga.msi.ui.map.MapRoute
 import mil.nga.msi.ui.navigation.DgpsStation
 import mil.nga.msi.ui.navigation.Point
 import mil.nga.msi.ui.navigation.Route
+import mil.nga.msi.ui.sort.SortScreen
 
 sealed class DgpsStationRoute(
    override val name: String,
    override val title: String,
    override val shortTitle: String,
-   override val color: Color = Color(0xFFFFB300)
+   override val color: Color = Color(0xFF00E676)
 ): Route {
    object Main: DgpsStationRoute("dgpsStations", "Differential GPS Stations", "DGPS")
    object Detail: DgpsStationRoute("dgpsStations/detail", "Differential GPS Station Details", "DGPS Details")
    object List: DgpsStationRoute("dgpsStations/list", "Differential GPS Stations", "DGPS Stations")
    object Sheet: DgpsStationRoute("dgpsStations/sheet", "Differential GPS Station Sheet", "DGPS Station Sheet")
+   object Filter: DgpsStationRoute("dgpsStations/filter", "Differential GPS Station Filter", "DGPS Station Filter")
+   object Sort: DgpsStationRoute("dgpsStations/sort", "Differential GPS Station Sort", "DGPS Station Sort")
 }
 
 @OptIn(ExperimentalMaterialNavigationApi::class)
@@ -58,6 +63,12 @@ fun NavGraphBuilder.dgpsStationGraph(
 
          DgpsStationsScreen(
             openDrawer = { openNavigationDrawer() },
+            openFilter = {
+               navController.navigate(DgpsStationRoute.Filter.name)
+            },
+            openSort = {
+               navController.navigate(DgpsStationRoute.Sort.name)
+            },
             onTap = { key ->
                val encoded = Uri.encode(Json.encodeToString(key))
                navController.navigate( "${DgpsStationRoute.Detail.name}?key=$encoded")
@@ -103,6 +114,23 @@ fun NavGraphBuilder.dgpsStationGraph(
                navController.navigate( "${DgpsStationRoute.Detail.name}?key=$encoded")
             })
          }
+      }
+
+      bottomSheet(DgpsStationRoute.Filter.name) {
+         FilterScreen(
+            dataSource = DataSource.DGPS_STATION,
+            close = {
+               navController.popBackStack()
+            }
+         )
+      }
+      bottomSheet(DgpsStationRoute.Sort.name) {
+         SortScreen(
+            dataSource = DataSource.DGPS_STATION,
+            close = {
+               navController.popBackStack()
+            }
+         )
       }
    }
 }

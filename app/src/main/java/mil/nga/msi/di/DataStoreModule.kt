@@ -12,10 +12,12 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mil.nga.msi.datasource.DataSource
+import mil.nga.msi.datasource.filter.AsamFilter
+import mil.nga.msi.datasource.filter.LightFilter
+import mil.nga.msi.datasource.filter.ModuFilter
 import mil.nga.msi.datasource.navigationwarning.NavigationArea
-import mil.nga.msi.type.MapLocation
-import mil.nga.msi.type.NavigationalWarningKey
-import mil.nga.msi.type.UserPreferences
+import mil.nga.msi.sort.SortDirection
+import mil.nga.msi.type.*
 import mil.nga.msi.ui.map.BaseMapType
 import java.io.InputStream
 import java.io.OutputStream
@@ -23,18 +25,21 @@ import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
 @Module
-object DataStoreModule {
+class DataStoreModule {
 
    @Singleton
    @Provides
    fun provideUserPreferencesDataStore(application: Application): DataStore<UserPreferences> {
-      val userPreferencesSerializer  = object : Serializer<UserPreferences> {
+      val userPreferencesSerializer = object : Serializer<UserPreferences> {
          override val defaultValue: UserPreferences =
             UserPreferences.newBuilder()
-               .setMapLayer(BaseMapType.NORMAL.value)
-               .setMgrs(false)
-               .setGars(false)
-               .setMapLocation(MapLocation.getDefaultInstance())
+               .setMap(
+                  MapPreferences.newBuilder()
+                     .setMapLayer(BaseMapType.NORMAL.value)
+                     .setMapLocation(MapLocation.getDefaultInstance())
+                     .setMgrs(false)
+                     .setGars(false)
+               )
                .putAllLastReadNavigationWarnings(
                   mapOf<String, NavigationalWarningKey>(
                      NavigationArea.HYDROARC.code to NavigationalWarningKey.newBuilder().build(),
@@ -60,6 +65,7 @@ object DataStoreModule {
                   listOf(DataSource.ASAM, DataSource.MODU, DataSource.NAVIGATION_WARNING, DataSource.LIGHT).map { it.name }
                )
                .addAllNonTabs(listOf(DataSource.PORT, DataSource.RADIO_BEACON, DataSource.DGPS_STATION).map { it.name })
+               .putAllSort(sortDefaults)
                .build()
 
          override suspend fun readFrom(input: InputStream): UserPreferences {
@@ -82,4 +88,102 @@ object DataStoreModule {
          corruptionHandler = null
       )
    }
+
+   companion object {
+      val sortDefaults = mapOf(
+         DataSource.ASAM.name to Sort.newBuilder()
+            .setSection(false)
+            .addAllList(
+               listOfNotNull(
+                  AsamFilter.parameters.find { it.parameter == "date" }
+               ).map {
+                  SortParameter.newBuilder()
+                     .setDirection(SortDirection.DESC.name)
+                     .setName(it.parameter)
+                     .setTitle(it.title)
+                     .setType(it.type.name)
+                     .build()
+               }
+            ).build(),
+
+         DataSource.MODU.name to Sort.newBuilder()
+            .setSection(false)
+            .addAllList(
+               listOfNotNull(
+                  ModuFilter.parameters.find { it.parameter == "date" }
+               ).map {
+                  SortParameter.newBuilder()
+                     .setDirection(SortDirection.DESC.name)
+                     .setName(it.parameter)
+                     .setTitle(it.title)
+                     .setType(it.type.name)
+                     .build()
+               }
+            ).build(),
+
+         DataSource.LIGHT.name to Sort.newBuilder()
+            .setSection(true)
+            .addAllList(
+               listOfNotNull(
+                  LightFilter.parameters.find { it.parameter == "section_header" },
+                  LightFilter.parameters.find { it.parameter == "feature_number" },
+               ).map {
+                  SortParameter.newBuilder()
+                     .setDirection(SortDirection.ASC.name)
+                     .setName(it.parameter)
+                     .setTitle(it.title)
+                     .setType(it.type.name)
+                     .build()
+               }
+            ).build(),
+
+         DataSource.PORT.name to Sort.newBuilder()
+            .setSection(true)
+            .addAllList(
+               listOfNotNull(
+                  LightFilter.parameters.find { it.parameter == "port_number" }
+               ).map {
+                  SortParameter.newBuilder()
+                     .setDirection(SortDirection.DESC.name)
+                     .setName(it.parameter)
+                     .setTitle(it.title)
+                     .setType(it.type.name)
+                     .build()
+               }
+            ).build(),
+
+         DataSource.RADIO_BEACON.name to Sort.newBuilder()
+            .setSection(true)
+            .addAllList(
+               listOfNotNull(
+                  LightFilter.parameters.find { it.parameter == "geopolitical_heading" },
+                  LightFilter.parameters.find { it.parameter == "feature_number" }
+               ).map {
+                  SortParameter.newBuilder()
+                     .setDirection(SortDirection.ASC.name)
+                     .setName(it.parameter)
+                     .setTitle(it.title)
+                     .setType(it.type.name)
+                     .build()
+               }
+            ).build(),
+
+         DataSource.DGPS_STATION.name to Sort.newBuilder()
+            .setSection(true)
+            .addAllList(
+               listOfNotNull(
+                  LightFilter.parameters.find { it.parameter == "geopolitical_heading" },
+                  LightFilter.parameters.find { it.parameter == "feature_number" }
+               ).map {
+                  SortParameter.newBuilder()
+                     .setDirection(SortDirection.ASC.name)
+                     .setName(it.parameter)
+                     .setTitle(it.title)
+                     .setType(it.type.name)
+                     .build()
+               }
+            ).build()
+      )
+   }
 }
+

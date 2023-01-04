@@ -499,7 +499,7 @@ class PortsTypeAdapter: TypeAdapter<List<Port>>() {
             }
             "repairCode" -> {
                repairCode = `in`.nextStringOrNull()?.let {
-                  RepairCode.fromCode(it)
+                  RepairCode.fromValue(it)
                }
             }
             "drydock" -> {

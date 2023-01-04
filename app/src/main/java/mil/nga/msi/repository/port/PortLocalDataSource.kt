@@ -1,5 +1,6 @@
 package mil.nga.msi.repository.port
 
+import androidx.sqlite.db.SimpleSQLiteQuery
 import mil.nga.msi.datasource.port.Port
 import mil.nga.msi.datasource.port.PortDao
 import javax.inject.Inject
@@ -8,8 +9,10 @@ class PortLocalDataSource @Inject constructor(
    private val dao: PortDao
 ) {
    fun observePort(portNumber: Int) = dao.observePort(portNumber)
-   fun observePortMapItems() = dao.observePortMapItems()
-   fun observePortListItems() = dao.observePortListItems()
+   fun observePortMapItems(query: SimpleSQLiteQuery) = dao.observePortMapItems(query)
+   fun observePortListItems(query: SimpleSQLiteQuery) = dao.observePortListItems(query)
+
+   fun getPorts(query: SimpleSQLiteQuery) = dao.getPorts(query)
 
    fun isEmpty() = dao.count() == 0
 

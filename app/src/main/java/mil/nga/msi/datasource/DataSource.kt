@@ -15,8 +15,7 @@ enum class DataSource(
    val route: Route,
    val mappable: Boolean,
    val color: Color,
-   val icon: Int,
-   val imageScale: Float = .75f
+   val icon: Int
 ) {
    ASAM(AsamRoute.Main, true, Color(0xFF000000), R.drawable.ic_asam_24dp),
    MODU(ModuRoute.Main,true, Color(0xFF0042A4), R.drawable.ic_modu_24dp),
@@ -24,5 +23,5 @@ enum class DataSource(
    LIGHT(LightRoute.Main, true, Color(0xFFFFC500), R.drawable.ic_baseline_lightbulb_24),
    PORT(PortRoute.Main, true, Color(0xFF5856d6), R.drawable.ic_baseline_anchor_24),
    RADIO_BEACON(RadioBeaconRoute.Main, true, Color(0xFF007BFF), R.drawable.ic_baseline_settings_input_antenna_24),
-   DGPS_STATION(DgpsStationRoute.Main, true, Color(0xFFFFB300), R.drawable.ic_dgps_icon_24)
+   DGPS_STATION(DgpsStationRoute.Main, true, Color(0xFF00E676), R.drawable.ic_dgps_icon_24)
 }

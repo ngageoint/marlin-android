@@ -129,7 +129,7 @@ class AsamsTypeAdapter: TypeAdapter<List<Asam>>() {
            this.hostility = hostility
            this.victim = victim
         }
-      } else { null }
+      } else null
    }
 
    override fun write(out: JsonWriter, value: List<Asam>) {

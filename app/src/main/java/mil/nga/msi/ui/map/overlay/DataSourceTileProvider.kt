@@ -2,16 +2,14 @@ package mil.nga.msi.ui.map.overlay
 
 import android.app.Application
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Paint
-import android.graphics.Rect
+import android.graphics.*
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.graphics.drawable.toBitmap
 import com.google.android.gms.maps.model.Tile
 import com.google.android.gms.maps.model.TileProvider
 import com.google.maps.android.geometry.Bounds
+import kotlinx.coroutines.runBlocking
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.ui.location.webMercatorToWgs84
 import mil.nga.msi.ui.location.wgs84ToWebMercator
@@ -20,7 +18,7 @@ import java.io.ByteArrayOutputStream
 import kotlin.math.*
 
 interface TileRepository {
-   fun getTileableItems(
+   suspend fun getTileableItems(
       minLatitude: Double,
       maxLatitude: Double,
       minLongitude: Double,
@@ -44,31 +42,40 @@ interface DataSourceImage {
       context: Context,
       mapZoom: Int,
    ): Bitmap {
-      val screenDensity = context.resources.displayMetrics.density
-      val radius = mapZoom / .5f * screenDensity * dataSource.imageScale
-      val size = (radius * 2).toInt()
+      val scale = context.resources.displayMetrics.density * 2.5
+      val size = ((mapZoom) * scale).toInt()
+
       val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
       val canvas = Canvas(bitmap)
 
+      val circleSize = size / 2f
       canvas.drawCircle(
-         radius,
-         radius,
-         radius,
+         circleSize,
+         circleSize,
+         circleSize / 2,
          Paint().apply {
-            color = dataSource.color.toArgb()
+            isAntiAlias = true
             style = Paint.Style.FILL
+            color = dataSource.color.toArgb()
          }
       )
 
-      val iconSize = (size * .8).toInt()
-      val icon = AppCompatResources.getDrawable(context, dataSource.icon)!!
-      icon.setBounds(0, 0, iconSize, iconSize)
-      canvas.drawBitmap(
-         icon.toBitmap(),
-         null,
-         Rect(size - iconSize, size - iconSize, iconSize, iconSize),
-         null
-      )
+      if (mapZoom > 6) {
+         val iconSize = (circleSize * .6).toInt()
+         val icon = AppCompatResources.getDrawable(context, dataSource.icon)!!
+         icon.setBounds(0, 0, iconSize, iconSize)
+         canvas.drawBitmap(
+            icon.toBitmap(),
+            null,
+            RectF(
+               ((circleSize / 2) + (circleSize - iconSize) / 2),
+               ((circleSize / 2) + (circleSize - iconSize) / 2),
+               (circleSize + (circleSize / 2) - (circleSize - iconSize) / 2),
+               (circleSize + (circleSize / 2) - (circleSize - iconSize) / 2)
+            ),
+            null
+         )
+      }
 
       return bitmap
    }
@@ -98,7 +105,7 @@ open class DataSourceTileProvider(
 
       // Border tile by 40 miles, biggest light in MSI.
       // Border has to be at least 256 pixels as well
-      val tolerance = max(40.0 * 1609.344, ((maxTileX - minTileX) / (width / 2)) * 40)
+      val tolerance = max(40.0 * 1852, ((maxTileX - minTileX) / (width / 2)) * 40)
 
       val neCornerTolerance = Point(maxTileX + tolerance, maxTileY + tolerance).webMercatorToWgs84()
       val swCornerTolerance = Point(minTileX - tolerance, minTileY - tolerance).webMercatorToWgs84()
@@ -114,12 +121,14 @@ open class DataSourceTileProvider(
          neCorner3857.y
       )
 
-      val items = repository.getTileableItems(
-         minLatitude = minQueryLat,
-         maxLatitude = maxQueryLat,
-         minLongitude = minQueryLon,
-         maxLongitude = maxQueryLon
-      )
+      val items = runBlocking() {
+         repository.getTileableItems(
+            minLatitude = minQueryLat,
+            maxLatitude = maxQueryLat,
+            minLongitude = minQueryLon,
+            maxLongitude = maxQueryLon
+         )
+      }
 
       val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
       val canvas = Canvas(bitmap)

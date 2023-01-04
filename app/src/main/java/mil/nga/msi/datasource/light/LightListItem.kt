@@ -5,6 +5,7 @@ import com.google.android.gms.maps.model.LatLng
 import mil.nga.msi.coordinate.DMS
 
 data class LightListItem(
+   @ColumnInfo(name = "id") val id: String,
    @ColumnInfo(name = "feature_number") val featureNumber: String,
    @ColumnInfo(name = "volume_number") val volumeNumber: String,
    @ColumnInfo(name = "characteristic_number") val characteristicNumber: Int,

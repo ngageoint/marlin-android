@@ -37,8 +37,8 @@ fun NavigationalWarningDetailScreen(
    Column {
       TopBar(
          title = "Navigational Warning",
-         buttonIcon = Icons.Default.ArrowBack,
-         onButtonClicked = { close() }
+         navigationIcon = Icons.Default.ArrowBack,
+         onNavigationClicked = { close() }
       )
 
       NavigationalWarningDetailContent(

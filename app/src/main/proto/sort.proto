@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+option java_package = "mil.nga.msi.type";
+option java_multiple_files = true;
+
+message SortParameter {
+  string type = 1; // TODO this should be static
+  string title = 2; // TODO this should be static
+  string name = 3;
+  string direction = 4;
+}
+
+message Sort {
+  bool section = 1;
+  repeated SortParameter list = 2;
+}

@@ -5,19 +5,30 @@ import androidx.lifecycle.*
 import com.google.android.gms.maps.model.TileProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mil.nga.msi.datasource.DataSource
+import mil.nga.msi.datasource.filter.MapBoundsFilter
+import mil.nga.msi.filter.ComparatorType
+import mil.nga.msi.filter.Filter
+import mil.nga.msi.filter.FilterParameter
+import mil.nga.msi.filter.FilterParameterType
 import mil.nga.msi.location.LocationPolicy
 import mil.nga.msi.repository.DataSourceRepository
 import mil.nga.msi.repository.asam.AsamRepository
 import mil.nga.msi.repository.dgpsstation.DgpsStationKey
 import mil.nga.msi.repository.dgpsstation.DgpsStationRepository
+import mil.nga.msi.repository.geocoder.GeocoderRemoteDataSource
 import mil.nga.msi.repository.light.LightKey
 import mil.nga.msi.repository.light.LightRepository
 import mil.nga.msi.repository.map.*
 import mil.nga.msi.repository.modu.ModuRepository
 import mil.nga.msi.repository.port.PortRepository
+import mil.nga.msi.repository.preferences.FilterRepository
 import mil.nga.msi.repository.preferences.UserPreferencesRepository
 import mil.nga.msi.repository.radiobeacon.RadioBeaconKey
 import mil.nga.msi.repository.radiobeacon.RadioBeaconRepository
@@ -42,6 +53,7 @@ enum class TileProviderType {
 @HiltViewModel
 class MapViewModel @Inject constructor(
    private val application: Application,
+   private val filterRepository: FilterRepository,
    private val asamRepository: AsamRepository,
    private val asamTileRepository: AsamTileRepository,
    private val moduRepository: ModuRepository,
@@ -57,17 +69,20 @@ class MapViewModel @Inject constructor(
    dataSourceRepository: DataSourceRepository,
    val locationPolicy: LocationPolicy,
    val userPreferencesRepository: UserPreferencesRepository,
+   val annotationProvider: AnnotationProvider,
+   private val geocoderRemoteDataSource: GeocoderRemoteDataSource,
    @Named("osmTileProvider") private val osmTileProvider: TileProvider,
    @Named("mgrsTileProvider") private val mgrsTileProvider: TileProvider,
-   @Named("garsTileProvider") private val garsTileProvider: TileProvider,
+   @Named("garsTileProvider") private val garsTileProvider: TileProvider
 ): ViewModel() {
 
    val baseMap = userPreferencesRepository.baseMapType.asLiveData()
    val mapLocation = userPreferencesRepository.mapLocation.asLiveData()
+   val showLocation = userPreferencesRepository.showLocation.asLiveData()
    val fetching = dataSourceRepository.fetching
+   val mapped = userPreferencesRepository.mapped.asLiveData()
 
    private val _zoom = MutableLiveData<Int>()
-   private val mapped = userPreferencesRepository.mapped.asLiveData()
 
    suspend fun setMapLocation(mapLocation: MapLocation, zoom: Int) {
       _zoom.value = zoom
@@ -80,6 +95,30 @@ class MapViewModel @Inject constructor(
    private var beaconTileProvider = RadioBeaconTileProvider(application, beaconTileRepository)
    private var lightTileProvider = LightTileProvider(application, lightTileRepository)
    private var dgpsTileProvider = DgpsStationTileProvider(application, dgpsStationTileRepository)
+
+   private val searchText = MutableStateFlow("")
+   fun search(text: String) {
+      searchText.value = text
+   }
+
+   val searchResults = searchText
+      .map {
+         val stuff = if (it.isNotEmpty()) {
+            geocoderRemoteDataSource.geocode(it)
+         } else emptyList()
+
+         stuff
+      }.asLiveData()
+
+   fun toggleOnMap(dataSource: DataSource) {
+      viewModelScope.launch {
+         userPreferencesRepository.setMapped(dataSource)
+      }
+   }
+
+   val filterCount = filterRepository.filters.map { entry ->
+      entry.values.fold(0) { count, filters -> count + filters.size }
+   }.asLiveData()
 
    val tileProviders: LiveData<Map<TileProviderType, TileProvider>> = MediatorLiveData<Map<TileProviderType, TileProvider>>().apply {
       addSource(userPreferencesRepository.mgrs.asLiveData()) { enabled ->
@@ -154,7 +193,7 @@ class MapViewModel @Inject constructor(
          value = providers
       }
 
-      addSource(asamRepository.asamMapItems.distinctUntilChanged().asLiveData()) {
+      addSource(asamRepository.observeAsamMapItems().distinctUntilChanged().asLiveData()) {
          if (mapped.value?.get(DataSource.ASAM) == true) {
             val providers = value?.toMutableMap() ?: mutableMapOf()
             asamTileProvider = AsamTileProvider(application, asamTileRepository)
@@ -163,7 +202,7 @@ class MapViewModel @Inject constructor(
          }
       }
 
-      addSource(moduRepository.moduMapItems.distinctUntilChanged().asLiveData()) {
+      addSource(moduRepository.observeModuMapItems().distinctUntilChanged().asLiveData()) {
          if (mapped.value?.get(DataSource.MODU) == true) {
             if (mapped.value?.get(DataSource.MODU) == true) {
                val providers = value?.toMutableMap() ?: mutableMapOf()
@@ -174,7 +213,7 @@ class MapViewModel @Inject constructor(
          }
       }
 
-      addSource(lightRepository.lightMapItems.distinctUntilChanged().asLiveData()) {
+      addSource(lightRepository.observeLightMapItems().distinctUntilChanged().asLiveData()) {
          if (mapped.value?.get(DataSource.LIGHT) == true) {
             val providers = value?.toMutableMap() ?: mutableMapOf()
             lightTileProvider = LightTileProvider(application, lightTileRepository)
@@ -183,7 +222,7 @@ class MapViewModel @Inject constructor(
          }
       }
 
-      addSource(portRepository.portMapItems.distinctUntilChanged().asLiveData()) {
+      addSource(portRepository.observePortMapItems().distinctUntilChanged().asLiveData()) {
          if (mapped.value?.get(DataSource.PORT) == true) {
             val providers = value?.toMutableMap() ?: mutableMapOf()
             portTileProvider = PortTileProvider(application, portTileRepository)
@@ -192,7 +231,7 @@ class MapViewModel @Inject constructor(
          }
       }
 
-      addSource(beaconRepository.radioBeaconMapItems.distinctUntilChanged().asLiveData()) {
+      addSource(beaconRepository.observeRadioBeaconMapItems().distinctUntilChanged().asLiveData()) {
          if (mapped.value?.get(DataSource.RADIO_BEACON) == true) {
             val providers = value?.toMutableMap() ?: mutableMapOf()
             beaconTileProvider = RadioBeaconTileProvider(application, beaconTileRepository)
@@ -201,7 +240,7 @@ class MapViewModel @Inject constructor(
          }
       }
 
-      addSource(dgpsStationRepository.dgpsStationMapItems.distinctUntilChanged().asLiveData()) {
+      addSource(dgpsStationRepository.observeDgpsStationMapItems().distinctUntilChanged().asLiveData()) {
          if (mapped.value?.get(DataSource.DGPS_STATION) == true) {
             val providers = value?.toMutableMap() ?: mutableMapOf()
             dgpsTileProvider = DgpsStationTileProvider(application, dgpsStationTileRepository)
@@ -211,6 +250,7 @@ class MapViewModel @Inject constructor(
       }
    }
 
+   // TODO need to filter on min/max box, that is surounding click
    suspend fun getMapAnnotations(
       minLongitude: Double,
       maxLongitude: Double,
@@ -218,10 +258,19 @@ class MapViewModel @Inject constructor(
       maxLatitude: Double
    ) = withContext(Dispatchers.IO) {
       val dataSources = mapped.value ?: emptyMap()
+      val boundsFilters = MapBoundsFilter.filtersForBounds(
+         minLongitude = minLongitude,
+         maxLongitude = maxLongitude,
+         minLatitude = minLatitude,
+         maxLatitude = maxLatitude
+      )
 
       val asams = if (dataSources[DataSource.ASAM] == true) {
+         val entry = filterRepository.filters.first()
+         val asamFilters = entry[DataSource.ASAM] ?: emptyList()
+         val filters = boundsFilters.toMutableList().apply { addAll(asamFilters) }
          asamRepository
-            .getAsams(minLatitude, maxLatitude, minLongitude, maxLongitude)
+            .getAsams(filters)
             .map { asam ->
                val key = MapAnnotation.Key(asam.reference, MapAnnotation.Type.ASAM)
                MapAnnotation(key, asam.latitude, asam.longitude)
@@ -229,8 +278,11 @@ class MapViewModel @Inject constructor(
       } else emptyList()
 
       val modus = if (dataSources[DataSource.MODU] == true) {
+         val entry = filterRepository.filters.first()
+         val moduFilters = entry[DataSource.MODU] ?: emptyList()
+         val filters = boundsFilters.toMutableList().apply { addAll(moduFilters) }
          moduRepository
-            .getModus(minLatitude, maxLatitude, minLongitude, maxLongitude)
+            .getModus(filters)
             .map { modu ->
                val key = MapAnnotation.Key(modu.name, MapAnnotation.Type.MODU)
                MapAnnotation(key, modu.latitude, modu.longitude)
@@ -238,8 +290,25 @@ class MapViewModel @Inject constructor(
       } else emptyList()
 
       val lights = if (dataSources[DataSource.LIGHT] == true) {
+         val entry = filterRepository.filters.first()
+         val lightFilters = entry[DataSource.LIGHT] ?: emptyList()
+         val filters = boundsFilters.toMutableList().apply {
+            addAll(lightFilters)
+            add(
+              Filter(
+                 parameter = FilterParameter(
+                    type = FilterParameterType.INT,
+                    title = "Characteristic Number",
+                    parameter = "characteristic_number",
+                 ),
+                 comparator = ComparatorType.EQUALS,
+                 value = 1
+              )
+            )
+         }
+
          lightRepository
-            .getLights(minLatitude, maxLatitude, minLongitude, maxLongitude)
+            .getLights(filters)
             .map { light ->
                val key = MapAnnotation.Key(LightKey.fromLight(light).id(), MapAnnotation.Type.LIGHT)
                MapAnnotation(key, light.latitude, light.longitude)
@@ -247,8 +316,11 @@ class MapViewModel @Inject constructor(
       } else emptyList()
 
       val ports = if (dataSources[DataSource.PORT] == true) {
+         val entry = filterRepository.filters.first()
+         val portFilters = entry[DataSource.PORT] ?: emptyList()
+         val filters = boundsFilters.toMutableList().apply { addAll(portFilters) }
          portRepository
-            .getPorts(minLatitude, maxLatitude, minLongitude, maxLongitude)
+            .getPorts(filters)
             .map { port ->
                val key = MapAnnotation.Key(port.portNumber.toString(), MapAnnotation.Type.PORT)
                MapAnnotation(key, port.latitude, port.longitude)
@@ -256,8 +328,11 @@ class MapViewModel @Inject constructor(
       } else emptyList()
 
       val beacons = if (dataSources[DataSource.RADIO_BEACON] == true) {
+         val entry = filterRepository.filters.first()
+         val beaconsFilters = entry[DataSource.RADIO_BEACON] ?: emptyList()
+         val filters = boundsFilters.toMutableList().apply { addAll(beaconsFilters) }
          beaconRepository
-            .getRadioBeacons(minLatitude, maxLatitude, minLongitude, maxLongitude)
+            .getRadioBeacons(filters)
             .map { beacon ->
                val key = MapAnnotation.Key(RadioBeaconKey.fromRadioBeacon(beacon).id(), MapAnnotation.Type.RADIO_BEACON)
                MapAnnotation(key, beacon.latitude, beacon.longitude)
@@ -265,14 +340,17 @@ class MapViewModel @Inject constructor(
       } else emptyList()
 
       val dgps = if (dataSources[DataSource.DGPS_STATION] == true) {
+         val entry = filterRepository.filters.first()
+         val dgpsFilters = entry[DataSource.DGPS_STATION] ?: emptyList()
+         val filters = boundsFilters.toMutableList().apply { addAll(dgpsFilters) }
          dgpsStationRepository
-            .getDgpsStations(minLatitude, maxLatitude, minLongitude, maxLongitude)
+            .getDgpsStations(filters)
             .map { dgps ->
                val key = MapAnnotation.Key(DgpsStationKey.fromDgpsStation(dgps).id(), MapAnnotation.Type.DGPS_STATION)
                MapAnnotation(key, dgps.latitude, dgps.longitude)
             }
       } else emptyList()
 
-      asams + modus + lights + ports + beacons + dgps
+     asams + modus + lights + ports + beacons + dgps
    }
 }

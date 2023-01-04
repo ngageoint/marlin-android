@@ -9,8 +9,6 @@ interface AsamService {
    @GET("/api/publications/asam")
    suspend fun getAsams(
       @Query("sort") sort: String = "date",
-      @Query("output") output: String = "json",
-      @Query("minOccurDate") minDate: String? = null,
-      @Query("maxOccurDate") maxDate: String? = null,
+      @Query("output") output: String = "json"
    ): Response<List<Asam>>
 }

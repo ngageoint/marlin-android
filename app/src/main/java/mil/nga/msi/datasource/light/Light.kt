@@ -6,6 +6,8 @@ import androidx.room.Entity
 import androidx.room.Index
 import com.google.android.gms.maps.model.LatLng
 import mil.nga.msi.coordinate.DMS
+import java.util.regex.Matcher
+import java.util.regex.Pattern
 
 enum class LightColor(val color: Color) {
    WHITE(Color(0xDEFFFF00)),
@@ -112,18 +114,37 @@ data class Light(
    @Transient
    val dms = DMS.from(LatLng(latitude, longitude))
 
-   fun isFogSignal(): Boolean {
-      return remarks?.contains("bl.", ignoreCase = true) ?: false
+   @Transient
+   val isFogSignal = {
+      remarks?.contains("bl.", ignoreCase = true) ?: false
    }
 
-   fun isBuoy(): Boolean {
-      return structure?.contains("pillar", ignoreCase = true) == true ||
-         structure?.contains("spar", ignoreCase = true) == true ||
-         structure?.contains("conical", ignoreCase = true) == true ||
-         structure?.contains("can", ignoreCase = true) == true
+   @Transient
+   val isBuoy = {
+      structure?.contains("pillar", ignoreCase = true) == true ||
+      structure?.contains("spar", ignoreCase = true) == true ||
+      structure?.contains("conical", ignoreCase = true) == true ||
+      structure?.contains("can", ignoreCase = true) == true
    }
 
-   fun lightColors(): List<Color>  {
+   @Transient
+   val isRacon = {
+      name?.let {
+         it.contains("RACON") || remarks?.contains("(3 & 10cm)") == true
+      } ?: false
+   }
+
+   @Transient
+   val morseCode = {
+      val firstIndex = characteristic?.indexOfFirst { it == '(' }?.takeIf { it >= 0 }
+      val lastIndex = characteristic?.indexOfLast { it == ')' }?.takeIf { it >= 0 }
+      if (firstIndex != null && lastIndex != null) {
+         characteristic?.substring(IntRange(firstIndex + 1, lastIndex - 1))
+      } else null
+   }
+
+   @delegate:Transient
+   val lightColors by lazy {
       val lightColors = mutableListOf<Color>()
 
       characteristic?.let { characteristic->
@@ -164,123 +185,120 @@ data class Light(
          }
       }
 
-      return lightColors
+      lightColors
    }
 
-   fun lightSectors(): List<LightSector> {
+   @delegate:Transient
+   val lightSectors by lazy {
       val sectors = mutableListOf<LightSector>()
 
-      val regex = Regex("(?<visible>(Visible)?)(?<fullLightObscured>(Partially obscured)?)((?<color>[A-Z]+)?)\\.?(?<unintensified>(\\(unintensified\\))?)(?<obscured>(\\(partially obscured\\))?)( (?<startdeg>(\\d*))°)?((?<startminutes>[0-9]*)[\\`'])?(-(?<enddeg>(\\d*))°)(?<endminutes>[0-9]*)[\\`']?")
+      // Use Java RegEx here instead of Kotlin.  Kotlin 1.7 has native issues that was causing this to be slow and a memory hog
+      val pattern = Pattern.compile("(?<visible>(Visible)?)(?<fullLightObscured>(Partially obscured)?)((?<color>[A-Z]+)?)\\.?(?<unintensified>(\\(unintensified\\))?)(?<obscured>(\\(partially obscured\\))?)( (?<startdeg>(\\d*))°)?((?<startminutes>[0-9]*)[\\`'])?(-(?<enddeg>(\\d*))°)(?<endminutes>[0-9]*)[\\`']?")
       remarks?.let { remarks ->
          var previousEnd = 0.0
-
-         regex.findAll(remarks).forEach {  matchResult ->
-            val groups = matchResult.groups as? MatchNamedGroupCollection
-
-            if (groups != null) {
-               var end = 0.0
-               var start: Double? = null
-               var color = ""
-               var visibleColor: Color? = null
-               var obscured = false
-               var fullLightObscured = false
-               arrayOf("visible", "fullLightObscured", "color", "unintensified", "obscured", "startdeg", "startminutes", "enddeg", "endminutes").forEach { name ->
-                  val component: MatchGroup? = groups[name]
-                  if (component?.value?.isNotEmpty() == true) {
-                     if (name == "visible") {
-                        visibleColor = lightColors().firstOrNull()
-                     }
-
-                     else if (name == "fullLightObscured") {
-                        visibleColor = lightColors().firstOrNull()
-                        fullLightObscured = true
-                     }
-                     else if (name == "color") {
-                        color = remarks.substring(component.range)
-                     }
-                     else if (name == "obscured") {
-                        obscured = true
-                     }
-                     else if (name == "startdeg") {
-                        start = (start ?: 0.0) + (remarks.substring(component.range).toDoubleOrNull() ?: 0.0)
-                     } else if (name == "startminutes") {
-                        start = (start ?: 0.0) + ((remarks.substring(component.range).toDoubleOrNull() ?: 0.0)  / 60)
-                     } else if (name == "enddeg") {
-                        end = remarks.substring(component.range).toDoubleOrNull() ?: 0.0
-                     } else if (name == "endminutes") {
-                        end += (remarks.substring(component.range).toDoubleOrNull() ?: 0.0) / 60
-                     }
+         val matcher: Matcher = pattern.matcher(remarks)
+         while (matcher.find()) {
+            var end = 0.0
+            var start: Double? = null
+            var color = ""
+            var visibleColor: Color? = null
+            var obscured = false
+            var fullLightObscured = false
+            arrayOf("visible", "fullLightObscured", "color", "unintensified", "obscured", "startdeg", "startminutes", "enddeg", "endminutes").forEach { name ->
+               val component = matcher.group(name)
+               if (component?.isNotEmpty() == true) {
+                  if (name == "visible") {
+                     visibleColor = lightColors.firstOrNull()
+                  }
+                  else if (name == "fullLightObscured") {
+                     visibleColor = lightColors.firstOrNull()
+                     fullLightObscured = true
+                  }
+                  else if (name == "color") {
+                     color = component
+                  }
+                  else if (name == "obscured") {
+                     obscured = true
+                  }
+                  else if (name == "startdeg") {
+                     start = (start ?: 0.0) + (component.toDoubleOrNull() ?: 0.0)
+                  } else if (name == "startminutes") {
+                     start = (start ?: 0.0) + ((component.toDoubleOrNull() ?: 0.0)  / 60)
+                  } else if (name == "enddeg") {
+                     end = component.toDoubleOrNull() ?: 0.0
+                  } else if (name == "endminutes") {
+                     end += (component.toDoubleOrNull() ?: 0.0) / 60
                   }
                }
-
-               val uiColor = when {
-                  obscured || fullLightObscured -> {
-                     visibleColor ?: (lightColors().getOrNull(0) ?: Color.Black)
-                  }
-                  color == "W" -> LightColor.WHITE.color
-                  color == "R" -> LightColor.RED.color
-                  color == "G" -> LightColor.GREEN.color
-                  else -> visibleColor ?: Color.Transparent
-               }
-
-               var sectorRange: Double? = null
-               range?.split("/n")?.forEach { split ->
-                  val rangePart = split.trim().filterNot { it.isWhitespace() }
-                  if (rangePart.startsWith(color)) {
-                     val rangeRegex = Regex("[0-9]+$")
-                     val match = rangeRegex.find(rangePart)
-                     match?.range?.let { matchRange ->
-                        val colorRange = rangePart.substring(matchRange)
-                        if (colorRange.isNotEmpty()) {
-                           sectorRange = colorRange.toDoubleOrNull()
-                        }
-                     }
-                  }
-               }
-
-               val startDegrees = start
-               if (startDegrees != null) {
-                  sectors.add(LightSector(
-                     startDegrees = startDegrees,
-                     endDegrees = end,
-                     range = sectorRange,
-                     color = uiColor,
-                     text = color,
-                     obscured = obscured || fullLightObscured, characteristicNumber)
-                  )
-               } else {
-                  if (end < previousEnd) {
-                     end += 360.0
-                  }
-                  sectors.add(LightSector(
-                     startDegrees = previousEnd,
-                     endDegrees = end,
-                     range = sectorRange,
-                     color = uiColor,
-                     text = color,
-                     obscured = obscured || fullLightObscured, characteristicNumber)
-                  )
-               }
-
-               if (fullLightObscured) {
-                  // add the sector for the part of the light which is not obscured
-                  sectors.add(
-                     LightSector(
-                        startDegrees = end,
-                        endDegrees = (start ?: 0.0) + 360.0,
-                        range = sectorRange,
-                        color = visibleColor ?: (lightColors().getOrNull(0) ?: Color.Transparent),
-                        characteristicNumber = characteristicNumber
-                     )
-                  )
-               }
-
-               previousEnd = end
             }
+
+            val uiColor = when {
+               obscured || fullLightObscured -> {
+                  visibleColor ?: (lightColors.getOrNull(0) ?: Color.Black)
+               }
+               color == "W" -> LightColor.WHITE.color
+               color == "R" -> LightColor.RED.color
+               color == "G" -> LightColor.GREEN.color
+               else -> visibleColor ?: Color.Transparent
+            }
+
+            var sectorRange: Double? = null
+            range?.split(";","/n")?.forEach { split ->
+               val rangePart = split.trim().filterNot { it.isWhitespace() }
+               if (rangePart.startsWith(color)) {
+                  val rangeRegex = Regex("[0-9]+$")
+                  val match = rangeRegex.find(rangePart)
+                  match?.range?.let { matchRange ->
+                     val colorRange = rangePart.substring(matchRange)
+                     if (colorRange.isNotEmpty()) {
+                        sectorRange = colorRange.toDoubleOrNull()
+                     }
+                  }
+               }
+            }
+
+            val startDegrees = start
+            if (startDegrees != null) {
+               sectors.add(LightSector(
+                  startDegrees = startDegrees,
+                  endDegrees = end,
+                  range = sectorRange,
+                  color = uiColor,
+                  text = color,
+                  obscured = obscured || fullLightObscured, characteristicNumber)
+               )
+            } else {
+               if (end < previousEnd) {
+                  end += 360.0
+               }
+               sectors.add(LightSector(
+                  startDegrees = previousEnd,
+                  endDegrees = end,
+                  range = sectorRange,
+                  color = uiColor,
+                  text = color,
+                  obscured = obscured || fullLightObscured, characteristicNumber)
+               )
+            }
+
+            if (fullLightObscured) {
+               // add the sector for the part of the light which is not obscured
+               sectors.add(
+                  LightSector(
+                     startDegrees = end,
+                     endDegrees = (start ?: 0.0) + 360.0,
+                     range = sectorRange,
+                     color = visibleColor ?: (lightColors.getOrNull(0) ?: Color.Transparent),
+                     characteristicNumber = characteristicNumber
+                  )
+               )
+            }
+
+            previousEnd = end
          }
       }
 
-      return sectors
+      sectors
    }
 
    @Transient
@@ -323,19 +341,6 @@ data class Light(
       expanded = expanded?.replace("Y.","Yellow ")
 
       expanded
-   }
-
-   fun isRacon(): Boolean {
-      val name = name ?: return false
-      return name.contains("RACON") || remarks?.contains("(3 & 10cm)") == true
-   }
-
-   fun morseCode(): String? {
-      val firstIndex = characteristic?.indexOfFirst { it == '(' }?.takeIf { it >= 0 }
-      val lastIndex = characteristic?.indexOfLast { it == ')' }?.takeIf { it >= 0 }
-      return if (firstIndex != null && lastIndex != null) {
-         characteristic?.substring(IntRange(firstIndex + 1, lastIndex - 1))
-      } else null
    }
 
    fun compositeKey(): String {

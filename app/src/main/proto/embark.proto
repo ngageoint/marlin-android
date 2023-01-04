@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+option java_package = "mil.nga.msi.type";
+option java_multiple_files = true;
+
+message Embark {
+  bool embark = 1;
+  bool disclaimer = 2;
+  bool location = 3;
+  bool notification = 4;
+  bool tabs = 5;
+  bool map = 6;
+}

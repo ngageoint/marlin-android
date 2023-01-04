@@ -2,6 +2,7 @@ package mil.nga.msi.datasource.light
 
 import androidx.paging.PagingSource
 import androidx.room.*
+import androidx.sqlite.db.SupportSQLiteQuery
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -20,6 +21,10 @@ interface LightDao {
 
    @Query("SELECT * FROM lights")
    suspend fun getLights(): List<Light>
+
+   @RawQuery(observedEntities = [Light::class])
+   @RewriteQueriesToDropUnusedColumns
+   fun getLights(query: SupportSQLiteQuery): List<Light>
 
    @Query("SELECT * FROM lights WHERE latitude >= :minLatitude AND latitude <= :maxLatitude AND longitude >= :minLongitude AND longitude <= :maxLongitude")
    fun getLights(
@@ -47,13 +52,12 @@ interface LightDao {
    @Query("SELECT * FROM lights WHERE volume_number = :volumeNumber AND feature_number = :featureNumber ORDER BY characteristic_number")
    fun observeLight(volumeNumber: String, featureNumber: String): Flow<List<Light>>
 
-   @Query("SELECT * FROM lights ORDER BY section_header ASC, feature_number ASC")
-   @RewriteQueriesToDropUnusedColumns
-   fun observeLightListItems(): PagingSource<Int, LightListItem>
+   @RawQuery(observedEntities = [Light::class])
+   fun observeLightListItems(query: SupportSQLiteQuery): PagingSource<Int, Light>
 
-   @Query("SELECT * FROM lights ORDER BY volume_number, feature_number, characteristic_number")
+   @RawQuery(observedEntities = [Light::class])
    @RewriteQueriesToDropUnusedColumns
-   fun observeLightMapItems(): Flow<List<LightMapItem>>
+   fun observeLightMapItems(query: SupportSQLiteQuery): Flow<List<LightMapItem>>
 
    @Query("SELECT * FROM lights WHERE id IN (:ids)")
    suspend fun existingLights(ids: List<String>): List<Light>

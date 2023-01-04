@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android" >
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="#0042A4"/>
+            <size
+                android:width="24dp"
+                android:height="24dp"/>
+        </shape>
+    </item>
+
+    <item android:drawable="@drawable/ic_modu_24dp"
+        android:gravity="center"
+        android:width="18dp"
+        android:height="18dp"/>
+</layer-list>

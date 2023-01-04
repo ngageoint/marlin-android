@@ -34,4 +34,11 @@ class MapSettingsViewModel @Inject constructor(
       }
    }
 
+   val showLocation = repository.showLocation.asLiveData()
+
+   fun setShowLocation(enabled: Boolean) {
+      viewModelScope.launch {
+         repository.setShowLocation(enabled)
+      }
+   }
 }

@@ -50,16 +50,16 @@ class LightImage(
          images.add(buoyImage(context))
       }
 
-      val sectors = light.lightSectors()
-      val colors = light.lightColors()
+      val sectors = light.lightSectors
+      val colors = light.lightColors
       if (sectors.isNotEmpty()) {
          val image = if (showSectorLightRanges) {
-            sectorRangeImage(context, light, sectors, zoom, tileBounds, tileSize)
+            sectorRangeImage(light, sectors, tileBounds, tileSize)
          } else {
             sectorImage(context, sectors, zoom < 8)
          }
 
-         image?.let { images.add(it) }
+         image.let { images.add(it) }
       } else if(colors.isNotEmpty()) {
          val image = if (showLightRanges) {
             colorRangeImage(context, light, colors, zoom, tileBounds, tileSize)

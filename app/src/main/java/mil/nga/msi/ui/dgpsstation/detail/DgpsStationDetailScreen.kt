@@ -44,8 +44,8 @@ fun DgpsStationDetailScreen(
    Column {
       TopBar(
          title = dgpsStation?.name ?: "",
-         buttonIcon = Icons.Default.ArrowBack,
-         onButtonClicked = { close() }
+         navigationIcon = Icons.Default.ArrowBack,
+         onNavigationClicked = { close() }
       )
 
       RadioBeaconDetailContent(

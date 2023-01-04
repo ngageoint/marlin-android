@@ -61,8 +61,8 @@ fun NavigationalWarningGroupScreen(
    Column {
       TopBar(
          title = NavigationWarningRoute.Main.title,
-         buttonIcon = Icons.Filled.Menu,
-         onButtonClicked = { openDrawer() }
+         navigationIcon = Icons.Filled.Menu,
+         onNavigationClicked = { openDrawer() }
       )
 
       NavigationAreaMap(

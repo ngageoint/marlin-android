@@ -20,7 +20,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.TileProvider
-import mil.nga.msi.R
 import mil.nga.msi.coordinate.DMS
 import mil.nga.msi.datasource.modu.Modu
 import mil.nga.msi.ui.location.LocationTextButton
@@ -47,8 +46,8 @@ fun ModuDetailScreen(
    Column {
       TopBar(
          title = "MODU",
-         buttonIcon = Icons.Default.ArrowBack,
-         onButtonClicked = { close() }
+         navigationIcon = Icons.Default.ArrowBack,
+         onNavigationClicked = { close() }
       )
 
       ModuDetailContent(

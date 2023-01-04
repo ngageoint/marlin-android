@@ -1,15 +1,23 @@
 package mil.nga.msi.datasource.port.types
 
-enum class Decision(val value: String? = null, val title: String? = null) {
-   YES("Y", "Yes"),
-   NO("N", "No"),
-   UNKNOWN("Unknown");
+enum class Decision: EnumerationType {
+   Y {
+      override val title = "Yes"
+   },
+   N {
+      override val title = "No"
+   },
+   UNKNOWN {
+      override val title = "Unknown"
+   };
 
    companion object {
       fun fromValue(value: String?): Decision {
-         return values().find {
-            value == it.name
-         } ?: UNKNOWN
+         return  try {
+            valueOf(value!!)
+         } catch (e: Exception) {
+            UNKNOWN
+         }
       }
    }
 }

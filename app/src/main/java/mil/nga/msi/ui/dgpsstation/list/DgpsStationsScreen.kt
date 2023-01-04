@@ -1,18 +1,21 @@
 package mil.nga.msi.ui.dgpsstation.list
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.GpsFixed
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -23,7 +26,7 @@ import androidx.paging.compose.items
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import mil.nga.msi.coordinate.DMS
-import mil.nga.msi.datasource.dgpsstation.DgpsStationListItem
+import mil.nga.msi.datasource.dgpsstation.DgpsStation
 import mil.nga.msi.repository.dgpsstation.DgpsStationKey
 import mil.nga.msi.ui.dgpsstation.DgpsStationAction
 import mil.nga.msi.ui.dgpsstation.DgpsStationRoute
@@ -35,21 +38,53 @@ import mil.nga.msi.ui.theme.screenBackground
 @Composable
 fun DgpsStationsScreen(
    openDrawer: () -> Unit,
+   openFilter: () -> Unit,
+   openSort: () -> Unit,
    onTap: (DgpsStationKey) -> Unit,
    onAction: (DgpsStationAction) -> Unit,
    viewModel: DgpsStationsViewModel = hiltViewModel()
 ) {
    val scope = rememberCoroutineScope()
+   val filters by viewModel.dgpsStationFilters.observeAsState(emptyList())
 
    Column(modifier = Modifier.fillMaxSize()) {
       TopBar(
          title = DgpsStationRoute.List.title,
-         buttonIcon = Icons.Filled.Menu,
-         onButtonClicked = { openDrawer() }
+         navigationIcon = Icons.Filled.Menu,
+         onNavigationClicked = { openDrawer() },
+         actions = {
+            IconButton(onClick = { openSort() } ) {
+               Icon(Icons.Default.SwapVert, contentDescription = "Sort DPGS Stations")
+            }
+
+            Box {
+               IconButton(onClick = { openFilter() } ) {
+                  Icon(Icons.Default.FilterList, contentDescription = "Filter DGPS Stations")
+               }
+
+               if (filters.isNotEmpty()) {
+                  Box(
+                     contentAlignment = Alignment.Center,
+                     modifier = Modifier
+                        .clip(CircleShape)
+                        .height(24.dp)
+                        .background(MaterialTheme.colors.secondary)
+                        .align(Alignment.TopEnd)
+                  ) {
+                     Text(
+                        text = "${filters.size}",
+                        style = MaterialTheme.typography.body2,
+                        modifier = Modifier.padding(horizontal = 8.dp),
+                        color = MaterialTheme.colors.onPrimary
+                     )
+                  }
+               }
+            }
+         }
       )
 
       DgpsStations(
-         pagingState = viewModel.radioBeacons,
+         pagingState = viewModel.dgpsStations,
          onTap = { onTap(DgpsStationKey.fromDgpsStation(it)) },
          onCopyLocation = { onAction(DgpsStationAction.Location(it)) },
          onZoom = { onAction(DgpsStationAction.Zoom(it)) },
@@ -66,10 +101,10 @@ fun DgpsStationsScreen(
 
 @Composable
 private fun DgpsStations(
-   pagingState: Flow<PagingData<DgpsStationItem>>,
-   onTap: (DgpsStationListItem) -> Unit,
+   pagingState: Flow<PagingData<DgpsStationListItem>>,
+   onTap: (DgpsStation) -> Unit,
    onZoom: (Point) -> Unit,
-   onShare: (DgpsStationListItem) -> Unit,
+   onShare: (DgpsStation) -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
    val lazyItems = pagingState.collectAsLazyPagingItems()
@@ -86,7 +121,7 @@ private fun DgpsStations(
 
          items(lazyItems) { item ->
             when (item) {
-               is DgpsStationItem.Header -> {
+               is DgpsStationListItem.HeaderItem -> {
                   Text(
                      text = item.header,
                      fontWeight = FontWeight.Medium,
@@ -94,9 +129,9 @@ private fun DgpsStations(
                      modifier = Modifier.padding(vertical = 8.dp)
                   )
                }
-               is DgpsStationItem.DgpsStation -> {
+               is DgpsStationListItem.DgpsStationItem -> {
                   DgpsStationCard(
-                     item = item.dgpsStation,
+                     dgpsStation = item.dgpsStation,
                      onTap = onTap,
                      onCopyLocation = { onCopyLocation(it) },
                      onZoom = { onZoom(Point(item.dgpsStation.latitude, item.dgpsStation.longitude)) },
@@ -112,32 +147,30 @@ private fun DgpsStations(
 
 @Composable
 private fun DgpsStationCard(
-   item: DgpsStationListItem?,
-   onTap: (DgpsStationListItem) -> Unit,
-   onShare: (DgpsStationListItem) -> Unit,
+   dgpsStation: DgpsStation,
+   onTap: (DgpsStation) -> Unit,
+   onShare: (DgpsStation) -> Unit,
    onZoom: () -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
-   if (item != null) {
-      Card(
-         Modifier
-            .fillMaxWidth()
-            .padding(bottom = 8.dp)
-            .clickable { onTap(item) }
-      ) {
-         DgpsStationContent(
-            item,
-            onShare = { onShare(item) },
-            onZoom,
-            onCopyLocation
-         )
-      }
+   Card(
+      Modifier
+         .fillMaxWidth()
+         .padding(bottom = 8.dp)
+         .clickable { onTap(dgpsStation) }
+   ) {
+      DgpsStationContent(
+         dgpsStation,
+         onShare = { onShare(dgpsStation) },
+         onZoom,
+         onCopyLocation
+      )
    }
 }
 
 @Composable
 private fun DgpsStationContent(
-   item: DgpsStationListItem,
+   dgpsStation: DgpsStation,
    onShare: () -> Unit,
    onZoom: () -> Unit,
    onCopyLocation: (String) -> Unit
@@ -145,7 +178,7 @@ private fun DgpsStationContent(
    Column(Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
       CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
          Text(
-            text = "${item.featureNumber} ${item.volumeNumber}",
+            text = "${dgpsStation.featureNumber} ${dgpsStation.volumeNumber}",
             fontWeight = FontWeight.SemiBold,
             style = MaterialTheme.typography.overline,
             maxLines = 1,
@@ -153,7 +186,7 @@ private fun DgpsStationContent(
          )
       }
 
-      item.name?.let { name ->
+      dgpsStation.name?.let { name ->
          Text(
             text = name,
             style = MaterialTheme.typography.h6,
@@ -164,7 +197,7 @@ private fun DgpsStationContent(
       }
 
       CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-         item.remarks?.let { remarks ->
+         dgpsStation.remarks?.let { remarks ->
             Text(
                text = remarks,
                style = MaterialTheme.typography.body2,
@@ -174,7 +207,7 @@ private fun DgpsStationContent(
       }
 
       DgpsStationFooter(
-         item = item,
+         dgpsStation = dgpsStation,
          onShare = onShare,
          onZoom = onZoom,
          onCopyLocation = onCopyLocation
@@ -184,7 +217,7 @@ private fun DgpsStationContent(
 
 @Composable
 private fun DgpsStationFooter(
-   item: DgpsStationListItem,
+   dgpsStation: DgpsStation,
    onShare: () -> Unit,
    onZoom: () -> Unit,
    onCopyLocation: (String) -> Unit
@@ -196,7 +229,7 @@ private fun DgpsStationFooter(
          .fillMaxWidth()
          .padding(top = 8.dp)
    ) {
-      DgpsStationLocation(item.dms, onCopyLocation)
+      DgpsStationLocation(dgpsStation.dms, onCopyLocation)
       DgpsStationActions(onShare, onZoom)
    }
 }

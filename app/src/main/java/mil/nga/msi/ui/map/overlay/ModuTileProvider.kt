@@ -3,7 +3,6 @@ package mil.nga.msi.ui.map.overlay
 import android.app.Application
 import android.content.Context
 import android.graphics.Bitmap
-import com.google.android.gms.maps.model.LatLngBounds
 import com.google.maps.android.geometry.Bounds
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.modu.Modu
@@ -28,6 +27,6 @@ class ModuImage(
       tileBounds: Bounds,
       tileSize: Double
    ): List<Bitmap> {
-      return listOf(circleImage(context,zoom))
+      return listOf(circleImage(context, zoom))
    }
 }

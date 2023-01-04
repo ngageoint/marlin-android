@@ -54,7 +54,7 @@ class LightTileRepository(
       )
    }
 
-   override fun getTileableItems(
+   override suspend fun getTileableItems(
       minLatitude: Double,
       maxLatitude: Double,
       minLongitude: Double,

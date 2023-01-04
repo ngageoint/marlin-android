@@ -2,10 +2,12 @@ package mil.nga.msi.ui.main
 
 import android.content.Context
 import android.content.Intent
+import android.os.Bundle
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -15,35 +17,49 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.google.accompanist.navigation.material.BottomSheetNavigator
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import com.google.accompanist.navigation.material.ModalBottomSheetLayout
-import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
 import kotlinx.coroutines.launch
 import mil.nga.msi.R
+import mil.nga.msi.ui.embark.EmbarkRoute
 import mil.nga.msi.ui.home.homeGraph
 import mil.nga.msi.ui.map.MapRoute
 import mil.nga.msi.ui.navigation.NavigationDrawer
 
-@OptIn(ExperimentalMaterialNavigationApi::class)
+@OptIn(ExperimentalMaterialNavigationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun MainScreen(
    viewModel: MainViewModel = hiltViewModel()
 ) {
-
    val context: Context = LocalContext.current
    val scope = rememberCoroutineScope()
-   val scaffoldState = rememberScaffoldState()
-   val bottomSheetNavigator = rememberBottomSheetNavigator()
-   val navController = rememberNavController(bottomSheetNavigator)
-   var bottomBarVisibility by remember { (mutableStateOf(true)) }
-
+   val embark by viewModel.embark.observeAsState()
    val tabs by viewModel.tabs.observeAsState(emptyList())
+   var bottomBarVisibility by remember { (mutableStateOf(false)) }
+
+   val bottomSheetState = rememberModalBottomSheetState(
+      initialValue = ModalBottomSheetValue.Hidden,
+      skipHalfExpanded = true
+   )
+
+   val bottomSheetNavigator = remember {
+      BottomSheetNavigator(sheetState = bottomSheetState)
+   }
+
+   val scaffoldState = rememberScaffoldState()
+   val navController = rememberNavController(bottomSheetNavigator)
+   navController.addOnDestinationChangedListener { _: NavController, destination: NavDestination, _: Bundle? ->
+      viewModel.track(destination)
+   }
 
    val openDrawer = {
       scope.launch { scaffoldState.drawerState.open() }
@@ -160,9 +176,16 @@ fun MainScreen(
             composable("main") {
                bottomBarVisibility = false
 
-               // TODO placeholder for app setup routes
-               LaunchedEffect(null) {
-                  navController.navigate(MapRoute.Map.name)
+               LaunchedEffect(embark) {
+                  embark?.let { embark ->
+                     if (embark) {
+                        navController.navigate(MapRoute.Map.name)
+                     } else {
+                        navController.navigate(EmbarkRoute.Welcome.name) {
+                           launchSingleTop = true
+                        }
+                     }
+                  }
                }
             }
 
@@ -174,6 +197,7 @@ fun MainScreen(
                share = { share(it) },
                showSnackbar = { showSnackbar(it) },
                openNavigationDrawer = { openDrawer() },
+               annotationProvider = viewModel.annotationProvider
             )
          }
       }
@@ -181,7 +205,12 @@ fun MainScreen(
 }
 
 @Composable
-fun TopBar(title: String, buttonIcon: ImageVector, onButtonClicked: () -> Unit) {
+fun TopBar(
+   title: String,
+   navigationIcon: ImageVector? = null,
+   onNavigationClicked: (() -> Unit)? = null,
+   actions: @Composable RowScope.() -> Unit = {},
+) {
    TopAppBar(
       title = {
          Text(
@@ -189,10 +218,13 @@ fun TopBar(title: String, buttonIcon: ImageVector, onButtonClicked: () -> Unit) 
          )
       },
       navigationIcon = {
-         IconButton(onClick = { onButtonClicked() } ) {
-            Icon(buttonIcon, contentDescription = "")
+         navigationIcon?.let { icon ->
+            IconButton(onClick = { onNavigationClicked?.invoke() } ) {
+               Icon(navigationIcon, contentDescription = "Navigation")
+            }
          }
       },
+      actions = actions,
       backgroundColor = MaterialTheme.colors.primaryVariant
    )
 }

@@ -3,6 +3,7 @@ package mil.nga.msi.datasource.modu
 import androidx.lifecycle.LiveData
 import androidx.paging.PagingSource
 import androidx.room.*
+import androidx.sqlite.db.SupportSQLiteQuery
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -22,6 +23,10 @@ interface ModuDao {
    @Query("SELECT * FROM modus")
    fun observeModus(): Flow<List<Modu>>
 
+   @RawQuery(observedEntities = [Modu::class])
+   @RewriteQueriesToDropUnusedColumns
+   fun getModus(query: SupportSQLiteQuery): List<Modu>
+
    @Query("SELECT * FROM modus WHERE name = :name")
    fun observeModu(name: String): LiveData<Modu>
 
@@ -34,13 +39,12 @@ interface ModuDao {
    @Query("SELECT * FROM modus ORDER BY date DESC LIMIT 1")
    suspend fun getLatestModu(): Modu?
 
-   @Query("SELECT * FROM modus ORDER BY date DESC")
-   @RewriteQueriesToDropUnusedColumns
-   fun getModuListItems(): PagingSource<Int, ModuListItem>
+   @RawQuery(observedEntities = [Modu::class])
+   fun observeModuListItems(query: SupportSQLiteQuery): PagingSource<Int, Modu>
 
-   @Query("SELECT * FROM modus ORDER BY name")
+   @RawQuery(observedEntities = [Modu::class])
    @RewriteQueriesToDropUnusedColumns
-   fun observeModuMapItems(): Flow<List<ModuMapItem>>
+   fun observeModuMapItems(query: SupportSQLiteQuery): Flow<List<ModuMapItem>>
 
    @Query("SELECT * FROM modus WHERE latitude >= :minLatitude AND latitude <= :maxLatitude AND longitude >= :minLongitude AND longitude <= :maxLongitude")
    fun getModus(

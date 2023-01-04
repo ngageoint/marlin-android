@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+option java_package = "mil.nga.msi.type";
+option java_multiple_files = true;
+
+message MapLocation {
+  // The latitude in degrees. It must be in the range [-90.0, +90.0].
+  double latitude = 1;
+
+  // The longitude in degrees. It must be in the range [-180.0, +180.0].
+  double longitude = 2;
+
+  // The zoom level. It must be in the range [0.0, 18.0].
+  double zoom = 3;
+}
+
+message MapPreferences {
+  int32 mapLayer = 2;
+  MapLocation mapLocation = 3;
+  bool mgrs = 4;
+  bool gars = 5;
+  bool showLightSectorRanges = 6;
+  bool showLightRanges = 7;
+  bool showLocation = 8;
+  map<string, bool> mapped = 10;
+}

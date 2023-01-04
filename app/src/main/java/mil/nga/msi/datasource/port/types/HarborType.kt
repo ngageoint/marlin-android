@@ -1,22 +1,44 @@
 package mil.nga.msi.datasource.port.types
 
-enum class HarborType(val value: String? = null, val title: String? = null) {
-   COASTAL_BREAKWATER("CB", "Coastal Breakwater"),
-   COASTAL_NATURAL("CN", "Coastal Natural"),
-   COASTAL_TIDE_GATE("CT", "Coastal Tide Gate"),
-   LAKE_OR_CANAL("LC", "Lake or Canal"),
-   OPEN_ROADSTEAD("OR", "Open Roadstead"),
-   RIVER_BASIN("RB", "River Basin"),
-   RIVER_NATURAL("RN", "River Natural"),
-   RIVER_TIDE_GATE("RT", "River Tide Gate"),
-   TYPHOON_HARBOR("TH", "Typhoon Harbor"),
-   UNKNOWN("Unknown");
+enum class HarborType: EnumerationType {
+   CB {
+      override val title = "Coastal Breakwater"
+   },
+   CN {
+      override val title = "Coastal Natural"
+   },
+   CT {
+      override val title = "Coastal Tide Gate"
+   },
+   LC {
+      override val title = "Lake or Canal"
+   },
+   OR {
+      override val title = "Open Roadstead"
+   },
+   RB {
+      override val title = "River Basin"
+   },
+   RN {
+      override val title = "River Natural"
+   },
+   RT {
+      override val title = "River Tide Gate"
+   },
+   TH {
+      override val title = "Typhoon Harbor"
+   },
+   UNKNOWN {
+      override val title = "Unknown"
+   };
 
    companion object {
       fun fromValue(value: String?): HarborType {
-         return values().find {
-            value == it.name
-         } ?: UNKNOWN
+         return  try {
+            valueOf(value!!)
+         } catch (e: Exception) {
+            UNKNOWN
+         }
       }
    }
 }

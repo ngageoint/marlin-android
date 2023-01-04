@@ -8,7 +8,9 @@ import com.google.accompanist.navigation.material.ExperimentalMaterialNavigation
 import com.google.accompanist.navigation.material.bottomSheet
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.repository.light.LightKey
+import mil.nga.msi.ui.filter.FilterScreen
 import mil.nga.msi.ui.light.detail.LightDetailScreen
 import mil.nga.msi.ui.light.list.LightsScreen
 import mil.nga.msi.ui.light.sheet.LightSheetScreen
@@ -16,6 +18,7 @@ import mil.nga.msi.ui.map.MapRoute
 import mil.nga.msi.ui.navigation.LightKey
 import mil.nga.msi.ui.navigation.Point
 import mil.nga.msi.ui.navigation.Route
+import mil.nga.msi.ui.sort.SortScreen
 
 sealed class LightRoute(
    override val name: String,
@@ -27,6 +30,8 @@ sealed class LightRoute(
    object Detail: LightRoute("lights/detail", "Light Details")
    object List: LightRoute("lights/list", "Lights")
    object Sheet: LightRoute("lights/sheet", "Light Sheet")
+   object Filter: LightRoute("lights/filter", "Light Filters", "Light Filters")
+   object Sort: LightRoute("lights/sort", "Light Sort", "Light Sort")
 }
 
 @OptIn(ExperimentalMaterialNavigationApi::class)
@@ -58,6 +63,12 @@ fun NavGraphBuilder.lightGraph(
 
          LightsScreen(
             openDrawer = { openNavigationDrawer() },
+            openFilter = {
+               navController.navigate(LightRoute.Filter.name)
+            },
+            openSort = {
+               navController.navigate(LightRoute.Sort.name)
+            },
             onTap = { key ->
                val encoded = Uri.encode(Json.encodeToString(key))
                navController.navigate( "${LightRoute.Detail.name}?key=$encoded")
@@ -103,6 +114,24 @@ fun NavGraphBuilder.lightGraph(
                navController.navigate( "${LightRoute.Detail.name}?key=$encoded")
             })
          }
+      }
+
+      bottomSheet(LightRoute.Filter.name) {
+         FilterScreen(
+            dataSource = DataSource.LIGHT,
+            close = {
+               navController.popBackStack()
+            }
+         )
+      }
+
+      bottomSheet(LightRoute.Sort.name) {
+         SortScreen(
+            dataSource = DataSource.LIGHT,
+            close = {
+               navController.popBackStack()
+            }
+         )
       }
    }
 }

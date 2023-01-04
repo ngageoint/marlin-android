@@ -1,18 +1,21 @@
 package mil.nga.msi.ui.asam.list
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.GpsFixed
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -23,7 +26,7 @@ import androidx.paging.compose.items
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import mil.nga.msi.coordinate.DMS
-import mil.nga.msi.datasource.asam.AsamListItem
+import mil.nga.msi.datasource.asam.Asam
 import mil.nga.msi.ui.asam.AsamAction
 import mil.nga.msi.ui.asam.AsamRoute
 import mil.nga.msi.ui.location.LocationTextButton
@@ -36,17 +39,49 @@ import java.util.*
 @Composable
 fun AsamsScreen(
    openDrawer: () -> Unit,
+   openFilter: () -> Unit,
+   openSort: () -> Unit,
    onTap: (String) -> Unit,
    onAction: (AsamAction) -> Unit,
    viewModel: AsamsViewModel = hiltViewModel()
 ) {
    val scope = rememberCoroutineScope()
+   val filters by viewModel.asamFilters.observeAsState(emptyList())
 
    Column(modifier = Modifier.fillMaxSize()) {
       TopBar(
          title = AsamRoute.List.title,
-         buttonIcon = Icons.Filled.Menu,
-         onButtonClicked = { openDrawer() }
+         navigationIcon = Icons.Default.Menu,
+         onNavigationClicked = { openDrawer() },
+         actions = {
+            IconButton(onClick = { openSort() } ) {
+               Icon(Icons.Default.SwapVert, contentDescription = "Sort ASAMs")
+            }
+
+            Box {
+               IconButton(onClick = { openFilter() } ) {
+                  Icon(Icons.Default.FilterList, contentDescription = "Filter ASAMs")
+               }
+
+               if (filters.isNotEmpty()) {
+                  Box(
+                     contentAlignment = Alignment.Center,
+                     modifier = Modifier
+                        .clip(CircleShape)
+                        .height(24.dp)
+                        .background(MaterialTheme.colors.secondary)
+                        .align(Alignment.TopEnd)
+                  ) {
+                     Text(
+                        text = "${filters.size}",
+                        style = MaterialTheme.typography.body2,
+                        modifier = Modifier.padding(horizontal = 8.dp),
+                        color = MaterialTheme.colors.onPrimary
+                     )
+                  }
+               }
+            }
+         }
       )
 
       Asams(
@@ -74,6 +109,7 @@ private fun Asams(
    onCopyLocation: (String) -> Unit
 ) {
    val lazyItems = pagingState.collectAsLazyPagingItems()
+
    Surface(
       color = MaterialTheme.colors.screenBackground,
       modifier = Modifier.fillMaxHeight()
@@ -83,13 +119,26 @@ private fun Asams(
          contentPadding = PaddingValues(top = 16.dp)
       ) {
          items(lazyItems) { item ->
-            AsamCard(
-               item = item,
-               onTap = onTap,
-               onCopyLocation = { onCopyLocation(it) },
-               onZoom = { item?.let { onZoom(Point(it.latitude, it.longitude)) }  },
-               onShare = { item?.reference?.let { onShare(it) } }
-            )
+            when (item) {
+               is AsamListItem.AsamItem -> {
+                  AsamCard(
+                     asam = item.asam,
+                     onTap = onTap,
+                     onCopyLocation = { onCopyLocation(it) },
+                     onZoom = { onZoom(Point(item.asam.latitude, item.asam.longitude)) },
+                     onShare = { onShare(item.asam.reference) }
+                  )
+               }
+               is AsamListItem.HeaderItem -> {
+                  Text(
+                     text = item.header,
+                     fontWeight = FontWeight.Medium,
+                     style = MaterialTheme.typography.caption,
+                     modifier = Modifier.padding(vertical = 8.dp)
+                  )
+               }
+               else -> { /* TODO item is null */}
+            }
          }
       }
    }
@@ -97,34 +146,32 @@ private fun Asams(
 
 @Composable
 private fun AsamCard(
-   item: AsamListItem?,
+   asam: Asam,
    onTap: (String) -> Unit,
    onShare: () -> Unit,
    onZoom: () -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
-   if (item != null) {
-      Card(
-         Modifier
-            .fillMaxWidth()
-            .padding(bottom = 8.dp)
-            .clickable { onTap(item.reference) }
-      ) {
-         AsamContent(item, onShare, onZoom, onCopyLocation)
-      }
+   Card(
+      Modifier
+         .fillMaxWidth()
+         .padding(bottom = 8.dp)
+         .clickable { onTap(asam.reference) }
+   ) {
+      AsamContent(asam, onShare, onZoom, onCopyLocation)
    }
 }
 
 @Composable
 private fun AsamContent(
-   item: AsamListItem,
+   asam: Asam,
    onShare: () -> Unit,
    onZoom: () -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
    Column(Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
       CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-         item.date.let { date ->
+         asam.date.let { date ->
             val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
             Text(
                text = dateFormat.format(date),
@@ -136,7 +183,7 @@ private fun AsamContent(
          }
       }
 
-      val header = listOfNotNull(item.hostility, item.victim).joinToString(": ")
+      val header = listOfNotNull(asam.hostility, asam.victim).joinToString(": ")
       Text(
          text = header,
          style = MaterialTheme.typography.h6,
@@ -146,7 +193,7 @@ private fun AsamContent(
       )
 
       CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-         item.description?.let {
+         asam.description?.let {
             Text(
                text = it,
                style = MaterialTheme.typography.body2,
@@ -154,9 +201,9 @@ private fun AsamContent(
             )
          }
       }
-      
+
       AsamFooter(
-         item = item,
+         asam = asam,
          onShare = onShare,
          onZoom = onZoom,
          onCopyLocation = onCopyLocation
@@ -166,7 +213,7 @@ private fun AsamContent(
 
 @Composable
 private fun AsamFooter(
-   item: AsamListItem,
+   asam: Asam,
    onShare: () -> Unit,
    onZoom: () -> Unit,
    onCopyLocation: (String) -> Unit
@@ -178,7 +225,7 @@ private fun AsamFooter(
          .fillMaxWidth()
          .padding(top = 8.dp)
    ) {
-      AsamLocation(item.dms, onCopyLocation)
+      AsamLocation(asam.dms, onCopyLocation)
       AsamActions(onShare, onZoom)
    }
 }

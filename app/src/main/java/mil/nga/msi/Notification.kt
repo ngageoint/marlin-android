@@ -3,8 +3,6 @@ package mil.nga.msi
 import android.app.*
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.toUri
@@ -32,7 +30,6 @@ private const val MarlinNotificationChannelImportance = NotificationManager.IMPO
 
 class MarlinNotificationChannel {
    companion object {
-      @RequiresApi(Build.VERSION_CODES.O)
       fun create(): NotificationChannel {
          return NotificationChannel(
             MarlinNotificationChannelId,

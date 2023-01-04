@@ -1,14 +1,22 @@
 package mil.nga.msi.repository.port
 
 import androidx.lifecycle.map
-import androidx.work.*
+import androidx.paging.PagingSource
+import androidx.work.WorkInfo
+import androidx.work.WorkManager
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flatMapLatest
 import mil.nga.msi.MarlinNotification
 import mil.nga.msi.datasource.DataSource
+import mil.nga.msi.datasource.filter.QueryBuilder
 import mil.nga.msi.datasource.port.Port
+import mil.nga.msi.datasource.port.PortMapItem
+import mil.nga.msi.filter.Filter
+import mil.nga.msi.repository.preferences.FilterRepository
 import mil.nga.msi.repository.preferences.UserPreferencesRepository
-import mil.nga.msi.work.port.LoadPortWorker
-import mil.nga.msi.work.port.RefreshPortWorker
-import java.util.concurrent.TimeUnit
+import mil.nga.msi.sort.SortParameter
+import mil.nga.msi.startup.port.PortInitializer.Companion.FETCH_LATEST_PORTS_TASK
 import javax.inject.Inject
 
 class PortRepository @Inject constructor(
@@ -16,17 +24,33 @@ class PortRepository @Inject constructor(
    private val localDataSource: PortLocalDataSource,
    private val remoteDataSource: PortRemoteDataSource,
    private val notification: MarlinNotification,
+   private val filterRepository: FilterRepository,
    private val userPreferencesRepository: UserPreferencesRepository
 ) {
-   val portMapItems = localDataSource.observePortMapItems()
-   fun getPortListItems() = localDataSource.observePortListItems()
 
-   fun getPorts(
-      minLatitude: Double,
-      maxLatitude: Double,
-      minLongitude: Double,
-      maxLongitude: Double
-   ) = localDataSource.getPorts(minLatitude, maxLatitude, minLongitude, maxLongitude)
+   @OptIn(ExperimentalCoroutinesApi::class)
+   fun observePortMapItems(): Flow<List<PortMapItem>> {
+      return filterRepository.filters.flatMapLatest { entry ->
+         val filters = entry[DataSource.PORT] ?: emptyList()
+         val query = QueryBuilder("ports", filters).buildQuery()
+         localDataSource.observePortMapItems(query)
+      }
+   }
+
+   fun observePortListItems(filters: List<Filter>, sort: List<SortParameter>): PagingSource<Int, Port> {
+      val query = QueryBuilder(
+         table = "ports",
+         filters = filters,
+         sort = sort
+      ).buildQuery()
+
+      return localDataSource.observePortListItems(query)
+   }
+
+   fun getPorts(filters: List<Filter>): List<Port> {
+      val query = QueryBuilder("ports", filters).buildQuery()
+      return localDataSource.getPorts(query)
+   }
 
    fun observePort(portNumber: Int) = localDataSource.observePort(portNumber)
    suspend fun getPort(portNumber: Int) = localDataSource.getPort(portNumber)
@@ -47,48 +71,7 @@ class PortRepository @Inject constructor(
       return localDataSource.getPorts()
    }
 
-   fun fetchPorts() {
-      val loadRequest = OneTimeWorkRequest.Builder(LoadPortWorker::class.java).build()
-      val fetchRequest = OneTimeWorkRequest.Builder(RefreshPortWorker::class.java)
-         .setConstraints(
-            Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .build()
-         )
-         .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
-         .setBackoffCriteria(BackoffPolicy.LINEAR, 15, TimeUnit.SECONDS)
-         .build()
-
-      workManager
-         .beginUniqueWork(FETCH_LATEST_PORTS_TASK, ExistingWorkPolicy.KEEP, loadRequest)
-         .then(fetchRequest)
-         .enqueue()
-   }
-
-   fun fetchPortsPeriodically() {
-      val fetchRequest = PeriodicWorkRequestBuilder<RefreshPortWorker>(
-         REFRESH_RATE_HOURS, TimeUnit.HOURS
-      ).setConstraints(
-         Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .setRequiresCharging(true)
-            .build()
-      ).addTag(TAG_FETCH_LATEST_PORTS)
-
-      workManager.enqueueUniquePeriodicWork(
-         FETCH_LATEST_PORTS_TASK,
-         ExistingPeriodicWorkPolicy.KEEP,
-         fetchRequest.build()
-      )
-   }
-
    val fetching = workManager.getWorkInfosForUniqueWorkLiveData(FETCH_LATEST_PORTS_TASK).map { workInfo ->
       workInfo.any { it.state == WorkInfo.State.RUNNING }
-   }
-
-   companion object {
-      private const val REFRESH_RATE_HOURS = 24L
-      private const val FETCH_LATEST_PORTS_TASK = "FetchLatestPortsTask"
-      private const val TAG_FETCH_LATEST_PORTS = "FetchLatestPortsTaskTag"
    }
 }

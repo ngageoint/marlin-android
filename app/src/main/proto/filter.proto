@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+option java_package = "mil.nga.msi.type";
+option java_multiple_files = true;
+
+message FilterParameter {
+  string type = 1;
+  string title = 2;
+  string name = 3; // TODO this should be static
+}
+
+message Filter {
+  FilterParameter parameter = 1;
+  string comparator = 2;
+  string value = 3;
+}
+
+message Filters {
+  repeated Filter filters = 1;
+}

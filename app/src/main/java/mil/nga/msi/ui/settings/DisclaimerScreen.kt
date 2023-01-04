@@ -25,9 +25,9 @@ fun DisclaimerScreen(
    val scrollState = rememberScrollState()
    Column(modifier = Modifier.fillMaxSize()) {
       TopBar(
-         title = SettingsRoute.Disclaimer.title,
-         buttonIcon = Icons.Default.ArrowBack,
-         onButtonClicked = { close() }
+         title = AboutRoute.Disclaimer.title,
+         navigationIcon = Icons.Default.ArrowBack,
+         onNavigationClicked = { close() }
       )
 
       Column(
@@ -44,7 +44,7 @@ fun DisclaimerScreen(
 }
 
 @Composable
-private fun LegalDisclaimer() {
+fun LegalDisclaimer() {
    Column(Modifier.padding(vertical = 8.dp)) {
       Text(
          text = "Legal Disclaimer",
@@ -65,7 +65,7 @@ private fun LegalDisclaimer() {
 }
 
 @Composable
-private fun SecurityPolicy() {
+fun SecurityPolicy() {
    Column() {
       Text(
          text = "Security Policy",
@@ -86,7 +86,7 @@ private fun SecurityPolicy() {
 }
 
 @Composable
-private fun LiabilityDisclaimer() {
+fun LiabilityDisclaimer() {
    Column() {
       Text(
          text = "Disclaimer of Liability",
@@ -107,7 +107,7 @@ private fun LiabilityDisclaimer() {
 }
 
 @Composable
-private fun EndorsementDisclaimer() {
+fun EndorsementDisclaimer() {
    Column() {
       Text(
          text = "Disclaimer of Endorsement",

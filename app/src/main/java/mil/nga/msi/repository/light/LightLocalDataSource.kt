@@ -1,5 +1,6 @@
 package mil.nga.msi.repository.light
 
+import androidx.sqlite.db.SimpleSQLiteQuery
 import mil.nga.msi.datasource.light.Light
 import mil.nga.msi.datasource.light.LightDao
 import javax.inject.Inject
@@ -7,8 +8,10 @@ import javax.inject.Inject
 class LightLocalDataSource @Inject constructor(
    private val dao: LightDao
 ) {
-   fun observeLightMapItems() = dao.observeLightMapItems()
-   fun observeLightListItems() = dao.observeLightListItems()
+   fun observeLightMapItems(query: SimpleSQLiteQuery) = dao.observeLightMapItems(query)
+   fun observeLightListItems(query: SimpleSQLiteQuery) = dao.observeLightListItems(query)
+
+   fun getLights(query: SimpleSQLiteQuery) = dao.getLights(query)
 
    fun isEmpty() = dao.count() == 0
    suspend fun existingLights(ids: List<String>) = dao.existingLights(ids)
@@ -23,13 +26,6 @@ class LightLocalDataSource @Inject constructor(
       featureNumber: String,
       characteristicNumber: Int
    ) = dao.getLight(volumeNumber, featureNumber, characteristicNumber)
-
-   fun getLights(
-      minLatitude: Double,
-      maxLatitude: Double,
-      minLongitude: Double,
-      maxLongitude: Double
-   ) = dao.getLights(minLatitude, maxLatitude, minLongitude, maxLongitude)
 
    fun getLights(
       minLatitude: Double,

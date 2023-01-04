@@ -1,18 +1,21 @@
 package mil.nga.msi.ui.modu.list
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.GpsFixed
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -23,7 +26,7 @@ import androidx.paging.compose.items
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import mil.nga.msi.coordinate.DMS
-import mil.nga.msi.datasource.modu.ModuListItem
+import mil.nga.msi.datasource.modu.Modu
 import mil.nga.msi.ui.location.LocationTextButton
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.modu.ModuAction
@@ -36,17 +39,49 @@ import java.util.*
 @Composable
 fun ModusScreen(
    openDrawer: () -> Unit,
+   openFilter: () -> Unit,
+   openSort: () -> Unit,
    onTap: (String) -> Unit,
    onAction: (ModuAction) -> Unit,
    viewModel: ModusViewModel = hiltViewModel()
 ) {
    val scope = rememberCoroutineScope()
+   val filters by viewModel.moduFilters.observeAsState(emptyList())
 
    Column(modifier = Modifier.fillMaxSize()) {
       TopBar(
          title = ModuRoute.List.title,
-         buttonIcon = Icons.Filled.Menu,
-         onButtonClicked = { openDrawer() }
+         navigationIcon = Icons.Filled.Menu,
+         onNavigationClicked = { openDrawer() },
+         actions = {
+            IconButton(onClick = { openSort() } ) {
+               Icon(Icons.Default.SwapVert, contentDescription = "Sort MODUs")
+            }
+
+            Box {
+               IconButton(onClick = { openFilter() } ) {
+                  Icon(Icons.Default.FilterList, contentDescription = "Filter MODUs")
+               }
+
+               if (filters.isNotEmpty()) {
+                  Box(
+                     contentAlignment = Alignment.Center,
+                     modifier = Modifier
+                        .clip(CircleShape)
+                        .height(24.dp)
+                        .background(MaterialTheme.colors.secondary)
+                        .align(Alignment.TopEnd)
+                  ) {
+                     Text(
+                        text = "${filters.size}",
+                        style = MaterialTheme.typography.body2,
+                        modifier = Modifier.padding(horizontal = 8.dp),
+                        color = MaterialTheme.colors.onPrimary
+                     )
+                  }
+               }
+            }
+         }
       )
       Modus(
          viewModel.modus,
@@ -82,13 +117,26 @@ private fun Modus(
          contentPadding = PaddingValues(top = 16.dp)
       ) {
          items(lazyItems) { item ->
-            ModuCard(
-               item = item,
-               onTap = onTap,
-               onZoom = { item?.let { onZoom(Point(it.latitude, it.longitude)) } },
-               onShare = { item?.name?.let { onShare(it) } },
-               onCopyLocation = onCopyLocation
-            )
+            when (item) {
+               is ModuListItem.ModuItem -> {
+                  ModuCard(
+                     modu = item.modu,
+                     onTap = onTap,
+                     onZoom = { onZoom(Point(item.modu.latitude, item.modu.longitude)) },
+                     onShare = { item.modu.name.let { onShare(it) } },
+                     onCopyLocation = onCopyLocation
+                  )
+               }
+               is ModuListItem.HeaderItem -> {
+                  Text(
+                     text = item.header,
+                     fontWeight = FontWeight.Medium,
+                     style = MaterialTheme.typography.caption,
+                     modifier = Modifier.padding(vertical = 8.dp)
+                  )
+               }
+               else -> { /* TODO item is null */}
+            }
          }
       }
    }
@@ -96,34 +144,34 @@ private fun Modus(
 
 @Composable
 private fun ModuCard(
-   item: ModuListItem?,
+   modu: Modu?,
    onTap: (String) -> Unit,
    onZoom: () -> Unit,
    onShare: () -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
-   if (item != null) {
+   if (modu != null) {
       Card(
          Modifier
             .fillMaxWidth()
             .padding(bottom = 8.dp)
-            .clickable { onTap(item.name) }
+            .clickable { onTap(modu.name) }
       ) {
-         ModuContent(item, onZoom, onShare, onCopyLocation)
+         ModuContent(modu, onZoom, onShare, onCopyLocation)
       }
    }
 }
 
 @Composable
 private fun ModuContent(
-   item: ModuListItem,
+   modu: Modu,
    onZoom: () -> Unit,
    onShare: () -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
    Column(Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
       CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-         item.date.let { date ->
+         modu.date.let { date ->
             val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
             Text(
                text = dateFormat.format(date),
@@ -136,7 +184,7 @@ private fun ModuContent(
       }
 
       Text(
-         text = item.name,
+         text = modu.name,
          style = MaterialTheme.typography.h6,
          maxLines = 1,
          overflow = TextOverflow.Ellipsis,
@@ -144,15 +192,15 @@ private fun ModuContent(
       )
 
       CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-         item.rigStatus?.let {
+         modu.rigStatus?.let {
             Text(
-               text = it,
+               text = it.name,
                style = MaterialTheme.typography.body2,
                modifier = Modifier.padding(top = 4.dp)
             )
          }
 
-         item.specialStatus?.let {
+         modu.specialStatus?.let {
             Text(
                text = it,
                style = MaterialTheme.typography.body2
@@ -160,13 +208,13 @@ private fun ModuContent(
          }
       }
       
-      ModuFooter(item, onZoom, onShare, onCopyLocation)
+      ModuFooter(modu, onZoom, onShare, onCopyLocation)
    }
 }
 
 @Composable
 private fun ModuFooter(
-   item: ModuListItem,
+   modu: Modu,
    onZoom: () -> Unit,
    onShare: () -> Unit,
    onCopyLocation: (String) -> Unit
@@ -178,7 +226,7 @@ private fun ModuFooter(
          .fillMaxWidth()
          .padding(top = 8.dp)
    ) {
-      ModuLocation(item.dms, onCopyLocation)
+      ModuLocation(modu.dms, onCopyLocation)
       ModuActions(onZoom, onShare)
    }
 }

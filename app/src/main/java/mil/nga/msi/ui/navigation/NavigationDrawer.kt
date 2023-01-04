@@ -12,9 +12,10 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LocationOff
 import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.NoteAdd
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -32,7 +33,8 @@ import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.ui.drag.DraggableItem
 import mil.nga.msi.ui.drag.dragContainer
 import mil.nga.msi.ui.drag.rememberDragDropState
-import mil.nga.msi.ui.settings.SettingsRoute
+import mil.nga.msi.ui.report.ReportRoute
+import mil.nga.msi.ui.settings.AboutRoute
 import mil.nga.msi.ui.theme.screenBackground
 
 private const val MAX_TABS = 4
@@ -141,9 +143,7 @@ fun NavigationDrawer(
                   isMapped = isMapped,
                   isDragging = isDragging,
                   onMapClicked = {
-                     scope.launch {
-                        viewModel.toggleOnMap(tab)
-                     }
+                     viewModel.toggleOnMap(tab)
                   },
                   onDestinationClicked = {
                      onDestinationClicked(it.name)
@@ -191,7 +191,7 @@ fun NavigationDrawer(
             Column(
                Modifier
                   .padding(top = 32.dp)
-                  .height(72.dp)
+                  .height(56.dp)
                   .fillMaxWidth()
             ) {
                Row(
@@ -200,15 +200,15 @@ fun NavigationDrawer(
                      .fillMaxSize()
                      .background(MaterialTheme.colors.background)
                      .clickable {
-                        onDestinationClicked(SettingsRoute.Main.name)
+                        onDestinationClicked(ReportRoute.Main.name)
                      }
                ) {
 
                   CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                      Icon(
-                        Icons.Default.Settings,
+                        Icons.Filled.NoteAdd,
                         modifier = Modifier.padding(start = 8.dp),
-                        contentDescription = "Settings"
+                        contentDescription = "Submit Report to NGA"
                      )
                   }
 
@@ -227,7 +227,56 @@ fun NavigationDrawer(
                      ) {
                         CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
                            Text(
-                              text = SettingsRoute.Main.title,
+                              text = ReportRoute.Main.title,
+                              style = MaterialTheme.typography.body2,
+                              fontWeight = FontWeight.Medium
+                           )
+                        }
+                     }
+                  }
+               }
+            }
+
+            Column(
+               Modifier
+                  .padding(top = 32.dp)
+                  .height(56.dp)
+                  .fillMaxWidth()
+            ) {
+               Row(
+                  verticalAlignment = Alignment.CenterVertically,
+                  modifier = Modifier
+                     .fillMaxSize()
+                     .background(MaterialTheme.colors.background)
+                     .clickable {
+                        onDestinationClicked(AboutRoute.Main.name)
+                     }
+               ) {
+
+                  CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                     Icon(
+                        Icons.Default.Info,
+                        modifier = Modifier.padding(start = 8.dp),
+                        contentDescription = "About"
+                     )
+                  }
+
+                  Column(
+                     verticalArrangement = Arrangement.Center,
+                     modifier = Modifier.fillMaxWidth()
+                  ) {
+                     Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier
+                           .height(72.dp)
+                           .fillMaxWidth()
+                           .weight(1f)
+                           .padding(horizontal = 8.dp)
+                     ) {
+                        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
+                           Text(
+                              text = AboutRoute.Main.title,
                               style = MaterialTheme.typography.body2,
                               fontWeight = FontWeight.Medium
                            )
@@ -255,7 +304,7 @@ private fun NavigationRow(
    Surface(elevation = elevation) {
       Column(
          Modifier
-            .height(72.dp)
+            .height(56.dp)
             .fillMaxWidth()
       ) {
          Row(

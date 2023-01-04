@@ -15,10 +15,6 @@ import javax.inject.Singleton
 class LocationProvider @Inject constructor(
     @ApplicationContext val context: Context
 ) : LiveData<Location>() {
-    companion object {
-        private val LOG_NAME = LocationProvider::class.java.simpleName
-    }
-
     private var fusedLocationClient: FusedLocationProviderClient? = null
     private val locationCallback: LocationCallback = object : LocationCallback() {
         override fun onLocationResult(result: LocationResult) {
@@ -26,9 +22,7 @@ class LocationProvider @Inject constructor(
         }
     }
 
-    override fun onActive() {
-        super.onActive()
-
+    init {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
     }
 
@@ -47,12 +41,16 @@ class LocationProvider @Inject constructor(
 
             Log.v(LOG_NAME, "request location updates")
             val locationRequest = LocationRequest.create().apply {
-                interval = 10000
+                interval = 5000
                 fastestInterval = 5000
                 priority = PRIORITY_HIGH_ACCURACY // TODO need to check if they enabled course or high
             }
 
             fusedLocationClient?.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
         } catch (ignore: SecurityException) {}
+    }
+
+    companion object {
+        private val LOG_NAME = LocationProvider::class.java.simpleName
     }
 }

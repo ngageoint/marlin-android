@@ -11,12 +11,15 @@ import com.google.accompanist.navigation.material.ExperimentalMaterialNavigation
 import com.google.accompanist.navigation.material.bottomSheet
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import mil.nga.msi.datasource.DataSource
+import mil.nga.msi.ui.filter.FilterScreen
 import mil.nga.msi.ui.map.MapRoute
 import mil.nga.msi.ui.modu.detail.ModuDetailScreen
 import mil.nga.msi.ui.modu.list.ModusScreen
 import mil.nga.msi.ui.modu.sheet.ModuSheetScreen
 import mil.nga.msi.ui.navigation.Point
 import mil.nga.msi.ui.navigation.Route
+import mil.nga.msi.ui.sort.SortScreen
 
 sealed class ModuRoute(
    override val name: String,
@@ -27,6 +30,8 @@ sealed class ModuRoute(
    object Main: ModuRoute("modus", "Mobile Offshore Drilling Units", "MODUs")
    object Detail: ModuRoute("modus/detail", "Mobile Offshore Drilling Unit Details", "MODU Details")
    object List: ModuRoute("modus/list", "Mobile Offshore Drilling Units", "MODUs")
+   object Filter: ModuRoute("modus/filter", "Mobile Offshore Drilling Units Filters", "MODU Filters")
+   object Sort: ModuRoute("modus/sort", "Mobile Offshore Drilling Units Sort", "MODU Sort")
    object Sheet: ModuRoute("modus/sheet", "Mobile Offshore Drilling Unit Sheet", "Modu Sheet")
 }
 
@@ -59,6 +64,12 @@ fun NavGraphBuilder.moduGraph(
 
          ModusScreen(
             openDrawer = { openNavigationDrawer() },
+            openFilter = {
+               navController.navigate(ModuRoute.Filter.name)
+            },
+            openSort = {
+               navController.navigate(ModuRoute.Sort.name)
+            },
             onTap = { name ->
                navController.navigate( "${ModuRoute.Detail.name}?name=$name")
             },
@@ -94,6 +105,22 @@ fun NavGraphBuilder.moduGraph(
                navController.navigate("${ModuRoute.Detail.name}?name=$name")
             })
          }
+      }
+      bottomSheet(ModuRoute.Filter.name) {
+         FilterScreen(
+            dataSource = DataSource.MODU,
+            close = {
+               navController.popBackStack()
+            }
+         )
+      }
+      bottomSheet(ModuRoute.Sort.name) {
+         SortScreen(
+            dataSource = DataSource.MODU,
+            close = {
+               navController.popBackStack()
+            }
+         )
       }
    }
 }

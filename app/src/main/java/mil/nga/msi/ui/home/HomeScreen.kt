@@ -4,12 +4,15 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import mil.nga.msi.ui.asam.asamGraph
 import mil.nga.msi.ui.dgpsstation.dgpsStationGraph
+import mil.nga.msi.ui.embark.embarkGraph
 import mil.nga.msi.ui.light.lightGraph
+import mil.nga.msi.ui.map.AnnotationProvider
 import mil.nga.msi.ui.map.mapGraph
 import mil.nga.msi.ui.modu.moduGraph
 import mil.nga.msi.ui.navigationalwarning.navigationalWarningGraph
 import mil.nga.msi.ui.port.portGraph
 import mil.nga.msi.ui.radiobeacon.radioBeaconGraph
+import mil.nga.msi.ui.report.reportGraph
 import mil.nga.msi.ui.settings.settingsGraph
 
 fun NavGraphBuilder.homeGraph(
@@ -17,12 +20,20 @@ fun NavGraphBuilder.homeGraph(
    bottomBarVisibility: (Boolean) -> Unit,
    share: (Pair<String, String>) -> Unit,
    showSnackbar: (String) -> Unit,
-   openNavigationDrawer: () -> Unit
+   openNavigationDrawer: () -> Unit,
+   annotationProvider: AnnotationProvider
 ) {
+   embarkGraph(
+      navController = navController,
+      bottomBarVisibility = { bottomBarVisibility(it) }
+   )
+
    mapGraph(
       navController = navController,
       bottomBarVisibility = { bottomBarVisibility(it) },
-      openNavigationDrawer = { openNavigationDrawer() }
+      openNavigationDrawer = { openNavigationDrawer() },
+      showSnackbar = { showSnackbar(it) },
+      annotationProvider = annotationProvider
    )
    asamGraph(
       navController = navController,
@@ -71,6 +82,11 @@ fun NavGraphBuilder.homeGraph(
       share = { share(it) },
       showSnackbar = { showSnackbar(it) },
       openNavigationDrawer = { openNavigationDrawer() }
+   )
+
+   reportGraph(
+      navController = navController,
+      bottomBarVisibility = { bottomBarVisibility(false) }
    )
 
    settingsGraph(
