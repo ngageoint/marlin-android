@@ -34,6 +34,7 @@ import mil.nga.msi.ui.embark.EmbarkRoute
 import mil.nga.msi.ui.home.homeGraph
 import mil.nga.msi.ui.map.MapRoute
 import mil.nga.msi.ui.navigation.NavigationDrawer
+import mil.nga.msi.ui.navigation.mainRouteFor
 
 @OptIn(ExperimentalMaterialNavigationApi::class, ExperimentalMaterialApi::class)
 @Composable
@@ -139,20 +140,21 @@ fun MainScreen(
                      )
 
                      tabs.forEach { tab ->
+                        val tabRoute = mainRouteFor(tab)
                         BottomNavigationItem(
                            icon = {
                               Icon(
                                  imageVector = ImageVector.vectorResource(id = tab.icon),
-                                 contentDescription = tab.route.title
+                                 contentDescription = tabRoute.title
                               )
                            },
-                           label = { Text(tab.route.shortTitle) },
+                           label = { Text(tabRoute.shortTitle) },
                            selectedContentColor = MaterialTheme.colors.primary,
                            unselectedContentColor = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.disabled),
-                           selected = currentDestination?.hierarchy?.any { it.route?.substringBefore("?") == tab.route.name } == true,
+                           selected = currentDestination?.hierarchy?.any { it.route?.substringBefore("?") == tabRoute.name } == true,
                            onClick = {
-                              if (currentDestination?.route?.substringBefore("?") != tab.route.name) {
-                                 navController.navigate(tab.route.name) {
+                              if (currentDestination?.route?.substringBefore("?") != tabRoute.name) {
+                                 navController.navigate(tabRoute.name) {
                                     popUpTo(navController.graph.findStartDestination().id) {
                                        saveState = true
                                     }
@@ -220,7 +222,7 @@ fun TopBar(
       navigationIcon = {
          navigationIcon?.let { icon ->
             IconButton(onClick = { onNavigationClicked?.invoke() } ) {
-               Icon(navigationIcon, contentDescription = "Navigation")
+               Icon(icon, contentDescription = "Navigation")
             }
          }
       },

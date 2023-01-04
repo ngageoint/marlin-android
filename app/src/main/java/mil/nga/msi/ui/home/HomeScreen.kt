@@ -5,6 +5,7 @@ import androidx.navigation.NavGraphBuilder
 import mil.nga.msi.ui.asam.asamGraph
 import mil.nga.msi.ui.dgpsstation.dgpsStationGraph
 import mil.nga.msi.ui.embark.embarkGraph
+import mil.nga.msi.ui.electronicpublication.electronicPublicationGraph
 import mil.nga.msi.ui.light.lightGraph
 import mil.nga.msi.ui.map.AnnotationProvider
 import mil.nga.msi.ui.map.mapGraph
@@ -31,7 +32,7 @@ fun NavGraphBuilder.homeGraph(
    mapGraph(
       navController = navController,
       bottomBarVisibility = { bottomBarVisibility(it) },
-      openNavigationDrawer = { openNavigationDrawer() },
+      openNavigationDrawer = openNavigationDrawer,
       showSnackbar = { showSnackbar(it) },
       annotationProvider = annotationProvider
    )
@@ -40,55 +41,60 @@ fun NavGraphBuilder.homeGraph(
       bottomBarVisibility = { bottomBarVisibility(it) },
       share = { share(it) },
       showSnackbar = { showSnackbar(it) },
-      openNavigationDrawer = { openNavigationDrawer() }
+      openNavigationDrawer = openNavigationDrawer
    )
    moduGraph(
       navController = navController,
       bottomBarVisibility = { bottomBarVisibility(it) },
       share = { share(it) },
       showSnackbar = { showSnackbar(it) },
-      openNavigationDrawer = { openNavigationDrawer() }
+      openNavigationDrawer = openNavigationDrawer
    )
    navigationalWarningGraph(
       navController = navController,
       bottomBarVisibility = { bottomBarVisibility(it) },
       share = { share(it) },
-      openNavigationDrawer = { openNavigationDrawer() }
+      openNavigationDrawer = openNavigationDrawer
    )
    lightGraph(
       navController = navController,
       bottomBarVisibility = { bottomBarVisibility(it) },
       share = { share(it) },
       showSnackbar = { showSnackbar(it) },
-      openNavigationDrawer = { openNavigationDrawer() }
+      openNavigationDrawer = openNavigationDrawer
    )
    portGraph(
       navController = navController,
       bottomBarVisibility = { bottomBarVisibility(it) },
       share = { share(it) },
       showSnackbar = { showSnackbar(it) },
-      openNavigationDrawer = { openNavigationDrawer() }
+      openNavigationDrawer = openNavigationDrawer
    )
    radioBeaconGraph(
       navController = navController,
       bottomBarVisibility = { bottomBarVisibility(it) },
       share = { share(it) },
       showSnackbar = { showSnackbar(it) },
-      openNavigationDrawer = { openNavigationDrawer() }
+      openNavigationDrawer = openNavigationDrawer
    )
    dgpsStationGraph(
       navController = navController,
       bottomBarVisibility = { bottomBarVisibility(it) },
       share = { share(it) },
       showSnackbar = { showSnackbar(it) },
-      openNavigationDrawer = { openNavigationDrawer() }
+      openNavigationDrawer = openNavigationDrawer
    )
-
+   electronicPublicationGraph(
+      navController = navController,
+      bottomBarVisibility = { bottomBarVisibility(it) },
+      share = { share(it) },
+      showSnackbar = { showSnackbar(it) },
+      openNavigationDrawer = openNavigationDrawer
+   )
    reportGraph(
       navController = navController,
       bottomBarVisibility = { bottomBarVisibility(false) }
    )
-
    settingsGraph(
       navController = navController,
       bottomBarVisibility = { bottomBarVisibility(false) }

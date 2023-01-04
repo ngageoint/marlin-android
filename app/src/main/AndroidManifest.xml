@@ -58,6 +58,10 @@
             <meta-data
                 android:name="mil.nga.msi.startup.dgpsstation.DgpsStationInitializer"
                 android:value="androidx.startup" />
+
+            <meta-data
+                android:name="mil.nga.msi.startup.electronicpublication.ElectronicPublicationInitializer"
+                android:value="androidx.startup" />
         </provider>
 
         <activity
@@ -67,7 +71,6 @@
             android:theme="@style/Theme.Msi">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

@@ -6,6 +6,7 @@ import androidx.lifecycle.MediatorLiveData
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.repository.asam.AsamRepository
 import mil.nga.msi.repository.dgpsstation.DgpsStationRepository
+import mil.nga.msi.repository.electronicpublication.ElectronicPublicationRepository
 import mil.nga.msi.repository.light.LightRepository
 import mil.nga.msi.repository.modu.ModuRepository
 import mil.nga.msi.repository.navigationalwarning.NavigationalWarningRepository
@@ -22,6 +23,7 @@ class DataSourceRepository @Inject constructor(
    portRepository: PortRepository,
    radioBeaconRepository: RadioBeaconRepository,
    dgpsStationRepository: DgpsStationRepository,
+   electronicPublicationRepository: ElectronicPublicationRepository,
 ) {
    val fetching: LiveData<Map<DataSource, Boolean>> = MediatorLiveData<Map<DataSource, Boolean>>().apply {
       value = emptyMap()
@@ -52,6 +54,10 @@ class DataSourceRepository @Inject constructor(
 
       addSource(dgpsStationRepository.fetching) {
          value = value?.toMutableMap()?.apply { put(DataSource.DGPS_STATION, it) }
+      }
+
+      addSource(electronicPublicationRepository.fetching) {
+         value = value?.toMutableMap()?.apply { put(DataSource.ELECTRONIC_PUBLICATION, it) }
       }
    }
 }

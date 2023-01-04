@@ -29,6 +29,7 @@ import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.ui.filter.Filter
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.MapRoute
+import mil.nga.msi.ui.navigation.mainRouteFor
 import mil.nga.msi.ui.theme.screenBackground
 
 @Composable
@@ -124,7 +125,7 @@ private fun DataSource(
             ) {
                CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
                   Text(
-                     text = dataSourceModel.dataSource.route.title,
+                     text = mainRouteFor(dataSourceModel.dataSource).title,
                      style = MaterialTheme.typography.body2,
                      fontWeight = FontWeight.Medium
                   )

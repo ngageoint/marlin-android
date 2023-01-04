@@ -251,18 +251,16 @@ private fun DgpsStationActions(
    onZoom: () -> Unit
 ) {
    Row {
-      IconButton(
-         onClick = { onShare() }
-      ) {
+      IconButton(onClick = { onShare() }) {
          Icon(Icons.Default.Share,
             tint = MaterialTheme.colors.primary,
-            contentDescription = "Share Radio Beacon"
+            contentDescription = "Share DGPS Station"
          )
       }
       IconButton(onClick = { onZoom() }) {
          Icon(Icons.Default.GpsFixed,
             tint = MaterialTheme.colors.primary,
-            contentDescription = "Zoom to Radio Beacon"
+            contentDescription = "Zoom to DGPS Station"
          )
       }
    }

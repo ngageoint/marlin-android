@@ -12,7 +12,9 @@ import mil.nga.msi.filter.FilterParameterType
 import mil.nga.msi.type.Filters
 import mil.nga.msi.type.UserPreferences
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class FilterRepository @Inject constructor(
    private val preferencesDataStore: DataStore<UserPreferences>
 ) {

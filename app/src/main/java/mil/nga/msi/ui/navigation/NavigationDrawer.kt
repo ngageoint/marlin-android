@@ -67,27 +67,24 @@ fun NavigationDrawer(
 
       if (fromIndex <= tabs.size && toIndex <= tabs.size) {
          // Drag within list1
-         val to = if (toIndex == 0) toIndex else toIndex - 1
+         val to = toIndex - 1
          val from = if (fromIndex == 0) fromIndex else fromIndex - 1
          previousTabs = tabs.toMutableList().apply { add(to, removeAt(from)) }
          previousTabs?.let { viewModel.setTabs(it) }
-      } else if (fromIndex <= tabs.size && toIndex > tabs.size) {
+      } else if (fromIndex <= tabs.size) {
          // Drag from list1 to list2
          val list1Element = tabs[fromIndex - 1]
          previousTabs = tabs.toMutableList().apply { removeLast() }
          previousNonTabs = nonTabs.toMutableList().apply {
             add(toIndex - tabs.size - 1, list1Element)
          }
-
          previousTabs?.let { viewModel.setTabs(it) }
          previousNonTabs?.let { viewModel.setNonTabs(it) }
-      } else if (fromIndex >= tabs.size - 2 && toIndex <= tabs.size + 1) {
+      } else if (toIndex <= tabs.size + 1) {
          // Drag from list2 to list1
          val list2Element = nonTabs[fromIndex - tabs.size - 2]
-
          previousNonTabs = nonTabs.toMutableList().apply { removeFirst() }
          previousTabs = tabs.toMutableList().apply { add(lastIndex + 1, list2Element) }
-
          previousTabs?.let { viewModel.setTabs(it) }
          previousNonTabs?.let { viewModel.setNonTabs(it) }
       } else if (fromIndex <= tabs.size + nonTabs.size + 1 && toIndex <= tabs.size + nonTabs.size + 1) {
@@ -95,7 +92,6 @@ fun NavigationDrawer(
          previousNonTabs = nonTabs.toMutableList().apply {
             add(toIndex - tabs.size - 2, removeAt(fromIndex - tabs.size - 2))
          }
-
          previousNonTabs?.let { viewModel.setNonTabs(it) }
       }
 
@@ -103,7 +99,6 @@ fun NavigationDrawer(
          val evict = tabs[tabs.lastIndex - 1]
          previousTabs = tabs.toMutableList().apply { remove(evict) }
          previousNonTabs = nonTabs.toMutableList().apply { add(0, evict) }
-
          previousTabs?.let { viewModel.setTabs(it) }
          previousNonTabs?.let { viewModel.setNonTabs(it) }
       }
@@ -313,7 +308,7 @@ private fun NavigationRow(
                .fillMaxSize()
                .background(MaterialTheme.colors.background)
                .clickable {
-                  onDestinationClicked(tab.route)
+                  onDestinationClicked(mainRouteFor(tab))
                }
          ) {
             Box(
@@ -357,7 +352,7 @@ private fun NavigationRow(
                ) {
                   CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
                      Text(
-                        text = tab.route.title,
+                        text = mainRouteFor(tab).title,
                         style = MaterialTheme.typography.body2,
                         fontWeight = FontWeight.Medium
                      )

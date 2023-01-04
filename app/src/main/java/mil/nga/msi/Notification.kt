@@ -6,6 +6,7 @@ import android.net.Uri
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.toUri
+import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.asam.Asam
 import mil.nga.msi.datasource.dgpsstation.DgpsStation
 import mil.nga.msi.datasource.light.Light
@@ -24,18 +25,16 @@ import mil.nga.msi.ui.radiobeacon.RadioBeaconRoute
 import javax.inject.Inject
 import javax.inject.Singleton
 
-private const val MarlinNotificationChannelId = "mil.nga.msi.Marlin"
-private const val MarlinNotificationChannelName = "Marlin"
-private const val MarlinNotificationChannelImportance = NotificationManager.IMPORTANCE_HIGH
 
 class MarlinNotificationChannel {
    companion object {
+
+      const val Id = "mil.nga.msi.Marlin"
+      const val Name = "Marlin"
+      const val Importance = NotificationManager.IMPORTANCE_HIGH
+
       fun create(): NotificationChannel {
-         return NotificationChannel(
-            MarlinNotificationChannelId,
-            MarlinNotificationChannelName,
-            MarlinNotificationChannelImportance
-         )
+         return NotificationChannel(Id, Name, Importance)
       }
    }
 }
@@ -44,103 +43,126 @@ class MarlinNotificationChannel {
 class MarlinNotification @Inject constructor(
    private val application: Application
 ) {
+
    fun asam(asams: List<Asam>) {
       if (asams.isNotEmpty()) {
-         val name = if (asams.size == 1) "ASAM" else "ASAMs"
-         notification(
-            uri = "marlin://${AsamRoute.List.name}".toUri(),
-            icon = R.drawable.ic_asam_24dp,
+         val name = DataSource.ASAM.labelForCount(asams.size)
+         notify(
+            notificationId = AsamNotificationId,
             title = "New $name",
             description = "You have ${asams.size} new $name",
-            notificationId = AsamNotificationId
+            icon = DataSource.ASAM.icon,
+            uri = "marlin://${AsamRoute.List.name}".toUri()
          )
       }
    }
 
-   fun modo(modus: List<Modu>) {
+   fun modu(modus: List<Modu>) {
       if (modus.isNotEmpty()) {
-         val name = if (modus.size == 1) "MODU" else "MODUs"
-         notification(
-            uri = "marlin://${ModuRoute.List.name}".toUri(),
-            icon = R.drawable.ic_modu_24dp,
+         val name = DataSource.MODU.labelForCount(modus.size)
+         notify(
+            notificationId = ModuNotificationId,
             title = "New $name",
             description = "You have ${modus.size} new $name",
-            notificationId = ModuNotificationId
+            icon = DataSource.MODU.icon,
+            uri = "marlin://${ModuRoute.List.name}".toUri()
          )
       }
    }
 
    fun navigationWarning(warnings: List<NavigationalWarning>) {
       if (warnings.isNotEmpty()) {
-         val name = if (warnings.size == 1) "Navigation Warning" else "Navigation Warnings"
-         notification(
-            uri = "marlin://${NavigationWarningRoute.Group.name}".toUri(),
-            icon = R.drawable.ic_round_warning_24,
+         val name = DataSource.NAVIGATION_WARNING.labelForCount(warnings.size)
+         notify(
+            notificationId = NavigationWarningNotificationId,
             title = "New $name",
             description = "You have ${warnings.size} new $name",
-            notificationId = NavigationWarningNotificationId
+            icon = DataSource.NAVIGATION_WARNING.icon,
+            uri = "marlin://${NavigationWarningRoute.Group.name}".toUri()
          )
       }
    }
 
    fun light(lights: List<Light>) {
       if (lights.isNotEmpty()) {
-         val name = if (lights.size == 1) "Light" else "Lights"
-         notification(
-            uri = "marlin://${LightRoute.List.name}".toUri(),
-            icon = R.drawable.ic_baseline_lightbulb_24,
+         val name = DataSource.LIGHT.labelForCount(lights.size)
+         notify(
+            notificationId = LightNotificationId,
             title = "New $name",
             description = "You have ${lights.size} new $name",
-            notificationId = LightNotificationId
+            icon = DataSource.LIGHT.icon,
+            uri = "marlin://${LightRoute.List.name}".toUri()
          )
       }
    }
 
    fun port(ports: List<Port>) {
       if (ports.isNotEmpty()) {
-         val name = if (ports.size == 1) "World Port" else "World Ports"
-         notification(
-            uri = "marlin://${PortRoute.List.name}".toUri(),
-            icon = R.drawable.ic_baseline_anchor_24,
+         val name = DataSource.PORT.labelForCount(ports.size)
+         notify(
+            notificationId = PortNotificationId,
             title = "New $name",
             description = "You have ${ports.size} new $name",
-            notificationId = PortNotificationId
+            icon = DataSource.PORT.icon,
+            uri = "marlin://${PortRoute.List.name}".toUri()
          )
       }
    }
 
    fun radioBeacon(beacons: List<RadioBeacon>) {
       if (beacons.isNotEmpty()) {
-         val name = if (beacons.size == 1) "Radio Beacon" else "Radio Beacons"
-         notification(
-            uri = "marlin://${RadioBeaconRoute.List.name}".toUri(),
-            icon = R.drawable.ic_baseline_settings_input_antenna_24,
+         val name = DataSource.RADIO_BEACON.labelForCount(beacons.size)
+         notify(
+            notificationId = RadioBeaconNotificationId,
             title = "New $name",
             description = "You have ${beacons.size} new $name",
-            notificationId = RadioBeaconNotificationId
+            icon = DataSource.RADIO_BEACON.icon,
+            uri = "marlin://${RadioBeaconRoute.List.name}".toUri()
          )
       }
    }
 
    fun dgpsStation(stations: List<DgpsStation>) {
       if (stations.isNotEmpty()) {
-         val name = if (stations.size == 1) "Differential GPS Station" else "Differential GPS Stations"
-         notification(
-            uri = "marlin://${DgpsStationRoute.List.name}".toUri(),
-            icon = R.drawable.ic_dgps_icon_24,
+         val name = DataSource.DGPS_STATION.labelForCount(stations.size)
+         notify(
+            notificationId = DgpsStationsNotificationId,
             title = "New $name",
             description = "You have ${stations.size} new $name",
-            notificationId = DgpsStationsNotificationId
+            icon = DataSource.DGPS_STATION.icon,
+            uri = "marlin://${DgpsStationRoute.List.name}".toUri()
          )
       }
    }
 
-   private fun notification(
-      uri: Uri,
-      icon: Int,
+   fun notificationForFetching(source: DataSource): Notification {
+      return NotificationCompat.Builder(application, MarlinNotificationChannel.Id)
+         .setContentTitle("Checking for new ${source.labelPlural}")
+         .setSmallIcon(source.icon)
+         .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+         .setAutoCancel(true)
+         .build()
+   }
+
+   fun notificationIdForFetching(source: DataSource): Int {
+      return when (source) {
+         DataSource.ASAM -> AsamFetchNotificationId
+         DataSource.MODU -> ModuFetchNotificationId
+         DataSource.NAVIGATION_WARNING -> NavigationWarningFetchNotificationId
+         DataSource.LIGHT -> LightFetchNotificationId
+         DataSource.PORT -> PortFetchNotificationId
+         DataSource.RADIO_BEACON -> RadioBeaconFetchNotificationId
+         DataSource.DGPS_STATION -> DgpsStationsFetchNotificationId
+         DataSource.ELECTRONIC_PUBLICATION -> ElectronicPublicationFetchNotificationId
+      }
+   }
+
+   private fun notify(
+      notificationId: Int,
       title: String,
       description: String,
-      notificationId: Int
+      icon: Int,
+      uri: Uri
    ) {
       val intent: PendingIntent = TaskStackBuilder.create(application).run {
          addNextIntentWithParentStack(
@@ -154,7 +176,7 @@ class MarlinNotification @Inject constructor(
          getPendingIntent(0, PendingIntent.FLAG_IMMUTABLE)
       }
 
-      val notification =  NotificationCompat.Builder(application, MarlinNotificationChannelId)
+      val notification =  NotificationCompat.Builder(application, MarlinNotificationChannel.Id)
          .setSmallIcon(icon)
          .setContentTitle(title)
          .setContentText(description)
@@ -171,11 +193,20 @@ class MarlinNotification @Inject constructor(
 
    companion object {
       private const val AsamNotificationId = 1
+      private const val AsamFetchNotificationId = 10
       private const val ModuNotificationId = 2
+      private const val ModuFetchNotificationId = 20
       private const val NavigationWarningNotificationId = 3
+      private const val NavigationWarningFetchNotificationId = 30
       private const val LightNotificationId = 4
+      private const val LightFetchNotificationId = 40
       private const val PortNotificationId = 5
+      private const val PortFetchNotificationId = 50
       private const val RadioBeaconNotificationId = 6
+      private const val RadioBeaconFetchNotificationId = 60
       private const val DgpsStationsNotificationId = 7
+      private const val DgpsStationsFetchNotificationId = 70
+      private const val ElectronicPublicationNotificationId = 8
+      private const val ElectronicPublicationFetchNotificationId = 80
    }
 }

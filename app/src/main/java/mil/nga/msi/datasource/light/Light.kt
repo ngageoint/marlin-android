@@ -147,7 +147,7 @@ data class Light(
    val lightColors by lazy {
       val lightColors = mutableListOf<Color>()
 
-      characteristic?.let { characteristic->
+      characteristic?.let { characteristic ->
          if (characteristic.contains("W.")) {
             lightColors.add(LightColor.WHITE.color)
          }

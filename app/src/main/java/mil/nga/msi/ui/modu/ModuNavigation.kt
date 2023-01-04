@@ -25,7 +25,7 @@ sealed class ModuRoute(
    override val name: String,
    override val title: String,
    override val shortTitle: String,
-   override val color: Color = Color(0xFF0042A4)
+   override val color: Color = DataSource.MODU.color
 ): Route {
    object Main: ModuRoute("modus", "Mobile Offshore Drilling Units", "MODUs")
    object Detail: ModuRoute("modus/detail", "Mobile Offshore Drilling Unit Details", "MODU Details")

@@ -6,6 +6,7 @@ import androidx.navigation.*
 import androidx.navigation.compose.composable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.navigationwarning.NavigationArea
 import mil.nga.msi.repository.navigationalwarning.NavigationalWarningKey
 import mil.nga.msi.ui.navigation.NavigationalWarningKey
@@ -17,7 +18,7 @@ sealed class NavigationWarningRoute(
    override val name: String,
    override val title: String,
    override val shortTitle: String,
-   override val color: Color = Color(0xFFD32F2F)
+   override val color: Color = DataSource.NAVIGATION_WARNING.color
 ): Route {
    object Main: NavigationWarningRoute("navigational_warnings", "Navigational Warnings", "Warnings")
    object Group: NavigationWarningRoute("navigational_warnings/group", "Navigational Warnings", "Navigational Warnings")

@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import mil.nga.msi.datasource.DataSource
+import mil.nga.msi.ui.navigation.mainRouteFor
 
 @Composable
 fun TabsScreen(
@@ -129,12 +130,12 @@ private fun Tabs(
                               imageVector = ImageVector.vectorResource(id = dataSource.icon),
                               tint = MaterialTheme.colors.onPrimary,
                               modifier = Modifier.align(Center),
-                              contentDescription = "${dataSource.route.shortTitle} icon"
+                              contentDescription = "${mainRouteFor(dataSource).shortTitle} icon"
                            )
                         }
 
                         Text(
-                           text = dataSource.route.shortTitle,
+                           text = mainRouteFor(dataSource).shortTitle,
                            style = MaterialTheme.typography.subtitle1,
                            textAlign = TextAlign.Center,
                            modifier = Modifier
@@ -164,7 +165,7 @@ private fun Tabs(
                            imageVector = Icons.Default.Check,
                            tint = MaterialTheme.colors.onPrimary,
                            modifier = Modifier.size(16.dp),
-                           contentDescription = "${dataSource.route.shortTitle} selected"
+                           contentDescription = "${mainRouteFor(dataSource).shortTitle} selected"
                         )
                      }
                   }

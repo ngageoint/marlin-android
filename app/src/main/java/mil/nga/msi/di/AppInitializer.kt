@@ -8,6 +8,7 @@ import dagger.hilt.components.SingletonComponent
 import mil.nga.msi.startup.WorkManagerInitializer
 import mil.nga.msi.startup.asam.AsamInitializer
 import mil.nga.msi.startup.dgpsstation.DgpsStationInitializer
+import mil.nga.msi.startup.electronicpublication.ElectronicPublicationInitializer
 import mil.nga.msi.startup.light.LightInitializer
 import mil.nga.msi.startup.modu.ModuInitializer
 import mil.nga.msi.startup.navigationalwarning.NavigationalWarningInitializer
@@ -37,4 +38,5 @@ interface AppInitializer {
    fun inject(portInitializer: PortInitializer)
    fun inject(radioBeaconInitializer: RadioBeaconInitializer)
    fun inject(dgpsStationInitializer: DgpsStationInitializer)
+   fun inject(electronicPublicationInitializer: ElectronicPublicationInitializer)
 }

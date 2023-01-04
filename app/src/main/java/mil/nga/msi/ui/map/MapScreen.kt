@@ -62,6 +62,7 @@ import mil.nga.msi.ui.location.LocationPermission
 import mil.nga.msi.ui.location.LocationText
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.cluster.MapAnnotation
+import mil.nga.msi.ui.navigation.mainRouteFor
 import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.seconds
 
@@ -726,7 +727,7 @@ private fun DataSources(
                bitmap = bitmap,
                tint = tint,
                modifier = Modifier.size(24.dp),
-               contentDescription = "${dataSource.route.title} map toggle"
+               contentDescription = "${mainRouteFor(dataSource).title} map toggle"
             )
          }
       }

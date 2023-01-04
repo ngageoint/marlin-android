@@ -24,7 +24,7 @@ sealed class DgpsStationRoute(
    override val name: String,
    override val title: String,
    override val shortTitle: String,
-   override val color: Color = Color(0xFF00E676)
+   override val color: Color = DataSource.DGPS_STATION.color
 ): Route {
    object Main: DgpsStationRoute("dgpsStations", "Differential GPS Stations", "DGPS")
    object Detail: DgpsStationRoute("dgpsStations/detail", "Differential GPS Station Details", "DGPS Details")
@@ -42,8 +42,8 @@ fun NavGraphBuilder.dgpsStationGraph(
    share: (Pair<String, String>) -> Unit,
    showSnackbar: (String) -> Unit
 ) {
-   val shareLight: (String) -> Unit = {
-      share(Pair("Share Radio Beacon Information", it))
+   val shareDgps: (String) -> Unit = {
+      share(Pair("Share DGPS Information", it))
    }
 
    val zoomTo: (Point) -> Unit = { point ->
@@ -76,7 +76,7 @@ fun NavGraphBuilder.dgpsStationGraph(
             onAction = { action ->
                when(action) {
                   is DgpsStationAction.Zoom -> zoomTo(action.point)
-                  is DgpsStationAction.Share -> shareLight(action.text)
+                  is DgpsStationAction.Share -> shareDgps(action.text)
                   is DgpsStationAction.Location -> showSnackbar("${action.text} copied to clipboard")
                }
             }
@@ -96,7 +96,7 @@ fun NavGraphBuilder.dgpsStationGraph(
                onAction = { action ->
                   when(action) {
                      is DgpsStationAction.Zoom -> zoomTo(action.point)
-                     is DgpsStationAction.Share -> shareLight(action.text)
+                     is DgpsStationAction.Share -> shareDgps(action.text)
                      is DgpsStationAction.Location -> showSnackbar("${action.text} copied to clipboard")
                   }
                }
