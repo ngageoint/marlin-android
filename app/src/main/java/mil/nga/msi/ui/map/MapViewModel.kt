@@ -5,9 +5,7 @@ import androidx.lifecycle.*
 import com.google.android.gms.maps.model.TileProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.filter.MapBoundsFilter
@@ -90,9 +88,13 @@ class MapViewModel @Inject constructor(
    private var lightTileProvider = LightTileProvider(application, lightTileRepository)
    private var dgpsTileProvider = DgpsStationTileProvider(application, dgpsStationTileRepository)
 
-   val filterCount = filterRepository.filters.map { entry ->
-      entry.values.reduce { acc, filters -> acc.toMutableList().apply { addAll(filters) } }.size
-   }.asLiveData()
+   val filterCount = filterRepository.filters
+      .map { allFilters ->
+         allFilters.values.fold(0, { totalCount, dataSourceFilters ->
+            totalCount + dataSourceFilters.size
+         })
+      }
+      .asLiveData()
 
    val tileProviders: LiveData<Map<TileProviderType, TileProvider>> = MediatorLiveData<Map<TileProviderType, TileProvider>>().apply {
       addSource(userPreferencesRepository.mgrs.asLiveData()) { enabled ->
