@@ -8,6 +8,7 @@ import mil.nga.msi.datasource.electronicpublication.ElectronicPublication
 import mil.nga.msi.datasource.electronicpublication.ElectronicPublicationType
 import mil.nga.msi.network.nextBooleanOrNull
 import mil.nga.msi.network.nextIntOrNull
+import mil.nga.msi.network.nextLongOrNull
 import mil.nga.msi.network.nextStringOrNull
 import mil.nga.msi.parseAsInstant
 import java.time.Instant
@@ -31,7 +32,7 @@ private fun readEPubKeys(jsonIn: JsonReader): ElectronicPublication? {
     var contentId: Int? = null
     var fileExtension: String? = null
     var filenameBase: String? = null
-    var fileSize: Int? = null
+    var fileSize: Long? = null
     var fullFilename: String? = null
     var fullPubFlag: Boolean? = null
     var internalPath: String? = null
@@ -41,7 +42,7 @@ private fun readEPubKeys(jsonIn: JsonReader): ElectronicPublication? {
     var pubDownloadOrder: Int? = null
     var pubsecId: Int? = null
     var pubsecLastModified: Instant? = null
-    var pubTypeId: Int = ElectronicPublicationType.Unknown.typeCode
+    var pubTypeId: Int = ElectronicPublicationType.Unknown.typeId
     var sectionDisplayName: String? = null
     var sectionLastModified: Instant? = null
     var sectionName: String? = null
@@ -58,7 +59,7 @@ private fun readEPubKeys(jsonIn: JsonReader): ElectronicPublication? {
             "contentId" -> contentId = jsonIn.nextIntOrNull()
             "fileExtension" -> fileExtension = jsonIn.nextStringOrNull()
             "filenameBase" -> filenameBase = jsonIn.nextStringOrNull()
-            "fileSize" -> fileSize = jsonIn.nextIntOrNull()
+            "fileSize" -> fileSize = jsonIn.nextLongOrNull()
             "fullFilename" -> fullFilename = jsonIn.nextStringOrNull()
             "fullPubFlag" -> fullPubFlag = jsonIn.nextBooleanOrNull()
             "internalPath" -> internalPath = jsonIn.nextStringOrNull()
@@ -68,7 +69,7 @@ private fun readEPubKeys(jsonIn: JsonReader): ElectronicPublication? {
             "pubDownloadOrder" -> pubDownloadOrder = jsonIn.nextIntOrNull()
             "pubsecId" -> pubsecId = jsonIn.nextIntOrNull()
             "pubsecLastModified" -> pubsecLastModified = jsonIn.nextStringOrNull()?.parseAsInstant()
-            "pubTypeId" -> pubTypeId = jsonIn.nextIntOrNull() ?: ElectronicPublicationType.Unknown.typeCode
+            "pubTypeId" -> pubTypeId = jsonIn.nextIntOrNull() ?: ElectronicPublicationType.Unknown.typeId
             "sectionDisplayName" -> sectionDisplayName = jsonIn.nextStringOrNull()
             "sectionLastModified" -> sectionLastModified = jsonIn.nextStringOrNull()?.parseAsInstant()
             "sectionName" -> sectionName = jsonIn.nextStringOrNull()

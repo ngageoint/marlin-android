@@ -20,6 +20,15 @@ class ElectronicPublicationRepository @Inject constructor(
         TODO()
     }
 
+    /**
+     * Query for publications of the given type.  The results are in ascending order by
+     * [ElectronicPublication.pubDownloadOrder], [ElectronicPublication.sectionOrder],
+     * [ElectronicPublication.s3Key] for consistency.
+     */
+    fun observeElectronicPublicationsOfType(pubType: ElectronicPublicationType): Flow<List<ElectronicPublication>> {
+        return localData.observePublicationsOfType(pubType)
+    }
+
     fun observeFileCountsByType(): Flow<Map<ElectronicPublicationType, Int>> = localData.observeFileCountsByType()
 
     val fetching: LiveData<Boolean> = MutableLiveData(false)

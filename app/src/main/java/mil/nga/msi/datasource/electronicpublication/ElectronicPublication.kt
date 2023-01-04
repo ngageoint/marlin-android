@@ -6,27 +6,30 @@ import androidx.room.PrimaryKey
 import java.time.Instant
 
 enum class ElectronicPublicationType(
-    val typeCode: Int,
+    /**
+     * The numeric ID that MSI assigns to publication types
+     */
+    val typeId: Int,
     val label: String,
 ) {
-    ListOfLights(9, "List of Lights"),
+    AmericanPracticalNavigator(2, "American Practical Navigator"),
     AtlasOfPilotCharts(30, "Atlas of Pilot Charts"),
     ChartNo1(3, "Chart No. 1"),
-    AmericanPracticalNavigator(2, "American Practical Navigator"),
-    RadioNavigationAids(11, "Radio Navigation Aids"),
-    RadarNavigationAndManeuveringBoardManual(10, "Radar Navigation and Maneuvering Board Manual"),
-    SightReductionTablesForAirNavigation(13, "Sight Reduction Tables for Air Navigation"),
-    WorldPortIndex(17, "World Port Index"),
-    SightReductionTablesForMarineNavigation(14, "Sight Reduction Tables for Marine Navigation"),
-    SailingDirectionsEnroute(22, "Sailing Directions Enroute"),
-    UscgLightList(16, "USCG Light List"),
-    SailingDirectionsPlanningGuides(21, "Sailing Directions Planning Guides"),
-    InternationalCodeOfSignals(7, "International Code of Signals"),
-    NoticeToMarinersAndCorrections(15, "Notice To Mariners and Corrections"),
     DistanceBetweenPorts(5, "Distances Between Ports"),
     FleetGuides(6, "Fleet Guides"),
+    InternationalCodeOfSignals(7, "International Code of Signals"),
+    ListOfLights(9, "List of Lights"),
     NoaaTidalCurrentTables(27, "NOAA Tidal Current Tables"),
+    NoticeToMarinersAndCorrections(15, "Notice To Mariners and Corrections"),
+    RadarNavigationAndManeuveringBoardManual(10, "Radar Navigation and Maneuvering Board Manual"),
+    RadioNavigationAids(11, "Radio Navigation Aids"),
     Random(40, "Random"),
+    SailingDirectionsEnroute(22, "Sailing Directions Enroute"),
+    SailingDirectionsPlanningGuides(21, "Sailing Directions Planning Guides"),
+    SightReductionTablesForAirNavigation(13, "Sight Reduction Tables for Air Navigation"),
+    SightReductionTablesForMarineNavigation(14, "Sight Reduction Tables for Marine Navigation"),
+    UscgLightList(16, "USCG Light List"),
+    WorldPortIndex(17, "World Port Index"),
     TideTables(26, "Tide Tables"),
     Unknown(-1, "Electronic Publications");
 
@@ -36,9 +39,9 @@ enum class ElectronicPublicationType(
 
     companion object {
         val typeCodeToType = buildMap {
-            putAll(values().map { x -> x.typeCode to x })
+            putAll(values().map { x -> x.typeId to x })
         }
-        fun fromTypeCode(x: Int?): ElectronicPublicationType = typeCodeToType[x ?: Unknown.typeCode] ?: Unknown
+        fun fromTypeCode(x: Int?): ElectronicPublicationType = typeCodeToType[x ?: Unknown.typeId] ?: Unknown
     }
 }
 
@@ -56,7 +59,7 @@ data class ElectronicPublication(
     @ColumnInfo(name = "file_name_base")
     val filenameBase: String? = null,
     @ColumnInfo(name = "file_size")
-    val fileSize: Int? = null,
+    val fileSize: Long? = null,
     @ColumnInfo(name = "full_filename")
     val fullFilename: String? = null,
     @ColumnInfo(name = "full_pub_flag")
@@ -85,7 +88,7 @@ data class ElectronicPublication(
      * `Unknown`.  Unaccounted type codes can be added to the enum in future releases.
      */
     @ColumnInfo(name = "pub_type_id")
-    val pubTypeId: Int = ElectronicPublicationType.Unknown.typeCode,
+    val pubTypeId: Int = ElectronicPublicationType.Unknown.typeId,
     @ColumnInfo(name = "section_display_name")
     val sectionDisplayName: String? = null,
     @ColumnInfo(name = "section_last_modified")
@@ -119,7 +122,7 @@ data class ElectronicPublicationListItem(
     @ColumnInfo(name = "s3_key")
     val s3Key: String,
     @ColumnInfo(name = "pub_type_id")
-    val pubTypeId: Int = ElectronicPublicationType.Unknown.typeCode,
+    val pubTypeId: Int = ElectronicPublicationType.Unknown.typeId,
     @ColumnInfo(name = "full_filename")
     val fullFilename: String?,
 ) {

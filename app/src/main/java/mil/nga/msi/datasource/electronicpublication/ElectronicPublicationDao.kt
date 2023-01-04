@@ -21,10 +21,12 @@ interface ElectronicPublicationDao {
     @TypeConverters(ElectronicPublicationTypeConverters::class)
     fun observeFileCountsByType(): Flow<Map<ElectronicPublicationType, Int>>
 
-    @Query("select * FROM epubs order by s3_key asc")
+    @Query("select * from epubs order by s3_key asc")
     suspend fun readElectronicPublications(): List<ElectronicPublication>
-    @Query("select * FROM epubs order by s3_key asc")
+    @Query("select * from epubs order by s3_key asc")
     fun observeElectronicPublications(): PagingSource<Int, ElectronicPublicationListItem>
+    @Query("select * from epubs where pub_type_id = :typeId order by pub_download_order asc, section_order asc, s3_key asc")
+    fun observeElectronicPublicationsOfType(typeId: Int): Flow<List<ElectronicPublication>>
 }
 
 class ElectronicPublicationTypeConverters {

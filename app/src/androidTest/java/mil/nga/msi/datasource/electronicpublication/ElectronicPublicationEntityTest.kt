@@ -65,10 +65,10 @@ class ElectronicPublicationEntityTest {
     @Test
     fun read_file_counts_by_type() = runTest {
         dao.insert(listOf(
-            ElectronicPublication("epub.1", pubTypeId = ElectronicPublicationType.AmericanPracticalNavigator.typeCode),
-            ElectronicPublication("epub.2", pubTypeId = ElectronicPublicationType.AtlasOfPilotCharts.typeCode),
-            ElectronicPublication("epub.3", pubTypeId = ElectronicPublicationType.AtlasOfPilotCharts.typeCode),
-            ElectronicPublication("epub.4", pubTypeId = ElectronicPublicationType.ChartNo1.typeCode),
+            ElectronicPublication("epub.1", pubTypeId = ElectronicPublicationType.AmericanPracticalNavigator.typeId),
+            ElectronicPublication("epub.2", pubTypeId = ElectronicPublicationType.AtlasOfPilotCharts.typeId),
+            ElectronicPublication("epub.3", pubTypeId = ElectronicPublicationType.AtlasOfPilotCharts.typeId),
+            ElectronicPublication("epub.4", pubTypeId = ElectronicPublicationType.ChartNo1.typeId),
         ))
         val fileCountForType = dao.observeFileCountsByType().first()
 

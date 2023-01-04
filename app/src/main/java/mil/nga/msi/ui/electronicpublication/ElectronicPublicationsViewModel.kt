@@ -1,9 +1,8 @@
 package mil.nga.msi.ui.electronicpublication
 
-import android.util.Log
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import mil.nga.msi.datasource.electronicpublication.ElectronicPublication
@@ -17,22 +16,11 @@ class ElectronicPublicationsViewModel @Inject constructor(
 ) : ViewModel() {
 
     val publicationTypes = repository.observeFileCountsByType().map {
-        it.map { PublicationTypeNode(it.key, it.value) } .sortedBy { it.pubType.toString() }
-    }
-
-    fun publicationsOfType(pubType: ElectronicPublicationType) : Unit {
+        it.map { PublicationTypeListItem(it.key, it.value) } .sortedBy { it.pubType.toString() }
     }
 }
 
-data class PublicationTypeNode(
+data class PublicationTypeListItem(
     val pubType: ElectronicPublicationType,
     val fileCount: Int
 )
-
-data class PublicationTreeNode(
-    val pubType: ElectronicPublicationType,
-)
-
-data class PublicationSections(val sections: List<PublicationSection>)
-
-data class PublicationSection(val title: String, val publications: List<ElectronicPublication>)
