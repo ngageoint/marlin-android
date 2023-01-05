@@ -58,7 +58,8 @@ fun ElectronicPublicationTypeBrowseRoute(
     ElectronicPublicationTypeBrowseScreen(
         pubType = pubTypeState,
         currentNode = currentNodeState,
-        onDownloadClick = {},
+        onDownloadClick = { /* TODO */ },
+        onLinkClick = { link -> if (link is PublicationFolderLink) viewModel.onFolderLinkClick(link) },
         onBackClick = onBackClick,
         formatDateTime = formatDateTime,
         formatByteCount = formatByteCount,
@@ -70,6 +71,7 @@ fun ElectronicPublicationTypeBrowseScreen(
     pubType: ElectronicPublicationType,
     currentNode: PublicationBrowsingNode,
     onDownloadClick: (ElectronicPublication) -> Unit,
+    onLinkClick: (PublicationBrowsingLink) -> Unit,
     onBackClick: () -> Unit,
     formatDateTime: (Instant?) -> String?,
     formatByteCount: (Long?) -> String?,
@@ -101,7 +103,7 @@ fun ElectronicPublicationTypeBrowseScreen(
                 is PublicationFolders -> {
                     PublicationFolderList(
                         folderLinks = currentNode.links,
-                        onLinkClick = {}
+                        onLinkClick = onLinkClick
                     )
                 }
             }

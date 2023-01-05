@@ -12,6 +12,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import mil.nga.msi.datasource.electronicpublication.ElectronicPublication
 import mil.nga.msi.datasource.electronicpublication.ElectronicPublicationType
 import mil.nga.msi.repository.electronicpublication.ElectronicPublicationRepository
@@ -28,20 +29,30 @@ class ElectronicPublicationTypeBrowseViewModel @Inject constructor(
     val pubTypeState: State<ElectronicPublicationType> = derivedStateOf { ElectronicPublicationType.fromTypeCode(pubTypeArg) }
 
     private val publications = ePubRepo.observeElectronicPublicationsOfType(pubTypeState.value)
+        .onEach { pubs ->
+            mutableCurrentNodeState.update { PublicationTypeRootNode(pubTypeState.value, linksForPubType(pubTypeState.value, pubs)) }
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
     private val mutableCurrentNodeState: MutableStateFlow<PublicationBrowsingNode> = MutableStateFlow(PublicationsLoadingNode(null, pubTypeState.value))
-    val currentNodeState = publications
-        .flatMapLatest { publications ->
-            mutableCurrentNodeState.value = PublicationTypeRootNode(pubTypeState.value, linksForPubType(pubTypeState.value, publications))
-            mutableCurrentNodeState
-        }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), mutableCurrentNodeState.value)
+    val currentNodeState = mutableCurrentNodeState.asStateFlow()
 
+    init {
+        viewModelScope.launch {
+            publications.collect()
+        }
+    }
 
     fun backToParent() {
+        mutableCurrentNodeState.update { it.parent ?: it }
     }
 
     fun onFolderLinkClick(link: PublicationFolderLink) {
+        mutableCurrentNodeState.update {
+            val pubsInFolder = linksForFolder(link, publications.value)
+            val folderNode = PublicationFolderNode(link.pubDownloadId, link.title, currentNodeState.value, pubsInFolder)
+            folderNode
+        }
     }
 
     fun onDownloadClick(ePub: ElectronicPublication) {
@@ -54,18 +65,6 @@ class ElectronicPublicationTypeBrowseViewModel @Inject constructor(
 
     fun onOpenEPubClick(ePub: ElectronicPublication) {
 
-    }
-}
-
-fun linksForNode(node: PublicationBrowsingNode, publications: List<ElectronicPublication>) {
-    when (node) {
-        is PublicationTypeRootNode -> linksForPubType(node.pubType, publications)
-        is PublicationFolderNode -> {
-
-        }
-        is PublicationsLoadingNode -> {
-
-        }
     }
 }
 
@@ -119,6 +118,10 @@ fun linksForPubType(pubType: ElectronicPublicationType, publications: List<Elect
     }
 }
 
+fun linksForFolder(folder: PublicationFolderLink, publications: List<ElectronicPublication>): Publications {
+    return Publications(publications.filter { it.pubDownloadId == folder.pubDownloadId } .sortedBy { it.sectionOrder } .map(::PublicationLink))
+}
+
 sealed class PublicationBrowsingNode(
     open val parent: PublicationBrowsingNode?,
     val title: String,
@@ -136,7 +139,7 @@ class PublicationTypeRootNode(
 class PublicationFolderNode(
     val pubDownloadId: Int,
     val pubDownloadDisplayName: String,
-    override val parent: PublicationTypeRootNode,
+    parent: PublicationBrowsingNode,
     links: PublicationBrowsingLinkList,
 ) : PublicationBrowsingNode(parent, pubDownloadDisplayName, links)
 
