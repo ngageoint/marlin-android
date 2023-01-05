@@ -5,9 +5,7 @@ package mil.nga.msi.ui.electronicpublication
 import android.content.Context
 import android.text.format.Formatter.formatShortFileSize
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -100,7 +98,12 @@ fun ElectronicPublicationTypeBrowseScreen(
                         onDownloadClick = onDownloadClick,
                     )
                 }
-                is PublicationFolders -> {}
+                is PublicationFolders -> {
+                    PublicationFolderList(
+                        folderLinks = currentNode.links,
+                        onLinkClick = {}
+                    )
+                }
             }
         }
     }
@@ -251,28 +254,33 @@ fun PublicationFolderList(
     folderLinks: PublicationFolders,
     onLinkClick: (PublicationFolderLink) -> Unit
 ) {
-    LazyColumn {
-        items(count = folderLinks.folders.size) {
-            val folderLink = folderLinks.folders[it]
-            ListItem(
-                text = { Text(folderLink.title) },
-                secondaryText = { Text("${folderLink.fileCount} files") },
-                icon = {
-                    Icon(
-                        imageVector = Icons.Default.Folder,
-                        contentDescription = folderLink.title
-                    )
-                },
-                trailing = {
-                    Icon(
-                        imageVector = Icons.Default.ChevronRight,
-                        contentDescription = folderLink.title
-                    )
-                },
-                modifier = Modifier.clickable(
-                    onClick = { onLinkClick(folderLink) }
+    Surface {
+        LazyColumn {
+            items(count = folderLinks.folders.size) {
+                val folderLink = folderLinks.folders[it]
+                ListItem(
+                    text = { Text(folderLink.title) },
+                    secondaryText = { Text("${folderLink.fileCount} files") },
+                    icon = {
+                        Icon(
+                            imageVector = Icons.Default.Folder,
+                            contentDescription = folderLink.title
+                        )
+                    },
+                    trailing = {
+                        Icon(
+                            imageVector = Icons.Default.ChevronRight,
+                            contentDescription = folderLink.title
+                        )
+                    },
+                    modifier = Modifier
+                        .clickable(
+                            onClick = { onLinkClick(folderLink) }
+                        )
+                        .padding(bottom = 8.dp)
                 )
-            )
+                Divider(startIndent = 16.dp)
+            }
         }
     }
 }

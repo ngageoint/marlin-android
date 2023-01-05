@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.*
 import mil.nga.msi.datasource.electronicpublication.ElectronicPublication
 import mil.nga.msi.datasource.electronicpublication.ElectronicPublicationType
 import mil.nga.msi.repository.electronicpublication.ElectronicPublicationRepository
-import java.util.SortedMap
+import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -74,7 +74,7 @@ fun linksForPubType(pubType: ElectronicPublicationType, publications: List<Elect
         ElectronicPublicationType.AtlasOfPilotCharts,
         ElectronicPublicationType.ListOfLights,
         ElectronicPublicationType.SightReductionTablesForMarineNavigation, -> {
-            PublicationFolders(emptyList())
+            groupIntoFoldersByDownloadId(publications)
         }
         ElectronicPublicationType.AmericanPracticalNavigator,
         ElectronicPublicationType.UscgLightList, ->
@@ -154,7 +154,6 @@ data class PublicationSection(val title: String, val publications: List<Publicat
     }
 }
 
-
 fun <T> List<ElectronicPublication>.sectionBy(discriminator: ElectronicPublication.() -> T, vararg sectionTitles: Pair<T, String>): PublicationSections {
     val sectionTitleMap = buildMap(sectionTitles.size) { putAll(sectionTitles) }
     val sectionPubs: MutableMap<String, MutableList<PublicationLink>> = fold(mutableMapOf()) { sections, pub ->
@@ -176,7 +175,21 @@ fun <T> List<ElectronicPublication>.sectionBy(discriminator: ElectronicPublicati
     return PublicationSections(sectionsOrdered)
 }
 
+fun groupIntoFoldersByDownloadId(pubs: List<ElectronicPublication>): PublicationFolders {
+    val folderLinks: Map<Int, PublicationFolderLink> = pubs.fold(emptyMap()) { folderLinks, pub ->
+        if (pub.pubDownloadId == null) {
+            return@fold folderLinks
+        }
+        val folderLink = folderLinks.get(pub.pubDownloadId)
+        val title = if (folderLink?.title.isNullOrBlank()) pub.pubDownloadDisplayName ?: "" else folderLink?.title ?: ""
+        folderLinks + (pub.pubDownloadId to
+            (folderLink?.copy(fileCount = folderLink.fileCount + 1, title = title)
+                ?: PublicationFolderLink(pub.pubDownloadId, pub.pubDownloadOrder, pub.pubDownloadDisplayName ?: "", 1)))
+    }
+    return PublicationFolders(folderLinks.values.sortedBy { it.pubDownloadOrder })
+}
+
 sealed interface PublicationBrowsingLink
-data class PublicationFolderLink(val pubDownloadId: Int, val title: String, val fileCount: Int) : PublicationBrowsingLink
+data class PublicationFolderLink(val pubDownloadId: Int, val pubDownloadOrder: Int?, val title: String, val fileCount: Int) : PublicationBrowsingLink
 data class PublicationLink(val publication: ElectronicPublication) : PublicationBrowsingLink
 

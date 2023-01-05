@@ -42,7 +42,7 @@ fun NavGraphBuilder.electronicPublicationGraph(
             bottomBarVisibility(true)
             ElectronicPublicationsScreen(
                 openDrawer = openNavigationDrawer,
-                onTap = { pubType ->
+                onPubTypeClick = { pubType ->
                     navController.navigate(routeForPubType(pubType))
                 }
             )
