@@ -1,5 +1,6 @@
 package mil.nga.msi.ui.embark
 
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -15,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -62,7 +64,6 @@ private fun Location(
       Column(
          Modifier
             .fillMaxSize()
-            .verticalScroll(scrollState)
             .background(
                brush = Brush.verticalGradient(
                   startY = height * .37f,
@@ -94,17 +95,22 @@ private fun Location(
             modifier = Modifier.align(Alignment.CenterHorizontally)
          )
 
-         Box(
-            Modifier
-               .padding(vertical = 96.dp)
-               .align(Alignment.CenterHorizontally),
-         ) {
-            Icon(
-               Icons.Default.NearMe,
-               modifier = Modifier.size(200.dp),
-               tint = Color.Black,
-               contentDescription = "Location icon"
-            )
+         Box(Modifier.weight(1f)) {
+            if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT) {
+               Box(
+                  contentAlignment = Alignment.Center,
+                  modifier = Modifier
+                     .padding(vertical = 96.dp)
+                     .fillMaxSize()
+               ) {
+                  Icon(
+                     Icons.Default.NearMe,
+                     modifier = Modifier.size(200.dp),
+                     tint = Color.Black,
+                     contentDescription = "Location icon"
+                  )
+               }
+            }
          }
 
          Button(

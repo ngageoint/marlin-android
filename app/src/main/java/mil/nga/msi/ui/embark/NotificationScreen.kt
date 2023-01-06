@@ -1,5 +1,6 @@
 package mil.nga.msi.ui.embark
 
+import android.content.res.Configuration
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
@@ -17,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -99,17 +101,22 @@ private fun Notification(
             modifier = Modifier.align(Alignment.CenterHorizontally)
          )
 
-         Box(
-            Modifier
-               .padding(vertical = 96.dp)
-               .align(Alignment.CenterHorizontally),
-         ) {
-            Icon(
-               Icons.Default.NotificationsActive,
-               modifier = Modifier.size(200.dp),
-               tint = Color.Black,
-               contentDescription = "Notifications icon"
-            )
+         Box(Modifier.weight(1f)) {
+            if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT) {
+               Box(
+                  contentAlignment = Alignment.Center,
+                  modifier = Modifier
+                     .padding(vertical = 96.dp)
+                     .fillMaxSize()
+               ) {
+                  Icon(
+                     Icons.Default.NotificationsActive,
+                     modifier = Modifier.size(200.dp),
+                     tint = Color.Black,
+                     contentDescription = "Notifications icon"
+                  )
+               }
+            }
          }
 
          Button(

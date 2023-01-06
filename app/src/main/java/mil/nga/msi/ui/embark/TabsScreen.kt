@@ -1,5 +1,6 @@
 package mil.nga.msi.ui.embark
 
+import android.content.res.Configuration
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -20,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -61,6 +63,10 @@ private fun Tabs(
    done: () -> Unit,
 ) {
    var height by remember { mutableStateOf(0) }
+   val verticalPadding = when (LocalConfiguration.current.orientation) {
+      Configuration.ORIENTATION_PORTRAIT -> 32.dp
+      else -> 0.dp
+   }
 
    Surface(color = MaterialTheme.colors.primary) {
       Column(
@@ -75,10 +81,10 @@ private fun Tabs(
                   )
                )
             )
-            .padding(vertical = 48.dp, horizontal = 32.dp)
             .onGloballyPositioned { coordinates ->
                height = coordinates.size.height
             }
+            .padding(horizontal = 16.dp, vertical = verticalPadding)
       ) {
          Text(
             text = "Marlin Tabs",
@@ -98,19 +104,19 @@ private fun Tabs(
          )
 
          LazyVerticalGrid(
-            columns = GridCells.Fixed(3),
-            horizontalArrangement = Arrangement.Center,
-            contentPadding = PaddingValues(8.dp),
-            modifier = Modifier.padding(vertical = 32.dp)
+            columns = GridCells.Adaptive(minSize = 100.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            contentPadding = PaddingValues(vertical = 8.dp, horizontal = 8.dp),
+            modifier = Modifier
+               .padding(vertical = 8.dp)
+               .weight(1f)
          ) {
             items(DataSource.values().asList()) { dataSource ->
                Box(contentAlignment = Alignment.TopEnd) {
                   Card(
                      backgroundColor = MaterialTheme.colors.secondary,
-                     modifier = Modifier
-                        .fillMaxSize()
-                        .padding(8.dp)
-                        .clickable { toggleTab(dataSource) }
+                     modifier = Modifier.clickable { toggleTab(dataSource) }
                   ) {
                      Column(Modifier.padding(12.dp)) {
                         Box(
@@ -118,11 +124,11 @@ private fun Tabs(
                            modifier = Modifier.fillMaxSize()
                         ) {
                            val onPrimaryColor = MaterialTheme.colors.onPrimary
-                           Canvas(modifier = Modifier.size(48.dp), onDraw = {
+                           Canvas(modifier = Modifier.size(38.dp), onDraw = {
                               drawCircle(color = onPrimaryColor)
                            })
 
-                           Canvas(modifier = Modifier.size(45.dp), onDraw = {
+                           Canvas(modifier = Modifier.size(35.dp), onDraw = {
                               drawCircle(color = dataSource.color)
                            })
 
@@ -149,7 +155,7 @@ private fun Tabs(
                   if (selectedTabs.contains(dataSource)) {
                      Box(
                         contentAlignment = Center,
-                        modifier = Modifier.offset(x = (4).dp, y = (-4).dp)
+                        modifier = Modifier.offset(x = (8).dp, y = (-8).dp)
                      ) {
                         val secondaryColor = MaterialTheme.colors.secondary
                         val onPrimaryColor = MaterialTheme.colors.onPrimary
@@ -178,7 +184,7 @@ private fun Tabs(
             shape = RoundedCornerShape(38.dp),
             modifier = Modifier
                .align(CenterHorizontally)
-               .padding(top = 32.dp)
+               .padding(bottom = 8.dp)
          ) {
             Text(
                text = "Next",
