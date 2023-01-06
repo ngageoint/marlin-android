@@ -54,7 +54,6 @@ private fun Disclaimer(
       Column(
          Modifier
             .fillMaxSize()
-            .verticalScroll(scrollState)
             .background(
                brush = Brush.verticalGradient(
                   startY = height * .37f,
@@ -64,6 +63,7 @@ private fun Disclaimer(
                   )
                )
             )
+            .verticalScroll(scrollState)
             .padding(vertical = 48.dp, horizontal = 32.dp)
             .onGloballyPositioned { coordinates ->
                height = coordinates.size.height
