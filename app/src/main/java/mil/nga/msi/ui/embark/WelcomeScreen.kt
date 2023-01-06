@@ -110,7 +110,7 @@ private fun Welcome(
          shape = RoundedCornerShape(38.dp)
       ) {
          Text(
-            text = "Let's Go",
+            text = "Set Sail",
             style = MaterialTheme.typography.subtitle1,
             fontSize = 18.sp,
             modifier = Modifier.padding(8.dp)
