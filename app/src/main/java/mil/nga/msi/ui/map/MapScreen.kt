@@ -2,6 +2,7 @@ package mil.nga.msi.ui.map
 
 import android.Manifest
 import android.animation.ValueAnimator
+import android.content.res.Configuration
 import android.graphics.Bitmap
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.animation.animateContentSize
@@ -172,7 +173,11 @@ fun MapScreen(
                   .fillMaxWidth()
                   .clickable {
                      text?.let {
-                        clipboardManager.setText(AnnotatedString.Builder(it).toAnnotatedString())
+                        clipboardManager.setText(
+                           AnnotatedString
+                              .Builder(it)
+                              .toAnnotatedString()
+                        )
                         locationCopy(it)
                      }
                   }
@@ -703,34 +708,57 @@ private fun DataSources(
    mapped: Map<DataSource, Boolean>,
    onDataSourceToggle: (DataSource) -> Unit,
 ) {
-   Column(
-      Modifier.padding(horizontal = 8.dp)
-   ) {
-      DataSource.values().filter { it.mappable }.forEach { dataSource ->
-         var tint =  MaterialTheme.colors.onPrimary
-         var background = dataSource.color
-         val bitmap = AppCompatResources.getDrawable(LocalContext.current, dataSource.icon)!!.toBitmap().asImageBitmap()
-
-         if (mapped[dataSource] == false) {
-            tint =  Color(0xFF999999)
-            background = Color(0xFFDDDDDD)
-         }
-
-         FloatingActionButton(
-            onClick = { onDataSourceToggle(dataSource) },
-            backgroundColor = background,
-            modifier = Modifier
-               .padding(bottom = 12.dp)
-               .size(40.dp)
-         ) {
-            Icon(
-               bitmap = bitmap,
-               tint = tint,
-               modifier = Modifier.size(24.dp),
-               contentDescription = "${mainRouteFor(dataSource).title} map toggle"
-            )
+   if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT) {
+      Column(
+         verticalArrangement = Arrangement.spacedBy(12.dp),
+         modifier = Modifier.padding(bottom = 8.dp)
+      ) {
+         DataSource.values().filter { it.mappable }.forEach { dataSource ->
+            DataSourceItem(dataSource = dataSource, mapped = mapped[dataSource]) {
+               onDataSourceToggle(dataSource)
+            }
          }
       }
+   } else {
+      Row(
+         horizontalArrangement = Arrangement.spacedBy(12.dp),
+      ) {
+         DataSource.values().filter { it.mappable }.forEach { dataSource ->
+            DataSourceItem(dataSource = dataSource, mapped = mapped[dataSource]) {
+               onDataSourceToggle(dataSource)
+            }
+         }
+      }
+   }
+}
+
+@Composable
+private fun DataSourceItem(
+   dataSource: DataSource,
+   mapped: Boolean?,
+   onToggle: () -> Unit,
+) {
+   var tint =  MaterialTheme.colors.onPrimary
+   var background = dataSource.color
+   val bitmap = AppCompatResources.getDrawable(LocalContext.current, dataSource.icon)!!.toBitmap().asImageBitmap()
+
+   if (mapped == false) {
+      tint =  Color(0xFF999999)
+      background = Color(0xFFDDDDDD)
+   }
+
+   FloatingActionButton(
+      onClick = { onToggle() },
+      backgroundColor = background,
+      modifier = Modifier
+         .size(40.dp)
+   ) {
+      Icon(
+         bitmap = bitmap,
+         tint = tint,
+         modifier = Modifier.size(24.dp),
+         contentDescription = "${mainRouteFor(dataSource).title} map toggle"
+      )
    }
 }
 
