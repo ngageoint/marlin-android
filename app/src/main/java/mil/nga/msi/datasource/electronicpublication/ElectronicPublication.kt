@@ -53,7 +53,7 @@ data class ElectronicPublication(
     @ColumnInfo(name = "content_id")
     val contentId: Int? = null,
     @ColumnInfo(name = "downloaded_bytes")
-    val downloadedBytes: Int = 0,
+    val downloadedBytes: Long = 0,
     @ColumnInfo(name = "file_ext")
     val fileExtension: String? = null,
     @ColumnInfo(name = "file_name_base")
@@ -70,6 +70,10 @@ data class ElectronicPublication(
     val isDownloaded: Boolean = false,
     @ColumnInfo(name = "is_downloading")
     val isDownloading: Boolean = false,
+    @ColumnInfo(name = "local_download_id")
+    val localDownloadId: Long? = null,
+    @ColumnInfo(name = "local_download_rel_path")
+    val localDownloadRelPath: String? = null,
     @ColumnInfo(name = "ods_entry_id")
     val odsEntryId: Int? = null,
     @ColumnInfo(name = "pub_download_display_name")

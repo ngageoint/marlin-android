@@ -2,26 +2,26 @@
 
 package mil.nga.msi.ui.electronicpublication
 
-import android.text.format.Formatter.formatShortFileSize
+import android.app.DownloadManager
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
+import androidx.core.net.toUri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 import mil.nga.msi.datasource.electronicpublication.ElectronicPublication
 import mil.nga.msi.datasource.electronicpublication.ElectronicPublicationType
 import mil.nga.msi.repository.electronicpublication.ElectronicPublicationRepository
 import java.util.*
 import javax.inject.Inject
+import kotlin.time.seconds
 
 @HiltViewModel
 class ElectronicPublicationTypeBrowseViewModel @Inject constructor(
-    private val savedStateHandle: SavedStateHandle,
+    savedStateHandle: SavedStateHandle,
     private val ePubRepo: ElectronicPublicationRepository,
 ) : ViewModel() {
 
@@ -30,16 +30,33 @@ class ElectronicPublicationTypeBrowseViewModel @Inject constructor(
 
     private val publications = ePubRepo.observeElectronicPublicationsOfType(pubTypeState.value)
         .onEach { pubs ->
-            mutableCurrentNodeState.update { PublicationTypeRootNode(pubTypeState.value, linksForPubType(pubTypeState.value, pubs)) }
+            mutableCurrentNodeState.update {
+                if (it is PublicationsLoadingNode) {
+                    val parent = it.parent
+                    parent ?: PublicationTypeRootNode(pubTypeState.value)
+                }
+                else {
+                    it
+                }
+            }
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
     private val mutableCurrentNodeState: MutableStateFlow<PublicationBrowsingNode> = MutableStateFlow(PublicationsLoadingNode(null, pubTypeState.value))
     val currentNodeState = mutableCurrentNodeState.asStateFlow()
 
+    val currentNodeLinksState = combine(publications, currentNodeState) { pubs, currentNode -> linksForNode(currentNode, pubs) }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), Publications(emptyList()))
+
     init {
         viewModelScope.launch {
             publications.collect()
+        }
+        viewModelScope.launch {
+            while (isActive) {
+                ePubRepo.updateDownloadProgress()
+                delay(1000)
+            }
         }
     }
 
@@ -49,14 +66,13 @@ class ElectronicPublicationTypeBrowseViewModel @Inject constructor(
 
     fun onFolderLinkClick(link: PublicationFolderLink) {
         mutableCurrentNodeState.update {
-            val pubsInFolder = linksForFolder(link, publications.value)
-            val folderNode = PublicationFolderNode(link.pubDownloadId, link.title, currentNodeState.value, pubsInFolder)
+            val folderNode = PublicationFolderNode(link.pubDownloadId, link.title, it)
             folderNode
         }
     }
 
     fun onDownloadClick(ePub: ElectronicPublication) {
-
+        viewModelScope.launch { ePubRepo.download(ePub) }
     }
 
     fun onDeleteClick(ePub: ElectronicPublication) {
@@ -68,7 +84,15 @@ class ElectronicPublicationTypeBrowseViewModel @Inject constructor(
     }
 }
 
-fun linksForPubType(pubType: ElectronicPublicationType, publications: List<ElectronicPublication>): PublicationBrowsingLinkList {
+fun linksForNode(node: PublicationBrowsingNode, ePubs: List<ElectronicPublication>): PublicationBrowsingLinksArrangement {
+    return when (node) {
+        is PublicationTypeRootNode -> linksForPubType(node.pubType, ePubs)
+        is PublicationFolderNode -> linksForFolder(node, ePubs)
+        is PublicationsLoadingNode -> Publications(emptyList())
+    }
+}
+
+fun linksForPubType(pubType: ElectronicPublicationType, publications: List<ElectronicPublication>): PublicationBrowsingLinksArrangement {
     return when (pubType) {
         ElectronicPublicationType.AtlasOfPilotCharts,
         ElectronicPublicationType.ListOfLights,
@@ -118,35 +142,32 @@ fun linksForPubType(pubType: ElectronicPublicationType, publications: List<Elect
     }
 }
 
-fun linksForFolder(folder: PublicationFolderLink, publications: List<ElectronicPublication>): Publications {
+fun linksForFolder(folder: PublicationFolderNode, publications: List<ElectronicPublication>): Publications {
     return Publications(publications.filter { it.pubDownloadId == folder.pubDownloadId } .sortedBy { it.sectionOrder } .map(::PublicationLink))
 }
 
 sealed class PublicationBrowsingNode(
     open val parent: PublicationBrowsingNode?,
     val title: String,
-    val links: PublicationBrowsingLinkList,
 )
 
 class PublicationsLoadingNode(parent: PublicationBrowsingNode?, val pubType: ElectronicPublicationType) :
-    PublicationBrowsingNode(parent, pubType.label, Publications(emptyList()))
+    PublicationBrowsingNode(parent, pubType.label)
 
 class PublicationTypeRootNode(
     val pubType: ElectronicPublicationType,
-    links: PublicationBrowsingLinkList,
-) : PublicationBrowsingNode(null, pubType.label, links)
+) : PublicationBrowsingNode(null, pubType.label)
 
 class PublicationFolderNode(
     val pubDownloadId: Int,
     val pubDownloadDisplayName: String,
     parent: PublicationBrowsingNode,
-    links: PublicationBrowsingLinkList,
-) : PublicationBrowsingNode(parent, pubDownloadDisplayName, links)
+) : PublicationBrowsingNode(parent, pubDownloadDisplayName)
 
-sealed class PublicationBrowsingLinkList
-class Publications(val publications: List<PublicationLink>) : PublicationBrowsingLinkList()
-class PublicationSections(val sections: List<PublicationSection>) : PublicationBrowsingLinkList()
-class PublicationFolders(val folders: List<PublicationFolderLink>) : PublicationBrowsingLinkList()
+sealed class PublicationBrowsingLinksArrangement
+class Publications(val publications: List<PublicationLink>) : PublicationBrowsingLinksArrangement()
+class PublicationSections(val sections: List<PublicationSection>) : PublicationBrowsingLinksArrangement()
+class PublicationFolders(val folders: List<PublicationFolderLink>) : PublicationBrowsingLinksArrangement()
 
 data class PublicationSection(val title: String, val publications: List<PublicationLink>) {
     override fun equals(other: Any?): Boolean {

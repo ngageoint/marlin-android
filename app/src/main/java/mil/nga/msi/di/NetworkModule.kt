@@ -1,5 +1,9 @@
 package mil.nga.msi.di
 
+import android.app.Application
+import android.app.DownloadManager
+import android.content.Context
+import androidx.core.content.getSystemService
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
@@ -35,6 +39,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.List
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
@@ -78,6 +83,11 @@ class NetworkModule {
          .client(okHttpClient)
          .build()
    }
+
+   @Provides
+   @Singleton
+   @Inject
+   fun provideDownloadManager(context: Application) = context.getSystemService<DownloadManager>()!!
 
    @Provides
    @Singleton

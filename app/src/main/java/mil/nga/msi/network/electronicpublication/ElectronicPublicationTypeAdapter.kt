@@ -48,7 +48,7 @@ private fun readEPubKeys(jsonIn: JsonReader): ElectronicPublication? {
     var sectionName: String? = null
     var sectionOrder: Int? = null
     var uploadTime: Instant? = null
-    val downloadedBytes = 0
+    val downloadedBytes = 0L
     val isDownloaded = false
     val isDownloading = false
 

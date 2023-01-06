@@ -45,6 +45,7 @@ fun ElectronicPublicationTypeBrowseRoute(
 ) {
     val pubTypeState by viewModel.pubTypeState
     val currentNodeState by viewModel.currentNodeState.collectAsStateWithLifecycle()
+    val currentNodeLinks by viewModel.currentNodeLinksState.collectAsStateWithLifecycle()
     val onBackClick = {
         when (currentNodeState.parent) {
             null -> onBackToRoot()
@@ -58,7 +59,8 @@ fun ElectronicPublicationTypeBrowseRoute(
     ElectronicPublicationTypeBrowseScreen(
         pubType = pubTypeState,
         currentNode = currentNodeState,
-        onDownloadClick = { /* TODO */ },
+        currentNodeLinks = currentNodeLinks,
+        onDownloadClick = viewModel::onDownloadClick,
         onLinkClick = { link -> if (link is PublicationFolderLink) viewModel.onFolderLinkClick(link) },
         onBackClick = onBackClick,
         formatDateTime = formatDateTime,
@@ -70,6 +72,7 @@ fun ElectronicPublicationTypeBrowseRoute(
 fun ElectronicPublicationTypeBrowseScreen(
     pubType: ElectronicPublicationType,
     currentNode: PublicationBrowsingNode,
+    currentNodeLinks: PublicationBrowsingLinksArrangement,
     onDownloadClick: (ElectronicPublication) -> Unit,
     onLinkClick: (PublicationBrowsingLink) -> Unit,
     onBackClick: () -> Unit,
@@ -83,10 +86,10 @@ fun ElectronicPublicationTypeBrowseScreen(
             onNavigationClicked = onBackClick,
         )
         Surface(color = MaterialTheme.colors.screenBackground) {
-            when (currentNode.links) {
+            when (currentNodeLinks) {
                 is Publications -> {
                     PublicationList(
-                        publicationLinks = currentNode.links,
+                        publicationLinks = currentNodeLinks,
                         formatDateTime = formatDateTime,
                         formatByteCount = formatByteCount,
                         onDownloadClick = onDownloadClick
@@ -94,7 +97,7 @@ fun ElectronicPublicationTypeBrowseScreen(
                 }
                 is PublicationSections -> {
                     PublicationSectionsList(
-                        sections = currentNode.links.sections,
+                        sections = currentNodeLinks.sections,
                         formatDateTime = formatDateTime,
                         formatByteCount = formatByteCount,
                         onDownloadClick = onDownloadClick,
@@ -102,7 +105,7 @@ fun ElectronicPublicationTypeBrowseScreen(
                 }
                 is PublicationFolders -> {
                     PublicationFolderList(
-                        folderLinks = currentNode.links,
+                        folderLinks = currentNodeLinks,
                         onLinkClick = onLinkClick
                     )
                 }
@@ -116,7 +119,7 @@ fun PublicationSectionsList(
     sections: List<PublicationSection>,
     formatDateTime: (Instant?) -> String?,
     formatByteCount: (Long?) -> String?,
-    onDownloadClick: (pub: ElectronicPublication) -> Unit
+    onDownloadClick: (ElectronicPublication) -> Unit
 ) {
     LazyColumn {
         sections.forEach { section ->
@@ -145,7 +148,7 @@ fun PublicationSectionsList(
 }
 
 @Composable
-fun PublicationListItem(ePub: ElectronicPublication, formatDateTime: (Instant?) -> String?, formatByteCount: (Long?) -> String?, onDownloadClick: (pub: ElectronicPublication) -> Unit) {
+fun PublicationListItem(ePub: ElectronicPublication, formatDateTime: (Instant?) -> String?, formatByteCount: (Long?) -> String?, onDownloadClick: (ElectronicPublication) -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.large,
@@ -235,7 +238,7 @@ fun PublicationList(
     publicationLinks: Publications,
     formatDateTime: (Instant?) -> String?,
     formatByteCount: (Long?) -> String?,
-    onDownloadClick: (pub: ElectronicPublication) -> Unit
+    onDownloadClick: (ElectronicPublication) -> Unit
 ) {
     LazyColumn {
         publicationLinks.publications.forEach { 
