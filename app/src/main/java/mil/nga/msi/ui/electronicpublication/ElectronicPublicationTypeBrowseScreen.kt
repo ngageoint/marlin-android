@@ -9,6 +9,7 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -19,7 +20,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.tooling.preview.Preview
@@ -35,6 +35,13 @@ import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
+
+interface PublicationActions {
+    fun onDownloadClick(ePub: ElectronicPublication)
+    fun onCancelDownloadClick(ePub: ElectronicPublication)
+    fun onViewClick(ePub: ElectronicPublication)
+    fun onDeleteClick(ePub: ElectronicPublication)
+}
 
 @OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
@@ -60,11 +67,16 @@ fun ElectronicPublicationTypeBrowseRoute(
         pubType = pubTypeState,
         currentNode = currentNodeState,
         currentNodeLinks = currentNodeLinks,
-        onDownloadClick = viewModel::onDownloadClick,
         onLinkClick = { link -> if (link is PublicationFolderLink) viewModel.onFolderLinkClick(link) },
         onBackClick = onBackClick,
         formatDateTime = formatDateTime,
         formatByteCount = formatByteCount,
+        publicationActions = object : PublicationActions {
+            override fun onDownloadClick(ePub: ElectronicPublication) = viewModel.onDownloadClick(ePub)
+            override fun onCancelDownloadClick(ePub: ElectronicPublication) = viewModel.onCancelDownloadClick(ePub)
+            override fun onViewClick(ePub: ElectronicPublication) = viewModel.onOpenEPubClick(ePub)
+            override fun onDeleteClick(ePub: ElectronicPublication) = viewModel.onDeleteClick(ePub)
+        }
     )
 }
 
@@ -73,9 +85,9 @@ fun ElectronicPublicationTypeBrowseScreen(
     pubType: ElectronicPublicationType,
     currentNode: PublicationBrowsingNode,
     currentNodeLinks: PublicationBrowsingLinksArrangement,
-    onDownloadClick: (ElectronicPublication) -> Unit,
     onLinkClick: (PublicationBrowsingLink) -> Unit,
     onBackClick: () -> Unit,
+    publicationActions: PublicationActions,
     formatDateTime: (Instant?) -> String?,
     formatByteCount: (Long?) -> String?,
 ) {
@@ -92,7 +104,7 @@ fun ElectronicPublicationTypeBrowseScreen(
                         publicationLinks = currentNodeLinks,
                         formatDateTime = formatDateTime,
                         formatByteCount = formatByteCount,
-                        onDownloadClick = onDownloadClick
+                        actions = publicationActions
                     )
                 }
                 is PublicationSections -> {
@@ -100,7 +112,7 @@ fun ElectronicPublicationTypeBrowseScreen(
                         sections = currentNodeLinks.sections,
                         formatDateTime = formatDateTime,
                         formatByteCount = formatByteCount,
-                        onDownloadClick = onDownloadClick,
+                        actions = publicationActions
                     )
                 }
                 is PublicationFolders -> {
@@ -119,9 +131,10 @@ fun PublicationSectionsList(
     sections: List<PublicationSection>,
     formatDateTime: (Instant?) -> String?,
     formatByteCount: (Long?) -> String?,
-    onDownloadClick: (ElectronicPublication) -> Unit
+    actions: PublicationActions,
 ) {
-    LazyColumn {
+    val state = rememberLazyListState()
+    LazyColumn(state = state) {
         sections.forEach { section ->
             stickyHeader(section.title) {
                 Surface {
@@ -140,7 +153,7 @@ fun PublicationSectionsList(
                     ePub = pubLink.publication,
                     formatDateTime = formatDateTime,
                     formatByteCount = formatByteCount,
-                    onDownloadClick = onDownloadClick,
+                    actions = actions,
                 )
             }
         }
@@ -148,7 +161,10 @@ fun PublicationSectionsList(
 }
 
 @Composable
-fun PublicationListItem(ePub: ElectronicPublication, formatDateTime: (Instant?) -> String?, formatByteCount: (Long?) -> String?, onDownloadClick: (ElectronicPublication) -> Unit) {
+fun PublicationListItem(
+    ePub: ElectronicPublication,
+    formatDateTime: (Instant?) -> String?, formatByteCount: (Long?) -> String?,
+    actions: PublicationActions) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.large,
@@ -168,16 +184,35 @@ fun PublicationListItem(ePub: ElectronicPublication, formatDateTime: (Instant?) 
             )
             Row(modifier = Modifier.align(Alignment.End), Arrangement.SpaceBetween) {
                 if (ePub.isDownloaded) {
-                    TextButton(onClick = { /*TODO*/ }) {
+                    TextButton(onClick = { actions.onViewClick(ePub) }) {
                         Text("View", style = MaterialTheme.typography.button)
                     }
-                    TextButton(onClick = { /*TODO*/ }) {
+                    TextButton(onClick = { actions.onDeleteClick(ePub) }) {
                         Text("Delete", style = MaterialTheme.typography.button)
+                    }
+                }
+                else if (ePub.isDownloading) {
+                    val progress = ePub.fileSize?.let {
+                        ePub.downloadedBytes.toDouble() / ePub.fileSize
+                    } ?: -1.0
+                    if (progress > -1) {
+                        LinearProgressIndicator(
+                            progress = progress.toFloat(),
+                            modifier = Modifier.align(Alignment.CenterVertically)
+                        )
+                    }
+                    else {
+                        LinearProgressIndicator(
+                            modifier = Modifier.align(Alignment.CenterVertically)
+                        )
+                    }
+                    TextButton(onClick = { actions.onCancelDownloadClick(ePub) }) {
+                        Text("Cancel", style = MaterialTheme.typography.button)
                     }
                 }
                 else {
                     TextButton(
-                        onClick = { onDownloadClick(ePub) }
+                        onClick = { actions.onDownloadClick(ePub) }
                     ) {
                         Text("Download", style = MaterialTheme.typography.button)
                     }
@@ -200,8 +235,62 @@ fun PreviewPublicationListItem() {
             uploadTime = Instant.parse("2022-12-25T12:25:00.0Z")
         ),
         formatDateTime = { DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.MEDIUM).withZone(ZoneId.of("UTC")).format(it) },
-        formatByteCount = { String.format("%d", it) },
-        onDownloadClick = {}
+        formatByteCount = { "${it ?: "Unknown size"}" },
+        actions = object : PublicationActions {
+            override fun onDownloadClick(ePub: ElectronicPublication) {}
+            override fun onCancelDownloadClick(ePub: ElectronicPublication) {}
+            override fun onViewClick(ePub: ElectronicPublication) {}
+            override fun onDeleteClick(ePub: ElectronicPublication) {}
+        }
+    )
+}
+
+@Preview(name = "Publication List Item Downloading Percent Progress")
+@Composable
+fun PreviewPublicationListItemDownloadingPercentProgress() {
+    PublicationListItem(
+        ePub = ElectronicPublication(
+            s3Key = "pub1",
+            sectionDisplayName = "Publication 1",
+            fullFilename = "pub1.pdf",
+            fileExtension = "pdf",
+            fileSize = 13_003_246,
+            uploadTime = Instant.parse("2022-12-25T12:25:00.0Z"),
+            isDownloading = true,
+            downloadedBytes = 3_456_678,
+        ),
+        formatDateTime = { DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.MEDIUM).withZone(ZoneId.of("UTC")).format(it) },
+        formatByteCount = { "${it ?: "Unknown size"}" },
+        actions = object : PublicationActions {
+            override fun onDownloadClick(ePub: ElectronicPublication) {}
+            override fun onCancelDownloadClick(ePub: ElectronicPublication) {}
+            override fun onViewClick(ePub: ElectronicPublication) {}
+            override fun onDeleteClick(ePub: ElectronicPublication) {}
+        }
+    )
+}
+
+@Preview(name = "Publication List Item Downloading Unknown Progress")
+@Composable
+fun PreviewPublicationListItemDownloadingUnknownProgress() {
+    PublicationListItem(
+        ePub = ElectronicPublication(
+            s3Key = "pub1",
+            sectionDisplayName = "Publication 1",
+            fullFilename = "pub1.pdf",
+            fileExtension = "pdf",
+            uploadTime = Instant.parse("2022-12-25T12:25:00.0Z"),
+            isDownloading = true,
+            downloadedBytes = 3_456_678,
+        ),
+        formatDateTime = { DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.MEDIUM).withZone(ZoneId.of("UTC")).format(it) },
+        formatByteCount = { "${it ?: "Unknown size"}" },
+        actions = object : PublicationActions {
+            override fun onDownloadClick(ePub: ElectronicPublication) {}
+            override fun onCancelDownloadClick(ePub: ElectronicPublication) {}
+            override fun onViewClick(ePub: ElectronicPublication) {}
+            override fun onDeleteClick(ePub: ElectronicPublication) {}
+        }
     )
 }
 
@@ -227,9 +316,14 @@ fun PreviewPublicationSectionsList() {
                 )
             )
         ),
-        onDownloadClick = {},
         formatDateTime = { it.toString() ?: "Unknown upload time" },
-        formatByteCount = { "${it} bytes" }
+        formatByteCount = { "${it} bytes" },
+        actions = object : PublicationActions {
+            override fun onDownloadClick(ePub: ElectronicPublication) {}
+            override fun onCancelDownloadClick(ePub: ElectronicPublication) {}
+            override fun onViewClick(ePub: ElectronicPublication) {}
+            override fun onDeleteClick(ePub: ElectronicPublication) {}
+        }
     )
 }
 
@@ -238,7 +332,7 @@ fun PublicationList(
     publicationLinks: Publications,
     formatDateTime: (Instant?) -> String?,
     formatByteCount: (Long?) -> String?,
-    onDownloadClick: (ElectronicPublication) -> Unit
+    actions: PublicationActions,
 ) {
     LazyColumn {
         publicationLinks.publications.forEach { 
@@ -247,7 +341,7 @@ fun PublicationList(
                     ePub = it.publication,
                     formatDateTime = formatDateTime,
                     formatByteCount = formatByteCount,
-                    onDownloadClick = onDownloadClick,
+                    actions = actions,
                 )
             }
         }

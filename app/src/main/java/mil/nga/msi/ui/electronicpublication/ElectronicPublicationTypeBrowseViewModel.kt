@@ -2,10 +2,8 @@
 
 package mil.nga.msi.ui.electronicpublication
 
-import android.app.DownloadManager
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
-import androidx.core.net.toUri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -15,9 +13,7 @@ import kotlinx.coroutines.flow.*
 import mil.nga.msi.datasource.electronicpublication.ElectronicPublication
 import mil.nga.msi.datasource.electronicpublication.ElectronicPublicationType
 import mil.nga.msi.repository.electronicpublication.ElectronicPublicationRepository
-import java.util.*
 import javax.inject.Inject
-import kotlin.time.seconds
 
 @HiltViewModel
 class ElectronicPublicationTypeBrowseViewModel @Inject constructor(
@@ -40,7 +36,6 @@ class ElectronicPublicationTypeBrowseViewModel @Inject constructor(
                 }
             }
         }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
     private val mutableCurrentNodeState: MutableStateFlow<PublicationBrowsingNode> = MutableStateFlow(PublicationsLoadingNode(null, pubTypeState.value))
     val currentNodeState = mutableCurrentNodeState.asStateFlow()
@@ -73,6 +68,10 @@ class ElectronicPublicationTypeBrowseViewModel @Inject constructor(
 
     fun onDownloadClick(ePub: ElectronicPublication) {
         viewModelScope.launch { ePubRepo.download(ePub) }
+    }
+
+    fun onCancelDownloadClick(ePub: ElectronicPublication) {
+        TODO("Not yet implemented")
     }
 
     fun onDeleteClick(ePub: ElectronicPublication) {
