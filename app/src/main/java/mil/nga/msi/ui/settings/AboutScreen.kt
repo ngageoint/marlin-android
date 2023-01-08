@@ -4,6 +4,8 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -28,7 +30,13 @@ fun AboutScreen(
    onDisclaimer: () -> Unit,
    onContact: () -> Unit,
 ) {
-   Column(modifier = Modifier.fillMaxSize()) {
+   val scrollState = rememberScrollState()
+
+   Column(
+      modifier = Modifier
+         .fillMaxSize()
+         .verticalScroll(scrollState)
+   ) {
       TopBar(
          title = AboutRoute.Main.title,
          navigationIcon = Icons.Filled.Close,
