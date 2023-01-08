@@ -3,6 +3,8 @@ package mil.nga.msi.ui.sort
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -27,6 +29,8 @@ fun SortScreen(
    close: () -> Unit,
    viewModel: SortViewModel = hiltViewModel()
 ) {
+   val scrollState = rememberScrollState()
+
    viewModel.setDataSource(dataSource)
    val title by viewModel.title.observeAsState("")
    val section by viewModel.section.observeAsState(false)
@@ -36,7 +40,9 @@ fun SortScreen(
    Column(
       Modifier
          .fillMaxSize()
+         .verticalScroll(scrollState)
          .background(MaterialTheme.colors.screenBackground)
+         .padding(bottom = 16.dp)
    ) {
       TopBar(
          title = title,
