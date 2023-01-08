@@ -110,6 +110,7 @@ fun NavigationDrawer(
    if (tabs != null && nonTabs != null) {
       LazyColumn(
          state = listState,
+         contentPadding = PaddingValues(bottom = 16.dp),
          modifier = Modifier
             .fillMaxHeight()
             .dragContainer(dragDropState)
