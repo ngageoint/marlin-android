@@ -4,7 +4,9 @@ import android.Manifest
 import android.content.pm.PackageManager
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -30,6 +32,8 @@ fun MapSettingsScreen(
    onClose: () -> Unit,
    viewModel: MapSettingsViewModel = hiltViewModel()
 ) {
+   val scrollState = rememberScrollState()
+
    val baseMap by viewModel.baseMap.observeAsState()
    val gars by viewModel.gars.observeAsState(false)
    val mgrs by viewModel.mgrs.observeAsState(false)
@@ -42,25 +46,32 @@ fun MapSettingsScreen(
          onNavigationClicked = { onClose() }
       )
 
-      baseMap?.let { baseMap ->
-         BaseMapLayer(baseMap) {
-            viewModel.setBaseLayer(it)
+      Column(
+         Modifier
+            .fillMaxSize()
+            .verticalScroll(scrollState)
+            .padding(bottom = 16.dp)
+      ) {
+         baseMap?.let { baseMap ->
+            BaseMapLayer(baseMap) {
+               viewModel.setBaseLayer(it)
+            }
          }
+
+         GridLayers(
+            gars = gars,
+            mgrs = mgrs,
+            onGarsToggled = { viewModel.setGARS(it) },
+            onMgrsToggled = { viewModel.setMGRS(it) }
+         )
+
+         DataSourceSettings(onLightSettings)
+
+         DisplaySettings(
+            showLocation = showLocation,
+            onShowLocationToggled = { viewModel.setShowLocation(it) }
+         )
       }
-
-      GridLayers(
-         gars = gars,
-         mgrs = mgrs,
-         onGarsToggled = { viewModel.setGARS(it) },
-         onMgrsToggled = { viewModel.setMGRS(it) }
-      )
-
-      DataSourceSettings(onLightSettings)
-
-      DisplaySettings(
-         showLocation = showLocation,
-         onShowLocationToggled = { viewModel.setShowLocation(it) }
-      )
    }
 }
 
