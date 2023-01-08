@@ -111,11 +111,12 @@ class UserPreferencesRepository @Inject constructor(
    suspend fun setMapLocation(mapLocation: MapLocation) {
       preferencesDataStore.updateData {
          val builder = it.toBuilder()
-         builder.map.toBuilder().setMapLocation(builder.map.mapLocation.toBuilder()
+         val mapBuilder = builder.map.toBuilder()
+         builder.map = mapBuilder.setMapLocation(mapBuilder.mapLocation.toBuilder()
             .setLatitude(mapLocation.latitude)
             .setLongitude(mapLocation.longitude)
             .setZoom(mapLocation.zoom)
-            .build())
+         ).build()
 
          builder.build()
       }
