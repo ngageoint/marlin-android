@@ -4,6 +4,8 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -24,17 +26,19 @@ fun ReportsScreen(
    close: () -> Unit,
    onTap: (ReportRoute) -> Unit,
 ) {
+   val scrollState = rememberScrollState()
    Column(
       Modifier
          .fillMaxSize()
+         .verticalScroll(scrollState)
          .background(MaterialTheme.colors.screenBackground)
+         .padding(bottom = 16.dp)
    ) {
       TopBar(
          title = ReportRoute.List.title,
          navigationIcon = Icons.Default.ArrowBack,
          onNavigationClicked = { close() }
       )
-
 
       CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
          Text(
