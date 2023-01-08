@@ -27,54 +27,56 @@ fun ReportsScreen(
    onTap: (ReportRoute) -> Unit,
 ) {
    val scrollState = rememberScrollState()
-   Column(
-      Modifier
-         .fillMaxSize()
-         .verticalScroll(scrollState)
-         .background(MaterialTheme.colors.screenBackground)
-         .padding(bottom = 16.dp)
-   ) {
+   Column {
       TopBar(
          title = ReportRoute.List.title,
          navigationIcon = Icons.Default.ArrowBack,
          onNavigationClicked = { close() }
       )
 
-      CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-         Text(
-            text = "Submit Reports to NGA",
-            style = MaterialTheme.typography.body2,
-            fontWeight = FontWeight.Medium,
-            modifier = Modifier.padding(start = 8.dp, top = 32.dp, bottom = 16.dp)
-         )
-      }
+      Column(
+         Modifier
+            .fillMaxSize()
+            .verticalScroll(scrollState)
+            .background(MaterialTheme.colors.screenBackground)
+            .padding(bottom = 16.dp)
+      ) {
+         CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+            Text(
+               text = "Submit Reports to NGA",
+               style = MaterialTheme.typography.body2,
+               fontWeight = FontWeight.Medium,
+               modifier = Modifier.padding(start = 8.dp, top = 32.dp, bottom = 16.dp)
+            )
+         }
 
-      Reports(ReportRoute.ASAM) {
-         onTap(ReportRoute.ASAM)
-      }
+         Reports(ReportRoute.ASAM) {
+            onTap(ReportRoute.ASAM)
+         }
 
-      Divider()
+         Divider()
 
-      Reports(ReportRoute.Observer) {
-         onTap(ReportRoute.Observer)
-      }
+         Reports(ReportRoute.Observer) {
+            onTap(ReportRoute.Observer)
+         }
 
-      Divider()
+         Divider()
 
-      Reports(ReportRoute.MODU) {
-         onTap(ReportRoute.MODU)
-      }
+         Reports(ReportRoute.MODU) {
+            onTap(ReportRoute.MODU)
+         }
 
-      Divider()
+         Divider()
 
-      Reports(ReportRoute.PortVisit) {
-         onTap(ReportRoute.PortVisit)
-      }
+         Reports(ReportRoute.PortVisit) {
+            onTap(ReportRoute.PortVisit)
+         }
 
-      Divider()
+         Divider()
 
-      Reports(ReportRoute.HostileShip) {
-         onTap(ReportRoute.HostileShip)
+         Reports(ReportRoute.HostileShip) {
+            onTap(ReportRoute.HostileShip)
+         }
       }
    }
 }
