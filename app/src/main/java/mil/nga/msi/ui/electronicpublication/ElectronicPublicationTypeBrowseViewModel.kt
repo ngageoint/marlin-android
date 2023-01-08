@@ -2,8 +2,12 @@
 
 package mil.nga.msi.ui.electronicpublication
 
+import android.net.Uri
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
+import androidx.core.app.ShareCompat.IntentBuilder
+import androidx.core.content.FileProvider
+import androidx.core.content.IntentCompat
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -75,12 +79,9 @@ class ElectronicPublicationTypeBrowseViewModel @Inject constructor(
     }
 
     fun onDeleteClick(ePub: ElectronicPublication) {
-
     }
 
-    fun onOpenEPubClick(ePub: ElectronicPublication) {
-
-    }
+    fun uriToSharePublication(ePub: ElectronicPublication): Uri = ePubRepo.getContentUriToSharePublication(ePub)
 }
 
 fun linksForNode(node: PublicationBrowsingNode, ePubs: List<ElectronicPublication>): PublicationBrowsingLinksArrangement {

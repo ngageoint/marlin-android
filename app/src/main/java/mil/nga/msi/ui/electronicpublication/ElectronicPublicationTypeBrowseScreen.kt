@@ -3,6 +3,7 @@
 package mil.nga.msi.ui.electronicpublication
 
 import android.content.Context
+import android.content.Intent
 import android.text.format.Formatter.formatShortFileSize
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.*
@@ -24,6 +25,7 @@ import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ShareCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -62,6 +64,7 @@ fun ElectronicPublicationTypeBrowseRoute(
     // TODO: how will this work when time zone changes, or when offline?
     val formatDateTime = formatDateTimeFunction(LocalContext.current)
     val formatByteCount = formatByteCountFunction(LocalContext.current)
+    val context = LocalContext.current
     BackHandler(onBack = onBackClick)
     ElectronicPublicationTypeBrowseScreen(
         pubType = pubTypeState,
@@ -74,8 +77,14 @@ fun ElectronicPublicationTypeBrowseRoute(
         publicationActions = object : PublicationActions {
             override fun onDownloadClick(ePub: ElectronicPublication) = viewModel.onDownloadClick(ePub)
             override fun onCancelDownloadClick(ePub: ElectronicPublication) = viewModel.onCancelDownloadClick(ePub)
-            override fun onViewClick(ePub: ElectronicPublication) = viewModel.onOpenEPubClick(ePub)
             override fun onDeleteClick(ePub: ElectronicPublication) = viewModel.onDeleteClick(ePub)
+            override fun onViewClick(ePub: ElectronicPublication) {
+                val ePubUri = viewModel.uriToSharePublication(ePub)
+                val viewEPub = Intent(Intent.ACTION_VIEW)
+                    .setDataAndType(ePubUri, ePub.downloadMediaType)
+                    .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                context.startActivity(viewEPub)
+            }
         }
     )
 }

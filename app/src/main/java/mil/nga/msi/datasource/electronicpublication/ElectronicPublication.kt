@@ -54,6 +54,12 @@ data class ElectronicPublication(
     val contentId: Int? = null,
     @ColumnInfo(name = "downloaded_bytes")
     val downloadedBytes: Long = 0,
+    /**
+     * The IANA media type from the HTTP response to the download of the publication file, e.g.,
+     * `application/pdf`
+     */
+    @ColumnInfo(name = "download_media_type")
+    val downloadMediaType: String? = null,
     @ColumnInfo(name = "file_ext")
     val fileExtension: String? = null,
     @ColumnInfo(name = "file_name_base")

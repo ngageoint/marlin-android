@@ -4,13 +4,15 @@ import android.app.Application
 import android.app.DownloadManager
 import android.net.Uri
 import android.os.Environment
+import android.util.Log
+import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
 import mil.nga.msi.datasource.electronicpublication.ElectronicPublication
 import mil.nga.msi.datasource.electronicpublication.ElectronicPublicationType
+import java.io.File
 import javax.inject.Inject
 
 
@@ -69,8 +71,10 @@ class ElectronicPublicationRepository @Inject constructor(
             val updates = mutableListOf<ElectronicPublication>()
             val colDownloadId = downloads.getColumnIndex(DownloadManager.COLUMN_ID)
             val colUri = downloads.getColumnIndex(DownloadManager.COLUMN_URI)
+            val colLocalUri = downloads.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI)
             val colStatus = downloads.getColumnIndex(DownloadManager.COLUMN_STATUS)
             val colBytes = downloads.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR)
+            val colMediaType = downloads.getColumnIndex(DownloadManager.COLUMN_MEDIA_TYPE)
             val isEPubDownload = Regex("^https://msi.nga.mil/api/publications/download.+")
             downloads.use {
                 while (downloads.moveToNext()) {
@@ -79,6 +83,9 @@ class ElectronicPublicationRepository @Inject constructor(
                         val downloadId = downloads.getLong(colDownloadId)
                         val status = downloads.getInt(colStatus)
                         val bytes = downloads.getLong(colBytes)
+                        val mediaType = downloads.getString(colMediaType)
+                        val localUri = downloads.getString(colLocalUri)
+                        Log.d("ElectronicPublicationRepoistory", "downloading to ${localUri}")
                         ePubsByDownloadId[downloadId]?.let { downloadingEPub ->
                             val update = when (status) {
                                 DownloadManager.STATUS_FAILED -> downloadingEPub.copy(
@@ -93,7 +100,7 @@ class ElectronicPublicationRepository @Inject constructor(
                                     isDownloading = false,
                                     isDownloaded = true,
                                 )
-                                else -> downloadingEPub.copy(downloadedBytes = bytes)
+                                else -> downloadingEPub.copy(downloadedBytes = bytes, downloadMediaType = mediaType)
                             }
                             updates.add(update)
                         }
@@ -102,6 +109,13 @@ class ElectronicPublicationRepository @Inject constructor(
             }
             updates
         }
+    }
+
+    fun getContentUriToSharePublication(ePub: ElectronicPublication): Uri {
+        val extDirPath = context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)
+        val ePubFile = File(extDirPath, ePub.localDownloadRelPath)
+        val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", ePubFile)
+        return uri
     }
 
     val fetching: LiveData<Boolean> = MutableLiveData(false)
