@@ -23,19 +23,68 @@ import mil.nga.msi.ui.theme.add
 import mil.nga.msi.ui.theme.remove
 import mil.nga.msi.ui.theme.screenBackground
 
+enum class SortField {
+   PRIMARY, SECONDARY
+}
+
 @Composable
 fun SortScreen(
    dataSource: DataSource,
    close: () -> Unit,
    viewModel: SortViewModel = hiltViewModel()
 ) {
-   val scrollState = rememberScrollState()
-
    viewModel.setDataSource(dataSource)
    val title by viewModel.title.observeAsState("")
    val section by viewModel.section.observeAsState(false)
    val parameters by viewModel.sortParameters.observeAsState(emptyList())
    val options by viewModel.sortOptions.observeAsState(emptyList())
+
+   Column {
+      TopBar(
+         title = title,
+         navigationIcon = Icons.Default.Close,
+         onNavigationClicked = { close() }
+      )
+
+      Sort(
+         section = section,
+         options = options,
+         parameters = parameters,
+         addSort = { field, parameter ->
+            when (field) {
+               SortField.PRIMARY -> viewModel.addPrimarySort(dataSource, parameter)
+               SortField.SECONDARY -> viewModel.addSecondarySort(dataSource, parameter)
+            }
+         },
+         removeSort = { field ->
+            when (field) {
+               SortField.PRIMARY -> viewModel.removePrimarySort(dataSource)
+               SortField.SECONDARY -> viewModel.removeSecondarySort(dataSource)
+            }
+         },
+         resetSort = {
+            viewModel.reset(dataSource)
+         },
+         setSection = {
+            viewModel.setSection(dataSource, it)
+         }
+      )
+   }
+}
+
+@Composable
+private fun Sort(
+   section: Boolean,
+   options: List<FilterParameter>,
+   parameters: List<SortParameter>,
+   addSort: (SortField, SortParameter) -> Unit,
+   removeSort: (SortField) -> Unit,
+   resetSort: () -> Unit,
+   setSection: (Boolean) -> Unit
+) {
+   val scrollState = rememberScrollState()
+   val primarySort = parameters.getOrNull(0)
+   val secondarySort = parameters.getOrNull(1)
 
    Column(
       Modifier
@@ -44,25 +93,16 @@ fun SortScreen(
          .background(MaterialTheme.colors.screenBackground)
          .padding(bottom = 16.dp)
    ) {
-      TopBar(
-         title = title,
-         navigationIcon = Icons.Default.Close,
-         onNavigationClicked = { close() }
-      )
-
-      val primarySort = parameters.getOrNull(0)
-      val secondarySort = parameters.getOrNull(1)
-
       if (options.isNotEmpty()) {
          SortField(
             title = "Primary Sort Field",
             parameter = primarySort,
             sortOptions = options,
             addSort = {
-               viewModel.addPrimarySort(dataSource, it)
+               addSort(SortField.PRIMARY, it)
             },
             removeSort = {
-               viewModel.removePrimarySort(dataSource)
+               removeSort(SortField.PRIMARY)
             }
          )
 
@@ -73,23 +113,23 @@ fun SortScreen(
             parameter = secondarySort,
             sortOptions = options,
             addSort = {
-               viewModel.addSecondarySort(dataSource, it)
+               addSort(SortField.SECONDARY, it)
             },
             removeSort = {
-               viewModel.removeSecondarySort(dataSource)
+               removeSort(SortField.SECONDARY)
             }
          )
 
          Reset(
             onReset = {
-               viewModel.reset(dataSource)
+               resetSort()
             }
          )
 
          Section(
             section = section,
             onSection = {
-               viewModel.setSection(dataSource, it)
+               setSection(it)
             }
          )
       }
