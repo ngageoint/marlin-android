@@ -16,6 +16,7 @@ import mil.nga.msi.datasource.filter.AsamFilter
 import mil.nga.msi.datasource.filter.LightFilter
 import mil.nga.msi.datasource.filter.ModuFilter
 import mil.nga.msi.datasource.navigationwarning.NavigationArea
+import mil.nga.msi.filter.ComparatorType
 import mil.nga.msi.sort.SortDirection
 import mil.nga.msi.type.*
 import mil.nga.msi.ui.map.BaseMapType
@@ -66,6 +67,7 @@ class DataStoreModule {
                )
                .addAllNonTabs(listOf(DataSource.PORT, DataSource.RADIO_BEACON, DataSource.DGPS_STATION, DataSource.ELECTRONIC_PUBLICATION).map { it.name })
                .putAllSort(sortDefaults)
+               .putAllFilters(filterDefaults)
                .build()
 
          override suspend fun readFrom(input: InputStream): UserPreferences {
@@ -90,6 +92,27 @@ class DataStoreModule {
    }
 
    companion object {
+      val filterDefaults = mapOf(
+         DataSource.ASAM.name to Filters.newBuilder()
+            .addFilters(
+               Filter.newBuilder()
+                  .setParameter(
+                     listOfNotNull(
+                        AsamFilter.parameters.find { it.parameter == "date" }
+                     ).map {
+                        FilterParameter.newBuilder()
+                           .setName(it.parameter)
+                           .setTitle(it.title)
+                           .setType(it.type.name)
+                           .build()
+                     }.first()
+                  )
+               .setValue("last 365 days")
+               .setComparator(ComparatorType.WITHIN.name)
+            )
+         .build()
+      )
+
       val sortDefaults = mapOf(
          DataSource.ASAM.name to Sort.newBuilder()
             .setSection(false)
