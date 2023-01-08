@@ -15,6 +15,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -44,6 +45,7 @@ fun NavigationalWarningGroupScreen(
    onGroupTap: (NavigationArea) -> Unit,
    viewModel: NavigationalWarningAreasViewModel = hiltViewModel()
 ) {
+   val screenHeight = LocalConfiguration.current.screenHeightDp
    val scrollState = rememberScrollState()
    val warningsByArea by viewModel.navigationalWarningsByArea.observeAsState(emptyList())
    val location by viewModel.locationProvider.observeAsState()
@@ -66,10 +68,11 @@ fun NavigationalWarningGroupScreen(
       )
 
       NavigationAreaMap(
-         location,
-         locationPermissionState,
-         viewModel.naturalEarthTileProvider,
-         viewModel.navigationAreaTileProvider
+         height = screenHeight * .30f,
+         location = location,
+         locationPermissionState = locationPermissionState,
+         naturalEarthTileProvider = viewModel.naturalEarthTileProvider,
+         navigationAreaTileProvider = viewModel.navigationAreaTileProvider
       )
 
       val navigationArea = location?.let { getNavigationArea(LocalContext.current, it) }
@@ -97,6 +100,7 @@ fun NavigationalWarningGroupScreen(
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 private fun NavigationAreaMap(
+   height: Float,
    location: Location?,
    locationPermissionState: PermissionState,
    naturalEarthTileProvider: TileProvider,
@@ -125,7 +129,7 @@ private fun NavigationAreaMap(
 
    GoogleMap(
       modifier = Modifier
-         .height(250.dp)
+         .height(height.dp)
          .fillMaxWidth(),
       cameraPositionState = cameraPositionState,
       properties = MapProperties(
@@ -216,7 +220,7 @@ private fun getNavigationArea(
 
    val geopackageManager = GeoPackageFactory.getManager(context)
    val resource = context.resources.openRawResource(R.raw.navigation_areas)
-   try { geopackageManager.importGeoPackage("navigation_areas", resource) } catch (e: Exception) { }
+   try { geopackageManager.importGeoPackage("navigation_areas", resource) } catch (_: Exception) { }
    val database = geopackageManager.databasesLike("navigation_areas").firstOrNull()
    val geopackage = geopackageManager.open(database)
    val features: List<String> = geopackage.featureTables
