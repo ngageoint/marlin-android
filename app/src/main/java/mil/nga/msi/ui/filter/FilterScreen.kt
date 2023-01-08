@@ -4,8 +4,10 @@ import android.app.DatePickerDialog
 import android.widget.DatePicker
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -40,10 +42,16 @@ fun FilterScreen(
    close: () -> Unit,
    viewModel: FilterViewModel = hiltViewModel()
 ) {
+   val scrollState = rememberScrollState()
+
    viewModel.setDataSource(dataSource)
    val title by viewModel.title.observeAsState("")
 
-   Column(Modifier.fillMaxSize()) {
+   Column(
+      modifier = Modifier
+         .fillMaxSize()
+         .verticalScroll(scrollState)
+   ) {
       TopBar(
          title = title,
          navigationIcon = Icons.Default.Close,

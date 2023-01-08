@@ -8,7 +8,9 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -37,12 +39,15 @@ fun MapFilterScreen(
    close: () -> Unit,
    viewModel: MapFilterViewModel = hiltViewModel()
 ) {
+   val scrollState = rememberScrollState()
    val dataSources by viewModel.dataSources.observeAsState(emptyList())
 
    Column(
       Modifier
          .fillMaxSize()
-         .background(MaterialTheme.colors.screenBackground)) {
+         .background(MaterialTheme.colors.screenBackground)
+         .verticalScroll(scrollState)
+   ) {
       TopBar(
          title = MapRoute.Filter.shortTitle,
          navigationIcon = Icons.Default.Close,
@@ -160,10 +165,11 @@ private fun DataSource(
             }
          }
 
-         Column(Modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colors.background)
-            .animateContentSize()
+         Column(
+            Modifier
+               .fillMaxWidth()
+               .background(MaterialTheme.colors.background)
+               .animateContentSize()
          ) {
             if (expand) {
                Filter(dataSource = dataSourceModel.dataSource)
