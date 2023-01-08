@@ -52,7 +52,14 @@ class ElectronicPublicationRepository @Inject constructor(
     }
 
     suspend fun removeDownload(ePub: ElectronicPublication) {
+        if (ePub.localDownloadId == null) {
+            return
+        }
+        localData.updateToRemoveDownload(ePub, { downloadManager.remove(ePub.localDownloadId) })
+    }
 
+    suspend fun cancelDownload(ePub: ElectronicPublication) {
+        removeDownload(ePub)
     }
 
     /**

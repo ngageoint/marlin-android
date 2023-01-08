@@ -75,10 +75,15 @@ class ElectronicPublicationTypeBrowseViewModel @Inject constructor(
     }
 
     fun onCancelDownloadClick(ePub: ElectronicPublication) {
-        TODO("Not yet implemented")
+        viewModelScope.launch {
+            ePubRepo.cancelDownload(ePub)
+        }
     }
 
     fun onDeleteClick(ePub: ElectronicPublication) {
+        viewModelScope.launch {
+            ePubRepo.removeDownload(ePub)
+        }
     }
 
     fun uriToSharePublication(ePub: ElectronicPublication): Uri = ePubRepo.getContentUriToSharePublication(ePub)

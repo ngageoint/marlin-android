@@ -23,6 +23,7 @@ class ElectronicPublicationLocalDataSource @Inject constructor(private val dao: 
      * given lambda to check for download status.
      */
     suspend fun updateDownloadProgress(progressUpdates: (List<ElectronicPublication>) -> List<ElectronicPublication>) = dao.updateDownloadProgress(progressUpdates)
+    suspend fun updateToRemoveDownload(ePub: ElectronicPublication, removeDownloadedFile: suspend () -> Unit) = dao.updateToRemoveDownload(ePub, removeDownloadedFile)
     fun observeFileCountsByType() = dao.observeFileCountsByType()
     fun observePublicationsOfType(pubType: ElectronicPublicationType) = dao.observeElectronicPublicationsOfType(pubType.typeId)
 }
