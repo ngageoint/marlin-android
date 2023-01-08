@@ -42,19 +42,21 @@ fun MapFilterScreen(
    val scrollState = rememberScrollState()
    val dataSources by viewModel.dataSources.observeAsState(emptyList())
 
-   Column(
-      Modifier
-         .fillMaxSize()
-         .background(MaterialTheme.colors.screenBackground)
-         .verticalScroll(scrollState)
-   ) {
+   Column {
       TopBar(
          title = MapRoute.Filter.shortTitle,
          navigationIcon = Icons.Default.Close,
          onNavigationClicked = { close() }
       )
 
-      DataSources(dataSources = dataSources)
+      Column(
+         Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colors.screenBackground)
+            .verticalScroll(scrollState)
+      ) {
+         DataSources(dataSources = dataSources)
+      }
    }
 }
 
@@ -64,22 +66,20 @@ private fun DataSources(
 ) {
    var expanded by remember { mutableStateOf<Map<DataSource, Boolean>>(emptyMap()) }
 
-   Column() {
-      dataSources.forEach { dataSourceModel ->
-         DataSource(
-            dataSourceModel = dataSourceModel,
-            expand = expanded[dataSourceModel.dataSource] ?: false,
-            onExpand = { expand ->
-               expanded = expanded.toMutableMap().apply {
-                  put(dataSourceModel.dataSource, expand)
-               }
+   dataSources.forEach { dataSourceModel ->
+      DataSource(
+         dataSourceModel = dataSourceModel,
+         expand = expanded[dataSourceModel.dataSource] ?: false,
+         onExpand = { expand ->
+            expanded = expanded.toMutableMap().apply {
+               put(dataSourceModel.dataSource, expand)
             }
-         )
+         }
+      )
 
-         Spacer(modifier = Modifier
-            .height(8.dp)
-            .background(MaterialTheme.colors.onSurface.copy(alpha = 0.12f)))
-      }
+      Spacer(modifier = Modifier
+         .height(8.dp)
+         .background(MaterialTheme.colors.onSurface.copy(alpha = 0.12f)))
    }
 }
 

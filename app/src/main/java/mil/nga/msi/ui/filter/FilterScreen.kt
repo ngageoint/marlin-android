@@ -47,18 +47,20 @@ fun FilterScreen(
    viewModel.setDataSource(dataSource)
    val title by viewModel.title.observeAsState("")
 
-   Column(
-      modifier = Modifier
-         .fillMaxSize()
-         .verticalScroll(scrollState)
-   ) {
+   Column {
       TopBar(
          title = title,
          navigationIcon = Icons.Default.Close,
          onNavigationClicked = { close() }
       )
 
-      Filter(dataSource = dataSource)
+      Column(
+         Modifier
+            .fillMaxSize()
+            .verticalScroll(scrollState)
+      ) {
+         Filter(dataSource = dataSource)
+      }
    }
 }
 
