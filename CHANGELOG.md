@@ -9,44 +9,6 @@ Marlin adheres to [Semantic Versioning](http://semver.org/).
 
 ##### Bug Fixes
 
----
-## 0.7.0
-
-### Summary
-This release includes the following MSI data sources
-* ASAMs
-* MODUS
-* Navigational Warnings
-* Lights
-* World Ports
-* Radio Beacons
-* Differential GPS Stations
-
-##### Features
-* Radio Beacons
-* Differential GPS Stations
-
-## 0.5.0
-
-### Summary
-This release includes the following MSI data sources
-* ASAMs
-* MODUS
-* Navigational Warnings
-* Lights
-* World Ports
-
-##### Features
-* World Ports
-
-## 0.4.0
-
-### Summary
-This release includes the following MSI data sources
-* ASAMs
-* MODUS
-* Navigational Warnings
-* Lights
-
-##### Features
-* Lights
+## 1.0.0
+  * Initial Release: Marlin brings NGA’s Maritime Safety Information datasets to your mobile device to help you navigate safely at sea. With Marlin, you can download the latest maritime safety reports and reference information before setting sail, then search and view the information on an interactive map, even when you have no cell service. Marlin automatically checks for updates when you have a data connection, and informs you what’s new.
+  Fair winds and following seas!
