@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
@@ -216,7 +217,9 @@ fun TopBar(
    TopAppBar(
       title = {
          Text(
-            text = title
+            text = title,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
          )
       },
       navigationIcon = {
