@@ -163,7 +163,16 @@ fun PublicationSectionsList(
                     formatByteCount = formatByteCount,
                     actions = actions,
                 )
+                if (pubLink != section.publications.last()) {
+                    Divider(
+                        startIndent = 8.dp,
+                        modifier = Modifier.background(MaterialTheme.colors.background)
+                    )
+                }
             }
+        }
+        item {
+            Divider()
         }
     }
 }
@@ -177,7 +186,7 @@ fun PublicationListItem(
         modifier = Modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.large,
     ) {
-        Column(modifier = Modifier.padding(8.dp)) {
+        Column(modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 8.dp)) {
             Text(
                 style = MaterialTheme.typography.subtitle1,
                 text = ePub.sectionDisplayName ?: ""
@@ -343,15 +352,24 @@ fun PublicationList(
     actions: PublicationActions,
 ) {
     LazyColumn {
-        publicationLinks.publications.forEach { 
+        publicationLinks.publications.forEachIndexed { pos, pubLink ->
             item { 
                 PublicationListItem(
-                    ePub = it.publication,
+                    ePub = pubLink.publication,
                     formatDateTime = formatDateTime,
                     formatByteCount = formatByteCount,
                     actions = actions,
                 )
+                if (pos < publicationLinks.publications.size - 1) {
+                    Divider(
+                        startIndent = 8.dp,
+                        modifier = Modifier.background(MaterialTheme.colors.background)
+                    )
+                }
             }
+        }
+        item {
+            Divider()
         }
     }
 }
