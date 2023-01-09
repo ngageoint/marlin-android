@@ -73,7 +73,10 @@ class ElectronicPublicationRepository @Inject constructor(
             val downloadIds = downloadingEPubs.map({ it.localDownloadId!! })
             val downloadIdsArray = LongArray(downloadIds.size)
             downloadIds.forEachIndexed { pos, id -> downloadIdsArray[pos] = id }
-            val downloadQuery = DownloadManager.Query().setFilterById(*downloadIdsArray)
+            var downloadQuery = DownloadManager.Query()
+            if (downloadIds.size > 0) {
+                downloadQuery = downloadQuery.setFilterById(*downloadIdsArray)
+            }
             val downloads = downloadManager.query(downloadQuery)
             val updates = mutableListOf<ElectronicPublication>()
             val colDownloadId = downloads.getColumnIndex(DownloadManager.COLUMN_ID)
@@ -92,7 +95,7 @@ class ElectronicPublicationRepository @Inject constructor(
                         val bytes = downloads.getLong(colBytes)
                         val mediaType = downloads.getString(colMediaType)
                         val localUri = downloads.getString(colLocalUri)
-                        Log.d("ElectronicPublicationRepoistory", "downloading to ${localUri}")
+                        Log.d("ElectronicPublicationRepository", "downloading publication ${remoteUri} to ${localUri}")
                         ePubsByDownloadId[downloadId]?.let { downloadingEPub ->
                             val update = when (status) {
                                 DownloadManager.STATUS_FAILED -> downloadingEPub.copy(
