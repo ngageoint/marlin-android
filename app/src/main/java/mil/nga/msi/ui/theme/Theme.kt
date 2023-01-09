@@ -9,8 +9,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
 private val DarkColorPalette = darkColors(
-   primary = SeaGreen,
-   primaryVariant = SeaGreen,
+   primary = NgaBlue,
+   primaryVariant = NgaBlue,
    secondary = NgaBlue
 )
 
@@ -26,7 +26,7 @@ fun MsiTheme(
    content: @Composable () -> Unit
 ) {
    val colors = if (darkTheme) {
-      DarkColorPalette
+      LightColorPalette
    } else {
       LightColorPalette
    }
