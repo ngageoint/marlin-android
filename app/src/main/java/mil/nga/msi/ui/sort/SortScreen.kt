@@ -1,5 +1,6 @@
 package mil.nga.msi.ui.sort
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -106,19 +107,23 @@ private fun Sort(
             }
          )
 
-         Divider(Modifier.fillMaxWidth())
+         Column(Modifier.animateContentSize()) {
+            if (parameters.isNotEmpty()) {
+               Divider(Modifier.fillMaxWidth())
 
-         SortField(
-            title = "Secondary Sort Field",
-            parameter = secondarySort,
-            sortOptions = options,
-            addSort = {
-               addSort(SortField.SECONDARY, it)
-            },
-            removeSort = {
-               removeSort(SortField.SECONDARY)
+               SortField(
+                  title = "Secondary Sort Field",
+                  parameter = secondarySort,
+                  sortOptions = options,
+                  addSort = {
+                     addSort(SortField.SECONDARY, it)
+                  },
+                  removeSort = {
+                     removeSort(SortField.SECONDARY)
+                  }
+               )
             }
-         )
+         }
 
          Reset(
             onReset = {

@@ -10,6 +10,7 @@ import mil.nga.msi.filter.FilterParameter
 import mil.nga.msi.repository.preferences.SortRepository
 import mil.nga.msi.sort.SortParameter
 import mil.nga.msi.ui.asam.AsamRoute
+import mil.nga.msi.ui.dgpsstation.DgpsStationRoute
 import mil.nga.msi.ui.light.LightRoute
 import mil.nga.msi.ui.modu.ModuRoute
 import mil.nga.msi.ui.port.PortRoute
@@ -32,7 +33,7 @@ class SortViewModel @Inject constructor(
          DataSource.LIGHT -> LightRoute.Sort.shortTitle
          DataSource.PORT -> PortRoute.Sort.shortTitle
          DataSource.RADIO_BEACON -> RadioBeaconRoute.Sort.shortTitle
-//         DataSource.DGPS_STATION -> DgpsStationRoute.Sort.shortTitle
+         DataSource.DGPS_STATION -> DgpsStationRoute.Sort.shortTitle
          else -> ""
       }
    }
@@ -80,8 +81,10 @@ class SortViewModel @Inject constructor(
    fun addSecondarySort(dataSource: DataSource, parameter: SortParameter) {
       viewModelScope.launch {
          val parameters = sortParameters.value?.toMutableList()?.apply {
-            add(parameter)
-            subList(2, size)
+            if (isNotEmpty()) {
+               add(parameter)
+               subList(2, size)
+            }
          } ?: emptyList()
 
          sortRepository.setSortParameters(dataSource, parameters)
