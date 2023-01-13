@@ -68,7 +68,7 @@ fun NavigationDrawer(
       if (fromIndex <= tabs.size && toIndex <= tabs.size) {
          // Drag within list1
          val to = toIndex - 1
-         val from = if (fromIndex == 0) fromIndex else fromIndex - 1
+         val from = if (fromIndex == 0) 0 else fromIndex - 1
          previousTabs = tabs.toMutableList().apply { add(to, removeAt(from)) }
          previousTabs?.let { viewModel.setTabs(it) }
       } else if (fromIndex <= tabs.size) {
@@ -82,28 +82,33 @@ fun NavigationDrawer(
          previousNonTabs?.let { viewModel.setNonTabs(it) }
       } else if (toIndex <= tabs.size + 1) {
          // Drag from list2 to list1
-         val list2Element = nonTabs[fromIndex - tabs.size - 2]
-         previousNonTabs = nonTabs.toMutableList().apply { removeFirst() }
-         previousTabs = tabs.toMutableList().apply { add(lastIndex + 1, list2Element) }
-         previousTabs?.let { viewModel.setTabs(it) }
-         previousNonTabs?.let { viewModel.setNonTabs(it) }
+         nonTabs.getOrNull(fromIndex - tabs.size - 2)?.let { dataSource ->
+            var newNonTabs = nonTabs.toMutableList().apply { removeFirst() }
+            var newTabs = tabs.toMutableList().apply { add(lastIndex + 1, dataSource) }
+
+            if (newTabs.size > MAX_TABS) {
+               newTabs.getOrNull(newTabs.lastIndex - 1)?.let { evict ->
+                  newTabs = newTabs.toMutableList().apply { remove(evict) }
+                  newNonTabs = newNonTabs.toMutableList().apply { add(0, evict) }
+               }
+            }
+
+            viewModel.setTabs(newTabs)
+            viewModel.setNonTabs(newNonTabs)
+            previousTabs = newTabs
+            previousNonTabs = newNonTabs
+         }
       } else if (fromIndex <= tabs.size + nonTabs.size + 1 && toIndex <= tabs.size + nonTabs.size + 1) {
          // Drag within list2
          previousNonTabs = nonTabs.toMutableList().apply {
-            add(toIndex - tabs.size - 2, removeAt(fromIndex - tabs.size - 2))
+            getOrNull(fromIndex - tabs.size - 2)?.let { dataSource ->
+               remove(dataSource)
+               add(toIndex - tabs.size - 2, dataSource)
+            }
          }
          previousNonTabs?.let { viewModel.setNonTabs(it) }
       }
-
-      if (tabs.size > MAX_TABS) {
-         val evict = tabs[tabs.lastIndex - 1]
-         previousTabs = tabs.toMutableList().apply { remove(evict) }
-         previousNonTabs = nonTabs.toMutableList().apply { add(0, evict) }
-         previousTabs?.let { viewModel.setTabs(it) }
-         previousNonTabs?.let { viewModel.setNonTabs(it) }
-      }
    }
-
 
    val tabs = previousTabs
    val nonTabs = previousNonTabs
