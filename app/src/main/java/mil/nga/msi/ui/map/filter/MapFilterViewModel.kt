@@ -6,11 +6,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import mil.nga.msi.datasource.DataSource
+import mil.nga.msi.location.LocationPolicy
 import mil.nga.msi.repository.preferences.FilterRepository
 import javax.inject.Inject
 
 @HiltViewModel
 class MapFilterViewModel @Inject constructor(
+   val locationPolicy: LocationPolicy,
    private val filterRepository: FilterRepository
 ): ViewModel() {
    data class DataSourceModel(

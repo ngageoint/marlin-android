@@ -8,6 +8,7 @@ import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.filter.*
 import mil.nga.msi.filter.Filter
 import mil.nga.msi.filter.FilterParameter
+import mil.nga.msi.location.LocationPolicy
 import mil.nga.msi.repository.preferences.FilterRepository
 import mil.nga.msi.ui.asam.AsamRoute
 import mil.nga.msi.ui.dgpsstation.DgpsStationRoute
@@ -19,6 +20,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class FilterViewModel @Inject constructor(
+   val locationPolicy: LocationPolicy,
    private val filterRepository: FilterRepository,
 ): ViewModel() {
    private val _dataSource = MutableLiveData<DataSource>()

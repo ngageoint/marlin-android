@@ -1,5 +1,6 @@
 package mil.nga.msi.ui.map.filter
 
+import android.location.Location
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -41,6 +42,7 @@ fun MapFilterScreen(
 ) {
    val scrollState = rememberScrollState()
    val dataSources by viewModel.dataSources.observeAsState(emptyList())
+   val location by viewModel.locationPolicy.bestLocationProvider.observeAsState()
 
    Column {
       TopBar(
@@ -55,20 +57,22 @@ fun MapFilterScreen(
             .background(MaterialTheme.colors.screenBackground)
             .verticalScroll(scrollState)
       ) {
-         DataSources(dataSources = dataSources)
+         DataSources(dataSources = dataSources, location = location)
       }
    }
 }
 
 @Composable
 private fun DataSources(
-   dataSources: List<MapFilterViewModel.DataSourceModel>
+   dataSources: List<MapFilterViewModel.DataSourceModel>,
+   location: Location?
 ) {
    var expanded by remember { mutableStateOf<Map<DataSource, Boolean>>(emptyMap()) }
 
    dataSources.forEach { dataSourceModel ->
       DataSource(
          dataSourceModel = dataSourceModel,
+         location = location,
          expand = expanded[dataSourceModel.dataSource] ?: false,
          onExpand = { expand ->
             expanded = expanded.toMutableMap().apply {
@@ -86,6 +90,7 @@ private fun DataSources(
 @Composable
 private fun DataSource(
    dataSourceModel: MapFilterViewModel.DataSourceModel,
+   location: Location?,
    expand: Boolean,
    onExpand: (Boolean) -> Unit
 ) {
@@ -172,7 +177,7 @@ private fun DataSource(
                .animateContentSize()
          ) {
             if (expand) {
-               Filter(dataSource = dataSourceModel.dataSource)
+               Filter(dataSource = dataSourceModel.dataSource, location = location)
             }
          }
       }

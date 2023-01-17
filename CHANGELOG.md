@@ -6,6 +6,7 @@ Marlin adheres to [Semantic Versioning](http://semver.org/).
 ## Pending on [`develop`](https://github.com/ngageoint/mage-server/tree/develop)
 
 ##### Features
+* Add map to location filter
 
 ##### Bug Fixes
 * Don't allow for secondary sort field if no primary

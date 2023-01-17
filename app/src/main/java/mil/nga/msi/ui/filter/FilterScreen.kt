@@ -1,7 +1,10 @@
 package mil.nga.msi.ui.filter
 
+import android.Manifest
 import android.app.DatePickerDialog
+import android.location.Location
 import android.widget.DatePicker
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -15,6 +18,8 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.SpanStyle
@@ -23,16 +28,33 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.core.graphics.drawable.toBitmap
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.PermissionState
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
+import com.google.maps.android.compose.*
+import mil.nga.msi.R
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.port.types.EnumerationType
 import mil.nga.msi.filter.ComparatorType
 import mil.nga.msi.filter.Filter
 import mil.nga.msi.filter.FilterParameter
 import mil.nga.msi.filter.FilterParameterType
+import mil.nga.msi.ui.image.tint
+import mil.nga.msi.ui.location.LocationPermission
+import mil.nga.msi.ui.location.webMercatorToWgs84
+import mil.nga.msi.ui.location.wgs84ToWebMercator
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.theme.add
 import mil.nga.msi.ui.theme.remove
+import mil.nga.sf.Point
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -43,6 +65,7 @@ fun FilterScreen(
    viewModel: FilterViewModel = hiltViewModel()
 ) {
    val scrollState = rememberScrollState()
+   val location by viewModel.locationPolicy.bestLocationProvider.observeAsState()
 
    viewModel.setDataSource(dataSource)
    val title by viewModel.title.observeAsState("")
@@ -59,7 +82,10 @@ fun FilterScreen(
             .fillMaxSize()
             .verticalScroll(scrollState)
       ) {
-         Filter(dataSource = dataSource)
+         Filter(
+            dataSource = dataSource,
+            location = location
+         )
       }
    }
 }
@@ -67,6 +93,7 @@ fun FilterScreen(
 @Composable
 fun Filter(
    dataSource: DataSource,
+   location: Location?,
    viewModel: FilterViewModel = hiltViewModel()
 ) {
    viewModel.setDataSource(dataSource)
@@ -84,6 +111,7 @@ fun Filter(
 
    if (filterParameters.isNotEmpty()) {
       FilterHeader(
+         location = location,
          filterParameters = filterParameters,
          addFilter = {
             val added = filters.toMutableList()
@@ -202,6 +230,7 @@ private fun stringValue(
 
 @Composable
 private fun FilterHeader(
+   location: Location?,
    filterParameters: List<FilterParameter>,
    addFilter: (Filter) -> Unit
 ) {
@@ -260,6 +289,7 @@ private fun FilterHeader(
                      .padding(horizontal = 16.dp)
                ) {
                   ValueSelection(
+                     location = location,
                      parameter = parameter,
                      comparator = comparator,
                      value = value,
@@ -272,6 +302,7 @@ private fun FilterHeader(
          if (parameter.type == FilterParameterType.STRING || parameter.type == FilterParameterType.LOCATION) {
             Column(Modifier.padding(top = 16.dp)) {
                ValueSelection(
+                  location = location,
                   comparator = comparator,
                   parameter = parameter,
                   value = value,
@@ -423,6 +454,7 @@ private fun ComparatorSelection(
 
 @Composable
 private fun ValueSelection(
+   location: Location?,
    parameter: FilterParameter,
    comparator: ComparatorType,
    value: Any?,
@@ -506,6 +538,7 @@ private fun ValueSelection(
       }
       FilterParameterType.LOCATION -> {
          LocationValue(
+            location = location,
             comparator = comparator,
             value = value.toString(),
             onValueChanged = { onValueChanged(it) }
@@ -643,24 +676,101 @@ fun IntValue(
    }
 }
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun LocationValue(
+   location: Location?,
    comparator: ComparatorType,
    value: String,
    onValueChanged: (Any) -> Unit,
 ) {
    val focusManager = LocalFocusManager.current
-
    val values = if (value.isNotEmpty()) value.split(",") else emptyList()
-   val latitude = values.getOrNull(0) ?: ""
-   val longitude = values.getOrNull(1) ?: ""
-   val distance = values.getOrNull(2) ?: ""
+   val latitude = values.getOrNull(0)?.toDoubleOrNull()
+   val longitude = values.getOrNull(1)?.toDoubleOrNull()
+   val distance = values.getOrNull(2)?.toDoubleOrNull()
+
+   val mapLocation: LatLng? = if (comparator == ComparatorType.NEAR_ME) {
+      if (location != null) {
+         LatLng(location.latitude, location.longitude)
+      } else null
+   } else {
+      if (latitude != null && longitude != null) {
+         LatLng(latitude, longitude)
+      } else null
+   }
+
+   val cameraPositionState = rememberCameraPositionState {
+      if (mapLocation != null) {
+         position = CameraPosition.fromLatLngZoom(mapLocation, 16f)
+      }
+   }
+
+   val locationPermissionState: PermissionState = rememberPermissionState(
+      Manifest.permission.ACCESS_FINE_LOCATION
+   )
+
+   val uiSettings = MapUiSettings(
+      zoomControlsEnabled = false,
+      compassEnabled = false
+   )
+
+   val mapProperties = MapProperties(
+      minZoomPreference = 0f,
+      isMyLocationEnabled = locationPermissionState.status.isGranted
+   )
+
+   LocationPermission(locationPermissionState)
+
+   LaunchedEffect(mapLocation, distance) {
+      if (mapLocation != null) {
+         if (distance == null) {
+            cameraPositionState.animate(
+               update = CameraUpdateFactory.newCameraPosition(
+                  CameraPosition(mapLocation, 11f, 0f, 0f)
+               ),
+               durationMs = 1000
+            )
+         } else {
+            val distanceInMeters = distance * 1852
+            val center4326 = Point(mapLocation.longitude, mapLocation.latitude).wgs84ToWebMercator()
+            val neCorner = Point(center4326.x + distanceInMeters, center4326.y + distanceInMeters).webMercatorToWgs84()
+            val swCorner = Point(center4326.x - distanceInMeters, center4326.y - distanceInMeters).webMercatorToWgs84()
+            val bounds = LatLngBounds(
+               LatLng(swCorner.y, swCorner.x),
+               LatLng(neCorner.y, neCorner.x),
+            )
+            cameraPositionState.animate(
+               update = CameraUpdateFactory.newLatLngBounds(bounds, 20),
+               durationMs = 1000
+            )
+         }
+      }
+   }
 
    Column(Modifier.padding(end = 8.dp)) {
+      GoogleMap(
+         uiSettings = uiSettings,
+         properties = mapProperties,
+         cameraPositionState = cameraPositionState,
+         modifier = Modifier
+            .height(200.dp)
+            .fillMaxWidth()
+            .padding(bottom = 16.dp)
+      ) {
+         if (mapLocation != null && comparator == ComparatorType.CLOSE_TO) {
+            val bitmap = AppCompatResources.getDrawable(LocalContext.current, R.drawable.ic_outline_my_location_24)!!.toBitmap()
+            Marker(
+               state = MarkerState(position = mapLocation),
+               icon = BitmapDescriptorFactory.fromBitmap(bitmap.tint(Color.Black.toArgb()))
+            )
+         }
+      }
+
       if (comparator == ComparatorType.CLOSE_TO) {
          Row(Modifier.padding(bottom = 16.dp)) {
             TextField(
-               value = latitude,
+               value = latitude?.toString() ?: "",
                label = { Text("Latitude") },
                onValueChange = { onValueChanged("${it},${longitude},${distance}") },
                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -671,7 +781,7 @@ fun LocationValue(
             )
 
             TextField(
-               value = longitude,
+               value = longitude?.toString() ?: "",
                label = { Text("Longitude") },
                onValueChange = { onValueChanged("${latitude},${it},${distance}") },
                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -682,7 +792,7 @@ fun LocationValue(
       }
 
       TextField(
-         value = distance ?: "",
+         value = distance?.toString() ?: "",
          label = { Text("Distance") },
          onValueChange = { onValueChanged("${latitude},${longitude},${it}") },
          keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
