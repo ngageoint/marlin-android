@@ -15,6 +15,8 @@ import mil.nga.msi.datasource.modu.Modu
 import mil.nga.msi.datasource.modu.ModuDao
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarning
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarningDao
+import mil.nga.msi.datasource.noticetomariners.NoticeToMariners
+import mil.nga.msi.datasource.noticetomariners.NoticeToMarinersDao
 import mil.nga.msi.datasource.port.Port
 import mil.nga.msi.datasource.port.PortDao
 import mil.nga.msi.datasource.radiobeacon.RadioBeacon
@@ -27,10 +29,11 @@ import mil.nga.msi.datasource.radiobeacon.RadioBeaconDao
       DgpsStation::class,
       ElectronicPublication::class,
       Light::class,
+      NoticeToMariners::class,
       Modu::class,
       NavigationalWarning::class,
       Port::class,
-      RadioBeacon::class,
+      RadioBeacon::class
    ]
 )
 @TypeConverters(
@@ -40,13 +43,14 @@ import mil.nga.msi.datasource.radiobeacon.RadioBeaconDao
 abstract class MsiDatabase : RoomDatabase() {
 
    companion object {
-      const val VERSION = 1
+      const val VERSION = 2
    }
 
    abstract fun asamDao(): AsamDao
    abstract fun dgpsStationDao(): DgpsStationDao
    abstract fun electronicPublicationDao(): ElectronicPublicationDao
    abstract fun lightDao(): LightDao
+   abstract fun noticeToMarinersDao(): NoticeToMarinersDao
    abstract fun moduDao(): ModuDao
    abstract fun navigationalWarning(): NavigationalWarningDao
    abstract fun portDao(): PortDao

@@ -60,6 +60,10 @@
                 android:value="androidx.startup" />
 
             <meta-data
+                android:name="mil.nga.msi.startup.noticetomariners.NoticeToMarinersInitializer"
+                android:value="androidx.startup" />
+
+            <meta-data
                 android:name="mil.nga.msi.startup.electronicpublication.ElectronicPublicationInitializer"
                 android:value="androidx.startup" />
         </provider>

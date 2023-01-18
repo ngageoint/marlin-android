@@ -12,6 +12,7 @@ import mil.nga.msi.datasource.dgpsstation.DgpsStation
 import mil.nga.msi.datasource.light.Light
 import mil.nga.msi.datasource.modu.Modu
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarning
+import mil.nga.msi.datasource.noticetomariners.NoticeToMariners
 import mil.nga.msi.datasource.port.Port
 import mil.nga.msi.datasource.radiobeacon.RadioBeacon
 import mil.nga.msi.ui.asam.AsamRoute
@@ -20,6 +21,7 @@ import mil.nga.msi.ui.light.LightRoute
 import mil.nga.msi.ui.main.MainActivity
 import mil.nga.msi.ui.modu.ModuRoute
 import mil.nga.msi.ui.navigationalwarning.NavigationWarningRoute
+import mil.nga.msi.ui.noticetomariners.NoticeToMarinersRoute
 import mil.nga.msi.ui.port.PortRoute
 import mil.nga.msi.ui.radiobeacon.RadioBeaconRoute
 import javax.inject.Inject
@@ -135,6 +137,19 @@ class MarlinNotification @Inject constructor(
       }
    }
 
+   fun noticeToMariners(notices: List<NoticeToMariners>) {
+      if (notices.isNotEmpty()) {
+         val name = DataSource.NOTICE_TO_MARINERS.labelForCount(notices.size)
+         notify(
+            notificationId = NoticeToMarinersNotificationId,
+            title = "New $name",
+            description = "You have ${notices.size} new $name",
+            icon = DataSource.NOTICE_TO_MARINERS.icon,
+            uri = "marlin://${NoticeToMarinersRoute.All.name}".toUri()
+         )
+      }
+   }
+
    fun notificationForFetching(source: DataSource): Notification {
       return NotificationCompat.Builder(application, MarlinNotificationChannel.Id)
          .setContentTitle("Checking for new ${source.labelPlural}")
@@ -154,6 +169,7 @@ class MarlinNotification @Inject constructor(
          DataSource.RADIO_BEACON -> RadioBeaconFetchNotificationId
          DataSource.DGPS_STATION -> DgpsStationsFetchNotificationId
          DataSource.ELECTRONIC_PUBLICATION -> ElectronicPublicationFetchNotificationId
+         DataSource.NOTICE_TO_MARINERS -> NoticeToMarinersFetchNotificationId
       }
    }
 
@@ -208,5 +224,7 @@ class MarlinNotification @Inject constructor(
       private const val DgpsStationsFetchNotificationId = 70
       private const val ElectronicPublicationNotificationId = 8
       private const val ElectronicPublicationFetchNotificationId = 80
+      private const val NoticeToMarinersNotificationId = 9
+      private const val NoticeToMarinersFetchNotificationId = 90
    }
 }

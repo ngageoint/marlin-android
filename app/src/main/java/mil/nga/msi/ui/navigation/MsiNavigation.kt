@@ -7,6 +7,7 @@ import mil.nga.msi.ui.electronicpublication.ElectronicPublicationRoute
 import mil.nga.msi.ui.light.LightRoute
 import mil.nga.msi.ui.modu.ModuRoute
 import mil.nga.msi.ui.navigationalwarning.NavigationWarningRoute
+import mil.nga.msi.ui.noticetomariners.NoticeToMarinersRoute
 import mil.nga.msi.ui.port.PortRoute
 import mil.nga.msi.ui.radiobeacon.RadioBeaconRoute
 
@@ -20,6 +21,7 @@ private val mainRoutes: Map<DataSource, Route> = DataSource.values().fold(mapOf(
         DataSource.RADIO_BEACON -> RadioBeaconRoute.Main
         DataSource.DGPS_STATION -> DgpsStationRoute.Main
         DataSource.ELECTRONIC_PUBLICATION -> ElectronicPublicationRoute.Main
+        DataSource.NOTICE_TO_MARINERS -> NoticeToMarinersRoute.Main
     }
     dataSourceToRoute + (dataSource to route)
 }

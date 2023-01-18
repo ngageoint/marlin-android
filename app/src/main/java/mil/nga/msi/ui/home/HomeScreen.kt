@@ -11,6 +11,7 @@ import mil.nga.msi.ui.map.AnnotationProvider
 import mil.nga.msi.ui.map.mapGraph
 import mil.nga.msi.ui.modu.moduGraph
 import mil.nga.msi.ui.navigationalwarning.navigationalWarningGraph
+import mil.nga.msi.ui.noticetomariners.noticeToMarinersGraph
 import mil.nga.msi.ui.port.portGraph
 import mil.nga.msi.ui.radiobeacon.radioBeaconGraph
 import mil.nga.msi.ui.report.reportGraph
@@ -94,6 +95,11 @@ fun NavGraphBuilder.homeGraph(
    reportGraph(
       navController = navController,
       bottomBarVisibility = { bottomBarVisibility(false) }
+   )
+   noticeToMarinersGraph(
+      navController = navController,
+      bottomBarVisibility = { bottomBarVisibility(it) },
+      openNavigationDrawer = openNavigationDrawer
    )
    settingsGraph(
       navController = navController,
