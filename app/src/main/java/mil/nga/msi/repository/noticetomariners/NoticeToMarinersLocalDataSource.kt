@@ -13,15 +13,16 @@ class NoticeToMarinersLocalDataSource @Inject constructor(
 //   fun observeAsams() = dao.observeAsams()
 //   fun observeAsam(reference: String) = dao.observeAsam(reference)
 //   fun observeAsamMapItems(query: SimpleSQLiteQuery) = dao.observeAsamMapItems(query)
-//   fun observeAsamListItems(query: SimpleSQLiteQuery) = dao.getAsamListItems(query)
+   fun observeNoticeToMarinersListItems() = dao.getNoticeToMarinersListItems()
 //
 //   fun getAsams(query: SimpleSQLiteQuery) = dao.getAsams(query)
 //
    fun isEmpty() = dao.count() == 0
 
-//   suspend fun getAsam(reference: String) = dao.getAsam(reference)
-   suspend fun getNoticeToMariners(): List<NoticeToMariners> = dao.getNoticeToMariners()
-//
+   suspend fun getNoticeToMariners() = dao.getNoticeToMariners()
+
+   suspend fun getNoticeToMariners(noticeNumber: Int) = dao.getNoticeToMariners(noticeNumber)
+
    suspend fun existingNoticeToMariners(odsEntryIds: List<Int>) = dao.existingNoticeToMariners(odsEntryIds)
 
    suspend fun insert(noticeToMariners: List<NoticeToMariners>) = dao.insert(noticeToMariners)

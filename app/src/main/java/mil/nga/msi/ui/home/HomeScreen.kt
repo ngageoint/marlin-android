@@ -99,7 +99,8 @@ fun NavGraphBuilder.homeGraph(
    noticeToMarinersGraph(
       navController = navController,
       bottomBarVisibility = { bottomBarVisibility(it) },
-      openNavigationDrawer = openNavigationDrawer
+      openNavigationDrawer = openNavigationDrawer,
+      shareGraphic = { share(Pair("NTM Graphic", it)) }
    )
    settingsGraph(
       navController = navController,

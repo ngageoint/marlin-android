@@ -17,6 +17,7 @@ import mil.nga.msi.datasource.light.Light
 import mil.nga.msi.datasource.modu.Modu
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarning
 import mil.nga.msi.datasource.noticetomariners.NoticeToMariners
+import mil.nga.msi.datasource.noticetomariners.NoticeToMarinersGraphics
 import mil.nga.msi.datasource.port.Port
 import mil.nga.msi.datasource.radiobeacon.RadioBeacon
 import mil.nga.msi.network.asam.AsamService
@@ -30,6 +31,7 @@ import mil.nga.msi.network.modu.ModuService
 import mil.nga.msi.network.modu.ModusTypeAdapter
 import mil.nga.msi.network.navigationalwarning.NavigationalWarningService
 import mil.nga.msi.network.navigationalwarning.NavigationalWarningsTypeAdapter
+import mil.nga.msi.network.noticetomariners.NoticeToMarinersGraphicsTypeAdapter
 import mil.nga.msi.network.noticetomariners.NoticeToMarinersService
 import mil.nga.msi.network.noticetomariners.NoticeToMarinersTypeAdapter
 import mil.nga.msi.network.port.PortService
@@ -70,6 +72,7 @@ class NetworkModule {
          .registerTypeAdapter(object : TypeToken<List<RadioBeacon>>() {}.type, RadioBeaconsTypeAdapter())
          .registerTypeAdapter(object : TypeToken<List<DgpsStation>>() {}.type, DgpsStationsTypeAdapter())
          .registerTypeAdapter(object : TypeToken<List<NoticeToMariners>>() {}.type, NoticeToMarinersTypeAdapter())
+         .registerTypeAdapter(object : TypeToken<List<NoticeToMarinersGraphics>>() {}.type, NoticeToMarinersGraphicsTypeAdapter())
          .registerTypeAdapter(object : TypeToken<ElectronicPublication>() {}.type, ElectronicPublicationTypeAdapter())
          .create()
    }

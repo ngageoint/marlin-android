@@ -1,6 +1,5 @@
 package mil.nga.msi.network.noticetomariners
 
-import android.util.Log
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
@@ -137,12 +136,11 @@ class NoticeToMarinersTypeAdapter: TypeAdapter<List<NoticeToMariners>>() {
 
       `in`.endObject()
 
-      return if (odsEntryId != null) {
-         NoticeToMariners(odsEntryId).apply {
+      return if (odsEntryId != null && noticeNumber != null) {
+         NoticeToMariners(odsEntryId, noticeNumber).apply {
             this.odsKey = odsKey
             this.odsContentId = odsContentId
             this.publicationId = publicationId
-            this.noticeNumber = noticeNumber
             this.title = title
             this.sectionOrder = sectionOrder
             this.limitedDist = limitedDist
@@ -154,10 +152,7 @@ class NoticeToMarinersTypeAdapter: TypeAdapter<List<NoticeToMariners>>() {
             this.uploadTime = uploadTime
             this.lastModified = lastModified
          }
-      } else {
-         Log.i("billy", "skiping cause i dunno")
-         null
-      }
+      } else { null }
    }
 
    override fun write(out: JsonWriter, value: List<NoticeToMariners>) {

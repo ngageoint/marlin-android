@@ -4,19 +4,13 @@ import androidx.lifecycle.map
 import androidx.paging.PagingSource
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flatMapLatest
 import mil.nga.msi.MarlinNotification
 import mil.nga.msi.datasource.DataSource
-import mil.nga.msi.datasource.asam.Asam
-import mil.nga.msi.datasource.asam.AsamMapItem
-import mil.nga.msi.datasource.filter.QueryBuilder
 import mil.nga.msi.datasource.noticetomariners.NoticeToMariners
-import mil.nga.msi.filter.Filter
+import mil.nga.msi.datasource.noticetomariners.NoticeToMarinersGraphics
 import mil.nga.msi.repository.preferences.FilterRepository
 import mil.nga.msi.repository.preferences.UserPreferencesRepository
-import mil.nga.msi.sort.SortParameter
 import mil.nga.msi.startup.asam.AsamInitializer.Companion.FETCH_LATEST_ASAMS_TASK
 import javax.inject.Inject
 
@@ -31,7 +25,6 @@ class NoticeToMarinersRepository @Inject constructor(
 //   val asams = localDataSource.observeAsams()
 //
 //   fun observeAsam(reference: String) = localDataSource.observeAsam(reference)
-//   suspend fun getAsam(reference: String) = localDataSource.getAsam(reference)
 //
 //   @OptIn(ExperimentalCoroutinesApi::class)
 //   fun observeAsamMapItems(): Flow<List<AsamMapItem>> {
@@ -41,25 +34,17 @@ class NoticeToMarinersRepository @Inject constructor(
 //         localDataSource.observeAsamMapItems(query)
 //      }
 //   }
-//
-//   fun observeAsamListItems(filters: List<Filter>, sort: List<SortParameter>): PagingSource<Int, Asam> {
-//      val query = QueryBuilder(
-//         table = "asams",
-//         filters = filters,
-//         sort = sort
-//      ).buildQuery()
-//
-//      return localDataSource.observeAsamListItems(query)
-//   }
 
-//   fun getAsams(filters: List<Filter>): List<Asam> {
-//      val query = QueryBuilder(
-//         table = "asams",
-//         filters = filters
-//      ).buildQuery()
-//      return localDataSource.getAsams(query)
-//   }
-//
+   suspend fun getNoticeToMariners(noticeNumber: Int) = localDataSource.getNoticeToMariners(noticeNumber)
+
+   suspend fun observeNoticeToMarinersGraphics(noticeNumber: Int): List<NoticeToMarinersGraphics> {
+      return remoteDataSource.fetchNoticeToMarinersGraphics(noticeNumber)
+   }
+
+   fun observeNoticeToMarinersListItems(): Flow<List<NoticeToMariners>> {
+      return localDataSource.observeNoticeToMarinersListItems()
+   }
+
    suspend fun fetchNoticeToMariners(refresh: Boolean = false): List<NoticeToMariners> {
       if (refresh) {
          val noticeToMariners = remoteDataSource.fetchNoticeToMariners()

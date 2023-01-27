@@ -2,6 +2,7 @@ package mil.nga.msi.datasource.noticetomariners
 
 import androidx.paging.PagingSource
 import androidx.room.*
+import kotlinx.coroutines.flow.Flow
 import mil.nga.msi.datasource.light.Light
 
 @Dao
@@ -26,9 +27,12 @@ interface NoticeToMarinersDao {
 
 //   @Query("SELECT * FROM asams WHERE reference = :reference")
 //   fun observeAsam(reference: String): LiveData<Asam>
-//
+
    @Query("SELECT * FROM notice_to_mariners")
    suspend fun getNoticeToMariners(): List<NoticeToMariners>
+
+   @Query("SELECT * FROM notice_to_mariners WHERE notice_number = :noticeNumber")
+   suspend fun getNoticeToMariners(noticeNumber: Int): List<NoticeToMariners>
 //
 //   @RawQuery(observedEntities = [Asam::class])
 //   @RewriteQueriesToDropUnusedColumns
@@ -37,8 +41,8 @@ interface NoticeToMarinersDao {
 //   @Query("SELECT * FROM asams WHERE reference = :reference")
 //   suspend fun getAsam(reference: String): Asam?
 //
-//   @RawQuery(observedEntities = [Asam::class])
-//   fun getAsamListItems(query: SupportSQLiteQuery): PagingSource<Int, Asam>
+   @Query("SELECT * FROM notice_to_mariners ORDER BY notice_number DESC")
+   fun getNoticeToMarinersListItems(): Flow<List<NoticeToMariners>>
 //
 //   @RawQuery(observedEntities = [Asam::class])
 //   @RewriteQueriesToDropUnusedColumns

@@ -1,7 +1,7 @@
 package mil.nga.msi.repository.noticetomariners
 
-import android.util.Log
 import mil.nga.msi.datasource.noticetomariners.NoticeToMariners
+import mil.nga.msi.datasource.noticetomariners.NoticeToMarinersGraphics
 import mil.nga.msi.network.noticetomariners.NoticeToMarinersService
 import java.util.*
 import javax.inject.Inject
@@ -39,5 +39,20 @@ class NoticeToMarinersRemoteDataSource @Inject constructor(
       }
 
       return noticeToMariners
+   }
+
+   suspend fun fetchNoticeToMarinersGraphics(noticeNumber: Int): List<NoticeToMarinersGraphics> {
+      val graphics = mutableListOf<NoticeToMarinersGraphics>()
+
+      val response = service.getNoticeToMarinersGraphics(
+         noticeNumber = noticeNumber
+      )
+
+      if (response.isSuccessful) {
+         val body = response.body()
+         body?.let { graphics.addAll(it) }
+      }
+
+      return graphics
    }
 }

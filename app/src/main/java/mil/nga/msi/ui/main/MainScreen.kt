@@ -71,7 +71,7 @@ fun MainScreen(
       val shareIntent = Intent.createChooser(Intent().apply {
          action = Intent.ACTION_SEND
          putExtra(Intent.EXTRA_TEXT, pair.second)
-         type = "text/plain"
+         type = "image/*"
          putExtra(Intent.EXTRA_TITLE, pair.first)
       }, pair.first)
 

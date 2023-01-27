@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 2,
-    "identityHash": "7a9c545a0e739f1baaee500cc1038abb",
+    "identityHash": "9b8a3c1870ec8d53e9d97ff23cbe7369",
     "entities": [
       {
         "tableName": "asams",
@@ -607,11 +607,17 @@
       },
       {
         "tableName": "notice_to_mariners",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`ods_entry_id` INTEGER NOT NULL, `ods_key` TEXT, `ods_content_id` TEXT, `publication_id` INTEGER, `notice_number` INTEGER, `title` TEXT, `section_order` INTEGER, `limited_dist` INTEGER, `internal_path` TEXT, `filename_base` TEXT, `file_extension` TEXT, `file_size` INTEGER, `is_full_publication` INTEGER, `upload_time` INTEGER, `last_modified` INTEGER, PRIMARY KEY(`ods_entry_id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`ods_entry_id` INTEGER NOT NULL, `notice_number` INTEGER NOT NULL, `ods_key` TEXT, `ods_content_id` TEXT, `publication_id` INTEGER, `title` TEXT, `section_order` INTEGER, `limited_dist` INTEGER, `internal_path` TEXT, `filename_base` TEXT, `file_extension` TEXT, `file_size` INTEGER, `is_full_publication` INTEGER, `upload_time` INTEGER, `last_modified` INTEGER, PRIMARY KEY(`ods_entry_id`))",
         "fields": [
           {
             "fieldPath": "odsEntryId",
             "columnName": "ods_entry_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "noticeNumber",
+            "columnName": "notice_number",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -630,12 +636,6 @@
           {
             "fieldPath": "publicationId",
             "columnName": "publication_id",
-            "affinity": "INTEGER",
-            "notNull": false
-          },
-          {
-            "fieldPath": "noticeNumber",
-            "columnName": "notice_number",
             "affinity": "INTEGER",
             "notNull": false
           },
@@ -1724,7 +1724,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '7a9c545a0e739f1baaee500cc1038abb')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '9b8a3c1870ec8d53e9d97ff23cbe7369')"
     ]
   }
 }

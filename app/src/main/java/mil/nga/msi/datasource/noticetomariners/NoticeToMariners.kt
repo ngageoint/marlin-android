@@ -9,7 +9,10 @@ import java.time.Instant
 data class NoticeToMariners(
    @PrimaryKey
    @ColumnInfo(name = "ods_entry_id")
-   val odsEntryId: Int
+   val odsEntryId: Int,
+
+   @ColumnInfo(name = "notice_number")
+   var noticeNumber: Int
 ) {
    @ColumnInfo(name = "ods_key")
    var odsKey: String? = null
@@ -19,9 +22,6 @@ data class NoticeToMariners(
 
    @ColumnInfo(name = "publication_id")
    var publicationId: Int? = null
-
-   @ColumnInfo(name = "notice_number")
-   var noticeNumber: Int? = null
 
    @ColumnInfo(name = "title")
    var title: String? = null
