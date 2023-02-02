@@ -10,6 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -21,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.SubcomposeAsyncImage
 import mil.nga.msi.datasource.noticetomariners.NoticeToMarinersGraphics
+import mil.nga.msi.repository.noticetomariners.NoticeToMarinersGraphic
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.noticetomariners.NoticeToMarinersRoute
 import mil.nga.msi.ui.theme.screenBackground
@@ -29,11 +31,6 @@ import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.*
 
-data class NoticeToMarinersGraphic(
-   val title: String,
-   val url: String
-)
-
 @Composable
 fun NoticeToMarinersDetailScreen(
    noticeNumber: Int?,
@@ -41,8 +38,12 @@ fun NoticeToMarinersDetailScreen(
    onGraphicTap: (NoticeToMarinersGraphic) -> Unit,
    viewModel: NoticeToMarinersDetailViewModel = hiltViewModel()
 ) {
+   val loading by viewModel.loading.observeAsState(true)
    val noticeToMariners by viewModel.noticeToMariners.observeAsState()
-   noticeNumber?.let { viewModel.setNoticeNumber(it) }
+
+   LaunchedEffect(noticeNumber) {
+      noticeNumber?.let { viewModel.setNoticeNumber(it) }
+   }
 
    Column(modifier = Modifier) {
       TopBar(
@@ -51,7 +52,13 @@ fun NoticeToMarinersDetailScreen(
          onNavigationClicked = { close() }
       )
 
-      NoticeToMariners(noticeToMariners) { onGraphicTap(it) }
+      Box {
+         if (loading) {
+            LinearProgressIndicator(Modifier.fillMaxWidth())
+         } else {
+            NoticeToMariners(noticeToMariners) { onGraphicTap(it) }
+         }
+      }
    }
 }
 
@@ -127,18 +134,10 @@ private fun NoticeToMarinersCharts(
 
 @Composable
 private fun NoticeToMarinersChart(
-   graphic: NoticeToMarinersGraphics,
+   graphics: NoticeToMarinersGraphics,
    onTap: (NoticeToMarinersGraphic) -> Unit
 ) {
-   val title = "${graphic.graphicType} ${graphic.chartNumber}"
-
-   val resourceType = when (graphic.graphicType) {
-      "Depth Tab" -> "depthtabs"
-      "Note" -> "notes"
-      else -> "chartlets"
-   }
-
-   val url = "https://msi.nga.mil/api/publications/download?type=view&key=16920957/SFH00000/UNTM/" + "${graphic.noticeNumber}/" + "${resourceType}/" + "${graphic.fileName}"
+   val graphic = NoticeToMarinersGraphic.fromNoticeToMarinersGraphics(graphics)
 
    Column(
       verticalArrangement = Arrangement.Center,
@@ -146,11 +145,11 @@ private fun NoticeToMarinersChart(
       modifier = Modifier
          .fillMaxWidth()
          .height(200.dp)
-         .clickable { onTap(NoticeToMarinersGraphic(title, url)) }
+         .clickable { onTap(graphic) }
    ) {
       Box(modifier = Modifier.fillMaxWidth()) {
          SubcomposeAsyncImage(
-            model = url,
+            model = graphic.url,
             loading = { CircularProgressIndicator(Modifier.padding(16.dp)) },
             modifier = Modifier.padding(horizontal = 12.dp),
             contentScale = ContentScale.Fit,
@@ -160,7 +159,7 @@ private fun NoticeToMarinersChart(
 
       CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
          Text(
-            text = title,
+            text = graphic.title,
             style = MaterialTheme.typography.subtitle2,
             fontWeight = FontWeight.SemiBold
          )

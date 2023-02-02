@@ -4,8 +4,8 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import mil.nga.msi.ui.asam.asamGraph
 import mil.nga.msi.ui.dgpsstation.dgpsStationGraph
-import mil.nga.msi.ui.embark.embarkGraph
 import mil.nga.msi.ui.electronicpublication.electronicPublicationGraph
+import mil.nga.msi.ui.embark.embarkGraph
 import mil.nga.msi.ui.light.lightGraph
 import mil.nga.msi.ui.map.AnnotationProvider
 import mil.nga.msi.ui.map.mapGraph
@@ -99,8 +99,7 @@ fun NavGraphBuilder.homeGraph(
    noticeToMarinersGraph(
       navController = navController,
       bottomBarVisibility = { bottomBarVisibility(it) },
-      openNavigationDrawer = openNavigationDrawer,
-      shareGraphic = { share(Pair("NTM Graphic", it)) }
+      openNavigationDrawer = openNavigationDrawer
    )
    settingsGraph(
       navController = navController,

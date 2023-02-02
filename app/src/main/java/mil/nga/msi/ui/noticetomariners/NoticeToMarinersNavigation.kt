@@ -1,18 +1,19 @@
 package mil.nga.msi.ui.noticetomariners
 
+import android.net.Uri
 import androidx.compose.ui.graphics.Color
-import androidx.navigation.NavController
-import androidx.navigation.NavGraphBuilder
+import androidx.navigation.*
 import androidx.navigation.compose.composable
-import androidx.navigation.navDeepLink
-import androidx.navigation.navigation
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import mil.nga.msi.datasource.DataSource
+import mil.nga.msi.repository.noticetomariners.NoticeToMarinersGraphic
+import mil.nga.msi.ui.navigation.NavTypeNoticeToMarinersGraphic
 import mil.nga.msi.ui.navigation.Route
 import mil.nga.msi.ui.noticetomariners.all.NoticeToMarinersAllScreen
 import mil.nga.msi.ui.noticetomariners.detail.NoticeToMarinersDetailScreen
 import mil.nga.msi.ui.noticetomariners.detail.NoticeToMarinersGraphicScreen
-import java.net.URLEncoder
-import java.nio.charset.StandardCharsets
+import java.io.File
 
 sealed class NoticeToMarinersRoute(
    override val name: String,
@@ -30,8 +31,7 @@ sealed class NoticeToMarinersRoute(
 fun NavGraphBuilder.noticeToMarinersGraph(
    navController: NavController,
    bottomBarVisibility: (Boolean) -> Unit,
-   openNavigationDrawer: () -> Unit,
-   shareGraphic: (String) -> Unit
+   openNavigationDrawer: () -> Unit
 ) {
    navigation(
       route = NoticeToMarinersRoute.Main.name,
@@ -78,25 +78,25 @@ fun NavGraphBuilder.noticeToMarinersGraph(
                noticeNumber.toIntOrNull(),
                close = { navController.popBackStack() },
                onGraphicTap = { graphic ->
-                  val url = URLEncoder.encode(graphic.url, StandardCharsets.UTF_8.toString())
-                  navController.navigate("${NoticeToMarinersRoute.Graphic.name}?title=${graphic.title}&url=$url")
+                  val encoded = Uri.encode(Json.encodeToString(graphic))
+                  navController.navigate( "${NoticeToMarinersRoute.Graphic.name}?graphic=$encoded")
                }
             )
          }
       }
 
-      composable("${NoticeToMarinersRoute.Graphic.name}?title={title}&url={url}") { backstackEntry ->
+      composable(
+         route = "${NoticeToMarinersRoute.Graphic.name}?graphic={graphic}",
+         arguments = listOf(navArgument("graphic") { type = NavType.NavTypeNoticeToMarinersGraphic })
+      ) { backstackEntry ->
          bottomBarVisibility(false)
 
-         val title: String = checkNotNull(backstackEntry.arguments?.getString("title"))
-         val url: String = checkNotNull(backstackEntry.arguments?.getString("url"))
-
-         NoticeToMarinersGraphicScreen(
-            title = title,
-            url = url,
-            onShare = { shareGraphic(url) },
-            close = { navController.popBackStack() },
-         )
+         backstackEntry.arguments?.getParcelable<NoticeToMarinersGraphic>("graphic")?.let { graphic ->
+            NoticeToMarinersGraphicScreen(
+               graphic = graphic,
+               close = { navController.popBackStack() }
+            )
+         }
       }
    }
 }

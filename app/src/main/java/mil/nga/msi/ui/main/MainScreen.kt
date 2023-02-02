@@ -70,9 +70,9 @@ fun MainScreen(
    val share: (Pair<String, String>) -> Unit = { pair ->
       val shareIntent = Intent.createChooser(Intent().apply {
          action = Intent.ACTION_SEND
-         putExtra(Intent.EXTRA_TEXT, pair.second)
-         type = "image/*"
          putExtra(Intent.EXTRA_TITLE, pair.first)
+         putExtra(Intent.EXTRA_TEXT, pair.second)
+         type = "text/*"
       }, pair.first)
 
       context.startActivity(shareIntent)

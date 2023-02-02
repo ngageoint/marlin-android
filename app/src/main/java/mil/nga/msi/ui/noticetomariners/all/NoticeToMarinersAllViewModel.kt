@@ -8,9 +8,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class NoticeToMarinersAllViewModel @Inject constructor(
-   private val noticeToMarinersRepository: NoticeToMarinersRepository,
+   noticeToMarinersRepository: NoticeToMarinersRepository,
 ): ViewModel() {
-
    val noticeToMariners = noticeToMarinersRepository
       .observeNoticeToMarinersListItems()
       .map { notices ->

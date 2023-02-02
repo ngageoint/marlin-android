@@ -1,12 +1,22 @@
 package mil.nga.msi.repository.noticetomariners
 
+import android.app.Application
+import android.net.Uri
+import androidx.core.content.FileProvider.getUriForFile
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 import mil.nga.msi.datasource.noticetomariners.NoticeToMariners
 import mil.nga.msi.datasource.noticetomariners.NoticeToMarinersGraphics
 import mil.nga.msi.network.noticetomariners.NoticeToMarinersService
+import java.io.File
+import java.nio.file.Files
+import java.nio.file.Paths
 import java.util.*
 import javax.inject.Inject
 
 class NoticeToMarinersRemoteDataSource @Inject constructor(
+   private val application: Application,
    private val service: NoticeToMarinersService,
    private val localDataSource: NoticeToMarinersLocalDataSource
 ) {
@@ -54,5 +64,21 @@ class NoticeToMarinersRemoteDataSource @Inject constructor(
       }
 
       return graphics
+   }
+
+   suspend fun fetchNoticeToMarinersGraphic(graphic: NoticeToMarinersGraphic): Uri = withContext(Dispatchers.IO) {
+      val response = service.getNoticeToMarinersGraphic(key = graphic.key)
+      val directory = Paths.get(application.cacheDir.absolutePath, "notice_to_mariners")
+      Files.createDirectories(directory)
+      val file = File(directory.toFile(), graphic.fileName)
+      if (response.isSuccessful) {
+         response.body()?.byteStream()?.use { input ->
+            file.outputStream().use { output ->
+               input.copyTo(output)
+            }
+         }
+      }
+
+      getUriForFile(application, "${application.packageName}.fileprovider", file)
    }
 }
