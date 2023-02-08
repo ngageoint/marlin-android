@@ -13,6 +13,10 @@ class NoticeToMarinersAllViewModel @Inject constructor(
    val noticeToMariners = noticeToMarinersRepository
       .observeNoticeToMarinersListItems()
       .map { notices ->
-         notices.groupBy { it.noticeNumber }.keys.sortedDescending()
+         notices.map {
+            it.noticeNumber
+         }.toSet().groupBy {
+            it.toString().take(4)
+         }
       }.asLiveData()
 }

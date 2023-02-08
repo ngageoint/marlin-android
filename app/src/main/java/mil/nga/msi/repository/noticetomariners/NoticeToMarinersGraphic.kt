@@ -12,7 +12,7 @@ data class NoticeToMarinersGraphic(
    val noticeNumber: Int,
    val chartNumber: String?,
    val graphicType: String?,
-   val fileName: String?
+   val fileName: String
 ): Parcelable {
    @IgnoredOnParcel
    val title = "$graphicType $chartNumber"

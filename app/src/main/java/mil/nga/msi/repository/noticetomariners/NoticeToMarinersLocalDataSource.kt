@@ -1,22 +1,20 @@
 package mil.nga.msi.repository.noticetomariners
 
-import androidx.sqlite.db.SimpleSQLiteQuery
-import mil.nga.msi.datasource.asam.Asam
-import mil.nga.msi.datasource.asam.AsamDao
+import android.app.Application
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import mil.nga.msi.datasource.noticetomariners.NoticeToMariners
 import mil.nga.msi.datasource.noticetomariners.NoticeToMarinersDao
+import java.nio.file.Files
+import java.nio.file.Paths
 import javax.inject.Inject
 
 class NoticeToMarinersLocalDataSource @Inject constructor(
+   private val application: Application,
    private val dao: NoticeToMarinersDao
 ) {
-//   fun observeAsams() = dao.observeAsams()
-//   fun observeAsam(reference: String) = dao.observeAsam(reference)
-//   fun observeAsamMapItems(query: SimpleSQLiteQuery) = dao.observeAsamMapItems(query)
    fun observeNoticeToMarinersListItems() = dao.getNoticeToMarinersListItems()
-//
-//   fun getAsams(query: SimpleSQLiteQuery) = dao.getAsams(query)
-//
+
    fun isEmpty() = dao.count() == 0
 
    suspend fun getNoticeToMariners() = dao.getNoticeToMariners()
@@ -29,4 +27,7 @@ class NoticeToMarinersLocalDataSource @Inject constructor(
 
    suspend fun getLatestNoticeToMariners() = dao.getLatestNoticeToMariners()
 
+   suspend fun deleteNoticeToMarinersPublication(notice: NoticeToMariners) = withContext(Dispatchers.IO) {
+      Files.delete(NoticeToMariners.filesPath(application, notice.filename))
+   }
 }

@@ -136,17 +136,15 @@ class NoticeToMarinersTypeAdapter: TypeAdapter<List<NoticeToMariners>>() {
 
       `in`.endObject()
 
-      return if (odsEntryId != null && noticeNumber != null) {
-         NoticeToMariners(odsEntryId, noticeNumber).apply {
-            this.odsKey = odsKey
+      return if (odsEntryId != null && odsKey != null && noticeNumber != null && filenameBase != null && fileExtension != null) {
+         val filename = "$filenameBase.$fileExtension"
+         NoticeToMariners(odsEntryId, odsKey, noticeNumber, filename).apply {
             this.odsContentId = odsContentId
             this.publicationId = publicationId
             this.title = title
             this.sectionOrder = sectionOrder
             this.limitedDist = limitedDist
             this.internalPath = internalPath
-            this.filenameBase = filenameBase
-            this.fileExtension = fileExtension
             this.fileSize = fileSize
             this.isFullPublication = isFullPublication
             this.uploadTime = uploadTime

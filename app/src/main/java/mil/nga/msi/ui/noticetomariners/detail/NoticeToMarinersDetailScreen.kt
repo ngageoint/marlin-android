@@ -1,5 +1,6 @@
 package mil.nga.msi.ui.noticetomariners.detail
 
+import android.content.Intent
 import android.text.format.Formatter
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -8,10 +9,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,6 +19,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.SubcomposeAsyncImage
+import kotlinx.coroutines.launch
+import mil.nga.msi.datasource.noticetomariners.NoticeToMariners
 import mil.nga.msi.datasource.noticetomariners.NoticeToMarinersGraphics
 import mil.nga.msi.repository.noticetomariners.NoticeToMarinersGraphic
 import mil.nga.msi.ui.main.TopBar
@@ -38,11 +38,23 @@ fun NoticeToMarinersDetailScreen(
    onGraphicTap: (NoticeToMarinersGraphic) -> Unit,
    viewModel: NoticeToMarinersDetailViewModel = hiltViewModel()
 ) {
+   val scope = rememberCoroutineScope()
+   val context = LocalContext.current
    val loading by viewModel.loading.observeAsState(true)
    val noticeToMariners by viewModel.noticeToMariners.observeAsState()
+   var available by remember { mutableStateOf(mapOf<Int, Boolean>()) }
+   var downloading by remember { mutableStateOf(mapOf<Int, Boolean>()) }
 
    LaunchedEffect(noticeNumber) {
       noticeNumber?.let { viewModel.setNoticeNumber(it) }
+   }
+
+   LaunchedEffect(noticeToMariners) {
+      noticeToMariners?.let {
+         available = it.publication.associate { publication ->
+            publication.notice.odsEntryId to (publication.uri != null)
+         }
+      }
    }
 
    Column(modifier = Modifier) {
@@ -56,7 +68,46 @@ fun NoticeToMarinersDetailScreen(
          if (loading) {
             LinearProgressIndicator(Modifier.fillMaxWidth())
          } else {
-            NoticeToMariners(noticeToMariners) { onGraphicTap(it) }
+            NoticeToMariners(
+               noticeToMariners = noticeToMariners,
+               available = available,
+               downloading = downloading,
+               onGraphicTap = { onGraphicTap(it) },
+               onView = { notice ->
+                  scope.launch {
+                     downloading = downloading.toMutableMap().apply {
+                        this[notice.odsEntryId] = true
+                     }
+
+                     val uri = viewModel.getNoticeToMarinersPublication(notice)
+
+                     available = available.toMutableMap().apply {
+                        this[notice.odsEntryId] = true
+                     }
+
+                     val shareIntent = Intent.createChooser(Intent().apply {
+                        action = Intent.ACTION_SEND
+                        type = context.contentResolver.getType(uri)
+                        putExtra(Intent.EXTRA_STREAM, uri)
+                     }, "Notice to Mariners Publication")
+
+                     context.startActivity(shareIntent)
+                  }
+               },
+               onDelete = { notice ->
+                  scope.launch {
+                     viewModel.deleteNoticeToMarinersPublication(notice)
+
+                     downloading = downloading.toMutableMap().apply {
+                        this[notice.odsEntryId] = false
+                     }
+
+                     available = available.toMutableMap().apply {
+                        this[notice.odsEntryId] = false
+                     }
+                  }
+               }
+            )
          }
       }
    }
@@ -65,6 +116,10 @@ fun NoticeToMarinersDetailScreen(
 @Composable
 private fun NoticeToMariners(
    noticeToMariners: NoticeToMarinersState?,
+   available: Map<Int, Boolean>,
+   downloading: Map<Int, Boolean>,
+   onView: (NoticeToMariners) -> Unit,
+   onDelete: (NoticeToMariners) -> Unit,
    onGraphicTap: (NoticeToMarinersGraphic) -> Unit
 ) {
    val scrollState = rememberScrollState()
@@ -99,7 +154,13 @@ private fun NoticeToMariners(
             )
          }
 
-         NoticeToMarinersFiles(noticeToMariners)
+         NoticeToMarinersPublications(
+            state = noticeToMariners,
+            available = available,
+            downloading = downloading,
+            onView = { onView(it) },
+            onDelete = { onDelete(it) }
+         )
       }
    }
 }
@@ -168,8 +229,12 @@ private fun NoticeToMarinersChart(
 }
 
 @Composable
-private fun NoticeToMarinersFiles(
-   state: NoticeToMarinersState?
+private fun NoticeToMarinersPublications(
+   state: NoticeToMarinersState?,
+   available: Map<Int, Boolean>,
+   downloading: Map<Int, Boolean>,
+   onView: (NoticeToMariners) -> Unit,
+   onDelete: (NoticeToMariners) -> Unit
 ) {
    val dateFormatter = DateTimeFormatter
       .ofLocalizedDate(FormatStyle.FULL)
@@ -177,7 +242,7 @@ private fun NoticeToMarinersFiles(
       .withZone(ZoneId.systemDefault())
 
    Column {
-      state?.notices?.forEach { notice ->
+      state?.publication?.forEach { publication ->
          Card(
             elevation = 4.dp,
             modifier = Modifier.padding(vertical = 8.dp)
@@ -185,31 +250,63 @@ private fun NoticeToMarinersFiles(
             Column(
                Modifier
                   .fillMaxWidth()
-                  .padding(vertical = 16.dp)
+                  .padding(vertical = 8.dp, horizontal = 16.dp)
             ) {
+               val extension = publication.notice.filename.substringAfterLast('.').uppercase()
                Text(
-                  text = "${notice.title} ${if (notice.isFullPublication == true) notice.fileExtension else ""}",
+                  text = "${publication.notice.title} ${if (publication.notice.isFullPublication == true) extension else ""}",
                   style = MaterialTheme.typography.subtitle1,
-                  modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
+                  modifier = Modifier.padding(vertical = 4.dp)
                )
 
-               notice.fileSize?.toLong()?.let { fileSize ->
+               publication.notice.fileSize?.toLong()?.let { fileSize ->
                   CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                      Text(
                         text = "File Size: ${Formatter.formatFileSize(LocalContext.current, fileSize)}",
                         style = MaterialTheme.typography.body1,
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
+                        modifier = Modifier.padding(vertical = 4.dp)
                      )
                   }
                }
 
                CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
                   Text(
-                     text = "Upload Time: ${dateFormatter.format(notice.uploadTime)}",
+                     text = "Upload Time: ${dateFormatter.format(publication.notice.uploadTime)}",
                      style = MaterialTheme.typography.body2,
                      fontWeight = FontWeight.SemiBold,
-                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
+                     modifier = Modifier.padding(bottom = 8.dp)
                   )
+               }
+
+               val isAvailable = available[publication.notice.odsEntryId] == true
+               val isDownloading = downloading[publication.notice.odsEntryId] == true
+               Row(
+                  horizontalArrangement = Arrangement.End,
+                  verticalAlignment = Alignment.CenterVertically,
+                  modifier = Modifier.fillMaxWidth()
+               ) {
+                  if (isDownloading && !isAvailable) {
+                     LinearProgressIndicator(
+                        modifier = Modifier
+                           .weight(1f)
+                           .padding(end = 16.dp)
+                     )
+                  }
+
+                  if (isAvailable) {
+                     TextButton(
+                        onClick = { onDelete(publication.notice) }
+                     ) {
+                        Text("Delete")
+                     }
+                  }
+
+                  TextButton(
+                     enabled = !isDownloading || isAvailable,
+                     onClick = { onView(publication.notice) }
+                  ) {
+                     Text(if (!isAvailable) "Download" else "View")
+                  }
                }
             }
          }

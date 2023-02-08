@@ -24,6 +24,13 @@ interface NoticeToMarinersService {
       @Query("graphicType") graphicType: String = "All",
       @Query("output") output: String = "json"
    ): Response<List<NoticeToMarinersGraphics>>
+
+   @GET("/api/publications/download/")
+   @Streaming
+   suspend fun getNoticeToMarinersPublication(
+      @Query("type") type: String = "download",
+      @Query("key") key: String,
+   ): Response<ResponseBody>
    
    @GET("/api/publications/download/")
    @Streaming

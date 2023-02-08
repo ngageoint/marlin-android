@@ -83,7 +83,7 @@ class NetworkModule {
       gson: Gson,
       okHttpClient: OkHttpClient,
    ): Retrofit {
-      return Retrofit.Builder()
+     return Retrofit.Builder()
          .addConverterFactory(GsonConverterFactory.create(gson))
          .baseUrl("https://msi.nga.mil/api/")
          .client(okHttpClient)

@@ -1,8 +1,11 @@
 package mil.nga.msi.datasource.noticetomariners
 
+import android.content.Context
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import java.nio.file.Path
+import java.nio.file.Paths
 import java.time.Instant
 
 @Entity(tableName = "notice_to_mariners")
@@ -11,12 +14,15 @@ data class NoticeToMariners(
    @ColumnInfo(name = "ods_entry_id")
    val odsEntryId: Int,
 
-   @ColumnInfo(name = "notice_number")
-   var noticeNumber: Int
-) {
    @ColumnInfo(name = "ods_key")
-   var odsKey: String? = null
+   val odsKey: String,
 
+   @ColumnInfo(name = "notice_number")
+   val noticeNumber: Int,
+
+   @ColumnInfo(name = "filename")
+   val filename: String,
+) {
    @ColumnInfo(name = "ods_content_id")
    var odsContentId: String? = null
 
@@ -34,12 +40,6 @@ data class NoticeToMariners(
 
    @ColumnInfo(name = "internal_path")
    var internalPath: String? = null
-
-   @ColumnInfo(name = "filename_base")
-   var filenameBase: String? = null
-
-   @ColumnInfo(name = "file_extension")
-   var fileExtension: String? = null
 
    @ColumnInfo(name = "file_size")
    var fileSize: Int? = null
@@ -64,11 +64,20 @@ data class NoticeToMariners(
               "  Section Order: $sectionOrder\n" +
               "  Limited Distribution: $limitedDist\n" +
               "  Internal Path: $internalPath\n" +
-              "  Filename Base: $filenameBase\n" +
-              "  File Extension: $fileExtension\n" +
+              "  Filename: $filename\n" +
               "  File Size: $fileSize\n" +
               "  Is Full Publication: $isFullPublication\n" +
               "  Upload Time: $uploadTime\n" +
               "  Last Modified: $lastModified"
+   }
+
+   companion object {
+      fun cachePath(context: Context, filename: String): Path {
+         return Paths.get(context.cacheDir.absolutePath, "notice_to_mariners", "publications", filename)
+      }
+
+      fun filesPath(context: Context, filename: String): Path {
+         return Paths.get(context.filesDir.absolutePath, "notice_to_mariners", "publications", filename)
+      }
    }
 }

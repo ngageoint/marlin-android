@@ -1,20 +1,28 @@
 package mil.nga.msi.repository.noticetomariners
 
+import android.app.Application
 import android.net.Uri
 import androidx.lifecycle.map
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.withContext
 import mil.nga.msi.MarlinNotification
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.noticetomariners.NoticeToMariners
 import mil.nga.msi.datasource.noticetomariners.NoticeToMarinersGraphics
 import mil.nga.msi.repository.preferences.UserPreferencesRepository
 import mil.nga.msi.startup.asam.AsamInitializer.Companion.FETCH_LATEST_ASAMS_TASK
+import mil.nga.msi.ui.noticetomariners.detail.NoticeToMarinersPublication
+import java.io.File
+import java.nio.file.Files
+import java.nio.file.Paths
 import javax.inject.Inject
 
 class NoticeToMarinersRepository @Inject constructor(
    workManager: WorkManager,
+   private val application: Application,
    private val localDataSource: NoticeToMarinersLocalDataSource,
    private val remoteDataSource: NoticeToMarinersRemoteDataSource,
    private val notification: MarlinNotification,
@@ -44,6 +52,14 @@ class NoticeToMarinersRepository @Inject constructor(
       }
 
       return localDataSource.getNoticeToMariners()
+   }
+
+   suspend fun getNoticeToMarinersPublication(notice: NoticeToMariners): Uri {
+      return remoteDataSource.fetchNoticeToMarinersPublication(notice)
+   }
+
+   suspend fun deleteNoticeToMarinersPublication(notice: NoticeToMariners) {
+      localDataSource.deleteNoticeToMarinersPublication(notice)
    }
 
    suspend fun getNoticeToMarinersGraphic(graphic: NoticeToMarinersGraphic): Uri {
