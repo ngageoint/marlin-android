@@ -1,6 +1,7 @@
 package mil.nga.msi.datasource.noticetomariners
 
 import android.content.Context
+import android.os.Environment
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -76,8 +77,8 @@ data class NoticeToMariners(
          return Paths.get(context.cacheDir.absolutePath, "notice_to_mariners", "publications", filename)
       }
 
-      fun filesPath(context: Context, filename: String): Path {
-         return Paths.get(context.filesDir.absolutePath, "notice_to_mariners", "publications", filename)
+      fun externalFilesPath(context: Context, filename: String): Path {
+         return Paths.get(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)?.absolutePath, "notice_to_mariners", "publications", filename)
       }
    }
 }

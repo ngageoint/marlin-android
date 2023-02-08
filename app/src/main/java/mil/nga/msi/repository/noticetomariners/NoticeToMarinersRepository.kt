@@ -22,7 +22,6 @@ import javax.inject.Inject
 
 class NoticeToMarinersRepository @Inject constructor(
    workManager: WorkManager,
-   private val application: Application,
    private val localDataSource: NoticeToMarinersLocalDataSource,
    private val remoteDataSource: NoticeToMarinersRemoteDataSource,
    private val notification: MarlinNotification,

@@ -28,6 +28,6 @@ class NoticeToMarinersLocalDataSource @Inject constructor(
    suspend fun getLatestNoticeToMariners() = dao.getLatestNoticeToMariners()
 
    suspend fun deleteNoticeToMarinersPublication(notice: NoticeToMariners) = withContext(Dispatchers.IO) {
-      Files.delete(NoticeToMariners.filesPath(application, notice.filename))
+      Files.delete(NoticeToMariners.externalFilesPath(application, notice.filename))
    }
 }

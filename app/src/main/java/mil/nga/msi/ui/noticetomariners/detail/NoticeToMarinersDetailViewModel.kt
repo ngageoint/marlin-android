@@ -70,8 +70,8 @@ class NoticeToMarinersDetailViewModel @Inject constructor(
    }
 
    private fun noticeToMarinersPublicationUri(filename: String): Uri? {
-      val directory =  Paths.get(application.filesDir.absolutePath, "notice_to_mariners", "publications")
-      val file = File(directory.toFile().absolutePath, filename)
+      val path = NoticeToMariners.externalFilesPath(application, filename)
+      val file = path.toFile()
 
       return if(file.exists()) {
          FileProvider.getUriForFile(application, "${application.packageName}.fileprovider", file)

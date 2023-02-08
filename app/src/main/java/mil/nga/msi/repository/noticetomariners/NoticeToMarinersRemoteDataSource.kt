@@ -9,12 +9,12 @@ import mil.nga.msi.datasource.noticetomariners.NoticeToMariners
 import mil.nga.msi.datasource.noticetomariners.NoticeToMarinersGraphics
 import mil.nga.msi.network.noticetomariners.NoticeToMarinersService
 import java.io.File
-import java.nio.file.CopyOption
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
 import java.util.*
 import javax.inject.Inject
+import kotlin.io.path.exists
 
 class NoticeToMarinersRemoteDataSource @Inject constructor(
    private val application: Application,
@@ -70,7 +70,8 @@ class NoticeToMarinersRemoteDataSource @Inject constructor(
    suspend fun fetchNoticeToMarinersPublication(notice: NoticeToMariners): Uri = withContext(Dispatchers.IO) {
       val response = service.getNoticeToMarinersPublication(key = notice.odsKey)
       val cacheFile = NoticeToMariners.cachePath(application, notice.filename)
-      Files.createDirectories(cacheFile)
+      Files.createDirectories(cacheFile.parent)
+
       if (response.isSuccessful) {
          response.body()?.byteStream()?.use { input ->
             Files.copy(input, cacheFile, StandardCopyOption.REPLACE_EXISTING)
@@ -78,8 +79,8 @@ class NoticeToMarinersRemoteDataSource @Inject constructor(
       }
 
       // Done streaming from server, move to non cache directory
-      val file = NoticeToMariners.filesPath(application, notice.filename)
-      Files.createDirectories(file)
+      val file = NoticeToMariners.externalFilesPath(application, notice.filename)
+      Files.createDirectories(file.parent)
       Files.copy(cacheFile, file, StandardCopyOption.REPLACE_EXISTING)
       Files.delete(cacheFile)
 
