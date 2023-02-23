@@ -25,4 +25,5 @@ message UserPreferences {
   map<string, Filters> filters = 8;
   map<string, Sort> sort = 9;
   NoticeToMarinersFilter noticeToMarinersFilter = 10;
+  int32 version = 11;
 }

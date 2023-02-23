@@ -16,6 +16,7 @@ import mil.nga.msi.datasource.filter.AsamFilter
 import mil.nga.msi.datasource.filter.LightFilter
 import mil.nga.msi.datasource.filter.ModuFilter
 import mil.nga.msi.datasource.navigationwarning.NavigationArea
+import mil.nga.msi.di.migrations.dataStoreMigration_1_2
 import mil.nga.msi.filter.ComparatorType
 import mil.nga.msi.sort.SortDirection
 import mil.nga.msi.type.*
@@ -27,13 +28,13 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 @Module
 class DataStoreModule {
-
    @Singleton
    @Provides
    fun provideUserPreferencesDataStore(application: Application): DataStore<UserPreferences> {
       val userPreferencesSerializer = object : Serializer<UserPreferences> {
          override val defaultValue: UserPreferences =
             UserPreferences.newBuilder()
+               .setVersion(1)
                .setMap(
                   MapPreferences.newBuilder()
                      .setMapLayer(BaseMapType.NORMAL.value)
@@ -90,15 +91,20 @@ class DataStoreModule {
             output: OutputStream
          ) = t.writeTo(output)
       }
-
+      
       return DataStoreFactory.create(
          serializer = userPreferencesSerializer,
          produceFile = { application.applicationContext.dataStoreFile("user_preferences.pb") },
+         migrations = listOf(
+            dataStoreMigration_1_2
+         ),
          corruptionHandler = null
       )
    }
 
    companion object {
+      const val VERSION = 1
+
       val filterDefaults = mapOf(
          DataSource.ASAM.name to Filters.newBuilder()
             .addFilters(
