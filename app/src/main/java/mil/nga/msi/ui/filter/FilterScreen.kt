@@ -394,7 +394,7 @@ private fun ParameterSelection(
 }
 
 @Composable
-private fun ComparatorSelection(
+fun ComparatorSelection(
    parameter: FilterParameter,
    selectedComparator: ComparatorType,
    onSelectComparator: (ComparatorType) -> Unit,

@@ -172,6 +172,8 @@ dependencies {
     implementation 'mil.nga.gars:gars-android:1.2.0'
     implementation 'mil.nga.mgrs:mgrs-android:2.2.0'
 
+    implementation("io.coil-kt:coil-compose:2.2.2")
+
     implementation 'com.google.android.gms:play-services-location:21.0.1'
 
     implementation 'mil.nga.geopackage:geopackage-android:6.7.0'

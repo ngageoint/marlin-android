@@ -12,6 +12,7 @@ import mil.nga.msi.startup.electronicpublication.ElectronicPublicationInitialize
 import mil.nga.msi.startup.light.LightInitializer
 import mil.nga.msi.startup.modu.ModuInitializer
 import mil.nga.msi.startup.navigationalwarning.NavigationalWarningInitializer
+import mil.nga.msi.startup.noticetomariners.NoticeToMarinersInitializer
 import mil.nga.msi.startup.port.PortInitializer
 import mil.nga.msi.startup.radiobeacon.RadioBeaconInitializer
 
@@ -39,4 +40,5 @@ interface AppInitializer {
    fun inject(radioBeaconInitializer: RadioBeaconInitializer)
    fun inject(dgpsStationInitializer: DgpsStationInitializer)
    fun inject(electronicPublicationInitializer: ElectronicPublicationInitializer)
+   fun inject(noticeToMarinersInitializer: NoticeToMarinersInitializer)
 }

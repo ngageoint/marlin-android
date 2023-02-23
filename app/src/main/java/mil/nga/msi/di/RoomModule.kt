@@ -13,6 +13,7 @@ import mil.nga.msi.datasource.electronicpublication.ElectronicPublicationDao
 import mil.nga.msi.datasource.light.LightDao
 import mil.nga.msi.datasource.modu.ModuDao
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarningDao
+import mil.nga.msi.datasource.noticetomariners.NoticeToMarinersDao
 import mil.nga.msi.datasource.port.PortDao
 import mil.nga.msi.datasource.radiobeacon.RadioBeaconDao
 import javax.inject.Singleton
@@ -70,6 +71,12 @@ class RoomModule {
    @Singleton
    fun provideDgpsStationDao(database: MsiDatabase): DgpsStationDao {
       return database.dgpsStationDao()
+   }
+
+   @Provides
+   @Singleton
+   fun provideNoticeToMarinersDao(database: MsiDatabase): NoticeToMarinersDao {
+      return database.noticeToMarinersDao()
    }
 
    @Provides

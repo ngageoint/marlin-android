@@ -2,7 +2,6 @@ package mil.nga.msi.di
 
 import android.app.Application
 import android.app.DownloadManager
-import android.content.Context
 import androidx.core.content.getSystemService
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -17,6 +16,9 @@ import mil.nga.msi.datasource.electronicpublication.ElectronicPublication
 import mil.nga.msi.datasource.light.Light
 import mil.nga.msi.datasource.modu.Modu
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarning
+import mil.nga.msi.datasource.noticetomariners.ChartCorrection
+import mil.nga.msi.datasource.noticetomariners.NoticeToMariners
+import mil.nga.msi.datasource.noticetomariners.NoticeToMarinersGraphics
 import mil.nga.msi.datasource.port.Port
 import mil.nga.msi.datasource.radiobeacon.RadioBeacon
 import mil.nga.msi.network.asam.AsamService
@@ -30,6 +32,10 @@ import mil.nga.msi.network.modu.ModuService
 import mil.nga.msi.network.modu.ModusTypeAdapter
 import mil.nga.msi.network.navigationalwarning.NavigationalWarningService
 import mil.nga.msi.network.navigationalwarning.NavigationalWarningsTypeAdapter
+import mil.nga.msi.network.noticetomariners.ChartCorrectionsTypeAdapter
+import mil.nga.msi.network.noticetomariners.NoticeToMarinersGraphicsTypeAdapter
+import mil.nga.msi.network.noticetomariners.NoticeToMarinersService
+import mil.nga.msi.network.noticetomariners.NoticeToMarinersTypeAdapter
 import mil.nga.msi.network.port.PortService
 import mil.nga.msi.network.port.PortsTypeAdapter
 import mil.nga.msi.network.radiobeacon.RadioBeaconService
@@ -67,6 +73,9 @@ class NetworkModule {
          .registerTypeAdapter(object : TypeToken<List<Port>>() {}.type, PortsTypeAdapter())
          .registerTypeAdapter(object : TypeToken<List<RadioBeacon>>() {}.type, RadioBeaconsTypeAdapter())
          .registerTypeAdapter(object : TypeToken<List<DgpsStation>>() {}.type, DgpsStationsTypeAdapter())
+         .registerTypeAdapter(object : TypeToken<List<NoticeToMariners>>() {}.type, NoticeToMarinersTypeAdapter())
+         .registerTypeAdapter(object : TypeToken<List<NoticeToMarinersGraphics>>() {}.type, NoticeToMarinersGraphicsTypeAdapter())
+         .registerTypeAdapter(object : TypeToken<List<ChartCorrection>>() {}.type, ChartCorrectionsTypeAdapter())
          .registerTypeAdapter(object : TypeToken<ElectronicPublication>() {}.type, ElectronicPublicationTypeAdapter())
          .create()
    }
@@ -77,7 +86,7 @@ class NetworkModule {
       gson: Gson,
       okHttpClient: OkHttpClient,
    ): Retrofit {
-      return Retrofit.Builder()
+     return Retrofit.Builder()
          .addConverterFactory(GsonConverterFactory.create(gson))
          .baseUrl("https://msi.nga.mil/api/")
          .client(okHttpClient)
@@ -129,5 +138,11 @@ class NetworkModule {
    @Singleton
    fun provideDgpsStationService(retrofit: Retrofit): DgpsStationService {
       return retrofit.create(DgpsStationService::class.java)
+   }
+
+   @Provides
+   @Singleton
+   fun provideNoticeToMarinersService(retrofit: Retrofit): NoticeToMarinersService {
+      return retrofit.create(NoticeToMarinersService::class.java)
    }
 }

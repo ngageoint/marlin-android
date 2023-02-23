@@ -7,6 +7,7 @@ import "embark.proto";
 import "map.proto";
 import "sort.proto";
 import "filter.proto";
+import "notice_to_mariners.proto";
 
 message NavigationalWarningKey {
   int64 number = 1;
@@ -23,4 +24,6 @@ message UserPreferences {
   map<string, int64> dataSourceSyncDate = 7;
   map<string, Filters> filters = 8;
   map<string, Sort> sort = 9;
+  NoticeToMarinersFilter noticeToMarinersFilter = 10;
+  int32 version = 11;
 }

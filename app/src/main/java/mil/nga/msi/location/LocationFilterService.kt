@@ -1,6 +1,7 @@
 package mil.nga.msi.location
 
 import android.location.Location
+import android.util.Log
 import androidx.lifecycle.Observer
 import androidx.lifecycle.asLiveData
 import kotlinx.coroutines.flow.first
@@ -35,7 +36,10 @@ open class LocationFilterService @Inject constructor(
       if (location == null) return
       this.location = location
 
+
       filters.forEach { entry ->
+         Log.i("Billy", "Update location filter for DataSource: ${entry.key}")
+
          val locationFilter = entry.value.find { it.parameter.type == FilterParameterType.LOCATION && it.comparator.name == ComparatorType.NEAR_ME.name }
          val newFilters = entry.value.toMutableList()
          newFilters.remove(locationFilter)
