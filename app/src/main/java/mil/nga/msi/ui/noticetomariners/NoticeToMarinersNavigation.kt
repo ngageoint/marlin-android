@@ -11,9 +11,10 @@ import mil.nga.msi.repository.noticetomariners.NoticeToMarinersGraphic
 import mil.nga.msi.ui.navigation.NavTypeNoticeToMarinersGraphic
 import mil.nga.msi.ui.navigation.Route
 import mil.nga.msi.ui.noticetomariners.all.NoticeToMarinersAllScreen
+import mil.nga.msi.ui.noticetomariners.corrections.NoticeToMarinersCorrectionsScreen
 import mil.nga.msi.ui.noticetomariners.detail.NoticeToMarinersDetailScreen
 import mil.nga.msi.ui.noticetomariners.detail.NoticeToMarinersGraphicScreen
-import java.io.File
+import mil.nga.msi.ui.noticetomariners.query.NoticeToMarinersQueryScreen
 
 sealed class NoticeToMarinersRoute(
    override val name: String,
@@ -24,6 +25,8 @@ sealed class NoticeToMarinersRoute(
    object Main: NoticeToMarinersRoute("ntms", "Notice To Mariners", "NTMs")
    object Home: NoticeToMarinersRoute("ntms/home", "Notice To Mariners", "NTMs")
    object All: NoticeToMarinersRoute("ntms/all", "Notice To Mariners", "NTMs")
+   object Query: NoticeToMarinersRoute("ntms/query", "Notice To Mariners", "NTMs")
+   object Corrections: NoticeToMarinersRoute("ntms/corrections", "Chart Corrections", "NTMs")
    object Detail: NoticeToMarinersRoute("ntms/detail", "Notice To Mariners", "NTMs")
    object Graphic: NoticeToMarinersRoute("ntms/graphic", "Notice To Mariners Graphic", "NTMs Graphic")
 }
@@ -50,9 +53,33 @@ fun NavGraphBuilder.noticeToMarinersGraph(
                   NoticeToMarinersHomeChoice.ALL -> {
                      navController.navigate(NoticeToMarinersRoute.All.name)
                   }
-                  NoticeToMarinersHomeChoice.CHART_CORRECTIONS -> {}
+                  NoticeToMarinersHomeChoice.QUERY -> {
+                     navController.navigate(NoticeToMarinersRoute.Query.name)
+                  }
                }
             }
+         )
+      }
+
+      composable(NoticeToMarinersRoute.Query.name) {
+         bottomBarVisibility(false)
+
+         NoticeToMarinersQueryScreen(
+            close = { navController.popBackStack() },
+            onQuery = {
+               navController.navigate(NoticeToMarinersRoute.Corrections.name)
+            }
+         )
+      }
+
+      composable(NoticeToMarinersRoute.Corrections.name) {
+         bottomBarVisibility(false)
+
+         NoticeToMarinersCorrectionsScreen(
+            onNoticeTap = {
+               navController.navigate("${NoticeToMarinersRoute.Detail.name}?noticeNumber=${it}")
+            },
+            close = { navController.popBackStack() }
          )
       }
 

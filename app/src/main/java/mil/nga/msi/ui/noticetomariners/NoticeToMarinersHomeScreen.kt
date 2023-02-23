@@ -15,7 +15,7 @@ import mil.nga.msi.ui.theme.screenBackground
 
 enum class NoticeToMarinersHomeChoice {
    ALL,
-   CHART_CORRECTIONS
+   QUERY
 }
 
 @Composable
@@ -58,7 +58,7 @@ private fun NoticeToMariners(
 
          Box(Modifier
             .fillMaxWidth()
-            .clickable { onTap(NoticeToMarinersHomeChoice.CHART_CORRECTIONS) }
+            .clickable { onTap(NoticeToMarinersHomeChoice.QUERY) }
             .background(MaterialTheme.colors.surface)
             .padding(16.dp)
          ) {
