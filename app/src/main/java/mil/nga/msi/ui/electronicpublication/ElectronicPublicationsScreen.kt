@@ -7,6 +7,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -46,16 +47,20 @@ fun ElectronicPublicationTypeList(pubTypes: List<PublicationTypeListItem>, onPub
                         text = { Text(it.pubType.label) },
                         secondaryText = { Text("${it.fileCount} files") },
                         icon = {
-                            Icon(
-                                imageVector = Icons.Default.Folder,
-                                contentDescription = it.pubType.label
-                            )
+                            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                                Icon(
+                                    imageVector = Icons.Default.Folder,
+                                    contentDescription = it.pubType.label
+                                )
+                            }
                         },
                         trailing = {
-                            Icon(
-                                imageVector = Icons.Default.ChevronRight,
-                                contentDescription = it.pubType.label
-                            )
+                            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                                Icon(
+                                    imageVector = Icons.Default.ChevronRight,
+                                    contentDescription = it.pubType.label
+                                )
+                            }
                         },
                         modifier = Modifier
                             .clickable(onClick = { onPubTypeClick(it.pubType) })

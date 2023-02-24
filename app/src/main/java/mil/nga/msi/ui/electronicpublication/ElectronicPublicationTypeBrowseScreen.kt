@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -146,14 +147,16 @@ fun PublicationSectionsList(
         sections.forEach { section ->
             stickyHeader(section.title) {
                 Surface {
-                    Text(
-                        style = MaterialTheme.typography.subtitle2,
-                        modifier = Modifier
-                            .background(MaterialTheme.colors.screenBackground)
-                            .padding(6.dp)
-                            .fillMaxWidth(),
-                        text = section.title,
-                    )
+                    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                        Text(
+                            style = MaterialTheme.typography.subtitle2,
+                            modifier = Modifier
+                                .background(MaterialTheme.colors.screenBackground)
+                                .padding(6.dp)
+                                .fillMaxWidth(),
+                            text = section.title,
+                        )
+                    }
                 }
             }
             items(section.publications) { pubLink ->
@@ -165,7 +168,7 @@ fun PublicationSectionsList(
                 )
                 if (pubLink != section.publications.last()) {
                     Divider(
-                        startIndent = 8.dp,
+                        startIndent = 16.dp,
                         modifier = Modifier.background(MaterialTheme.colors.background)
                     )
                 }
@@ -186,19 +189,21 @@ fun PublicationListItem(
         modifier = Modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.large,
     ) {
-        Column(modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 8.dp)) {
+        Column(modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp)) {
             Text(
                 style = MaterialTheme.typography.subtitle1,
                 text = ePub.sectionDisplayName ?: ""
             )
-            Text(
-                style = MaterialTheme.typography.caption,
-                text = "${ePub.fileExtension?.toUpperCase(Locale.current) ?: "Unknown file type"} - ${formatByteCount(ePub.fileSize) ?: "Unknown size"}"
-            )
-            Text(
-                style = MaterialTheme.typography.caption,
-                text = ePub.uploadTime?.let { "Uploaded ${formatDateTime(ePub.uploadTime)}" } ?: "Unknown upload time"
-            )
+            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                Text(
+                    style = MaterialTheme.typography.body2,
+                    text = "${ePub.fileExtension?.toUpperCase(Locale.current) ?: "Unknown file type"} - ${formatByteCount(ePub.fileSize) ?: "Unknown size"}"
+                )
+                Text(
+                    style = MaterialTheme.typography.caption,
+                    text = ePub.uploadTime?.let { "Uploaded ${formatDateTime(ePub.uploadTime)}" } ?: "Unknown upload time"
+                )
+            }
             Row(modifier = Modifier.align(Alignment.End), Arrangement.SpaceBetween) {
                 if (ePub.isDownloaded) {
                     TextButton(onClick = { actions.onViewClick(ePub) }) {
