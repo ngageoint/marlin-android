@@ -1,12 +1,8 @@
 package mil.nga.msi.ui.asam.list
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.ContentAlpha
-import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
@@ -16,7 +12,6 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -38,6 +33,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import androidx.compose.material3.*
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AsamsScreen(
    openDrawer: () -> Unit,
@@ -60,28 +56,22 @@ fun AsamsScreen(
                Icon(Icons.Default.SwapVert, contentDescription = "Sort ASAMs")
             }
 
-            Box {
-               IconButton(onClick = { openFilter() } ) {
-                  Icon(Icons.Default.FilterList, contentDescription = "Filter ASAMs")
-               }
-
-               if (filters.isNotEmpty()) {
-                  Box(
-                     contentAlignment = Alignment.Center,
-                     modifier = Modifier
-                        .clip(CircleShape)
-                        .height(24.dp)
-                        .background(MaterialTheme.colorScheme.secondary)
-                        .align(Alignment.TopEnd)
-                  ) {
-                     Text(
-                        text = "${filters.size}",
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(horizontal = 8.dp),
-                        color = MaterialTheme.colorScheme.onPrimary
-                     )
+            BadgedBox(
+               badge = {
+                  if (filters.isNotEmpty()) {
+                     Badge(
+                        containerColor = MaterialTheme.colorScheme.secondary
+                     ) {
+                        Text("${filters.size}")
+                     }
                   }
-               }
+               },
+               modifier = Modifier.padding(end = 16.dp)
+            ) {
+               Icon(
+                  Icons.Default.FilterList,
+                  contentDescription = "Filter ASAMs"
+               )
             }
          }
       )
@@ -172,7 +162,7 @@ private fun AsamContent(
    onCopyLocation: (String) -> Unit
 ) {
    Column(Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
-      CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+      CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
          asam.date.let { date ->
             val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
             Text(
@@ -194,7 +184,7 @@ private fun AsamContent(
          modifier = Modifier.padding(top = 16.dp)
       )
 
-      CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+      CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
          asam.description?.let {
             Text(
                text = it,

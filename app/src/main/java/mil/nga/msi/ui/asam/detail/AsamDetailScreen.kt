@@ -3,7 +3,7 @@ package mil.nga.msi.ui.asam.detail
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.GpsFixed
@@ -29,7 +29,6 @@ import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.BaseMapType
 import mil.nga.msi.ui.map.MapClip
 import mil.nga.msi.ui.navigation.Point
-import mil.nga.msi.ui.theme.screenBackground
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -71,7 +70,6 @@ private fun AsamDetailContent(
 ) {
    if (asam != null) {
       Surface(
-         color = MaterialTheme.colors.screenBackground,
          modifier = Modifier.fillMaxHeight()
       ) {
          Column(
@@ -112,13 +110,13 @@ private fun AsamHeader(
          )
 
          Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
-            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                asam.date.let { date ->
                   val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
                   Text(
                      text = dateFormat.format(date),
                      fontWeight = FontWeight.SemiBold,
-                     style = MaterialTheme.typography.overline,
+                     style = MaterialTheme.typography.labelSmall,
                      maxLines = 1,
                      overflow = TextOverflow.Ellipsis
                   )
@@ -128,7 +126,7 @@ private fun AsamHeader(
             val header = listOfNotNull(asam.hostility, asam.victim).joinToString(": ")
             Text(
                text = header,
-               style = MaterialTheme.typography.h6,
+               style = MaterialTheme.typography.titleLarge,
                maxLines = 1,
                overflow = TextOverflow.Ellipsis,
                modifier = Modifier.padding(top = 16.dp)
@@ -180,13 +178,13 @@ private fun AsamActions(
    Row {
       IconButton(onClick = { onShare() }) {
          Icon(Icons.Default.Share,
-            tint = MaterialTheme.colors.primary,
+            tint = MaterialTheme.colorScheme.primary,
             contentDescription = "Share ASAM"
          )
       }
       IconButton(onClick = { onZoom() }) {
          Icon(Icons.Default.GpsFixed,
-            tint = MaterialTheme.colors.primary,
+            tint = MaterialTheme.colorScheme.primary,
             contentDescription = "Zoom to ASAM"
          )
       }
@@ -199,25 +197,22 @@ private fun AsamDescription(
    description: String?
 ) {
    Column(Modifier.padding(vertical = 16.dp)) {
-      CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
+      CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
          Text(
             text = "DESCRIPTION",
-            style = MaterialTheme.typography.subtitle1
+            style = MaterialTheme.typography.titleMedium
          )
       }
 
       Card(
-         elevation = 4.dp,
          modifier = Modifier.padding(vertical = 8.dp)
       ) {
-         CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-            description?.let {
-               Text(
-                  text = it,
-                  style = MaterialTheme.typography.body2,
-                  modifier = Modifier.padding(all = 16.dp)
-               )
-            }
+         description?.let {
+            Text(
+               text = it,
+               style = MaterialTheme.typography.bodyMedium,
+               modifier = Modifier.padding(all = 16.dp)
+            )
          }
       }
    }
@@ -227,15 +222,14 @@ private fun AsamDescription(
 private fun AsamInformation(
    asam: Asam
 ) {
-   CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
+   CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
       Text(
          text = "ADDITIONAL INFORMATION",
-         style = MaterialTheme.typography.subtitle1,
+         style = MaterialTheme.typography.titleMedium
       )
    }
 
    Card(
-      elevation = 4.dp,
       modifier = Modifier.padding(vertical = 8.dp)
    ) {
       Column(
@@ -260,17 +254,15 @@ private fun AsamProperty(
 ) {
    if (value?.isNotBlank() == true) {
       Column(Modifier.padding(vertical = 8.dp)) {
-         CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-            Text(
-               text = title,
-               style = MaterialTheme.typography.body2,
-               modifier = Modifier.padding(bottom = 4.dp)
-            )
-         }
+         Text(
+            text = title,
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.padding(bottom = 4.dp)
+         )
 
          Text(
             text = value,
-            style = MaterialTheme.typography.body1
+            style = MaterialTheme.typography.bodyLarge
          )
       }
    }

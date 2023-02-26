@@ -14,8 +14,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.ContentAlpha
-import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -63,6 +61,7 @@ import mil.nga.msi.ui.location.LocationText
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.cluster.MapAnnotation
 import mil.nga.msi.ui.navigation.mainRouteFor
+import mil.nga.msi.ui.theme.onSurfaceDisabled
 import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.seconds
 
@@ -532,7 +531,7 @@ private fun Zoom(
       },
    ) {
       var icon = Icons.Outlined.LocationSearching
-      var tint =  MaterialTheme.colorScheme.onSurface.copy(alpha = ContentAlpha.disabled)
+      var tint =  MaterialTheme.colorScheme.onSurfaceDisabled
       if (located) {
          icon = Icons.Outlined.MyLocation
          tint = MaterialTheme.colorScheme.primary
@@ -660,7 +659,7 @@ private fun Search(
                            style = MaterialTheme.typography.titleMedium,
                            fontWeight = FontWeight.Medium
                         )
-                        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
+                        CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceDisabled) {
                            Text(
                               text = result.address ?: "",
                               style = MaterialTheme.typography.titleSmall

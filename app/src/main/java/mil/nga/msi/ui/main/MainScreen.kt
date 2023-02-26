@@ -244,22 +244,4 @@ fun TopBar(
          navigationIconContentColor = Color.White
       )
    )
-//   TopAppBar(
-//      title = {
-//         Text(
-//            text = title,
-//            maxLines = 1,
-//            overflow = TextOverflow.Ellipsis,
-//         )
-//      },
-//      navigationIcon = {
-//         navigationIcon?.let { icon ->
-//            IconButton(onClick = { onNavigationClicked?.invoke() } ) {
-//               Icon(icon, contentDescription = "Navigation")
-//            }
-//         }
-//      },
-//      actions = actions,
-//      backgroundColor = MaterialTheme.colors.primaryVariant
-//   )
 }
