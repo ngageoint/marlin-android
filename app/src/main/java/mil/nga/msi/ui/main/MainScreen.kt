@@ -10,6 +10,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
@@ -36,6 +37,10 @@ import mil.nga.msi.ui.home.homeGraph
 import mil.nga.msi.ui.map.MapRoute
 import mil.nga.msi.ui.navigation.NavigationDrawer
 import mil.nga.msi.ui.navigation.mainRouteFor
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.graphics.Color
 
 @OptIn(ExperimentalMaterialNavigationApi::class, ExperimentalMaterialApi::class)
 @Composable
@@ -111,7 +116,7 @@ fun MainScreen(
                exit = fadeOut(animationSpec = tween()),
                content = {
                   BottomNavigation(
-                     backgroundColor = MaterialTheme.colors.background
+                     backgroundColor = MaterialTheme.colorScheme.background
                   ) {
                      val navBackStackEntry by navController.currentBackStackEntryAsState()
                      val currentDestination = navBackStackEntry?.destination
@@ -124,8 +129,8 @@ fun MainScreen(
                            )
                         },
                         label = { Text("Map") },
-                        selectedContentColor = MaterialTheme.colors.primary,
-                        unselectedContentColor = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.disabled),
+                        selectedContentColor = MaterialTheme.colorScheme.primary,
+                        unselectedContentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = ContentAlpha.disabled),
                         selected = currentDestination?.hierarchy?.any { it.route?.substringBefore("?") == MapRoute.Map.name } == true,
                         onClick = {
                            if (currentDestination?.route?.substringBefore("?") != MapRoute.Map.name) {
@@ -150,8 +155,8 @@ fun MainScreen(
                               )
                            },
                            label = { Text(tabRoute.shortTitle) },
-                           selectedContentColor = MaterialTheme.colors.primary,
-                           unselectedContentColor = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.disabled),
+                           selectedContentColor = MaterialTheme.colorScheme.primary,
+                           unselectedContentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = ContentAlpha.disabled),
                            selected = currentDestination?.hierarchy?.any { it.route?.substringBefore("?") == tabRoute.name } == true,
                            onClick = {
                               if (currentDestination?.route?.substringBefore("?") != tabRoute.name) {
@@ -207,6 +212,7 @@ fun MainScreen(
    }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopBar(
    title: String,
@@ -216,20 +222,44 @@ fun TopBar(
 ) {
    TopAppBar(
       title = {
-         Text(
+         androidx.compose.material3.Text(
             text = title,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
+            style = MaterialTheme.typography.titleMedium
          )
       },
       navigationIcon = {
          navigationIcon?.let { icon ->
-            IconButton(onClick = { onNavigationClicked?.invoke() } ) {
-               Icon(icon, contentDescription = "Navigation")
+            androidx.compose.material3.IconButton(onClick = { onNavigationClicked?.invoke() } ) {
+               androidx.compose.material3.Icon(icon, contentDescription = "Navigation")
             }
          }
       },
       actions = actions,
-      backgroundColor = MaterialTheme.colors.primaryVariant
+      colors = TopAppBarDefaults.smallTopAppBarColors(
+         containerColor = MaterialTheme.colorScheme.tertiary,
+         actionIconContentColor = Color.White,
+         titleContentColor = Color.White,
+         navigationIconContentColor = Color.White
+      )
    )
+//   TopAppBar(
+//      title = {
+//         Text(
+//            text = title,
+//            maxLines = 1,
+//            overflow = TextOverflow.Ellipsis,
+//         )
+//      },
+//      navigationIcon = {
+//         navigationIcon?.let { icon ->
+//            IconButton(onClick = { onNavigationClicked?.invoke() } ) {
+//               Icon(icon, contentDescription = "Navigation")
+//            }
+//         }
+//      },
+//      actions = actions,
+//      backgroundColor = MaterialTheme.colors.primaryVariant
+//   )
 }

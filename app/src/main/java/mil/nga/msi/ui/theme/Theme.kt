@@ -2,21 +2,22 @@ package mil.nga.msi.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.Colors
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.darkColors
-import androidx.compose.material.lightColors
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
-private val DarkColorPalette = darkColors(
-   primary = NgaBlue,
-   primaryVariant = NgaBlue,
+val LightColorPalette = lightColorScheme(
+   primary = SeaGreen,
+   primaryContainer = Color.White,
+   tertiary = SeaGreen,
    secondary = NgaBlue
 )
 
-private val LightColorPalette = lightColors(
-   primary = SeaGreen,
-   primaryVariant = SeaGreen,
+val DarkColorPalette = darkColorScheme(
+   primary = NgaBlue,
+   tertiary = NgaBlue,
    secondary = NgaBlue
 )
 
@@ -25,14 +26,14 @@ fun MsiTheme(
    darkTheme: Boolean = isSystemInDarkTheme(),
    content: @Composable () -> Unit
 ) {
-   val colors = if (darkTheme) {
+   val colorScheme = if (darkTheme) {
       LightColorPalette
    } else {
       LightColorPalette
    }
 
    MaterialTheme(
-      colors = colors,
+      colorScheme = colorScheme,
       content = content
    )
 }
