@@ -3,7 +3,7 @@ package mil.nga.msi.ui.navigationalwarning.detail
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Share
@@ -55,7 +55,7 @@ private fun NavigationalWarningDetailContent(
 ) {
    if (warning != null) {
       Surface(
-         color = MaterialTheme.colors.screenBackground,
+         color = MaterialTheme.colorScheme.screenBackground,
          modifier = Modifier.fillMaxHeight()
       ) {
          Column(
@@ -80,11 +80,11 @@ private fun NavigationalWarningHeader(
    Card {
       Column {
          Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
-            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                Text(
                   text = dateFormat.format(warning.issueDate),
                   fontWeight = FontWeight.SemiBold,
-                  style = MaterialTheme.typography.overline,
+                  style = MaterialTheme.typography.labelSmall,
                   maxLines = 1,
                   overflow = TextOverflow.Ellipsis
                )
@@ -95,7 +95,7 @@ private fun NavigationalWarningHeader(
             val header = listOfNotNull(warning.navigationArea.title, identifier, subregions).joinToString(" ")
             Text(
                text = header,
-               style = MaterialTheme.typography.h6,
+               style = MaterialTheme.typography.titleLarge,
                maxLines = 1,
                overflow = TextOverflow.Ellipsis,
                modifier = Modifier.padding(top = 16.dp)
@@ -133,7 +133,7 @@ private fun NavigationalWarningActions(
 ) {
    IconButton(onClick = { onShare() }) {
       Icon(Icons.Default.Share,
-         tint = MaterialTheme.colors.primary,
+         tint = MaterialTheme.colorScheme.primary,
          contentDescription = "Share Navigational Warning"
       )
    }
@@ -144,23 +144,24 @@ private fun NavigationalWarningText(
    text: String?
 ) {
    Column(Modifier.padding(vertical = 16.dp)) {
-      CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
+      CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
          Text(
             text = "Text",
-            style = MaterialTheme.typography.subtitle1,
+            style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Medium
          )
       }
 
       Card(
-         elevation = 4.dp,
-         modifier = Modifier.padding(vertical = 8.dp)
+         modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
       ) {
-         CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
             text?.let {
                Text(
                   text = it,
-                  style = MaterialTheme.typography.body2,
+                  style = MaterialTheme.typography.bodyMedium,
                   modifier = Modifier.padding(all = 16.dp)
                )
             }
@@ -178,15 +179,15 @@ private fun NavigationalWarningProperty(
       Column(Modifier.padding(vertical = 8.dp)) {
          Text(
             text = title,
-            style = MaterialTheme.typography.subtitle1,
+            style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Medium,
             modifier = Modifier.padding(bottom = 4.dp)
          )
 
-         CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
             Text(
                text = value,
-               style = MaterialTheme.typography.body1
+               style = MaterialTheme.typography.bodyLarge
             )
          }
       }
