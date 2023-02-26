@@ -12,7 +12,7 @@ import androidx.compose.ui.graphics.Color
 val LightColorPalette = lightColorScheme(
    primary = SeaGreen,
    primaryContainer = Color.White,
-   surfaceVariant = Color(0x08000000),
+   surfaceVariant = Color(0x09000000),
    tertiary = SeaGreen,
    secondary = NgaBlue
 )
@@ -41,6 +41,9 @@ fun MsiTheme(
 }
 val ColorScheme.onSurfaceDisabled: Color @Composable
    get() = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+
+val ColorScheme.screenBackground: Color @Composable
+   get() = Color(0x09000000)
 
 val Colors.screenBackground: Color @Composable get() = Color(0x09000000)
 val Colors.add: Color @Composable get() = Add

@@ -68,10 +68,14 @@ fun AsamsScreen(
                },
                modifier = Modifier.padding(end = 16.dp)
             ) {
-               Icon(
-                  Icons.Default.FilterList,
-                  contentDescription = "Filter ASAMs"
-               )
+               IconButton(
+                  onClick = { openFilter() }
+               ) {
+                  Icon(
+                     Icons.Default.FilterList,
+                     contentDescription = "Filter ASAMs"
+                  )
+               }
             }
          }
       )
@@ -103,7 +107,7 @@ private fun Asams(
    val lazyItems = pagingState.collectAsLazyPagingItems()
 
    Surface(
-      color = androidx.compose.material.MaterialTheme.colors.screenBackground,
+      color = MaterialTheme.colorScheme.screenBackground,
       modifier = Modifier.fillMaxHeight()
    ) {
       LazyColumn(
