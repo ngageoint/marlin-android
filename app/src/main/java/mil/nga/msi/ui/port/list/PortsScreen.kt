@@ -64,7 +64,8 @@ fun PortsScreen(
                badge = {
                   if (filters.isNotEmpty()) {
                      Badge(
-                        containerColor = MaterialTheme.colorScheme.secondary
+                        containerColor = MaterialTheme.colorScheme.secondary,
+                        modifier = Modifier.offset(x = (-12).dp, y = 12.dp)
                      ) {
                         Text("${filters.size}")
                      }

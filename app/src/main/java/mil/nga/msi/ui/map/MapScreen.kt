@@ -138,7 +138,8 @@ fun MapScreen(
                badge = {
                   if (filterCount > 0) {
                      Badge(
-                        containerColor = MaterialTheme.colorScheme.secondary
+                        containerColor = MaterialTheme.colorScheme.secondary,
+                        modifier = Modifier.offset(x = (-12).dp, y = 12.dp)
                      ) {
                         Text("$filterCount")
                      }
