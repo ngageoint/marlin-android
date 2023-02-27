@@ -6,7 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
@@ -21,6 +21,7 @@ import mil.nga.msi.sort.SortDirection
 import mil.nga.msi.sort.SortParameter
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.theme.add
+import mil.nga.msi.ui.theme.onSurfaceDisabled
 import mil.nga.msi.ui.theme.remove
 import mil.nga.msi.ui.theme.screenBackground
 
@@ -91,7 +92,7 @@ private fun Sort(
       Modifier
          .fillMaxSize()
          .verticalScroll(scrollState)
-         .background(MaterialTheme.colors.screenBackground)
+         .background(MaterialTheme.colorScheme.screenBackground)
          .padding(bottom = 16.dp)
    ) {
       if (options.isNotEmpty()) {
@@ -166,10 +167,10 @@ private fun Section(
       verticalAlignment = Alignment.CenterVertically,
       modifier = Modifier
          .fillMaxWidth()
-         .background(MaterialTheme.colors.background)
+         .background(MaterialTheme.colorScheme.background)
          .padding(16.dp)
    ) {
-      CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
+      CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceDisabled) {
          Text(text = "Group by primary sort field")
       }
 
@@ -190,14 +191,14 @@ private fun SortField(
 ) {
    Column(
       Modifier
-         .background(MaterialTheme.colors.background)
+         .background(MaterialTheme.colorScheme.background)
          .padding(16.dp)
    ) {
       if (parameter == null) {
-         CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
+         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceDisabled) {
             Text(
                text = title,
-               style = MaterialTheme.typography.subtitle1
+               style = MaterialTheme.typography.titleMedium
             )
          }
 
@@ -206,10 +207,10 @@ private fun SortField(
             addSort = addSort
          )
       } else {
-         CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
+         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
             Text(
                text = title,
-               style = MaterialTheme.typography.subtitle1,
+               style = MaterialTheme.typography.titleMedium,
             )
          }
 
@@ -274,7 +275,7 @@ private fun SortPicker(
       ) {
          Icon(
             imageVector = Icons.Filled.AddCircle,
-            tint = MaterialTheme.colors.add,
+            tint = MaterialTheme.colorScheme.add,
             contentDescription = "Add Sort",
          )
       }
@@ -298,12 +299,12 @@ private fun ParameterSelection(
       ) {
          Text(
             text = selectedParameter.title,
-            style = MaterialTheme.typography.subtitle1,
-            color = MaterialTheme.colors.primary
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.primary
          )
          Icon(
             imageVector = Icons.Default.ExpandMore,
-            tint = MaterialTheme.colors.primary,
+            tint = MaterialTheme.colorScheme.primary,
             contentDescription = "Parameters"
          )
       }
@@ -317,26 +318,27 @@ private fun ParameterSelection(
                onClick = {
                   onSelectParameter(parameter)
                   expanded = false
-               }
-            ) {
-               Row(
-                  verticalAlignment = Alignment.CenterVertically
-               ) {
-                  if (selectedParameter == parameter) {
-                     Icon(
-                        imageVector = Icons.Default.Check,
-                        contentDescription = "Selected Parameter"
-                     )
-                  } else {
-                     Spacer(modifier = Modifier.size(24.dp))
-                  }
+               },
+               text = {
+                  Row(
+                     verticalAlignment = Alignment.CenterVertically
+                  ) {
+                     if (selectedParameter == parameter) {
+                        Icon(
+                           imageVector = Icons.Default.Check,
+                           contentDescription = "Selected Parameter"
+                        )
+                     } else {
+                        Spacer(modifier = Modifier.size(24.dp))
+                     }
 
-                  Text(
-                     text = parameter.title,
-                     modifier = Modifier.padding(start = 8.dp)
-                  )
+                     Text(
+                        text = parameter.title,
+                        modifier = Modifier.padding(start = 8.dp)
+                     )
+                  }
                }
-            }
+            )
          }
       }
    }
@@ -358,12 +360,12 @@ private fun DirectionSelection(
       ) {
          Text(
             text = selectedDirection.title,
-            style = MaterialTheme.typography.subtitle1,
-            color = MaterialTheme.colors.primary
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.primary
          )
          Icon(
             imageVector = Icons.Default.ExpandMore,
-            tint = MaterialTheme.colors.primary,
+            tint = MaterialTheme.colorScheme.primary,
             contentDescription = "Directions"
          )
       }
@@ -377,24 +379,25 @@ private fun DirectionSelection(
                onClick = {
                   onSelectDirection(direction)
                   expanded = false
-               }
-            ) {
-               Row {
-                  if (selectedDirection == direction) {
-                     Icon(
-                        imageVector = Icons.Default.Check,
-                        contentDescription = "Selected Direction"
-                     )
-                  } else {
-                     Spacer(modifier = Modifier.size(24.dp))
-                  }
+               },
+               text = {
+                  Row {
+                     if (selectedDirection == direction) {
+                        Icon(
+                           imageVector = Icons.Default.Check,
+                           contentDescription = "Selected Direction"
+                        )
+                     } else {
+                        Spacer(modifier = Modifier.size(24.dp))
+                     }
 
-                  Text(
-                     text = direction.title,
-                     modifier = Modifier.padding(start = 8.dp)
-                  )
+                     Text(
+                        text = direction.title,
+                        modifier = Modifier.padding(start = 8.dp)
+                     )
+                  }
                }
-            }
+            )
          }
       }
    }
@@ -414,7 +417,7 @@ fun SortValue(
       val text = "${parameter.parameter.title} ${parameter.direction.title}"
       Text(
          text = text,
-         style = MaterialTheme.typography.subtitle1,
+         style = MaterialTheme.typography.titleMedium,
          modifier = Modifier.padding(vertical = 8.dp)
       )
 
@@ -423,7 +426,7 @@ fun SortValue(
       ) {
          Icon(
             imageVector = Icons.Filled.RemoveCircle,
-            tint = MaterialTheme.colors.remove,
+            tint = MaterialTheme.colorScheme.remove,
             contentDescription = "Remove Sort",
          )
       }
