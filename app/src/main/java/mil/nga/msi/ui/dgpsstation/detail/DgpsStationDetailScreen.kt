@@ -3,7 +3,7 @@ package mil.nga.msi.ui.dgpsstation.detail
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.GpsFixed
@@ -30,6 +30,7 @@ import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.BaseMapType
 import mil.nga.msi.ui.map.MapClip
 import mil.nga.msi.ui.navigation.Point
+import mil.nga.msi.ui.theme.onSurfaceDisabled
 import mil.nga.msi.ui.theme.screenBackground
 
 @Composable
@@ -70,7 +71,7 @@ private fun RadioBeaconDetailContent(
 ) {
    if (dgpsStation != null) {
       Surface(
-         color = MaterialTheme.colors.screenBackground,
+         color = MaterialTheme.colorScheme.screenBackground,
          modifier = Modifier.fillMaxHeight()
       ) {
          Column(
@@ -103,11 +104,11 @@ private fun DgpsStationHeader(
          )
 
          Column(Modifier.padding(horizontal = 8.dp, vertical = 8.dp)) {
-            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                Text(
                   text = "${dgpsStation.featureNumber} ${dgpsStation.volumeNumber}",
                   fontWeight = FontWeight.SemiBold,
-                  style = MaterialTheme.typography.overline,
+                  style = MaterialTheme.typography.labelSmall,
                   maxLines = 1,
                   overflow = TextOverflow.Ellipsis
                )
@@ -116,25 +117,25 @@ private fun DgpsStationHeader(
             dgpsStation.name?.let { name ->
                Text(
                   text = name,
-                  style = MaterialTheme.typography.h6,
+                  style = MaterialTheme.typography.titleLarge,
                   maxLines = 1,
                   overflow = TextOverflow.Ellipsis,
                   modifier = Modifier.padding(top = 16.dp, bottom = 0.dp)
                )
             }
 
-            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                Text(
                   text = dgpsStation.sectionHeader,
-                  style = MaterialTheme.typography.body2
+                  style = MaterialTheme.typography.bodyMedium
                )
             }
 
-            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                dgpsStation.remarks?.let { remarks ->
                   Text(
                      text = remarks,
-                     style = MaterialTheme.typography.body2,
+                     style = MaterialTheme.typography.bodyMedium,
                      modifier = Modifier.padding(top = 8.dp)
                   )
                }
@@ -186,13 +187,13 @@ private fun DgpsStationActions(
    Row {
       IconButton(onClick = { onShare() }) {
          Icon(Icons.Default.Share,
-            tint = MaterialTheme.colors.primary,
+            tint = MaterialTheme.colorScheme.primary,
             contentDescription = "Share Radio Beacon"
          )
       }
       IconButton(onClick = { onZoom() }) {
          Icon(Icons.Default.GpsFixed,
-            tint = MaterialTheme.colors.primary,
+            tint = MaterialTheme.colorScheme.primary,
             contentDescription = "Zoom to Radio Beacon"
          )
       }
@@ -204,10 +205,10 @@ private fun DgpsStationActions(
 private fun DgpsStationInformation(
    dgpsStation: DgpsStation
 ) {
-   CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
+   CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceDisabled) {
       Text(
          text = "ADDITIONAL INFORMATION",
-         style = MaterialTheme.typography.subtitle1,
+         style = MaterialTheme.typography.titleMedium,
          modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
       )
    }
@@ -232,20 +233,18 @@ private fun DgpsStationProperty(
 ) {
    if (value?.toString()?.isNotBlank() == true) {
       Column(Modifier.padding(bottom = 16.dp)) {
-         CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
             Text(
                text = title,
-               style = MaterialTheme.typography.body2,
+               style = MaterialTheme.typography.bodyMedium,
                modifier = Modifier.padding(bottom = 4.dp)
             )
          }
 
-         CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
-            Text(
-               text = value.toString().trim(),
-               style = MaterialTheme.typography.body1
-            )
-         }
+         Text(
+            text = value.toString().trim(),
+            style = MaterialTheme.typography.bodyLarge
+         )
       }
    }
 }

@@ -35,6 +35,7 @@ import mil.nga.msi.ui.radiobeacon.RadioBeaconAction
 import mil.nga.msi.ui.radiobeacon.RadioBeaconRoute
 import mil.nga.msi.ui.theme.screenBackground
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RadioBeaconsScreen(
    openDrawer: () -> Unit,
@@ -57,27 +58,25 @@ fun RadioBeaconsScreen(
                Icon(Icons.Default.SwapVert, contentDescription = "Sort Radio Beacons")
             }
 
-            Box {
-               IconButton(onClick = { openFilter() } ) {
-                  Icon(Icons.Default.FilterList, contentDescription = "Filter Radio Beacons")
-               }
-
-               if (filters.isNotEmpty()) {
-                  Box(
-                     contentAlignment = Alignment.Center,
-                     modifier = Modifier
-                        .clip(CircleShape)
-                        .height(24.dp)
-                        .background(MaterialTheme.colorScheme.secondary)
-                        .align(Alignment.TopEnd)
-                  ) {
-                     Text(
-                        text = "${filters.size}",
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(horizontal = 8.dp),
-                        color = MaterialTheme.colorScheme.onPrimary
-                     )
+            BadgedBox(
+               badge = {
+                  if (filters.isNotEmpty()) {
+                     Badge(
+                        containerColor = MaterialTheme.colorScheme.secondary
+                     ) {
+                        Text("${filters.size}")
+                     }
                   }
+               },
+               modifier = Modifier.padding(end = 16.dp)
+            ) {
+               IconButton(
+                  onClick = { openFilter() }
+               ) {
+                  Icon(
+                     Icons.Default.FilterList,
+                     contentDescription = "Filter Radio Beacons"
+                  )
                }
             }
          }

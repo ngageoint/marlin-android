@@ -36,6 +36,7 @@ import mil.nga.msi.ui.port.PortAction
 import mil.nga.msi.ui.port.PortRoute
 import mil.nga.msi.ui.theme.screenBackground
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PortsScreen(
    openDrawer: () -> Unit,
@@ -59,27 +60,25 @@ fun PortsScreen(
                Icon(Icons.Default.SwapVert, contentDescription = "Sort World Ports")
             }
 
-            Box {
-               IconButton(onClick = { openFilter() } ) {
-                  Icon(Icons.Default.FilterList, contentDescription = "Filter World Ports")
-               }
-
-               if (filters.isNotEmpty()) {
-                  Box(
-                     contentAlignment = Alignment.Center,
-                     modifier = Modifier
-                        .clip(CircleShape)
-                        .height(24.dp)
-                        .background(MaterialTheme.colorScheme.secondary)
-                        .align(Alignment.TopEnd)
-                  ) {
-                     Text(
-                        text = "${filters.size}",
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(horizontal = 8.dp),
-                        color = MaterialTheme.colorScheme.onPrimary
-                     )
+            BadgedBox(
+               badge = {
+                  if (filters.isNotEmpty()) {
+                     Badge(
+                        containerColor = MaterialTheme.colorScheme.secondary
+                     ) {
+                        Text("${filters.size}")
+                     }
                   }
+               },
+               modifier = Modifier.padding(end = 16.dp)
+            ) {
+               IconButton(
+                  onClick = { openFilter() }
+               ) {
+                  Icon(
+                     Icons.Default.FilterList,
+                     contentDescription = "Filter World Ports"
+                  )
                }
             }
          }
