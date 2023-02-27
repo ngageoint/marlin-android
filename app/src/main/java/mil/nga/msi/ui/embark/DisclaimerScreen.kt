@@ -7,10 +7,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -50,7 +50,7 @@ private fun Disclaimer(
    var height by remember { mutableStateOf(0) }
    val scrollState = rememberScrollState()
 
-   Surface(color = MaterialTheme.colors.primary) {
+   Surface(color = MaterialTheme.colorScheme.primary) {
       Column(
          Modifier
             .fillMaxSize()
@@ -58,8 +58,8 @@ private fun Disclaimer(
                brush = Brush.verticalGradient(
                   startY = height * .37f,
                   colors = listOf(
-                     MaterialTheme.colors.primary,
-                     MaterialTheme.colors.secondary
+                     MaterialTheme.colorScheme.primary,
+                     MaterialTheme.colorScheme.secondary
                   )
                )
             )
@@ -71,8 +71,8 @@ private fun Disclaimer(
       ) {
          Text(
             text = "Welcome to Marlin",
-            color = MaterialTheme.colors.onPrimary,
-            style = MaterialTheme.typography.h4,
+            color = MaterialTheme.colorScheme.onPrimary,
+            style = MaterialTheme.typography.headlineMedium,
             modifier =
             Modifier
                .align(Alignment.CenterHorizontally)
@@ -91,7 +91,7 @@ private fun Disclaimer(
          ) {
             Text(
                text = "Accept",
-               style = MaterialTheme.typography.subtitle1,
+               style = MaterialTheme.typography.titleMedium,
                fontSize = 18.sp,
                modifier = Modifier.padding(8.dp)
             )

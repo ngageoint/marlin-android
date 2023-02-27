@@ -7,15 +7,12 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.BottomEnd
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
-import androidx.compose.ui.Alignment.Companion.End
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -50,8 +47,8 @@ private fun Welcome(
             brush = Brush.verticalGradient(
                startY = height * .37f,
                colors = listOf(
-                  MaterialTheme.colors.primary,
-                  MaterialTheme.colors.secondary
+                  MaterialTheme.colorScheme.primary,
+                  MaterialTheme.colorScheme.secondary
                )
             )
          )
@@ -63,8 +60,8 @@ private fun Welcome(
       Column {
          Text(
             text = "Welcome to Marlin",
-            color = MaterialTheme.colors.onPrimary,
-            style = MaterialTheme.typography.h4,
+            color = MaterialTheme.colorScheme.onPrimary,
+            style = MaterialTheme.typography.headlineMedium,
             modifier =
             Modifier
                .align(CenterHorizontally)
@@ -73,8 +70,8 @@ private fun Welcome(
 
          Text(
             text = "Marlin puts NGA's Maritime Safety Information datasets at your fingertips even when offline.  The next few screens will allow you to customize your experience to meet your needs.",
-            color = MaterialTheme.colors.onPrimary,
-            style = MaterialTheme.typography.subtitle1,
+            color = MaterialTheme.colorScheme.onPrimary,
+            style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.align(CenterHorizontally)
          )
       }
@@ -111,7 +108,7 @@ private fun Welcome(
       ) {
          Text(
             text = "Set Sail",
-            style = MaterialTheme.typography.subtitle1,
+            style = MaterialTheme.typography.titleMedium,
             fontSize = 18.sp,
             modifier = Modifier.padding(8.dp)
          )

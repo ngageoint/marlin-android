@@ -9,7 +9,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.runtime.*
@@ -19,7 +19,6 @@ import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
@@ -69,7 +68,7 @@ private fun Map(
       else -> 0.dp
    }
 
-   Surface(color = MaterialTheme.colors.primary) {
+   Surface(color = MaterialTheme.colorScheme.primary) {
       Column(
          Modifier
             .fillMaxSize()
@@ -77,8 +76,8 @@ private fun Map(
                brush = Brush.verticalGradient(
                   startY = height * .37f,
                   colors = listOf(
-                     MaterialTheme.colors.primary,
-                     MaterialTheme.colors.secondary
+                     MaterialTheme.colorScheme.primary,
+                     MaterialTheme.colorScheme.secondary
                   )
                )
             )
@@ -89,8 +88,8 @@ private fun Map(
       ) {
          Text(
             text = "Marlin Map",
-            color = MaterialTheme.colors.onPrimary,
-            style = MaterialTheme.typography.h4,
+            color = MaterialTheme.colorScheme.onPrimary,
+            style = MaterialTheme.typography.headlineMedium,
             modifier =
             Modifier
                .align(CenterHorizontally)
@@ -99,8 +98,8 @@ private fun Map(
 
          Text(
             text = "Choose what datasets you want to see on the map.  This can always be changed via the navigation menu later.",
-            color = MaterialTheme.colors.onPrimary,
-            style = MaterialTheme.typography.subtitle1,
+            color = MaterialTheme.colorScheme.onPrimary,
+            style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.align(CenterHorizontally)
          )
 
@@ -116,7 +115,9 @@ private fun Map(
             items(DataSource.values().filter { it.mappable }) { dataSource ->
                Box(contentAlignment = Alignment.TopEnd) {
                   Card(
-                     backgroundColor = MaterialTheme.colors.secondary,
+                     colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.secondary
+                     ),
                      modifier = Modifier.clickable { toggleMap(dataSource) }
                   ) {
                      Column(Modifier.padding(12.dp)) {
@@ -124,7 +125,7 @@ private fun Map(
                            contentAlignment = Center,
                            modifier = Modifier.fillMaxSize()
                         ) {
-                           val onPrimaryColor = MaterialTheme.colors.onPrimary
+                           val onPrimaryColor = MaterialTheme.colorScheme.onPrimary
                            Canvas(modifier = Modifier.size(46.dp), onDraw = {
                               drawCircle(color = onPrimaryColor)
                            })
@@ -135,7 +136,7 @@ private fun Map(
 
                            Icon(
                               imageVector = ImageVector.vectorResource(id = dataSource.icon),
-                              tint = MaterialTheme.colors.onPrimary,
+                              tint = MaterialTheme.colorScheme.onPrimary,
                               modifier = Modifier.align(Center),
                               contentDescription = "${mainRouteFor(dataSource).shortTitle} icon"
                            )
@@ -143,12 +144,12 @@ private fun Map(
 
                         Text(
                            text = mainRouteFor(dataSource).shortTitle,
-                           style = MaterialTheme.typography.subtitle1,
+                           style = MaterialTheme.typography.titleMedium,
                            textAlign = TextAlign.Center,
                            modifier = Modifier
                               .padding(top = 4.dp)
                               .align(CenterHorizontally),
-                           color = MaterialTheme.colors.onPrimary
+                           color = MaterialTheme.colorScheme.onPrimary
                         )
                      }
                   }
@@ -158,8 +159,8 @@ private fun Map(
                         contentAlignment = Center,
                         modifier = Modifier.offset(x = (8).dp, y = (-8).dp)
                      ) {
-                        val secondaryColor = MaterialTheme.colors.secondary
-                        val onPrimaryColor = MaterialTheme.colors.onPrimary
+                        val secondaryColor = MaterialTheme.colorScheme.secondary
+                        val onPrimaryColor = MaterialTheme.colorScheme.onPrimary
                         Canvas(modifier = Modifier.size(24.dp), onDraw = {
                            drawCircle(color = onPrimaryColor)
                         })
@@ -170,7 +171,7 @@ private fun Map(
 
                         Icon(
                            imageVector = Icons.Default.Check,
-                           tint = MaterialTheme.colors.onPrimary,
+                           tint = MaterialTheme.colorScheme.onPrimary,
                            modifier = Modifier.size(16.dp),
                            contentDescription = "${mainRouteFor(dataSource).shortTitle} selected"
                         )
@@ -189,7 +190,7 @@ private fun Map(
          ) {
             Text(
                text = "Take Me To Marlin",
-               style = MaterialTheme.typography.subtitle1,
+               style = MaterialTheme.typography.titleMedium,
                fontSize = 18.sp,
                modifier = Modifier.padding(8.dp)
             )
