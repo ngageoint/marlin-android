@@ -45,6 +45,10 @@ val ColorScheme.onSurfaceDisabled: Color @Composable
 val ColorScheme.screenBackground: Color @Composable
    get() = Color(0x09000000)
 
+val ColorScheme.add: Color @Composable get() = Add
+
+val ColorScheme.remove: Color @Composable get() = Remove
+
 val Colors.screenBackground: Color @Composable get() = Color(0x09000000)
 val Colors.add: Color @Composable get() = Add
 val Colors.remove: Color @Composable get() = Remove
