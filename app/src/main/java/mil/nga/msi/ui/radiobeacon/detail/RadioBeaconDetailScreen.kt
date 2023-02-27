@@ -4,7 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.GpsFixed
@@ -32,6 +32,7 @@ import mil.nga.msi.ui.navigation.Point
 import mil.nga.msi.ui.radiobeacon.RadioBeaconAction
 import mil.nga.msi.ui.radiobeacon.RadioBeaconRoute
 import mil.nga.msi.ui.radiobeacon.RadioBeaconViewModel
+import mil.nga.msi.ui.theme.onSurfaceDisabled
 import mil.nga.msi.ui.theme.screenBackground
 
 @Composable
@@ -72,7 +73,7 @@ private fun RadioBeaconDetailContent(
 ) {
    if (beacon != null) {
       Surface(
-         color = MaterialTheme.colors.screenBackground,
+         color = MaterialTheme.colorScheme.screenBackground,
          modifier = Modifier.fillMaxHeight()
       ) {
          Column(
@@ -105,11 +106,11 @@ private fun RadioBeaconHeader(
          )
 
          Column(Modifier.padding(horizontal = 8.dp, vertical = 8.dp)) {
-            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                Text(
                   text = "${beacon.featureNumber} ${beacon.volumeNumber}",
                   fontWeight = FontWeight.SemiBold,
-                  style = MaterialTheme.typography.overline,
+                  style = MaterialTheme.typography.labelSmall,
                   maxLines = 1,
                   overflow = TextOverflow.Ellipsis
                )
@@ -118,24 +119,24 @@ private fun RadioBeaconHeader(
             beacon.name?.let { name ->
                Text(
                   text = name,
-                  style = MaterialTheme.typography.h6,
+                  style = MaterialTheme.typography.titleLarge,
                   maxLines = 1,
                   overflow = TextOverflow.Ellipsis,
                   modifier = Modifier.padding(top = 16.dp, bottom = 0.dp)
                )
             }
 
-            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                Text(
                   text = beacon.sectionHeader,
-                  style = MaterialTheme.typography.body2
+                  style = MaterialTheme.typography.bodyMedium
                )
             }
 
             beacon.morseCode()?.let { code ->
                Text(
                   text = beacon.morseLetter(),
-                  style = MaterialTheme.typography.h6,
+                  style = MaterialTheme.typography.titleLarge,
                   modifier = Modifier.padding(top = 4.dp)
                )
 
@@ -148,16 +149,16 @@ private fun RadioBeaconHeader(
             beacon.expandedCharacteristicWithoutCode()?.let {
                Text(
                   text = it,
-                  style = MaterialTheme.typography.body2,
+                  style = MaterialTheme.typography.bodyMedium,
                   modifier = Modifier.padding(top = 0.dp)
                )
             }
 
-            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                beacon.stationRemark?.let { stationRemark ->
                   Text(
                      text = stationRemark,
-                     style = MaterialTheme.typography.body2,
+                     style = MaterialTheme.typography.bodyMedium,
                      modifier = Modifier.padding(top = 8.dp)
                   )
                }
@@ -209,13 +210,13 @@ private fun RadioBeaconActions(
    Row {
       IconButton(onClick = { onShare() }) {
          Icon(Icons.Default.Share,
-            tint = MaterialTheme.colors.primary,
+            tint = MaterialTheme.colorScheme.primary,
             contentDescription = "Share Radio Beacon"
          )
       }
       IconButton(onClick = { onZoom() }) {
          Icon(Icons.Default.GpsFixed,
-            tint = MaterialTheme.colors.primary,
+            tint = MaterialTheme.colorScheme.primary,
             contentDescription = "Zoom to Radio Beacon"
          )
       }
@@ -227,10 +228,10 @@ private fun RadioBeaconActions(
 private fun RadioBeaconInformation(
    beacon: RadioBeacon
 ) {
-   CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
+   CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceDisabled) {
       Text(
          text = "ADDITIONAL INFORMATION",
-         style = MaterialTheme.typography.subtitle1,
+         style = MaterialTheme.typography.titleMedium,
          modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
       )
    }
@@ -254,20 +255,18 @@ private fun RadioBeaconProperty(
 ) {
    if (value?.isNotBlank() == true) {
       Column(Modifier.padding(bottom = 16.dp)) {
-         CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
             Text(
                text = title,
-               style = MaterialTheme.typography.body2,
+               style = MaterialTheme.typography.bodyMedium,
                modifier = Modifier.padding(bottom = 4.dp)
             )
          }
 
-         CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
-            Text(
-               text = value.trim(),
-               style = MaterialTheme.typography.body1
-            )
-         }
+         Text(
+            text = value.trim(),
+            style = MaterialTheme.typography.bodyLarge
+         )
       }
    }
 }
@@ -286,7 +285,7 @@ private fun MorseCode(
                   .padding(end = 8.dp)
                   .height(5.dp)
                   .width(if (letter == "-") 24.dp else 8.dp)
-                  .background(MaterialTheme.colors.onSurface)
+                  .background(MaterialTheme.colorScheme.onSurface)
             )
          }
       }
