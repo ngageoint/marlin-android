@@ -6,7 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
@@ -70,14 +70,14 @@ fun PortsScreen(
                      modifier = Modifier
                         .clip(CircleShape)
                         .height(24.dp)
-                        .background(MaterialTheme.colors.secondary)
+                        .background(MaterialTheme.colorScheme.secondary)
                         .align(Alignment.TopEnd)
                   ) {
                      Text(
                         text = "${filters.size}",
-                        style = MaterialTheme.typography.body2,
+                        style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier.padding(horizontal = 8.dp),
-                        color = MaterialTheme.colors.onPrimary
+                        color = MaterialTheme.colorScheme.onPrimary
                      )
                   }
                }
@@ -113,7 +113,7 @@ private fun Ports(
 ) {
    val lazyItems = pagingState.collectAsLazyPagingItems()
    Surface(
-      color = MaterialTheme.colors.screenBackground,
+      color = MaterialTheme.colorScheme.screenBackground,
       modifier = Modifier.fillMaxHeight()
    ) {
       LazyColumn(
@@ -136,7 +136,7 @@ private fun Ports(
                   Text(
                      text = item.header,
                      fontWeight = FontWeight.Medium,
-                     style = MaterialTheme.typography.caption,
+                     style = MaterialTheme.typography.bodySmall,
                      modifier = Modifier.padding(vertical = 8.dp)
                   )
                }
@@ -181,21 +181,18 @@ private fun PortContent(
          Column(
             Modifier.weight(1f)
          ) {
-            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
-               Text(
-                  text = port.portName,
-                  fontWeight = FontWeight.SemiBold,
-                  style = MaterialTheme.typography.h6,
-                  maxLines = 1,
-                  overflow = TextOverflow.Ellipsis
-               )
-            }
+            Text(
+               text = port.portName,
+               style = MaterialTheme.typography.titleLarge,
+               maxLines = 1,
+               overflow = TextOverflow.Ellipsis
+            )
 
-            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                port.alternateName?.let {
                   Text(
                      text = it,
-                     style = MaterialTheme.typography.body2,
+                     style = MaterialTheme.typography.bodyMedium,
                      modifier = Modifier.padding(top = 4.dp)
                   )
                }
@@ -212,10 +209,10 @@ private fun PortContent(
                val distance = location.distanceTo(portLocation) / 1000
                val direction = location.generalDirection(portLocation)
                val nmi = distance * 0.539957
-               CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+               CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                   Text(
                      text = "${String.format("%.2f", nmi)}, $direction",
-                     style = MaterialTheme.typography.body2,
+                     style = MaterialTheme.typography.bodyMedium,
                      modifier = Modifier.padding(top = 4.dp)
                   )
                }
@@ -272,13 +269,13 @@ private fun PortActions(
          onClick = { onShare() }
       ) {
          Icon(Icons.Default.Share,
-            tint = MaterialTheme.colors.primary,
+            tint = MaterialTheme.colorScheme.primary,
             contentDescription = "Share Port"
          )
       }
       IconButton(onClick = { onZoom() }) {
          Icon(Icons.Default.GpsFixed,
-            tint = MaterialTheme.colors.primary,
+            tint = MaterialTheme.colorScheme.primary,
             contentDescription = "Zoom to Port"
          )
       }
