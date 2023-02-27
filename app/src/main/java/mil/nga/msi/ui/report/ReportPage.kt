@@ -2,9 +2,9 @@ package mil.nga.msi.ui.report
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
@@ -53,8 +53,8 @@ fun ReportPage(
 
                Text(
                   text = "Loading ${reportRoute.shortTitle}...",
-                  style = MaterialTheme.typography.h5,
-                  color = MaterialTheme.colors.primary,
+                  style = MaterialTheme.typography.headlineSmall,
+                  color = MaterialTheme.colorScheme.primary,
                   modifier = Modifier.align(Alignment.Center)
                )
             }
