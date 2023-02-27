@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.*
@@ -21,7 +21,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import mil.nga.msi.R
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.BaseMapType
@@ -85,8 +84,8 @@ private fun BaseMapLayer(
    Column(Modifier.padding(bottom = 16.dp)) {
       Text(
          text = "Map",
-         color = MaterialTheme.colors.primary,
-         style = MaterialTheme.typography.subtitle1,
+         color = MaterialTheme.colorScheme.primary,
+         style = MaterialTheme.typography.titleMedium,
          fontWeight = FontWeight.Medium,
          modifier = Modifier.padding(top = 32.dp, bottom = 16.dp, start = 32.dp, end = 32.dp)
       )
@@ -101,13 +100,13 @@ private fun BaseMapLayer(
          Column {
             Text(
                text = "Base Map",
-               style = MaterialTheme.typography.body1
+               style = MaterialTheme.typography.bodyLarge
             )
 
-            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                Text(
                   text = baseLayer.title,
-                  style = MaterialTheme.typography.body2
+                  style = MaterialTheme.typography.bodyMedium
                )
             }
          }
@@ -134,7 +133,7 @@ fun MapLayerDialog(
          Column(Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp)) {
             Text(
                text = "Base Map",
-               style = MaterialTheme.typography.h6,
+               style = MaterialTheme.typography.titleLarge,
                modifier = Modifier
                   .height(64.dp)
                   .wrapContentHeight(align = Alignment.CenterVertically)
@@ -172,8 +171,8 @@ private fun GridLayers(
    Column(Modifier.padding(bottom = 16.dp)) {
       Text(
          text = "Grids",
-         color = MaterialTheme.colors.primary,
-         style= MaterialTheme.typography.subtitle1,
+         color = MaterialTheme.colorScheme.primary,
+         style= MaterialTheme.typography.titleMedium,
          fontWeight = FontWeight.Medium,
          modifier = Modifier.padding(vertical = 16.dp, horizontal = 32.dp)
       )
@@ -189,13 +188,13 @@ private fun GridLayers(
          Column {
             Text(
                text = "GARS",
-               style = MaterialTheme.typography.body1
+               style = MaterialTheme.typography.bodyLarge
             )
 
-            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                Text(
                   text = "Global Area Reference System",
-                  style = MaterialTheme.typography.body2
+                  style = MaterialTheme.typography.bodyMedium
                )
             }
          }
@@ -217,13 +216,13 @@ private fun GridLayers(
          Column {
             Text(
                text = "MGRS",
-               style = MaterialTheme.typography.body1
+               style = MaterialTheme.typography.bodyLarge
             )
 
-            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                Text(
                   text = "Military Grid Reference System",
-                  style = MaterialTheme.typography.body2
+                  style = MaterialTheme.typography.bodyMedium
                )
             }
          }
@@ -255,8 +254,8 @@ private fun LightSettings(
    ) {
       Text(
          text = "Data Source",
-         color = MaterialTheme.colors.primary,
-         style = MaterialTheme.typography.subtitle1,
+         color = MaterialTheme.colorScheme.primary,
+         style = MaterialTheme.typography.titleMedium,
          fontWeight = FontWeight.Medium,
          modifier = Modifier.padding(vertical = 16.dp, horizontal = 32.dp)
       )
@@ -268,7 +267,7 @@ private fun LightSettings(
             .clickable { onSettings() }
             .padding(vertical = 16.dp, horizontal = 32.dp)
       ) {
-         CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
             Icon(
                painter = painterResource(id = R.drawable.ic_baseline_lightbulb_24),
                modifier = Modifier.padding(end = 16.dp),
@@ -276,17 +275,16 @@ private fun LightSettings(
             )
          }
 
-         CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
+         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
             Text(
                text = "Light Settings",
-               style = MaterialTheme.typography.body1
+               style = MaterialTheme.typography.bodyLarge
             )
          }
       }
    }
 }
 
-@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 private fun DisplaySettings(
    showLocation: Boolean,
@@ -302,8 +300,8 @@ private fun DisplaySettings(
       ) {
          Text(
             text = "Display",
-            color = MaterialTheme.colors.primary,
-            style = MaterialTheme.typography.subtitle1,
+            color = MaterialTheme.colorScheme.primary,
+            style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Medium,
             modifier = Modifier.padding(vertical = 16.dp, horizontal = 32.dp)
          )
@@ -319,13 +317,13 @@ private fun DisplaySettings(
             Column {
                Text(
                   text = "Show Current Location",
-                  style = MaterialTheme.typography.body1
+                  style = MaterialTheme.typography.bodyLarge
                )
 
-               CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+               CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                   Text(
                      text = "Display your current position on the map",
-                     style = MaterialTheme.typography.body2
+                     style = MaterialTheme.typography.bodyMedium
                   )
                }
             }
