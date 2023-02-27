@@ -139,15 +139,21 @@ fun MapScreen(
                   if (filterCount > 0) {
                      Badge(
                         containerColor = MaterialTheme.colorScheme.secondary
-                     ) { Text("$filterCount") }
+                     ) {
+                        Text("$filterCount")
+                     }
                   }
                },
                modifier = Modifier.padding(end = 16.dp)
             ) {
-               Icon(
-                  Icons.Default.FilterList,
-                  contentDescription = "Filter Map"
-               )
+               IconButton(
+                  onClick = { openFilter() }
+               ) {
+                  Icon(
+                     Icons.Default.FilterList,
+                     contentDescription = "Filter Map"
+                  )
+               }
             }
          }
       )
