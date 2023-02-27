@@ -23,6 +23,15 @@ val DarkColorPalette = darkColorScheme(
    secondary = NgaBlue
 )
 
+val EmbarkColorPalette = lightColorScheme(
+   primary = SeaGreen,
+   primaryContainer = Color.White,
+   surface = SeaGreen,
+   surfaceVariant = Color(0x09000000),
+   tertiary = SeaGreen,
+   secondary = NgaBlue
+)
+
 @Composable
 fun MsiTheme(
    darkTheme: Boolean = isSystemInDarkTheme(),
@@ -39,6 +48,17 @@ fun MsiTheme(
       content = content
    )
 }
+
+@Composable
+fun MsiEmbarkTheme (
+   content: @Composable () -> Unit
+) {
+   MaterialTheme(
+      colorScheme = EmbarkColorPalette,
+      content = content
+   )
+}
+
 val ColorScheme.onSurfaceDisabled: Color @Composable
    get() = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
 

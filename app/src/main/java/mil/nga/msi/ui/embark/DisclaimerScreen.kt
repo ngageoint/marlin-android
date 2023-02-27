@@ -50,7 +50,7 @@ private fun Disclaimer(
    var height by remember { mutableStateOf(0) }
    val scrollState = rememberScrollState()
 
-   Surface(color = MaterialTheme.colorScheme.primary) {
+   Surface {
       Column(
          Modifier
             .fillMaxSize()
