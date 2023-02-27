@@ -12,7 +12,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ExpandMore
@@ -54,7 +54,7 @@ fun MapFilterScreen(
       Column(
          Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colors.screenBackground)
+            .background(MaterialTheme.colorScheme.screenBackground)
             .verticalScroll(scrollState)
       ) {
          DataSources(dataSources = dataSources, location = location)
@@ -83,7 +83,7 @@ private fun DataSources(
 
       Spacer(modifier = Modifier
          .height(8.dp)
-         .background(MaterialTheme.colors.onSurface.copy(alpha = 0.12f)))
+         .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)))
    }
 }
 
@@ -112,10 +112,10 @@ private fun DataSource(
             modifier = Modifier
                .fillMaxWidth()
                .height(72.dp)
-               .background(MaterialTheme.colors.background)
+               .background(MaterialTheme.colorScheme.background)
                .clickable { onExpand(!expand) }
          ) {
-            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                val bitmap = AppCompatResources.getDrawable(LocalContext.current, dataSourceModel.dataSource.icon)!!.toBitmap().asImageBitmap()
                Icon(
                   bitmap = bitmap,
@@ -133,10 +133,10 @@ private fun DataSource(
                   .weight(1f)
                   .padding(horizontal = 8.dp)
             ) {
-               CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
+               CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
                   Text(
                      text = mainRouteFor(dataSourceModel.dataSource).title,
-                     style = MaterialTheme.typography.body2,
+                     style = MaterialTheme.typography.bodyMedium,
                      fontWeight = FontWeight.Medium
                   )
                }
@@ -149,20 +149,20 @@ private fun DataSource(
                            .padding(end = 16.dp)
                            .clip(CircleShape)
                            .height(24.dp)
-                           .background(MaterialTheme.colors.secondary)
+                           .background(MaterialTheme.colorScheme.secondary)
                      ) {
                         Text(
                            text = dataSourceModel.numberOfFilters.toString(),
-                           style = MaterialTheme.typography.body2,
+                           style = MaterialTheme.typography.bodyMedium,
                            modifier = Modifier.padding(horizontal = 8.dp),
-                           color = MaterialTheme.colors.onPrimary
+                           color = MaterialTheme.colorScheme.onPrimary
                         )
                      }
                   }
 
                   Icon(
                      imageVector = Icons.Default.ExpandMore,
-                     tint = MaterialTheme.colors.primary,
+                     tint = MaterialTheme.colorScheme.primary,
                      modifier = Modifier.rotate(angle),
                      contentDescription = "Expand Filter"
                   )
@@ -173,7 +173,7 @@ private fun DataSource(
          Column(
             Modifier
                .fillMaxWidth()
-               .background(MaterialTheme.colors.background)
+               .background(MaterialTheme.colorScheme.background)
                .animateContentSize()
          ) {
             if (expand) {
