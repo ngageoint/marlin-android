@@ -3,7 +3,9 @@ package mil.nga.msi.ui.electronicpublication
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.*
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ListItem
+import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
@@ -47,7 +49,7 @@ fun ElectronicPublicationTypeList(pubTypes: List<PublicationTypeListItem>, onPub
                         text = { Text(it.pubType.label) },
                         secondaryText = { Text("${it.fileCount} files") },
                         icon = {
-                            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                                 Icon(
                                     imageVector = Icons.Default.Folder,
                                     contentDescription = it.pubType.label
@@ -55,7 +57,7 @@ fun ElectronicPublicationTypeList(pubTypes: List<PublicationTypeListItem>, onPub
                             }
                         },
                         trailing = {
-                            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                                 Icon(
                                     imageVector = Icons.Default.ChevronRight,
                                     contentDescription = it.pubType.label
@@ -66,7 +68,7 @@ fun ElectronicPublicationTypeList(pubTypes: List<PublicationTypeListItem>, onPub
                             .clickable(onClick = { onPubTypeClick(it.pubType) })
                             .padding(bottom = 8.dp)
                     )
-                    Divider(startIndent = 16.dp)
+                    Divider(Modifier.padding(start = 16.dp))
                 }
             }
         }

@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
+@file:OptIn(ExperimentalFoundationApi::class)
 
 package mil.nga.msi.ui.electronicpublication
 
@@ -11,7 +11,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.*
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ListItem
+import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ChevronRight
@@ -30,7 +32,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mil.nga.msi.datasource.electronicpublication.ElectronicPublication
-import mil.nga.msi.datasource.electronicpublication.ElectronicPublicationType
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.theme.screenBackground
 import java.time.Instant
@@ -48,11 +49,9 @@ interface PublicationActions {
 @OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
 fun ElectronicPublicationTypeBrowseRoute(
-    openDrawer: () -> Unit,
     onBackToRoot: () -> Unit,
     viewModel: ElectronicPublicationTypeBrowseViewModel = hiltViewModel()
 ) {
-    val pubTypeState by viewModel.pubTypeState
     val currentNodeState by viewModel.currentNodeState.collectAsStateWithLifecycle()
     val currentNodeLinks by viewModel.currentNodeLinksState.collectAsStateWithLifecycle()
     val onBackClick = {
@@ -62,12 +61,11 @@ fun ElectronicPublicationTypeBrowseRoute(
         }
     }
     // TODO: how will this work when time zone changes, or when offline?
-    val formatDateTime = formatDateTimeFunction(LocalContext.current)
+    val formatDateTime = formatDateTimeFunction()
     val formatByteCount = formatByteCountFunction(LocalContext.current)
     val context = LocalContext.current
     BackHandler(onBack = onBackClick)
     ElectronicPublicationTypeBrowseScreen(
-        pubType = pubTypeState,
         currentNode = currentNodeState,
         currentNodeLinks = currentNodeLinks,
         onLinkClick = { link -> if (link is PublicationFolderLink) viewModel.onFolderLinkClick(link) },
@@ -91,7 +89,6 @@ fun ElectronicPublicationTypeBrowseRoute(
 
 @Composable
 fun ElectronicPublicationTypeBrowseScreen(
-    pubType: ElectronicPublicationType,
     currentNode: PublicationBrowsingNode,
     currentNodeLinks: PublicationBrowsingLinksArrangement,
     onLinkClick: (PublicationBrowsingLink) -> Unit,
@@ -106,7 +103,7 @@ fun ElectronicPublicationTypeBrowseScreen(
             navigationIcon = Icons.Default.ArrowBack,
             onNavigationClicked = onBackClick,
         )
-        Surface(color = MaterialTheme.colors.screenBackground) {
+        Surface(color = MaterialTheme.colorScheme.screenBackground) {
             when (currentNodeLinks) {
                 is Publications -> {
                     PublicationList(
@@ -147,11 +144,11 @@ fun PublicationSectionsList(
         sections.forEach { section ->
             stickyHeader(section.title) {
                 Surface {
-                    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                    CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                         Text(
-                            style = MaterialTheme.typography.subtitle2,
+                            style = MaterialTheme.typography.titleSmall,
                             modifier = Modifier
-                                .background(MaterialTheme.colors.screenBackground)
+                                .background(MaterialTheme.colorScheme.screenBackground)
                                 .padding(6.dp)
                                 .fillMaxWidth(),
                             text = section.title,
@@ -168,8 +165,9 @@ fun PublicationSectionsList(
                 )
                 if (pubLink != section.publications.last()) {
                     Divider(
-                        startIndent = 16.dp,
-                        modifier = Modifier.background(MaterialTheme.colors.background)
+                        modifier = Modifier
+                            .padding(start = 16.dp)
+                            .background(MaterialTheme.colorScheme.background)
                     )
                 }
             }
@@ -185,59 +183,54 @@ fun PublicationListItem(
     ePub: ElectronicPublication,
     formatDateTime: (Instant?) -> String?, formatByteCount: (Long?) -> String?,
     actions: PublicationActions) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.large,
-    ) {
-        Column(modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp)) {
+
+    Column(modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, top = 16.dp)) {
+        Text(
+            style = MaterialTheme.typography.titleMedium,
+            text = ePub.sectionDisplayName ?: ""
+        )
+        CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
             Text(
-                style = MaterialTheme.typography.subtitle1,
-                text = ePub.sectionDisplayName ?: ""
+                style = MaterialTheme.typography.bodyMedium,
+                text = "${ePub.fileExtension?.toUpperCase(Locale.current) ?: "Unknown file type"} - ${formatByteCount(ePub.fileSize) ?: "Unknown size"}"
             )
-            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-                Text(
-                    style = MaterialTheme.typography.body2,
-                    text = "${ePub.fileExtension?.toUpperCase(Locale.current) ?: "Unknown file type"} - ${formatByteCount(ePub.fileSize) ?: "Unknown size"}"
-                )
-                Text(
-                    style = MaterialTheme.typography.caption,
-                    text = ePub.uploadTime?.let { "Uploaded ${formatDateTime(ePub.uploadTime)}" } ?: "Unknown upload time"
-                )
-            }
-            Row(modifier = Modifier.align(Alignment.End), Arrangement.SpaceBetween) {
-                if (ePub.isDownloaded) {
-                    TextButton(onClick = { actions.onViewClick(ePub) }) {
-                        Text("View", style = MaterialTheme.typography.button)
-                    }
-                    TextButton(onClick = { actions.onDeleteClick(ePub) }) {
-                        Text("Delete", style = MaterialTheme.typography.button)
-                    }
+            Text(
+                style = MaterialTheme.typography.bodySmall,
+                text = ePub.uploadTime?.let { "Uploaded ${formatDateTime(ePub.uploadTime)}" } ?: "Unknown upload time"
+            )
+        }
+        Row(modifier = Modifier.fillMaxWidth(),
+            Arrangement.End
+        ) {
+            if (ePub.isDownloaded) {
+                TextButton(onClick = { actions.onViewClick(ePub) }) {
+                    Text("View", style = MaterialTheme.typography.labelLarge)
                 }
-                else if (ePub.isDownloading) {
-                    val progress = ePub.fileSize?.let {
-                        ePub.downloadedBytes.toDouble() / ePub.fileSize
-                    } ?: -1.0
-                    if (progress > -1) {
-                        LinearProgressIndicator(
-                            progress = progress.toFloat(),
-                            modifier = Modifier.align(Alignment.CenterVertically)
-                        )
-                    }
-                    else {
-                        LinearProgressIndicator(
-                            modifier = Modifier.align(Alignment.CenterVertically)
-                        )
-                    }
-                    TextButton(onClick = { actions.onCancelDownloadClick(ePub) }) {
-                        Text("Cancel", style = MaterialTheme.typography.button)
-                    }
+                TextButton(onClick = { actions.onDeleteClick(ePub) }) {
+                    Text("Delete", style = MaterialTheme.typography.labelLarge)
                 }
-                else {
-                    TextButton(
-                        onClick = { actions.onDownloadClick(ePub) }
-                    ) {
-                        Text("Download", style = MaterialTheme.typography.button)
-                    }
+            } else if (ePub.isDownloading) {
+                val progress = ePub.fileSize?.let {
+                    ePub.downloadedBytes.toDouble() / ePub.fileSize
+                } ?: -1.0
+                if (progress > -1) {
+                    LinearProgressIndicator(
+                        progress = progress.toFloat(),
+                        modifier = Modifier.align(Alignment.CenterVertically)
+                    )
+                } else {
+                    LinearProgressIndicator(
+                        modifier = Modifier.align(Alignment.CenterVertically)
+                    )
+                }
+                TextButton(onClick = { actions.onCancelDownloadClick(ePub) }) {
+                    Text("Cancel", style = MaterialTheme.typography.labelLarge)
+                }
+            } else {
+                TextButton(
+                    onClick = { actions.onDownloadClick(ePub) }
+                ) {
+                    Text("Download", style = MaterialTheme.typography.labelLarge)
                 }
             }
         }
@@ -338,8 +331,8 @@ fun PreviewPublicationSectionsList() {
                 )
             )
         ),
-        formatDateTime = { it.toString() ?: "Unknown upload time" },
-        formatByteCount = { "${it} bytes" },
+        formatDateTime = { it?.toString() ?: "Unknown upload time" },
+        formatByteCount = { "$it bytes" },
         actions = object : PublicationActions {
             override fun onDownloadClick(ePub: ElectronicPublication) {}
             override fun onCancelDownloadClick(ePub: ElectronicPublication) {}
@@ -367,8 +360,9 @@ fun PublicationList(
                 )
                 if (pos < publicationLinks.publications.size - 1) {
                     Divider(
-                        startIndent = 8.dp,
-                        modifier = Modifier.background(MaterialTheme.colors.background)
+                        modifier = Modifier
+                            .padding(start = 16.dp)
+                            .background(MaterialTheme.colorScheme.background)
                     )
                 }
             }
@@ -379,6 +373,7 @@ fun PublicationList(
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun PublicationFolderList(
     folderLinks: PublicationFolders,
@@ -409,7 +404,7 @@ fun PublicationFolderList(
                         )
                         .padding(bottom = 8.dp)
                 )
-                Divider(startIndent = 16.dp)
+                Divider(Modifier.padding(start = 16.dp))
             }
         }
     }
@@ -420,7 +415,7 @@ fun formatByteCountFunction(context: Context): (Long?) -> String? {
     return { count: Long? -> count?.let { formatShortFileSize(context, it) } }
 }
 
-fun formatDateTimeFunction(context: Context): (Instant?) -> String? {
+fun formatDateTimeFunction(): (Instant?) -> String? {
     val formatter = DateTimeFormatter.ofPattern("d MMM yyyy HH:mm z").withZone(ZoneId.systemDefault())
     return { dateTime: Instant? -> dateTime?.let { formatter.format(it) } }
 }
