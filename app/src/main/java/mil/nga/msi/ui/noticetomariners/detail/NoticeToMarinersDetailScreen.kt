@@ -135,14 +135,6 @@ private fun NoticeToMariners(
             .padding(16.dp)
             .verticalScroll(scrollState)
       ) {
-         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceDisabled) {
-            Text(
-               text = "CHARTLETS",
-               style = MaterialTheme.typography.titleMedium,
-               modifier = Modifier.padding(top = 8.dp)
-            )
-         }
-
          NoticeToMarinersCharts(graphics = noticeToMariners?.graphics ?: emptyList()) {
             onGraphicTap(it)
          }
@@ -171,22 +163,35 @@ private fun NoticeToMarinersCharts(
    graphics: List<NoticeToMarinersGraphics>,
    onTap: (NoticeToMarinersGraphic) -> Unit
 ) {
-   graphics.sortedBy { it.graphicType }.windowed(3, 3, true).forEach { window ->
-      Column(Modifier.fillMaxWidth()) {
-         Row {
-            Box(Modifier.weight(.33f)) {
-               window.getOrNull(0)?.let { graphic ->
-                  NoticeToMarinersChart(graphic) { onTap(it) }
-               }
-            }
-            Box(Modifier.weight(.33f)) {
-               window.getOrNull(1)?.let { graphic ->
-                  NoticeToMarinersChart(graphic) { onTap(it) }
-               }
-            }
-            Box(Modifier.weight(.33f)) {
-               window.getOrNull(2)?.let { graphic ->
-                  NoticeToMarinersChart(graphic) { onTap(it) }
+   val group = graphics.groupBy { it.graphicType }.toSortedMap()
+   group.forEach { entry ->
+      if (entry.value.isNotEmpty()) {
+         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceDisabled) {
+            Text(
+               text = entry.key.uppercase(Locale.getDefault()),
+               style = MaterialTheme.typography.titleMedium,
+               modifier = Modifier.padding(top = 8.dp)
+            )
+         }
+
+         entry.value.windowed(3, 3, true).forEach { window ->
+            Column(Modifier.fillMaxWidth()) {
+               Row {
+                  Box(Modifier.weight(.33f)) {
+                     window.getOrNull(0)?.let { graphic ->
+                        NoticeToMarinersChart(graphic) { onTap(it) }
+                     }
+                  }
+                  Box(Modifier.weight(.33f)) {
+                     window.getOrNull(1)?.let { graphic ->
+                        NoticeToMarinersChart(graphic) { onTap(it) }
+                     }
+                  }
+                  Box(Modifier.weight(.33f)) {
+                     window.getOrNull(2)?.let { graphic ->
+                        NoticeToMarinersChart(graphic) { onTap(it) }
+                     }
+                  }
                }
             }
          }

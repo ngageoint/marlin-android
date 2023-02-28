@@ -114,8 +114,8 @@ class NoticeToMarinersGraphicsTypeAdapter: TypeAdapter<List<NoticeToMarinersGrap
 
       `in`.endObject()
 
-      return if (noticeNumber != null && chartNumber != null && fileName != null) {
-         NoticeToMarinersGraphics(noticeNumber, chartNumber, fileName).apply {
+      return if (noticeNumber != null && chartNumber != null && fileName != null && graphicType != null) {
+         NoticeToMarinersGraphics(noticeNumber, chartNumber, fileName, graphicType).apply {
             this.noticeYear = noticeYear
             this.noticeWeek = noticeWeek
             this.priceCategory = priceCategory
