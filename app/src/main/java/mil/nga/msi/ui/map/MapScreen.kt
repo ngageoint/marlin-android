@@ -163,7 +163,7 @@ fun MapScreen(
          val text = location?.let {
             "${String.format("%.5f", it.latitude)}, ${String.format("%.5f", it.longitude)}"
          }
-         Surface(color = MaterialTheme.colorScheme.surface) {
+         Surface(color = MaterialTheme.colorScheme.primary) {
             Row(
                horizontalArrangement = Arrangement.Center,
                modifier = Modifier
