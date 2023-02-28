@@ -3,7 +3,7 @@ package mil.nga.msi.ui.modu.detail
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.GpsFixed
@@ -29,6 +29,7 @@ import mil.nga.msi.ui.map.MapClip
 import mil.nga.msi.ui.modu.ModuAction
 import mil.nga.msi.ui.modu.ModuViewModel
 import mil.nga.msi.ui.navigation.Point
+import mil.nga.msi.ui.theme.onSurfaceDisabled
 import mil.nga.msi.ui.theme.screenBackground
 import java.text.SimpleDateFormat
 import java.util.*
@@ -72,7 +73,7 @@ private fun ModuDetailContent(
 ) {
    if (modu != null) {
       Surface(
-         color = MaterialTheme.colors.screenBackground,
+         color = MaterialTheme.colorScheme.screenBackground,
          modifier = Modifier.fillMaxHeight()
       ) {
          Column(
@@ -107,13 +108,13 @@ private fun ModuHeader(
          )
 
          Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
-            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                modu.date.let { date ->
                   val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
                   Text(
                      text = dateFormat.format(date),
                      fontWeight = FontWeight.SemiBold,
-                     style = MaterialTheme.typography.overline,
+                     style = MaterialTheme.typography.labelSmall,
                      maxLines = 1,
                      overflow = TextOverflow.Ellipsis
                   )
@@ -122,7 +123,7 @@ private fun ModuHeader(
 
             Text(
                text = modu.name,
-               style = MaterialTheme.typography.h6,
+               style = MaterialTheme.typography.titleLarge,
                maxLines = 1,
                overflow = TextOverflow.Ellipsis,
                modifier = Modifier.padding(top = 16.dp)
@@ -170,13 +171,13 @@ private fun ModuActions(
    Row {
       IconButton(onClick = { onShare() }) {
          Icon(Icons.Default.Share,
-            tint = MaterialTheme.colors.primary,
+            tint = MaterialTheme.colorScheme.primary,
             contentDescription = "Share MODU"
          )
       }
       IconButton(onClick = { onZoom() }) {
          Icon(Icons.Default.GpsFixed,
-            tint = MaterialTheme.colors.primary,
+            tint = MaterialTheme.colorScheme.primary,
             contentDescription = "Zoom to MODU"
          )
       }
@@ -187,15 +188,14 @@ private fun ModuActions(
 private fun ModuInformation(
    modu: Modu
 ) {
-   CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
+   CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceDisabled) {
       Text(
          text = "ADDITIONAL INFORMATION",
-         style = MaterialTheme.typography.subtitle1
+         style = MaterialTheme.typography.titleMedium
       )
    }
 
    Card(
-      elevation = 4.dp,
       modifier = Modifier.padding(vertical = 8.dp)
    ) {
       Column(
@@ -221,18 +221,20 @@ private fun ModuProperty(
 ) {
    if (value?.isNotBlank() == true) {
       Column(Modifier.padding(vertical = 8.dp)) {
-         CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
             Text(
                text = title,
-               style = MaterialTheme.typography.body2,
+               style = MaterialTheme.typography.bodyMedium,
                modifier = Modifier.padding(bottom = 4.dp)
             )
          }
 
-         Text(
-            text = value,
-            style = MaterialTheme.typography.body1
-         )
+         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
+            Text(
+               text = value,
+               style = MaterialTheme.typography.bodyLarge
+            )
+         }
       }
    }
 }

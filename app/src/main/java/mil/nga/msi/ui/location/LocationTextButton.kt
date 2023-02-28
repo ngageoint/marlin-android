@@ -1,9 +1,10 @@
 package mil.nga.msi.ui.location
 
 import androidx.compose.foundation.clickable
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.TextButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ClipboardManager
@@ -21,7 +22,7 @@ fun LocationText(
 
    Text(
       text = dms.format(),
-      color = MaterialTheme.colors.primary,
+      color = MaterialTheme.colorScheme.primary,
       modifier = Modifier.clickable {
          clipboardManager.setText(AnnotatedString.Builder(text).toAnnotatedString())
          onCopiedToClipboard(text)
@@ -38,6 +39,9 @@ fun LocationTextButton(
    val clipboardManager: ClipboardManager = LocalClipboardManager.current
 
    TextButton(
+      colors = ButtonDefaults.textButtonColors(
+         contentColor = MaterialTheme.colorScheme.primary
+      ),
       onClick = {
          clipboardManager.setText(AnnotatedString(text))
          onCopiedToClipboard(text)

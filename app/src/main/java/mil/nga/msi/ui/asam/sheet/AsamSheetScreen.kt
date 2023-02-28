@@ -3,7 +3,7 @@ package mil.nga.msi.ui.asam.sheet
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -25,8 +25,8 @@ import java.util.*
 @Composable
 fun AsamSheetScreen(
    reference: String,
-   onDetails: (() -> Unit)? = null,
    modifier: Modifier = Modifier,
+   onDetails: (() -> Unit)? = null,
    viewModel: AsamViewModel = hiltViewModel()
 ) {
    val asam by viewModel.getAsam(reference).observeAsState()
@@ -63,13 +63,13 @@ private fun AsamContent(
       }
 
       Column(Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
-         CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
             asam.date.let { date ->
                val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
                Text(
                   text = dateFormat.format(date),
                   fontWeight = FontWeight.SemiBold,
-                  style = MaterialTheme.typography.overline,
+                  style = MaterialTheme.typography.labelSmall,
                   maxLines = 1,
                   overflow = TextOverflow.Ellipsis
                )
@@ -80,7 +80,7 @@ private fun AsamContent(
          if (header.isNotEmpty()) {
             Text(
                text = header.joinToString(": "),
-               style = MaterialTheme.typography.h6,
+               style = MaterialTheme.typography.titleLarge,
                maxLines = 1,
                overflow = TextOverflow.Ellipsis,
                modifier = Modifier.padding(top = 16.dp)
@@ -88,13 +88,13 @@ private fun AsamContent(
          }
 
 
-         CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
             asam.description?.let {
                Text(
                   text = it,
                   maxLines = 5,
                   overflow = TextOverflow.Ellipsis,
-                  style = MaterialTheme.typography.body2,
+                  style = MaterialTheme.typography.bodyMedium,
                   modifier = Modifier.padding(top = 8.dp)
                )
             }

@@ -88,8 +88,6 @@ fun NavGraphBuilder.homeGraph(
    electronicPublicationGraph(
       navController = navController,
       bottomBarVisibility = { bottomBarVisibility(it) },
-      share = { share(it) },
-      showSnackbar = { showSnackbar(it) },
       openNavigationDrawer = openNavigationDrawer
    )
    reportGraph(

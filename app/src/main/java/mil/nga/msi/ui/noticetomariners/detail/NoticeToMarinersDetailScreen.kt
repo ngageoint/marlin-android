@@ -6,7 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
@@ -25,6 +25,7 @@ import mil.nga.msi.datasource.noticetomariners.NoticeToMarinersGraphics
 import mil.nga.msi.repository.noticetomariners.NoticeToMarinersGraphic
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.noticetomariners.NoticeToMarinersRoute
+import mil.nga.msi.ui.theme.onSurfaceDisabled
 import mil.nga.msi.ui.theme.screenBackground
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -125,7 +126,7 @@ private fun NoticeToMariners(
    val scrollState = rememberScrollState()
 
    Surface(
-      color = MaterialTheme.colors.screenBackground,
+      color = MaterialTheme.colorScheme.screenBackground,
       modifier = Modifier.fillMaxHeight()
    ) {
       Column(
@@ -134,22 +135,14 @@ private fun NoticeToMariners(
             .padding(16.dp)
             .verticalScroll(scrollState)
       ) {
-         CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
-            Text(
-               text = "CHARTLETS",
-               style = MaterialTheme.typography.subtitle1,
-               modifier = Modifier.padding(top = 8.dp)
-            )
-         }
-
          NoticeToMarinersCharts(graphics = noticeToMariners?.graphics ?: emptyList()) {
             onGraphicTap(it)
          }
 
-         CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
+         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceDisabled) {
             Text(
                text = "FILES",
-               style = MaterialTheme.typography.subtitle1,
+               style = MaterialTheme.typography.titleMedium,
                modifier = Modifier.padding(top = 8.dp)
             )
          }
@@ -170,22 +163,35 @@ private fun NoticeToMarinersCharts(
    graphics: List<NoticeToMarinersGraphics>,
    onTap: (NoticeToMarinersGraphic) -> Unit
 ) {
-   graphics.sortedBy { it.graphicType }.windowed(3, 3, true).forEach { window ->
-      Column(Modifier.fillMaxWidth()) {
-         Row {
-            Box(Modifier.weight(.33f)) {
-               window.getOrNull(0)?.let { graphic ->
-                  NoticeToMarinersChart(graphic) { onTap(it) }
-               }
-            }
-            Box(Modifier.weight(.33f)) {
-               window.getOrNull(1)?.let { graphic ->
-                  NoticeToMarinersChart(graphic) { onTap(it) }
-               }
-            }
-            Box(Modifier.weight(.33f)) {
-               window.getOrNull(2)?.let { graphic ->
-                  NoticeToMarinersChart(graphic) { onTap(it) }
+   val group = graphics.groupBy { it.graphicType }.toSortedMap()
+   group.forEach { entry ->
+      if (entry.value.isNotEmpty()) {
+         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceDisabled) {
+            Text(
+               text = entry.key.uppercase(Locale.getDefault()),
+               style = MaterialTheme.typography.titleMedium,
+               modifier = Modifier.padding(top = 8.dp)
+            )
+         }
+
+         entry.value.windowed(3, 3, true).forEach { window ->
+            Column(Modifier.fillMaxWidth()) {
+               Row {
+                  Box(Modifier.weight(.33f)) {
+                     window.getOrNull(0)?.let { graphic ->
+                        NoticeToMarinersChart(graphic) { onTap(it) }
+                     }
+                  }
+                  Box(Modifier.weight(.33f)) {
+                     window.getOrNull(1)?.let { graphic ->
+                        NoticeToMarinersChart(graphic) { onTap(it) }
+                     }
+                  }
+                  Box(Modifier.weight(.33f)) {
+                     window.getOrNull(2)?.let { graphic ->
+                        NoticeToMarinersChart(graphic) { onTap(it) }
+                     }
+                  }
                }
             }
          }
@@ -218,10 +224,10 @@ private fun NoticeToMarinersChart(
          )
       }
 
-      CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
+      CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceDisabled) {
          Text(
             text = graphic.title,
-            style = MaterialTheme.typography.subtitle2,
+            style = MaterialTheme.typography.titleSmall,
             fontWeight = FontWeight.SemiBold
          )
       }
@@ -244,7 +250,6 @@ private fun NoticeToMarinersPublications(
    Column {
       state?.publication?.forEach { publication ->
          Card(
-            elevation = 4.dp,
             modifier = Modifier.padding(vertical = 8.dp)
          ) {
             Column(
@@ -255,24 +260,24 @@ private fun NoticeToMarinersPublications(
                val extension = publication.notice.filename.substringAfterLast('.').uppercase()
                Text(
                   text = "${publication.notice.title} ${if (publication.notice.isFullPublication == true) extension else ""}",
-                  style = MaterialTheme.typography.subtitle1,
+                  style = MaterialTheme.typography.titleMedium,
                   modifier = Modifier.padding(vertical = 4.dp)
                )
 
                publication.notice.fileSize?.toLong()?.let { fileSize ->
-                  CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                  CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                      Text(
                         text = "File Size: ${Formatter.formatFileSize(LocalContext.current, fileSize)}",
-                        style = MaterialTheme.typography.body1,
+                        style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier.padding(vertical = 4.dp)
                      )
                   }
                }
 
-               CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
+               CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceDisabled) {
                   Text(
                      text = "Upload Time: ${dateFormatter.format(publication.notice.uploadTime)}",
-                     style = MaterialTheme.typography.body2,
+                     style = MaterialTheme.typography.bodyMedium,
                      fontWeight = FontWeight.SemiBold,
                      modifier = Modifier.padding(bottom = 8.dp)
                   )

@@ -5,7 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
@@ -68,14 +68,14 @@ fun LightsScreen(
                      modifier = Modifier
                         .clip(CircleShape)
                         .height(24.dp)
-                        .background(MaterialTheme.colors.secondary)
+                        .background(MaterialTheme.colorScheme.secondary)
                         .align(Alignment.TopEnd)
                   ) {
                      Text(
                         text = "${filters.size}",
-                        style = MaterialTheme.typography.body2,
+                        style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier.padding(horizontal = 8.dp),
-                        color = MaterialTheme.colors.onPrimary
+                        color = MaterialTheme.colorScheme.onPrimary
                      )
                   }
                }
@@ -110,7 +110,7 @@ private fun Lights(
    val lazyItems = pagingState.collectAsLazyPagingItems()
 
    Surface(
-      color = MaterialTheme.colors.screenBackground,
+      color = MaterialTheme.colorScheme.screenBackground,
       modifier = Modifier.fillMaxHeight()
    ) {
 
@@ -125,7 +125,7 @@ private fun Lights(
                   Text(
                      text = item.header,
                      fontWeight = FontWeight.Medium,
-                     style = MaterialTheme.typography.caption,
+                     style = MaterialTheme.typography.bodySmall,
                      modifier = Modifier.padding(vertical = 8.dp)
                   )
                }
@@ -176,11 +176,11 @@ private fun LightContent(
    onCopyLocation: (String) -> Unit
 ) {
    Column(Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
-      CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+      CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
          Text(
             text = "${light.featureNumber} ${light.internationalFeature ?: ""} ${light.volumeNumber}",
             fontWeight = FontWeight.SemiBold,
-            style = MaterialTheme.typography.overline,
+            style = MaterialTheme.typography.labelSmall,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
          )
@@ -189,18 +189,18 @@ private fun LightContent(
       light.name?.let { name ->
          Text(
             text = name,
-            style = MaterialTheme.typography.h6,
+            style = MaterialTheme.typography.titleLarge,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.padding(top = 16.dp)
          )
       }
 
-      CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+      CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
          light.structure?.let { structure ->
             Text(
                text = structure,
-               style = MaterialTheme.typography.body2,
+               style = MaterialTheme.typography.bodyMedium,
                modifier = Modifier.padding(top = 4.dp)
             )
          }
@@ -255,13 +255,13 @@ private fun LightActions(
          onClick = { onShare() }
       ) {
          Icon(Icons.Default.Share,
-            tint = MaterialTheme.colors.primary,
+            tint = MaterialTheme.colorScheme.primary,
             contentDescription = "Share Light"
          )
       }
       IconButton(onClick = { onZoom() }) {
          Icon(Icons.Default.GpsFixed,
-            tint = MaterialTheme.colors.primary,
+            tint = MaterialTheme.colorScheme.primary,
             contentDescription = "Zoom to Light"
          )
       }

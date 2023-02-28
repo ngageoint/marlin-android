@@ -1,11 +1,8 @@
 package mil.nga.msi.ui.asam.list
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
@@ -15,7 +12,6 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -35,7 +31,9 @@ import mil.nga.msi.ui.navigation.Point
 import mil.nga.msi.ui.theme.screenBackground
 import java.text.SimpleDateFormat
 import java.util.*
+import androidx.compose.material3.*
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AsamsScreen(
    openDrawer: () -> Unit,
@@ -58,27 +56,26 @@ fun AsamsScreen(
                Icon(Icons.Default.SwapVert, contentDescription = "Sort ASAMs")
             }
 
-            Box {
-               IconButton(onClick = { openFilter() } ) {
-                  Icon(Icons.Default.FilterList, contentDescription = "Filter ASAMs")
-               }
-
-               if (filters.isNotEmpty()) {
-                  Box(
-                     contentAlignment = Alignment.Center,
-                     modifier = Modifier
-                        .clip(CircleShape)
-                        .height(24.dp)
-                        .background(MaterialTheme.colors.secondary)
-                        .align(Alignment.TopEnd)
-                  ) {
-                     Text(
-                        text = "${filters.size}",
-                        style = MaterialTheme.typography.body2,
-                        modifier = Modifier.padding(horizontal = 8.dp),
-                        color = MaterialTheme.colors.onPrimary
-                     )
+            BadgedBox(
+               badge = {
+                  if (filters.isNotEmpty()) {
+                     Badge(
+                        containerColor = MaterialTheme.colorScheme.secondary,
+                        modifier = Modifier.offset(x = (-12).dp, y = 12.dp)
+                     ) {
+                        Text("${filters.size}")
+                     }
                   }
+               },
+               modifier = Modifier.padding(end = 16.dp)
+            ) {
+               IconButton(
+                  onClick = { openFilter() }
+               ) {
+                  Icon(
+                     Icons.Default.FilterList,
+                     contentDescription = "Filter ASAMs"
+                  )
                }
             }
          }
@@ -111,7 +108,7 @@ private fun Asams(
    val lazyItems = pagingState.collectAsLazyPagingItems()
 
    Surface(
-      color = MaterialTheme.colors.screenBackground,
+      color = MaterialTheme.colorScheme.screenBackground,
       modifier = Modifier.fillMaxHeight()
    ) {
       LazyColumn(
@@ -133,7 +130,7 @@ private fun Asams(
                   Text(
                      text = item.header,
                      fontWeight = FontWeight.Medium,
-                     style = MaterialTheme.typography.caption,
+                     style = MaterialTheme.typography.labelSmall,
                      modifier = Modifier.padding(vertical = 8.dp)
                   )
                }
@@ -170,13 +167,13 @@ private fun AsamContent(
    onCopyLocation: (String) -> Unit
 ) {
    Column(Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
-      CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+      CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
          asam.date.let { date ->
             val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
             Text(
                text = dateFormat.format(date),
                fontWeight = FontWeight.SemiBold,
-               style = MaterialTheme.typography.overline,
+               style = MaterialTheme.typography.labelSmall,
                maxLines = 1,
                overflow = TextOverflow.Ellipsis
             )
@@ -186,17 +183,17 @@ private fun AsamContent(
       val header = listOfNotNull(asam.hostility, asam.victim).joinToString(": ")
       Text(
          text = header,
-         style = MaterialTheme.typography.h6,
+         style = MaterialTheme.typography.titleLarge,
          maxLines = 1,
          overflow = TextOverflow.Ellipsis,
          modifier = Modifier.padding(top = 16.dp)
       )
 
-      CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+      CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
          asam.description?.let {
             Text(
                text = it,
-               style = MaterialTheme.typography.body2,
+               style = MaterialTheme.typography.bodyMedium,
                modifier = Modifier.padding(top = 4.dp)
             )
          }
@@ -251,13 +248,13 @@ private fun AsamActions(
          onClick = { onShare() }
       ) {
          Icon(Icons.Default.Share,
-            tint = MaterialTheme.colors.primary,
+            tint = MaterialTheme.colorScheme.primary,
             contentDescription = "Share ASAM"
          )
       }
       IconButton(onClick = { onZoom() }) {
          Icon(Icons.Default.GpsFixed,
-            tint = MaterialTheme.colors.primary,
+            tint = MaterialTheme.colorScheme.primary,
             contentDescription = "Zoom to ASAM"
          )
       }

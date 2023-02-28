@@ -11,7 +11,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.*
+import androidx.compose.material.LocalContentAlpha
+import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
@@ -156,7 +157,7 @@ private fun Filters(
             ) {
                Icon(
                   imageVector = Icons.Filled.RemoveCircle,
-                  tint = MaterialTheme.colors.remove,
+                  tint = MaterialTheme.colorScheme.remove,
                   contentDescription = "Remove Filter",
                )
             }
@@ -325,7 +326,7 @@ private fun FilterHeader(
       ) {
          Icon(
             imageVector = Icons.Filled.AddCircle,
-            tint = MaterialTheme.colors.add,
+            tint = MaterialTheme.colorScheme.add,
             contentDescription = "Add Filter",
          )
       }
@@ -349,12 +350,12 @@ private fun ParameterSelection(
       ) {
          Text(
             text = selectedParameter.title,
-            style = MaterialTheme.typography.subtitle1,
-            color = MaterialTheme.colors.primary
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.primary
          )
          Icon(
             imageVector = Icons.Default.ExpandMore,
-            tint = MaterialTheme.colors.primary,
+            tint = MaterialTheme.colorScheme.primary,
             contentDescription = "Parameters"
          )
       }
@@ -368,26 +369,27 @@ private fun ParameterSelection(
                onClick = {
                   onSelectParameter(parameter)
                   expanded = false
-               }
-            ) {
-               Row(
-                  verticalAlignment = Alignment.CenterVertically
-               ) {
-                  if (selectedParameter == parameter) {
-                     Icon(
-                        imageVector = Icons.Default.Check,
-                        contentDescription = "Selected Parameter"
+               },
+               text = {
+                  Row(
+                     verticalAlignment = Alignment.CenterVertically
+                  ) {
+                     if (selectedParameter == parameter) {
+                        Icon(
+                           imageVector = Icons.Default.Check,
+                           contentDescription = "Selected Parameter"
+                        )
+                     } else {
+                        Spacer(modifier = Modifier.size(24.dp))
+                     }
+
+                     Text(
+                        text = parameter.title,
+                        modifier = Modifier.padding(start = 8.dp)
                      )
-                  } else {
-                     Spacer(modifier = Modifier.size(24.dp))
                   }
 
-                  Text(
-                     text = parameter.title,
-                     modifier = Modifier.padding(start = 8.dp)
-                  )
-               }
-            }
+               })
          }
       }
    }
@@ -410,12 +412,12 @@ fun ComparatorSelection(
       ) {
          Text(
             text = selectedComparator.title,
-            style = MaterialTheme.typography.subtitle1,
-            color = MaterialTheme.colors.primary
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.primary
          )
          Icon(
             imageVector = Icons.Default.ExpandMore,
-            tint = MaterialTheme.colors.primary,
+            tint = MaterialTheme.colorScheme.primary,
             contentDescription = "Parameters"
          )
       }
@@ -429,24 +431,25 @@ fun ComparatorSelection(
                onClick = {
                   onSelectComparator(comparator)
                   expanded = false
-               }
-            ) {
-               Row {
-                  if (selectedComparator == comparator) {
-                     Icon(
-                        imageVector = Icons.Default.Check,
-                        contentDescription = "Selected Parameter"
-                     )
-                  } else {
-                     Spacer(modifier = Modifier.size(24.dp))
-                  }
+               },
+               text = {
+                  Row {
+                     if (selectedComparator == comparator) {
+                        Icon(
+                           imageVector = Icons.Default.Check,
+                           contentDescription = "Selected Parameter"
+                        )
+                     } else {
+                        Spacer(modifier = Modifier.size(24.dp))
+                     }
 
-                  Text(
-                     text = comparator.title,
-                     modifier = Modifier.padding(start = 8.dp)
-                  )
+                     Text(
+                        text = comparator.title,
+                        modifier = Modifier.padding(start = 8.dp)
+                     )
+                  }
                }
-            }
+            )
          }
       }
    }
@@ -484,12 +487,12 @@ private fun ValueSelection(
          ) {
             Text(
                text = (value as EnumerationType).title,
-               style = MaterialTheme.typography.subtitle1,
-               color = MaterialTheme.colors.primary
+               style = MaterialTheme.typography.titleMedium,
+               color = MaterialTheme.colorScheme.primary
             )
             Icon(
                imageVector = Icons.Default.ExpandMore,
-               tint = MaterialTheme.colors.primary,
+               tint = MaterialTheme.colorScheme.primary,
                contentDescription = "Select new enumeration"
             )
          }
@@ -503,24 +506,25 @@ private fun ValueSelection(
                   onClick = {
                      onValueChanged(enumeration)
                      expanded = false
-                  }
-               ) {
-                  Row {
-                     if (value == enumeration) {
-                        Icon(
-                           imageVector = Icons.Default.Check,
-                           contentDescription = "Selected Enumeration"
-                        )
-                     } else {
-                        Spacer(modifier = Modifier.size(24.dp))
-                     }
+                  },
+                  text = {
+                     Row {
+                        if (value == enumeration) {
+                           Icon(
+                              imageVector = Icons.Default.Check,
+                              contentDescription = "Selected Enumeration"
+                           )
+                        } else {
+                           Spacer(modifier = Modifier.size(24.dp))
+                        }
 
-                     Text(
-                        text = enumeration.title,
-                        modifier = Modifier.padding(start = 8.dp)
-                     )
+                        Text(
+                           text = enumeration.title,
+                           modifier = Modifier.padding(start = 8.dp)
+                        )
+                     }
                   }
-               }
+               )
             }
          }
       }
@@ -553,6 +557,7 @@ private fun ValueSelection(
    }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DateValue(
    comparator: ComparatorType,
@@ -571,12 +576,12 @@ private fun DateValue(
          ) {
             Text(
                text = value?.toString() ?: "",
-               style = MaterialTheme.typography.subtitle1,
-               color = MaterialTheme.colors.primary
+               style = MaterialTheme.typography.titleMedium,
+               color = MaterialTheme.colorScheme.primary
             )
             Icon(
                imageVector = Icons.Default.ExpandMore,
-               tint = MaterialTheme.colors.primary,
+               tint = MaterialTheme.colorScheme.primary,
                contentDescription = "Date Value"
             )
          }
@@ -590,24 +595,25 @@ private fun DateValue(
                   onClick = {
                      onSelectValue(comparator)
                      expanded = false
-                  }
-               ) {
-                  Row {
-                     if (value == comparator) {
-                        Icon(
-                           imageVector = Icons.Default.Check,
-                           contentDescription = "Selected Date"
-                        )
-                     } else {
-                        Spacer(modifier = Modifier.size(24.dp))
-                     }
+                  },
+                  text = {
+                     Row {
+                        if (value == comparator) {
+                           Icon(
+                              imageVector = Icons.Default.Check,
+                              contentDescription = "Selected Date"
+                           )
+                        } else {
+                           Spacer(modifier = Modifier.size(24.dp))
+                        }
 
-                     Text(
-                        text = comparator,
-                        modifier = Modifier.padding(start = 8.dp)
-                     )
+                        Text(
+                           text = comparator,
+                           modifier = Modifier.padding(start = 8.dp)
+                        )
+                     }
                   }
-               }
+               )
             }
          }
       }
@@ -628,7 +634,7 @@ private fun DateValue(
             onValueChange = { },
             enabled = false,
             colors = TextFieldDefaults.textFieldColors(
-               disabledTrailingIconColor = MaterialTheme.colors.onSurface.copy(alpha = TextFieldDefaults.IconOpacity),
+               disabledTrailingIconColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
                disabledTextColor = LocalContentColor.current.copy(LocalContentAlpha.current)
             ),
             modifier = Modifier
@@ -642,6 +648,7 @@ private fun DateValue(
    }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DoubleValue(
    value: String,
@@ -659,6 +666,7 @@ fun DoubleValue(
    }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun IntValue(
    value: String,
@@ -676,7 +684,7 @@ fun IntValue(
    }
 }
 
-@OptIn(ExperimentalPermissionsApi::class)
+@OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun LocationValue(
    location: Location?,
@@ -802,6 +810,7 @@ fun LocationValue(
    }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun StringValue(
    value: String,

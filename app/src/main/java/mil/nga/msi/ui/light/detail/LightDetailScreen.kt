@@ -7,7 +7,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.GpsFixed
@@ -43,6 +43,7 @@ import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.BaseMapType
 import mil.nga.msi.ui.map.MapClip
 import mil.nga.msi.ui.navigation.Point
+import mil.nga.msi.ui.theme.onSurfaceDisabled
 import mil.nga.msi.ui.theme.screenBackground
 
 @Composable
@@ -83,7 +84,7 @@ private fun LightDetailContent(
 ) {
    if (lights.isNotEmpty()) {
       Surface(
-         color = MaterialTheme.colors.screenBackground,
+         color = MaterialTheme.colorScheme.screenBackground,
          modifier = Modifier.fillMaxHeight()
       ) {
          Column(
@@ -116,11 +117,11 @@ private fun LightHeader(
          )
 
          Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
-            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                Text(
                   text = "${light.featureNumber} ${light.internationalFeature ?: ""} ${light.volumeNumber}",
                   fontWeight = FontWeight.SemiBold,
-                  style = MaterialTheme.typography.overline,
+                  style = MaterialTheme.typography.labelSmall,
                   maxLines = 1,
                   overflow = TextOverflow.Ellipsis
                )
@@ -129,24 +130,24 @@ private fun LightHeader(
             light.name?.let { name ->
                Text(
                   text = name,
-                  style = MaterialTheme.typography.h6,
+                  style = MaterialTheme.typography.titleLarge,
                   maxLines = 1,
                   overflow = TextOverflow.Ellipsis,
                   modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
                )
             }
 
-            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                Text(
                   text = light.sectionHeader,
-                  style = MaterialTheme.typography.body2,
+                  style = MaterialTheme.typography.bodyMedium,
                   modifier = Modifier.padding(top = 4.dp)
                )
 
                light.structure?.let { structure ->
                   Text(
                      text = structure,
-                     style = MaterialTheme.typography.body2,
+                     style = MaterialTheme.typography.bodyMedium,
                      modifier = Modifier.padding(top = 4.dp)
                   )
                }
@@ -155,7 +156,7 @@ private fun LightHeader(
                if (height.isNotEmpty()) {
                   Text(
                      text = "Focal Plane Elevation: ${height.first()}ft ${if (height.size > 1) "${height.last()}m" else ""}",
-                     style = MaterialTheme.typography.body2,
+                     style = MaterialTheme.typography.bodyMedium,
                      modifier = Modifier.padding(top = 8.dp)
                   )
                }
@@ -207,13 +208,13 @@ private fun LightActions(
    Row {
       IconButton(onClick = { onShare() }) {
          Icon(Icons.Default.Share,
-            tint = MaterialTheme.colors.primary,
+            tint = MaterialTheme.colorScheme.primary,
             contentDescription = "Share ASAM"
          )
       }
       IconButton(onClick = { onZoom() }) {
          Icon(Icons.Default.GpsFixed,
-            tint = MaterialTheme.colors.primary,
+            tint = MaterialTheme.colorScheme.primary,
             contentDescription = "Zoom to ASAM"
          )
       }
@@ -226,10 +227,10 @@ private fun LightCharacteristics(
    lights: List<Light>
 ) {
    if (lights.isNotEmpty()) {
-      CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
+      CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceDisabled) {
          Text(
             text = "CHARACTERISTICS",
-            style = MaterialTheme.typography.subtitle1,
+            style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
          )
       }
@@ -259,7 +260,7 @@ private fun RaconDetail(
          light.name?.let { name ->
             Text(
                text = name,
-               style = MaterialTheme.typography.h6,
+               style = MaterialTheme.typography.titleLarge,
                maxLines = 1,
                overflow = TextOverflow.Ellipsis,
                modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
@@ -276,7 +277,7 @@ private fun RaconDetail(
                Column {
                   Text(
                      text = "Signal",
-                     style = MaterialTheme.typography.body1,
+                     style = MaterialTheme.typography.bodyLarge,
                      modifier = Modifier.padding(bottom = 8.dp)
                   )
 
@@ -285,10 +286,10 @@ private fun RaconDetail(
                      modifier = Modifier.padding(bottom = 8.dp)
                   )
 
-                  CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
+                  CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                      Text(
                         text = light.characteristic?.trim() ?: "",
-                        style = MaterialTheme.typography.body2
+                        style = MaterialTheme.typography.bodyMedium
                      )
                   }
                }
@@ -298,13 +299,13 @@ private fun RaconDetail(
                Column {
                   Text(
                      text = "Remarks",
-                     style = MaterialTheme.typography.body1
+                     style = MaterialTheme.typography.bodyLarge
                   )
 
-                  CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
+                  CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                      Text(
                         text = remarks,
-                        style = MaterialTheme.typography.body2
+                        style = MaterialTheme.typography.bodyMedium
                      )
                   }
                }
@@ -327,7 +328,7 @@ private fun MorseCode(
                   .padding(end = 8.dp)
                   .height(5.dp)
                   .width(if (letter == "-") 24.dp else 8.dp)
-                  .background(MaterialTheme.colors.onSurface)
+                  .background(MaterialTheme.colorScheme.onSurface)
             )
          }
       }
@@ -356,18 +357,18 @@ private fun LightDetail(
                light.name?.let { name ->
                   Text(
                      text = name,
-                     style = MaterialTheme.typography.h6,
+                     style = MaterialTheme.typography.titleLarge,
                      maxLines = 1,
                      overflow = TextOverflow.Ellipsis,
                      modifier = Modifier.padding(bottom = 8.dp)
                   )
                }
 
-               CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
+               CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                   light.expandedCharacteristic()?.let { characteristic ->
                      Text(
                         text = characteristic,
-                        style = MaterialTheme.typography.body2
+                        style = MaterialTheme.typography.bodyMedium
                      )
                   }
                }
@@ -389,31 +390,31 @@ private fun LightDetail(
                .padding(bottom = 8.dp)
          ) {
             Column {
-               CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+               CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                   Text(
                      text = "Range (nm)",
-                     style = MaterialTheme.typography.body2
+                     style = MaterialTheme.typography.bodyMedium
                   )
                }
 
                Text(
                   text = light.range ?: "",
-                  style = MaterialTheme.typography.body1
+                  style = MaterialTheme.typography.bodyLarge
                )
             }
 
             light.remarks?.trim()?.let { remarks ->
                Column {
-                  CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                  CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                      Text(
                         text = "Remarks",
-                        style = MaterialTheme.typography.body2
+                        style = MaterialTheme.typography.bodyMedium
                      )
                   }
 
                   Text(
                      text = remarks,
-                     style = MaterialTheme.typography.body1
+                     style = MaterialTheme.typography.bodyLarge
                   )
                }
             }

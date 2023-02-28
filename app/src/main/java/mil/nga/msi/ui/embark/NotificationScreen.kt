@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.NotificationsActive
 import androidx.compose.runtime.*
@@ -65,7 +65,7 @@ private fun Notification(
       done()
    }
 
-   Surface(color = MaterialTheme.colors.primary) {
+   Surface(color = MaterialTheme.colorScheme.primary) {
       Column(
          Modifier
             .fillMaxSize()
@@ -74,8 +74,8 @@ private fun Notification(
                brush = Brush.verticalGradient(
                   startY = height * .37f,
                   colors = listOf(
-                     MaterialTheme.colors.primary,
-                     MaterialTheme.colors.secondary
+                     MaterialTheme.colorScheme.primary,
+                     MaterialTheme.colorScheme.secondary
                   )
                )
             )
@@ -86,8 +86,8 @@ private fun Notification(
       ) {
          Text(
             text = "Allow Notifications",
-            color = MaterialTheme.colors.onPrimary,
-            style = MaterialTheme.typography.h4,
+            color = MaterialTheme.colorScheme.onPrimary,
+            style = MaterialTheme.typography.headlineMedium,
             modifier =
             Modifier
                .align(Alignment.CenterHorizontally)
@@ -96,8 +96,8 @@ private fun Notification(
 
          Text(
             text = "Would you like to receive alerts when new data is available",
-            color = MaterialTheme.colors.onPrimary,
-            style = MaterialTheme.typography.subtitle1,
+            color = MaterialTheme.colorScheme.onPrimary,
+            style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.align(Alignment.CenterHorizontally)
          )
 
@@ -130,7 +130,7 @@ private fun Notification(
          ) {
             Text(
                text = "Yes, Enable Notifications",
-               style = MaterialTheme.typography.subtitle1,
+               style = MaterialTheme.typography.titleMedium,
                fontSize = 18.sp,
                modifier = Modifier.padding(8.dp)
             )
@@ -142,9 +142,9 @@ private fun Notification(
          ) {
             Text(
                text = "Not Now",
-               style = MaterialTheme.typography.subtitle1,
+               style = MaterialTheme.typography.titleMedium,
                fontSize = 18.sp,
-               color = MaterialTheme.colors.onPrimary
+               color = MaterialTheme.colorScheme.onPrimary
             )
          }
       }

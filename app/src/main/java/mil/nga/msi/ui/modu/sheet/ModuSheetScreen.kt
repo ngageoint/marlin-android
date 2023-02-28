@@ -3,7 +3,7 @@ package mil.nga.msi.ui.modu.sheet
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -25,8 +25,8 @@ import java.util.*
 @Composable
 fun ModuSheetScreen(
    id: String,
-   onDetails: (() -> Unit)? = null,
    modifier: Modifier = Modifier,
+   onDetails: (() -> Unit)? = null,
    viewModel: ModuViewModel = hiltViewModel()
 ) {
    val modu by viewModel.getModu(id).observeAsState()
@@ -63,13 +63,13 @@ private fun ModuContent(
       }
 
       Column(Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
-         CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
             modu.date.let { date ->
                val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
                Text(
                   text = dateFormat.format(date),
                   fontWeight = FontWeight.SemiBold,
-                  style = MaterialTheme.typography.overline,
+                  style = MaterialTheme.typography.labelSmall,
                   maxLines = 1,
                   overflow = TextOverflow.Ellipsis
                )
@@ -78,24 +78,24 @@ private fun ModuContent(
 
          Text(
             text = modu.name,
-            style = MaterialTheme.typography.h6,
+            style = MaterialTheme.typography.titleLarge,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.padding(top = 16.dp)
          )
 
-         CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
             modu.rigStatus?.let {
                Text(
                   text = it.name,
-                  style = MaterialTheme.typography.body2,
+                  style = MaterialTheme.typography.bodyMedium,
                   modifier = Modifier.padding(top = 4.dp)
                )
             }
             modu.specialStatus?.let {
                Text(
                   text = it,
-                  style = MaterialTheme.typography.body2
+                  style = MaterialTheme.typography.bodyMedium
                )
             }
          }

@@ -4,7 +4,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -63,11 +63,11 @@ private fun RadioBeaconContent(
       }
 
       Column(Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
-         CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
             Text(
                text = "${beacon.featureNumber} ${beacon.volumeNumber}",
                fontWeight = FontWeight.SemiBold,
-               style = MaterialTheme.typography.overline,
+               style = MaterialTheme.typography.labelSmall,
                maxLines = 1,
                overflow = TextOverflow.Ellipsis
             )
@@ -76,24 +76,24 @@ private fun RadioBeaconContent(
          beacon.name?.let { name ->
             Text(
                text = name,
-               style = MaterialTheme.typography.h6,
+               style = MaterialTheme.typography.titleLarge,
                maxLines = 1,
                overflow = TextOverflow.Ellipsis,
                modifier = Modifier.padding(top = 16.dp, bottom = 0.dp)
             )
          }
 
-         CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
             Text(
                text = beacon.sectionHeader,
-               style = MaterialTheme.typography.body2
+               style = MaterialTheme.typography.bodyMedium
             )
          }
 
          beacon.morseCode()?.let { code ->
             Text(
                text = beacon.morseLetter(),
-               style = MaterialTheme.typography.h6,
+               style = MaterialTheme.typography.titleLarge,
                modifier = Modifier.padding(top = 4.dp)
             )
 
@@ -106,16 +106,16 @@ private fun RadioBeaconContent(
          beacon.expandedCharacteristicWithoutCode()?.let {
             Text(
                text = it,
-               style = MaterialTheme.typography.body2,
+               style = MaterialTheme.typography.bodyMedium,
                modifier = Modifier.padding(top = 0.dp)
             )
          }
 
-         CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
             beacon.stationRemark?.let { stationRemark ->
                Text(
                   text = stationRemark,
-                  style = MaterialTheme.typography.body2,
+                  style = MaterialTheme.typography.bodyMedium,
                   modifier = Modifier.padding(top = 8.dp)
                )
             }
@@ -143,7 +143,7 @@ private fun MorseCode(
                   .padding(end = 8.dp)
                   .height(5.dp)
                   .width(if (letter == "-") 24.dp else 8.dp)
-                  .background(MaterialTheme.colors.onSurface)
+                  .background(MaterialTheme.colorScheme.onSurface)
             )
          }
       }

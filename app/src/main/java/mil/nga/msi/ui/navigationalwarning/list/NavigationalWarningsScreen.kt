@@ -8,7 +8,7 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowUpward
@@ -103,7 +103,7 @@ private fun NavigationalWarnings(
    }
 
    Surface(
-      color = MaterialTheme.colors.screenBackground
+      color = MaterialTheme.colorScheme.screenBackground
    ) {
       Box {
          LazyColumn(
@@ -143,7 +143,7 @@ private fun NavigationalWarnings(
                   modifier = Modifier
                      .height(40.dp)
                      .clip(RoundedCornerShape(20.dp))
-                     .background(MaterialTheme.colors.primary)
+                     .background(MaterialTheme.colorScheme.primary)
                      .clickable {
                         scope.launch {
                            listState.animateScrollToItem(0)
@@ -153,7 +153,7 @@ private fun NavigationalWarnings(
                ) {
                   Icon(Icons.Default.ArrowUpward,
                      contentDescription = "Scroll to new warnings",
-                     tint = MaterialTheme.colors.contentColorFor(MaterialTheme.colors.primary),
+                     tint = MaterialTheme.colorScheme.contentColorFor(MaterialTheme.colorScheme.primary),
                      modifier = Modifier
                         .padding(end = 4.dp)
                         .height(16.dp)
@@ -162,8 +162,8 @@ private fun NavigationalWarnings(
 
                   Text(
                      text = "$index Unread ${if (index == 1) "Warning" else "Warnings"}",
-                     style = MaterialTheme.typography.body2,
-                     color = MaterialTheme.colors.contentColorFor(MaterialTheme.colors.primary)
+                     style = MaterialTheme.typography.bodyMedium,
+                     color = MaterialTheme.colorScheme.contentColorFor(MaterialTheme.colorScheme.primary)
                   )
                }
             }
@@ -221,13 +221,13 @@ private fun NavigationalWarningContent(
    onShare: () -> Unit
 ) {
    Column(Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
-      CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+      CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
          item.issueDate.let { date ->
             val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.US)
             Text(
                text = dateFormat.format(date),
                fontWeight = FontWeight.SemiBold,
-               style = MaterialTheme.typography.overline,
+               style = MaterialTheme.typography.labelSmall,
                maxLines = 1,
                overflow = TextOverflow.Ellipsis
             )
@@ -239,17 +239,17 @@ private fun NavigationalWarningContent(
       val header = listOfNotNull(item.navigationArea.title, identifier, subregions).joinToString(" ")
       Text(
          text = header,
-         style = MaterialTheme.typography.h6,
+         style = MaterialTheme.typography.titleLarge,
          maxLines = 1,
          overflow = TextOverflow.Ellipsis,
          modifier = Modifier.padding(top = 16.dp)
       )
 
-      CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+      CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
          item.text?.let {
             Text(
                text = it,
-               style = MaterialTheme.typography.body2,
+               style = MaterialTheme.typography.bodyMedium,
                maxLines = 8,
                overflow = TextOverflow.Ellipsis,
                modifier = Modifier.padding(top = 4.dp)
@@ -285,7 +285,7 @@ private fun NavigationalWarningActions(
          onClick = { onShare() }
       ) {
          Icon(Icons.Default.Share,
-            tint = MaterialTheme.colors.primary,
+            tint = MaterialTheme.colorScheme.primary,
             contentDescription = "Share Navigational Warning"
          )
       }

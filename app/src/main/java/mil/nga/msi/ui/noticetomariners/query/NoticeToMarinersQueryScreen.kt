@@ -2,7 +2,7 @@ package mil.nga.msi.ui.noticetomariners.query
 
 import android.location.Location
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
@@ -108,11 +108,11 @@ private fun LocationFilter(
    onAdd: (Filter) -> Unit,
    onRemove: () -> Unit
 ) {
-   CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+   CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
       Text(
          text = "Required Filters",
          fontWeight = FontWeight.SemiBold,
-         style = MaterialTheme.typography.subtitle2,
+         style = MaterialTheme.typography.titleSmall,
          modifier = Modifier.padding(top = 16.dp)
       )
    }
@@ -145,7 +145,7 @@ private fun LocationFilterSelect(
    Row(Modifier.padding(bottom = 16.dp)) {
       Text(
          text = "Location",
-         style = MaterialTheme.typography.subtitle1,
+         style = MaterialTheme.typography.titleMedium,
          modifier = Modifier.padding(end = 16.dp)
       )
 
@@ -187,7 +187,7 @@ private fun LocationFilterSelect(
       ) {
          Icon(
             imageVector = Icons.Filled.AddCircle,
-            tint = MaterialTheme.colors.add,
+            tint = MaterialTheme.colorScheme.add,
             contentDescription = "Add Location Filter",
          )
       }
@@ -234,7 +234,7 @@ private fun LocationFilterValue(
       ) {
          Icon(
             imageVector = Icons.Filled.RemoveCircle,
-            tint = MaterialTheme.colors.remove,
+            tint = MaterialTheme.colorScheme.remove,
             contentDescription = "Remove Filter",
          )
       }
@@ -248,11 +248,11 @@ private fun NoticeFilter(
    onAdd: (Filter) -> Unit,
    onRemove: () -> Unit
 ) {
-   CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+   CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
       Text(
          text = "Additional Filters",
          fontWeight = FontWeight.SemiBold,
-         style = MaterialTheme.typography.subtitle2,
+         style = MaterialTheme.typography.titleSmall,
          modifier = Modifier.padding(top = 16.dp)
       )
    }
@@ -283,7 +283,7 @@ private fun NoticeFilterSelect(
    Row(Modifier.padding(bottom = 16.dp)) {
       Text(
          text = "Notice Number",
-         style = MaterialTheme.typography.subtitle1,
+         style = MaterialTheme.typography.titleMedium,
          modifier = Modifier.padding(end = 16.dp)
       )
 
@@ -316,7 +316,7 @@ private fun NoticeFilterSelect(
       ) {
          Icon(
             imageVector = Icons.Filled.AddCircle,
-            tint = MaterialTheme.colors.add,
+            tint = MaterialTheme.colorScheme.add,
             contentDescription = "Add Location Filter",
          )
       }
@@ -353,7 +353,7 @@ private fun NoticeFilterValue(
       ) {
          Icon(
             imageVector = Icons.Filled.RemoveCircle,
-            tint = MaterialTheme.colors.remove,
+            tint = MaterialTheme.colorScheme.remove,
             contentDescription = "Remove Filter",
          )
       }

@@ -6,7 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
@@ -38,13 +38,13 @@ fun ReportsScreen(
          Modifier
             .fillMaxSize()
             .verticalScroll(scrollState)
-            .background(MaterialTheme.colors.screenBackground)
+            .background(MaterialTheme.colorScheme.screenBackground)
             .padding(bottom = 16.dp)
       ) {
-         CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
             Text(
                text = "Submit Reports to NGA",
-               style = MaterialTheme.typography.body2,
+               style = MaterialTheme.typography.bodyMedium,
                fontWeight = FontWeight.Medium,
                modifier = Modifier.padding(start = 8.dp, top = 32.dp, bottom = 16.dp)
             )
@@ -104,13 +104,13 @@ private fun Report(
       verticalAlignment = Alignment.CenterVertically,
       modifier = Modifier
          .fillMaxWidth()
-         .background(MaterialTheme.colors.background)
+         .background(MaterialTheme.colorScheme.background)
          .clickable {
             onTap()
          }
    ) {
 
-      CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+      CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
          Icon(
             bitmap = bitmap,
             modifier = Modifier.padding(start = 8.dp),
@@ -130,10 +130,10 @@ private fun Report(
                .fillMaxWidth()
                .padding(horizontal = 8.dp)
          ) {
-            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
+            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
                Text(
                   text = route.title,
-                  style = MaterialTheme.typography.body2,
+                  style = MaterialTheme.typography.bodyMedium,
                   fontWeight = FontWeight.Medium
                )
             }

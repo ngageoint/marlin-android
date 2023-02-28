@@ -3,7 +3,7 @@ package mil.nga.msi.ui.noticetomariners.detail
 import android.content.ClipData
 import android.content.Intent
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Share
@@ -61,7 +61,7 @@ fun NoticeToMarinersGraphicScreen(
       )
 
       Surface(
-         color = MaterialTheme.colors.screenBackground,
+         color = MaterialTheme.colorScheme.screenBackground,
          modifier = Modifier.fillMaxWidth()
       ) {
          if (downloading) {

@@ -12,12 +12,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.*
-import androidx.compose.material.TextFieldDefaults.indicatorLine
+import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.LocationSearching
@@ -64,6 +61,7 @@ import mil.nga.msi.ui.location.LocationText
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.cluster.MapAnnotation
 import mil.nga.msi.ui.navigation.mainRouteFor
+import mil.nga.msi.ui.theme.onSurfaceDisabled
 import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.seconds
 
@@ -72,7 +70,7 @@ data class MapPosition(
    val name: String? = null
 )
 
-@OptIn(ExperimentalPermissionsApi::class)
+@OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun MapScreen(
    mapDestination : MapPosition? = null,
@@ -136,27 +134,26 @@ fun MapScreen(
          navigationIcon = Icons.Filled.Menu,
          onNavigationClicked = { openDrawer() },
          actions = {
-            Box {
-               IconButton(onClick = { openFilter() } ) {
-                  Icon(Icons.Default.FilterList, contentDescription = "Filter Map")
-               }
-
-               if (filterCount > 0) {
-                  Box(
-                     contentAlignment = Alignment.Center,
-                     modifier = Modifier
-                        .clip(CircleShape)
-                        .height(24.dp)
-                        .background(MaterialTheme.colors.secondary)
-                        .align(Alignment.TopEnd)
-                  ) {
-                     Text(
-                        text = "$filterCount",
-                        style = MaterialTheme.typography.body2,
-                        modifier = Modifier.padding(horizontal = 8.dp),
-                        color = MaterialTheme.colors.onPrimary
-                     )
+            BadgedBox(
+               badge = {
+                  if (filterCount > 0) {
+                     Badge(
+                        containerColor = MaterialTheme.colorScheme.secondary,
+                        modifier = Modifier.offset(x = (-12).dp, y = 12.dp)
+                     ) {
+                        Text("$filterCount")
+                     }
                   }
+               },
+               modifier = Modifier.padding(end = 16.dp)
+            ) {
+               IconButton(
+                  onClick = { openFilter() }
+               ) {
+                  Icon(
+                     Icons.Default.FilterList,
+                     contentDescription = "Filter Map"
+                  )
                }
             }
          }
@@ -166,7 +163,7 @@ fun MapScreen(
          val text = location?.let {
             "${String.format("%.5f", it.latitude)}, ${String.format("%.5f", it.longitude)}"
          }
-         Surface(color = MaterialTheme.colors.primarySurface) {
+         Surface(color = MaterialTheme.colorScheme.primary) {
             Row(
                horizontalArrangement = Arrangement.Center,
                modifier = Modifier
@@ -262,13 +259,13 @@ fun MapScreen(
                   modifier = Modifier
                      .align(Alignment.CenterHorizontally)
                      .height(40.dp)
-                     .clip(RoundedCornerShape(20.dp))
-                     .background(MaterialTheme.colors.primary)
+                     .clip(MaterialTheme.shapes.medium)
+                     .background(MaterialTheme.colorScheme.primary)
                      .padding(horizontal = 16.dp)
                ) {
                   Box(Modifier.align(Alignment.CenterVertically)) {
                      CircularProgressIndicator(
-                        color = MaterialTheme.colors.onPrimary,
+                        color = MaterialTheme.colorScheme.onPrimary,
                         strokeWidth = 2.dp,
                         modifier = Modifier
                            .padding(end = 8.dp)
@@ -278,8 +275,8 @@ fun MapScreen(
 
                   Text(
                      text = "Loading Data",
-                     style = MaterialTheme.typography.body2,
-                     color = MaterialTheme.colors.onPrimary)
+                     style = MaterialTheme.typography.bodyMedium,
+                     color = MaterialTheme.colorScheme.onPrimary)
                }
             }
          }
@@ -520,11 +517,11 @@ private fun Settings(
 ) {
    FloatingActionButton(
       onClick = { onTap() },
-      backgroundColor = MaterialTheme.colors.background,
+//      backgroundColor = MaterialTheme.colorScheme.background,
       modifier = Modifier.size(40.dp)
    ) {
       Icon(Icons.Outlined.Map,
-         tint = MaterialTheme.colors.primary,
+         tint = MaterialTheme.colorScheme.primary,
          contentDescription = "Map Settings"
       )
    }
@@ -539,13 +536,12 @@ private fun Zoom(
       onClick = {
          onZoom()
       },
-      backgroundColor = MaterialTheme.colors.background
    ) {
       var icon = Icons.Outlined.LocationSearching
-      var tint =  MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.disabled)
+      var tint =  MaterialTheme.colorScheme.onSurfaceDisabled
       if (located) {
          icon = Icons.Outlined.MyLocation
-         tint = MaterialTheme.colors.primary
+         tint = MaterialTheme.colorScheme.primary
       }
       Icon(
          imageVector = icon,
@@ -555,7 +551,7 @@ private fun Zoom(
    }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun Search(
    expanded: Boolean,
@@ -567,7 +563,6 @@ private fun Search(
 ) {
    val focusRequester = remember { FocusRequester() }
    val configuration = LocalConfiguration.current
-   val colors = TextFieldDefaults.textFieldColors()
    val interactionSource = remember { MutableInteractionSource() }
    var text by remember { mutableStateOf("") }
    val width = if (expanded) configuration.screenWidthDp.dp.minus(88.dp) else 40.dp
@@ -579,8 +574,11 @@ private fun Search(
    }
 
    Surface(
-      elevation = 6.dp,
-      shape = RoundedCornerShape(20.dp)
+      tonalElevation = 6.dp,
+      shadowElevation = 6.dp,
+      shape = FloatingActionButtonDefaults.shape,
+      color = MaterialTheme.colorScheme.primaryContainer,
+      contentColor = MaterialTheme.colorScheme.primaryContainer
    ) {
       Column {
          BasicTextField(
@@ -595,16 +593,8 @@ private fun Search(
             modifier = Modifier
                .animateContentSize()
                .background(
-                  color = MaterialTheme.colors.background,
-                  shape = RoundedCornerShape(6.dp)
-               )
-               .indicatorLine(
-                  enabled = expanded,
-                  isError = false,
-                  interactionSource = interactionSource,
-                  colors = colors,
-                  focusedIndicatorLineThickness = 0.dp,
-                  unfocusedIndicatorLineThickness = 0.dp
+                  color = MaterialTheme.colorScheme.background,
+                  shape = FloatingActionButtonDefaults.shape
                )
                .height(40.dp)
                .width(width)
@@ -615,11 +605,17 @@ private fun Search(
                innerTextField = it,
                singleLine = true,
                enabled = expanded,
+               colors  = TextFieldDefaults.textFieldColors(
+                  containerColor = MaterialTheme.colorScheme.primaryContainer,
+                  focusedIndicatorColor = MaterialTheme.colorScheme.primaryContainer,
+                  unfocusedIndicatorColor = MaterialTheme.colorScheme.primaryContainer,
+                  disabledIndicatorColor = MaterialTheme.colorScheme.primaryContainer
+               ),
                leadingIcon = {
                   IconButton(onClick = { onExpand() }) {
                      Icon(
                         imageVector = Icons.Default.Search,
-                        tint = MaterialTheme.colors.primary,
+                        tint = MaterialTheme.colorScheme.primary,
                         contentDescription = "Search"
                      )
                   }
@@ -643,7 +639,7 @@ private fun Search(
                   Text(text = "Search")
                },
                interactionSource = interactionSource,
-               contentPadding = TextFieldDefaults.textFieldWithoutLabelPadding(top = 0.dp, bottom = 0.dp),
+               contentPadding = TextFieldDefaults.textFieldWithoutLabelPadding(top = 0.dp, bottom = 0.dp)
             )
          }
 
@@ -667,13 +663,13 @@ private fun Search(
                      Column(Modifier.weight(1f)) {
                         Text(
                            text = result.name,
-                           style = MaterialTheme.typography.subtitle1,
+                           style = MaterialTheme.typography.titleMedium,
                            fontWeight = FontWeight.Medium
                         )
-                        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
+                        CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceDisabled) {
                            Text(
                               text = result.address ?: "",
-                              style = MaterialTheme.typography.subtitle2
+                              style = MaterialTheme.typography.titleSmall
                            )
                         }
 
@@ -689,7 +685,7 @@ private fun Search(
                         ) {
                            Icon(
                               imageVector = Icons.Default.LocationSearching,
-                              tint = MaterialTheme.colors.primary,
+                              tint = MaterialTheme.colorScheme.primary,
                               contentDescription = "Zoom To Search Result"
                            )
                         }
@@ -738,7 +734,7 @@ private fun DataSourceItem(
    mapped: Boolean?,
    onToggle: () -> Unit,
 ) {
-   var tint =  MaterialTheme.colors.onPrimary
+   var tint =  MaterialTheme.colorScheme.onPrimary
    var background = dataSource.color
    val bitmap = AppCompatResources.getDrawable(LocalContext.current, dataSource.icon)!!.toBitmap().asImageBitmap()
 
@@ -749,7 +745,7 @@ private fun DataSourceItem(
 
    FloatingActionButton(
       onClick = { onToggle() },
-      backgroundColor = background,
+      containerColor = background,
       modifier = Modifier
          .size(40.dp)
    ) {

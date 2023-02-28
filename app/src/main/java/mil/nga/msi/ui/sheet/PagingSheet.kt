@@ -2,7 +2,7 @@ package mil.nga.msi.ui.sheet
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.ChevronRight
@@ -91,15 +91,15 @@ fun PagingSheet(
             {
                Icon(
                   Icons.Default.ChevronLeft,
-                  tint = if (previousEnabled) MaterialTheme.colors.primary else Color.Black.copy(alpha = LocalContentAlpha.current),
+                  tint = if (previousEnabled) MaterialTheme.colorScheme.primary else Color.Black.copy(alpha = 0.38f),
                   contentDescription = "Previous Page"
                )
             }
 
-            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                Text(
                   text = "${pagerState.currentPage + 1} of ${mapAnnotations.size}",
-                  style = MaterialTheme.typography.body1,
+                  style = MaterialTheme.typography.bodyLarge,
                   modifier = Modifier
                      .padding(8.dp)
                )
@@ -112,7 +112,7 @@ fun PagingSheet(
             }) {
                Icon(
                   Icons.Default.ChevronRight,
-                  tint = MaterialTheme.colors.primary,
+                  tint = MaterialTheme.colorScheme.primary,
                   contentDescription = "Next Page"
                )
             }

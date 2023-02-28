@@ -4,7 +4,7 @@ import android.location.Location
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -24,8 +24,8 @@ import mil.nga.msi.ui.port.PortViewModel
 @Composable
 fun PortSheetScreen(
    id: String,
-   onDetails: (() -> Unit)? = null,
    modifier: Modifier = Modifier,
+   onDetails: (() -> Unit)? = null,
    viewModel: PortViewModel = hiltViewModel()
 ) {
    val location by viewModel.locationProvider.observeAsState()
@@ -70,21 +70,19 @@ private fun PortContent(
          modifier = Modifier
             .padding(vertical = 8.dp, horizontal = 16.dp)
       ) {
-         CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
-            Text(
-               text = port.portName,
-               fontWeight = FontWeight.SemiBold,
-               style = MaterialTheme.typography.h6,
-               maxLines = 1,
-               overflow = TextOverflow.Ellipsis
-            )
-         }
+         Text(
+            text = port.portName,
+            fontWeight = FontWeight.SemiBold,
+            style = MaterialTheme.typography.titleLarge,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+         )
 
-         CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
             port.alternateName?.let {
                Text(
                   text = it,
-                  style = MaterialTheme.typography.body2,
+                  style = MaterialTheme.typography.bodyMedium,
                   modifier = Modifier.padding(top = 4.dp)
                )
             }
@@ -100,10 +98,10 @@ private fun PortContent(
                val distance = location.distanceTo(portLocation) / 1000
                val direction = location.generalDirection(portLocation)
                val nmi = distance * 0.539957
-               CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+               CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                   Text(
                      text = "${String.format("%.2f", nmi)}, $direction",
-                     style = MaterialTheme.typography.body2,
+                     style = MaterialTheme.typography.bodyMedium,
                      modifier = Modifier.padding(top = 4.dp)
                   )
                }

@@ -10,7 +10,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LocationOff
@@ -119,13 +119,13 @@ fun NavigationDrawer(
          modifier = Modifier
             .fillMaxHeight()
             .dragContainer(dragDropState)
-            .background(MaterialTheme.colors.screenBackground)
+            .background(MaterialTheme.colorScheme.screenBackground)
       ) {
          item {
-            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                Text(
                   text = "Data Source Tabs (Drag to reorder, $MAX_TABS max.)",
-                  style = MaterialTheme.typography.body2,
+                  style = MaterialTheme.typography.bodyMedium,
                   fontWeight = FontWeight.Medium,
                   modifier = Modifier.padding(start = 8.dp, top = 32.dp, bottom = 16.dp)
                )
@@ -154,10 +154,10 @@ fun NavigationDrawer(
          }
 
          item {
-            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                Text(
                   text = "Other Data Sources (Drag to add to tabs)",
-                  style = MaterialTheme.typography.body2,
+                  style = MaterialTheme.typography.bodyMedium,
                   fontWeight = FontWeight.Medium,
                   modifier = Modifier.padding(start = 8.dp, top = 32.dp, bottom = 16.dp)
                )
@@ -199,13 +199,13 @@ fun NavigationDrawer(
                   verticalAlignment = Alignment.CenterVertically,
                   modifier = Modifier
                      .fillMaxSize()
-                     .background(MaterialTheme.colors.background)
+                     .background(MaterialTheme.colorScheme.background)
                      .clickable {
                         onDestinationClicked(ReportRoute.Main.name)
                      }
                ) {
 
-                  CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                  CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                      Icon(
                         Icons.Filled.NoteAdd,
                         modifier = Modifier.padding(start = 8.dp),
@@ -226,10 +226,10 @@ fun NavigationDrawer(
                            .weight(1f)
                            .padding(horizontal = 8.dp)
                      ) {
-                        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
+                        CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                            Text(
                               text = ReportRoute.Main.title,
-                              style = MaterialTheme.typography.body2,
+                              style = MaterialTheme.typography.bodyMedium,
                               fontWeight = FontWeight.Medium
                            )
                         }
@@ -248,13 +248,13 @@ fun NavigationDrawer(
                   verticalAlignment = Alignment.CenterVertically,
                   modifier = Modifier
                      .fillMaxSize()
-                     .background(MaterialTheme.colors.background)
+                     .background(MaterialTheme.colorScheme.background)
                      .clickable {
                         onDestinationClicked(AboutRoute.Main.name)
                      }
                ) {
 
-                  CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                  CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                      Icon(
                         Icons.Default.Info,
                         modifier = Modifier.padding(start = 8.dp),
@@ -275,10 +275,10 @@ fun NavigationDrawer(
                            .weight(1f)
                            .padding(horizontal = 8.dp)
                      ) {
-                        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
+                        CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                            Text(
                               text = AboutRoute.Main.title,
-                              style = MaterialTheme.typography.body2,
+                              style = MaterialTheme.typography.bodyMedium,
                               fontWeight = FontWeight.Medium
                            )
                         }
@@ -302,7 +302,10 @@ private fun NavigationRow(
 ) {
    val elevation by animateDpAsState(if (isDragging) 4.dp else 0.dp)
 
-   Surface(elevation = elevation) {
+   Surface(
+      tonalElevation = elevation,
+      shadowElevation = elevation
+   ) {
       Column(
          Modifier
             .height(56.dp)
@@ -312,7 +315,7 @@ private fun NavigationRow(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                .fillMaxSize()
-               .background(MaterialTheme.colors.background)
+               .background(MaterialTheme.colorScheme.background)
                .clickable {
                   onDestinationClicked(mainRouteFor(tab))
                }
@@ -327,13 +330,13 @@ private fun NavigationRow(
             if (loading == true) {
                Box(Modifier.padding(start = 8.dp)) {
                   CircularProgressIndicator(
-                     color = MaterialTheme.colors.onSurface.copy(alpha = .4f),
+                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = .4f),
                      strokeWidth = 3.dp,
                      modifier = Modifier.size(24.dp)
                   )
                }
             } else {
-               CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+               CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                   val bitmap = AppCompatResources.getDrawable(LocalContext.current, tab.icon)!!.toBitmap().asImageBitmap()
                   Icon(
                      bitmap = bitmap,
@@ -356,20 +359,20 @@ private fun NavigationRow(
                      .weight(1f)
                      .padding(horizontal = 8.dp)
                ) {
-                  CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
+                  CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
                      Text(
                         text = mainRouteFor(tab).title,
-                        style = MaterialTheme.typography.body2,
+                        style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Medium
                      )
                   }
 
                   if (tab.mappable) {
                      var icon = Icons.Default.LocationOff
-                     var iconColor = Color.Black.copy(alpha = ContentAlpha.disabled)
+                     var iconColor = Color.Black.copy(alpha = 0.38f)
                      if (isMapped) {
                         icon = Icons.Default.LocationOn
-                        iconColor = MaterialTheme.colors.primary
+                        iconColor = MaterialTheme.colorScheme.primary
                      }
 
                      IconButton(

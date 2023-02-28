@@ -6,6 +6,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import mil.nga.msi.ui.map.MapRoute
 import mil.nga.msi.ui.navigation.Route
+import mil.nga.msi.ui.theme.MsiEmbarkTheme
 
 sealed class EmbarkRoute(
    override val name: String,
@@ -28,64 +29,76 @@ fun NavGraphBuilder.embarkGraph(
    composable(EmbarkRoute.Welcome.name) {
       bottomBarVisibility(false)
 
-      WelcomeScreen(
-         done = {
-            navController.navigate(EmbarkRoute.Disclaimer.name)
-         }
-      )
+      MsiEmbarkTheme {
+         WelcomeScreen(
+            done = {
+               navController.navigate(EmbarkRoute.Disclaimer.name)
+            }
+         )
+      }
    }
 
    composable(EmbarkRoute.Disclaimer.name) {
       bottomBarVisibility(false)
 
-      DisclaimerScreen(
-         done = {
-            navController.navigate(EmbarkRoute.Location.name)
-         }
-      )
+      MsiEmbarkTheme {
+         DisclaimerScreen(
+            done = {
+               navController.navigate(EmbarkRoute.Location.name)
+            }
+         )
+      }
    }
 
    composable(EmbarkRoute.Location.name) {
       bottomBarVisibility(false)
-      
-      LocationScreen(
-         done = {
-            navController.navigate(EmbarkRoute.Notification.name)
-         }
-      )
+
+      MsiEmbarkTheme {
+         LocationScreen(
+            done = {
+               navController.navigate(EmbarkRoute.Notification.name)
+            }
+         )
+      }
    }
 
    composable(EmbarkRoute.Notification.name) {
       bottomBarVisibility(false)
 
-      NotificationScreen(
-         done = {
-            navController.navigate(EmbarkRoute.Tabs.name)
-         }
-      )
+      MsiEmbarkTheme {
+         NotificationScreen(
+            done = {
+               navController.navigate(EmbarkRoute.Tabs.name)
+            }
+         )
+      }
    }
 
    composable(EmbarkRoute.Tabs.name) {
       bottomBarVisibility(false)
 
-      TabsScreen(
-         done = {
-            navController.navigate(EmbarkRoute.Map.name)
-         }
-      )
+      MsiEmbarkTheme {
+         TabsScreen(
+            done = {
+               navController.navigate(EmbarkRoute.Map.name)
+            }
+         )
+      }
    }
 
    composable(EmbarkRoute.Map.name) {
       bottomBarVisibility(false)
 
-      MapScreen(
-         done = {
-            navController.navigate(MapRoute.Map.name) {
-               popUpTo(EmbarkRoute.Welcome.name) {
-                  inclusive = true
+      MsiEmbarkTheme {
+         MapScreen(
+            done = {
+               navController.navigate(MapRoute.Map.name) {
+                  popUpTo(EmbarkRoute.Welcome.name) {
+                     inclusive = true
+                  }
                }
             }
-         }
-      )
+         )
+      }
    }
 }

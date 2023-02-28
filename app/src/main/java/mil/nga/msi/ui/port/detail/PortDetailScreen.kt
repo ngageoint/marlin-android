@@ -4,7 +4,7 @@ import android.location.Location
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.GpsFixed
@@ -15,7 +15,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -31,6 +30,7 @@ import mil.nga.msi.ui.map.MapClip
 import mil.nga.msi.ui.navigation.Point
 import mil.nga.msi.ui.port.PortAction
 import mil.nga.msi.ui.port.PortViewModel
+import mil.nga.msi.ui.theme.onSurfaceDisabled
 import mil.nga.msi.ui.theme.screenBackground
 
 fun Int.asNonZeroOrNull(): Int? {
@@ -81,7 +81,7 @@ private fun PortDetailContent(
 ) {
    if (port != null) {
       Surface(
-         color = MaterialTheme.colors.screenBackground,
+         color = MaterialTheme.colorScheme.screenBackground,
          modifier = Modifier.fillMaxHeight()
       ) {
          Column(
@@ -130,21 +130,20 @@ private fun PortHeader(
                Column(
                   Modifier.weight(1f)
                ) {
-                  CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
+                  CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
                      Text(
                         text = port.portName,
-                        fontWeight = FontWeight.SemiBold,
-                        style = MaterialTheme.typography.h6,
+                        style = MaterialTheme.typography.titleLarge,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                      )
                   }
 
-                  CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                  CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                      port.alternateName?.let {
                         Text(
                            text = it,
-                           style = MaterialTheme.typography.body2,
+                           style = MaterialTheme.typography.bodyMedium,
                            modifier = Modifier.padding(top = 4.dp)
                         )
                      }
@@ -161,10 +160,10 @@ private fun PortHeader(
                      val distance = location.distanceTo(portLocation) / 1000
                      val direction = location.generalDirection(portLocation)
                      val nmi = distance * 0.539957
-                     CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                     CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                         Text(
                            text = "${String.format("%.2f", nmi)}, $direction",
-                           style = MaterialTheme.typography.body2,
+                           style = MaterialTheme.typography.bodyMedium,
                            modifier = Modifier.padding(top = 4.dp)
                         )
                      }
@@ -219,13 +218,13 @@ private fun PortActions(
    Row {
       IconButton(onClick = { onShare() }) {
          Icon(Icons.Default.Share,
-            tint = MaterialTheme.colors.primary,
+            tint = MaterialTheme.colorScheme.primary,
             contentDescription = "Share Port"
          )
       }
       IconButton(onClick = { onZoom() }) {
          Icon(Icons.Default.GpsFixed,
-            tint = MaterialTheme.colors.primary,
+            tint = MaterialTheme.colorScheme.primary,
             contentDescription = "Zoom to Port"
          )
       }
@@ -293,15 +292,14 @@ private fun PortSection(
             .fillMaxWidth()
             .padding(vertical = 8.dp)
       ) {
-         CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
+         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceDisabled) {
             Text(
                text = title,
-               style = MaterialTheme.typography.subtitle1,
+               style = MaterialTheme.typography.titleMedium,
             )
          }
 
          Card(
-            elevation = 4.dp,
             modifier = Modifier.padding(vertical = 8.dp)
          ) {
             Column() {
@@ -325,18 +323,18 @@ private fun PortProperty(
             .fillMaxWidth()
             .padding(vertical = 8.dp, horizontal = 8.dp)
       ) {
-         CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
             Text(
                text = title,
-               style = MaterialTheme.typography.body2,
+               style = MaterialTheme.typography.bodyMedium,
                modifier = Modifier.padding(bottom = 4.dp)
             )
          }
 
-         CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
+         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
             Text(
                text = value,
-               style = MaterialTheme.typography.body1
+               style = MaterialTheme.typography.bodyLarge
             )
          }
       }

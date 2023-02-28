@@ -3,7 +3,6 @@ package mil.nga.msi.ui.electronicpublication
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.*
 import androidx.navigation.compose.composable
-import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.electronicpublication.ElectronicPublicationType
 import mil.nga.msi.ui.navigation.Route
@@ -22,13 +21,10 @@ fun routeForPubType(pubType: ElectronicPublicationType): String {
     return "${ElectronicPublicationRoute.List.name}/${pubType.typeId}"
 }
 
-@OptIn(ExperimentalMaterialNavigationApi::class)
 fun NavGraphBuilder.electronicPublicationGraph(
     navController: NavController,
     bottomBarVisibility: (Boolean) -> Unit,
-    openNavigationDrawer: () -> Unit,
-    share: (Pair<String, String>) -> Unit,
-    showSnackbar: (String) -> Unit
+    openNavigationDrawer: () -> Unit
 ) {
     navigation(
         route = ElectronicPublicationRoute.Main.name,
@@ -52,11 +48,8 @@ fun NavGraphBuilder.electronicPublicationGraph(
             route = "${ElectronicPublicationRoute.List.name}/{pubType}",
             arguments = listOf(navArgument("pubType") { type = NavType.IntType })
         ) { navBackStackEntry ->
-//            val pubTypeCode = navBackStackEntry.arguments?.getInt("pubType")
-//            val pubType = ElectronicPublicationType.fromTypeCode(pubTypeCode)
             bottomBarVisibility(true)
             ElectronicPublicationTypeBrowseRoute(
-                openDrawer = openNavigationDrawer,
                 onBackToRoot = { navController.popBackStack() },
             )
         }

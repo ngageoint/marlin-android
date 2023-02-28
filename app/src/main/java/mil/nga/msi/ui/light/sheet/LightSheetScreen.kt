@@ -3,7 +3,7 @@ package mil.nga.msi.ui.light.sheet
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -23,8 +23,8 @@ import mil.nga.msi.ui.light.LightViewModel
 @Composable
 fun LightSheetScreen(
    key: LightKey,
-   onDetails: (() -> Unit)? = null,
    modifier: Modifier = Modifier,
+   onDetails: (() -> Unit)? = null,
    viewModel: LightViewModel = hiltViewModel()
 ) {
    val light by viewModel.getLight(key.volumeNumber, key.featureNumber).observeAsState()
@@ -63,11 +63,11 @@ private fun LightContent(
       }
 
       Column(Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
-         CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
             Text(
                text = "${light.featureNumber} ${light.internationalFeature ?: ""} ${light.volumeNumber}",
                fontWeight = FontWeight.SemiBold,
-               style = MaterialTheme.typography.overline,
+               style = MaterialTheme.typography.labelSmall,
                maxLines = 1,
                overflow = TextOverflow.Ellipsis
             )
@@ -76,24 +76,24 @@ private fun LightContent(
          light.name?.let { name ->
             Text(
                text = name,
-               style = MaterialTheme.typography.h6,
+               style = MaterialTheme.typography.titleLarge,
                maxLines = 1,
                overflow = TextOverflow.Ellipsis,
                modifier = Modifier.padding(top = 16.dp)
             )
          }
 
-         CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
             Text(
                text = light.sectionHeader,
-               style = MaterialTheme.typography.body2,
+               style = MaterialTheme.typography.bodyMedium,
                modifier = Modifier.padding(top = 4.dp)
             )
 
             light.structure?.let { structure ->
                Text(
                   text = structure,
-                  style = MaterialTheme.typography.body2,
+                  style = MaterialTheme.typography.bodyMedium,
                   modifier = Modifier.padding(top = 4.dp)
                )
             }

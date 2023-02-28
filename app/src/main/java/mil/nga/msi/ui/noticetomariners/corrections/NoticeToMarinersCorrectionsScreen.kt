@@ -4,11 +4,10 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
@@ -54,10 +53,10 @@ fun NoticeToMarinersCorrectionsScreen(
                Column(
                   horizontalAlignment = Alignment.CenterHorizontally,
                ) {
-                  CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
+                  CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                      Text(
                         text = "Loading Chart Corrections...",
-                        style = MaterialTheme.typography.h5,
+                        style = MaterialTheme.typography.headlineSmall,
                         modifier = Modifier.padding(bottom = 16.dp)
                      )
                   }
@@ -85,7 +84,7 @@ private fun ChartCorrections(
    var expanded by remember { mutableStateOf<Map<String, Boolean>>(emptyMap()) }
 
    Surface(
-      color = MaterialTheme.colors.screenBackground,
+      color = MaterialTheme.colorScheme.screenBackground,
       modifier = Modifier.fillMaxHeight()
    ) {
       Column(
@@ -144,16 +143,18 @@ private fun Chart(
                      .padding(horizontal = 16.dp)
                      .padding(bottom = 8.dp)
                ) {
-                  Text(
-                     text = "Chart No. ${correction.chartNumber}",
-                     style = MaterialTheme.typography.subtitle1
-                  )
+                  CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
+                     Text(
+                        text = "Chart No. ${correction.chartNumber}",
+                        style = MaterialTheme.typography.titleMedium
+                     )
+                  }
 
-                  CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
+                  CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                      Text(
                         text = "${correction.editionNumber} Ed. ${correction.editionDate}",
                         fontWeight = FontWeight.Medium,
-                        style = MaterialTheme.typography.subtitle2
+                        style = MaterialTheme.typography.titleSmall
                      )
                   }
                }
@@ -165,11 +166,11 @@ private fun Chart(
                      .fillMaxWidth()
                      .padding(start = 16.dp, end = 8.dp)
                ) {
-                  CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
+                  CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                      Text(
                         text = "Current Notice: ${correction.currentNoticeNumber}",
                         fontWeight = FontWeight.Medium,
-                        style = MaterialTheme.typography.subtitle2
+                        style = MaterialTheme.typography.titleSmall
                      )
                   }
 
@@ -188,7 +189,7 @@ private fun Chart(
             ) {
                Icon(
                   imageVector = Icons.Default.ExpandMore,
-                  tint = MaterialTheme.colors.primary,
+                  tint = MaterialTheme.colorScheme.primary,
                   modifier = Modifier.rotate(angle),
                   contentDescription = "Expand Filter"
                )
@@ -198,11 +199,12 @@ private fun Chart(
          Column(
             Modifier
                .fillMaxWidth()
-               .background(MaterialTheme.colors.background)
                .animateContentSize()
          ) {
             if (expand) {
-               Notices(notices)
+               Notices(notices) {
+                  onNoticeTap(it)
+               }
             }
          }
       }
@@ -211,7 +213,8 @@ private fun Chart(
 
 @Composable
 private fun Notices(
-   notices: List<ChartCorrection>
+   notices: List<ChartCorrection>,
+   onNoticeTap: (ChartCorrection) -> Unit
 ) {
    notices.forEach { notice ->
       Column(
@@ -219,39 +222,56 @@ private fun Notices(
       ) {
          Divider(Modifier.padding(bottom = 16.dp))
 
-         Text(
-            text = "Notice: ${notice.currentNoticeNumber}",
-            style = MaterialTheme.typography.subtitle1,
-            modifier = Modifier.padding(bottom = 4.dp)
-         )
+         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
+            Text(
+               text = "Notice: ${notice.currentNoticeNumber}",
+               style = MaterialTheme.typography.titleMedium,
+               modifier = Modifier.padding(bottom = 4.dp)
+            )
+         }
 
          notice.corrections.forEach { correction ->
-            Row(
-               verticalAlignment = Alignment.CenterVertically,
-               modifier = Modifier.padding(vertical = 16.dp)
-            ) {
-               CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
-                  Text(
-                     text = "${correction.action}",
-                     style = MaterialTheme.typography.subtitle2,
-                     modifier = Modifier.weight(1f)
-                  )
+            Column {
+               Row(
+                  verticalAlignment = Alignment.CenterVertically,
+                  modifier = Modifier.padding(vertical = 16.dp)
+               ) {
+                  CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+                     Text(
+                        text = "${correction.action}",
+                        style = MaterialTheme.typography.titleSmall,
+                        modifier = Modifier.weight(1f)
+                     )
 
-                  Text(
-                     text = "${correction.text}",
-                     style = MaterialTheme.typography.subtitle2,
-                     modifier = Modifier.weight(1f)
-                  )
+                     Text(
+                        text = "${correction.text}",
+                        style = MaterialTheme.typography.titleSmall,
+                        modifier = Modifier.weight(1f)
+                     )
+                  }
                }
             }
          }
 
-         CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
+         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
             Text(
                text = "${notice.authority}",
-               style = MaterialTheme.typography.subtitle2,
+               style = MaterialTheme.typography.titleSmall,
                modifier = Modifier.padding(bottom = 8.dp)
             )
+         }
+
+         Row(
+            horizontalArrangement = Arrangement.End,
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
+         ) {
+            if (notice.noticeDecade >= 99 && notice.noticeWeek >= 29 || notice.noticeDecade <= Year.now().value % 1000) {
+               TextButton(
+                  onClick = { onNoticeTap(notice) }
+               ) {
+                  Text("NTM ${notice.currentNoticeNumber} Details")
+               }
+            }
          }
       }
    }

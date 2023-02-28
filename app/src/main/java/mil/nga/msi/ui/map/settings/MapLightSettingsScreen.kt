@@ -3,7 +3,7 @@ package mil.nga.msi.ui.map.settings
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ModeStandby
@@ -23,6 +23,7 @@ import com.google.android.gms.maps.model.TileProvider
 import com.google.maps.android.compose.*
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.BaseMapType
+import mil.nga.msi.ui.theme.onSurfaceDisabled
 import mil.nga.msi.ui.theme.screenBackground
 
 @Composable
@@ -102,12 +103,12 @@ private fun Options(
    Column(
       Modifier
          .fillMaxSize()
-         .background(MaterialTheme.colors.screenBackground)
+         .background(MaterialTheme.colorScheme.screenBackground)
    ) {
-      CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
+      CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
          Text(
             text = "MAP OPTIONS",
-            style = MaterialTheme.typography.body2,
+            style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.Medium,
             modifier = Modifier.padding(start = 8.dp, top = 32.dp, bottom = 16.dp)
          )
@@ -117,11 +118,11 @@ private fun Options(
          verticalAlignment = Alignment.CenterVertically,
          modifier = Modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colors.background)
+            .background(MaterialTheme.colorScheme.background)
             .clickable { onSectorLightRangeToggle(!sectorLightRange) }
             .padding(horizontal = 32.dp, vertical = 16.dp)
       ) {
-         CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
             Icon(
                Icons.Outlined.Stream,
                modifier = Modifier.padding(end = 8.dp),
@@ -136,13 +137,13 @@ private fun Options(
             Column {
                Text(
                   text = "Show Sector Light Ranges",
-                  style = MaterialTheme.typography.body1
+                  style = MaterialTheme.typography.bodyLarge
                )
 
-               CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+               CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                   Text(
                      text = "Lights with defined sectors",
-                     style = MaterialTheme.typography.body2
+                     style = MaterialTheme.typography.bodyMedium
                   )
                }
             }
@@ -155,19 +156,20 @@ private fun Options(
       }
 
       Divider(
-         startIndent = 64.dp,
-         modifier = Modifier.background(MaterialTheme.colors.background)
+         modifier = Modifier
+            .padding(start = 64.dp)
+            .background(MaterialTheme.colorScheme.background)
       )
 
       Row(
          verticalAlignment = Alignment.CenterVertically,
          modifier = Modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colors.background)
+            .background(MaterialTheme.colorScheme.background)
             .clickable { onLightRangeToggle(!lightRange) }
             .padding(horizontal = 32.dp, vertical = 16.dp)
       ) {
-         CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
             Icon(
                Icons.Filled.ModeStandby,
                modifier = Modifier.padding(end = 8.dp),
@@ -182,13 +184,13 @@ private fun Options(
             Column(Modifier.weight(1f)) {
                Text(
                   text = "Show Light Ranges",
-                  style = MaterialTheme.typography.body1
+                  style = MaterialTheme.typography.bodyLarge
                )
 
-               CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+               CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                   Text(
                      text = "Lights showing an unbroken light over an arc of the horizon of 360 degrees",
-                     style = MaterialTheme.typography.body2
+                     style = MaterialTheme.typography.bodyMedium
                   )
                }
             }
@@ -200,10 +202,10 @@ private fun Options(
          }
       }
 
-      CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
+      CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
          Text(
             text = "A lights range is the distance, expressed in nautical miles, that a light can be seen in clear water. These ranges can be visualized on the map. Lights which have defined color sectors, or have visibility or obscured ranges are drawn as arcs of visibility.  All other lights are drawn as full circles.",
-            style = MaterialTheme.typography.body2,
+            style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier
                .padding(horizontal = 16.dp, vertical = 16.dp)
          )
