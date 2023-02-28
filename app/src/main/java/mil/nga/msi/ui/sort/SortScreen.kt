@@ -170,7 +170,7 @@ private fun Section(
          .background(MaterialTheme.colorScheme.background)
          .padding(16.dp)
    ) {
-      CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceDisabled) {
+      CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
          Text(text = "Group by primary sort field")
       }
 
@@ -195,10 +195,10 @@ private fun SortField(
          .padding(16.dp)
    ) {
       if (parameter == null) {
-         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceDisabled) {
+         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
             Text(
                text = title,
-               style = MaterialTheme.typography.titleMedium
+               style = MaterialTheme.typography.titleSmall
             )
          }
 
@@ -210,7 +210,7 @@ private fun SortField(
          CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
             Text(
                text = title,
-               style = MaterialTheme.typography.titleMedium,
+               style = MaterialTheme.typography.titleSmall,
             )
          }
 
