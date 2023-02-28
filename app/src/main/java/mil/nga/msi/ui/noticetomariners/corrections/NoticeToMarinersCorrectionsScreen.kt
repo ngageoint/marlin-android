@@ -4,7 +4,6 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -22,7 +21,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import mil.nga.msi.datasource.noticetomariners.ChartCorrection
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.noticetomariners.NoticeToMarinersRoute
-import mil.nga.msi.ui.theme.onSurfaceDisabled
 import mil.nga.msi.ui.theme.screenBackground
 import java.time.Year
 
@@ -204,7 +202,9 @@ private fun Chart(
                .animateContentSize()
          ) {
             if (expand) {
-               Notices(notices)
+               Notices(notices) {
+                  onNoticeTap(it)
+               }
             }
          }
       }
@@ -213,7 +213,8 @@ private fun Chart(
 
 @Composable
 private fun Notices(
-   notices: List<ChartCorrection>
+   notices: List<ChartCorrection>,
+   onNoticeTap: (ChartCorrection) -> Unit
 ) {
    notices.forEach { notice ->
       Column(
@@ -230,22 +231,24 @@ private fun Notices(
          }
 
          notice.corrections.forEach { correction ->
-            Row(
-               verticalAlignment = Alignment.CenterVertically,
-               modifier = Modifier.padding(vertical = 16.dp)
-            ) {
-               CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-                  Text(
-                     text = "${correction.action}",
-                     style = MaterialTheme.typography.titleSmall,
-                     modifier = Modifier.weight(1f)
-                  )
+            Column {
+               Row(
+                  verticalAlignment = Alignment.CenterVertically,
+                  modifier = Modifier.padding(vertical = 16.dp)
+               ) {
+                  CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+                     Text(
+                        text = "${correction.action}",
+                        style = MaterialTheme.typography.titleSmall,
+                        modifier = Modifier.weight(1f)
+                     )
 
-                  Text(
-                     text = "${correction.text}",
-                     style = MaterialTheme.typography.titleSmall,
-                     modifier = Modifier.weight(1f)
-                  )
+                     Text(
+                        text = "${correction.text}",
+                        style = MaterialTheme.typography.titleSmall,
+                        modifier = Modifier.weight(1f)
+                     )
+                  }
                }
             }
          }
@@ -256,6 +259,19 @@ private fun Notices(
                style = MaterialTheme.typography.titleSmall,
                modifier = Modifier.padding(bottom = 8.dp)
             )
+         }
+
+         Row(
+            horizontalArrangement = Arrangement.End,
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
+         ) {
+            if (notice.noticeDecade >= 99 && notice.noticeWeek >= 29 || notice.noticeDecade <= Year.now().value % 1000) {
+               TextButton(
+                  onClick = { onNoticeTap(notice) }
+               ) {
+                  Text("NTM ${notice.currentNoticeNumber} Details")
+               }
+            }
          }
       }
    }
