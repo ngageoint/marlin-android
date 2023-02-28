@@ -263,10 +263,12 @@ private fun RadioBeaconProperty(
             )
          }
 
-         Text(
-            text = value.trim(),
-            style = MaterialTheme.typography.bodyLarge
-         )
+         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
+            Text(
+               text = value.trim(),
+               style = MaterialTheme.typography.bodyLarge
+            )
+         }
       }
    }
 }

@@ -229,10 +229,12 @@ private fun ModuProperty(
             )
          }
 
-         Text(
-            text = value,
-            style = MaterialTheme.typography.bodyLarge
-         )
+         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
+            Text(
+               text = value,
+               style = MaterialTheme.typography.bodyLarge
+            )
+         }
       }
    }
 }

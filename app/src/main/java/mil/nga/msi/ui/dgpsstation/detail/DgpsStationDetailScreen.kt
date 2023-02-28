@@ -241,10 +241,12 @@ private fun DgpsStationProperty(
             )
          }
 
-         Text(
-            text = value.toString().trim(),
-            style = MaterialTheme.typography.bodyLarge
-         )
+         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
+            Text(
+               text = value.toString().trim(),
+               style = MaterialTheme.typography.bodyLarge
+            )
+         }
       }
    }
 }

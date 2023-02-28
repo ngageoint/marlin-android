@@ -55,7 +55,7 @@ fun NoticeToMarinersCorrectionsScreen(
                Column(
                   horizontalAlignment = Alignment.CenterHorizontally,
                ) {
-                  CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceDisabled) {
+                  CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                      Text(
                         text = "Loading Chart Corrections...",
                         style = MaterialTheme.typography.headlineSmall,
@@ -145,12 +145,14 @@ private fun Chart(
                      .padding(horizontal = 16.dp)
                      .padding(bottom = 8.dp)
                ) {
-                  Text(
-                     text = "Chart No. ${correction.chartNumber}",
-                     style = MaterialTheme.typography.titleMedium
-                  )
+                  CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
+                     Text(
+                        text = "Chart No. ${correction.chartNumber}",
+                        style = MaterialTheme.typography.titleMedium
+                     )
+                  }
 
-                  CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceDisabled) {
+                  CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                      Text(
                         text = "${correction.editionNumber} Ed. ${correction.editionDate}",
                         fontWeight = FontWeight.Medium,
@@ -166,7 +168,7 @@ private fun Chart(
                      .fillMaxWidth()
                      .padding(start = 16.dp, end = 8.dp)
                ) {
-                  CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceDisabled) {
+                  CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                      Text(
                         text = "Current Notice: ${correction.currentNoticeNumber}",
                         fontWeight = FontWeight.Medium,
@@ -219,18 +221,20 @@ private fun Notices(
       ) {
          Divider(Modifier.padding(bottom = 16.dp))
 
-         Text(
-            text = "Notice: ${notice.currentNoticeNumber}",
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(bottom = 4.dp)
-         )
+         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
+            Text(
+               text = "Notice: ${notice.currentNoticeNumber}",
+               style = MaterialTheme.typography.titleMedium,
+               modifier = Modifier.padding(bottom = 4.dp)
+            )
+         }
 
          notice.corrections.forEach { correction ->
             Row(
                verticalAlignment = Alignment.CenterVertically,
                modifier = Modifier.padding(vertical = 16.dp)
             ) {
-               CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceDisabled) {
+               CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                   Text(
                      text = "${correction.action}",
                      style = MaterialTheme.typography.titleSmall,
@@ -246,7 +250,7 @@ private fun Notices(
             }
          }
 
-         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceDisabled) {
+         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
             Text(
                text = "${notice.authority}",
                style = MaterialTheme.typography.titleSmall,

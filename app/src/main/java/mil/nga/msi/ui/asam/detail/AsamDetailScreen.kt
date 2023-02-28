@@ -254,16 +254,20 @@ private fun AsamProperty(
 ) {
    if (value?.isNotBlank() == true) {
       Column(Modifier.padding(vertical = 8.dp)) {
-         Text(
-            text = title,
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(bottom = 4.dp)
-         )
+         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+            Text(
+               text = title,
+               style = MaterialTheme.typography.bodyMedium,
+               modifier = Modifier.padding(bottom = 4.dp)
+            )
+         }
 
-         Text(
-            text = value,
-            style = MaterialTheme.typography.bodyLarge
-         )
+         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
+            Text(
+               text = value,
+               style = MaterialTheme.typography.bodyLarge
+            )
+         }
       }
    }
 }
