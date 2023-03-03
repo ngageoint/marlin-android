@@ -35,7 +35,6 @@ import mil.nga.msi.ui.drag.dragContainer
 import mil.nga.msi.ui.drag.rememberDragDropState
 import mil.nga.msi.ui.report.ReportRoute
 import mil.nga.msi.ui.settings.AboutRoute
-import mil.nga.msi.ui.theme.screenBackground
 
 private const val MAX_TABS = 4
 
@@ -119,7 +118,7 @@ fun NavigationDrawer(
          modifier = Modifier
             .fillMaxHeight()
             .dragContainer(dragDropState)
-            .background(MaterialTheme.colorScheme.screenBackground)
+            .background(MaterialTheme.colorScheme.surfaceVariant)
       ) {
          item {
             CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {

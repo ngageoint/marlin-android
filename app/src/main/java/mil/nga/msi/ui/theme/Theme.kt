@@ -1,7 +1,6 @@
 package mil.nga.msi.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material.Colors
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
@@ -12,9 +11,10 @@ import androidx.compose.ui.graphics.Color
 val LightColorPalette = lightColorScheme(
    primary = SeaGreen,
    primaryContainer = Color.White,
+   surface = Color.White,
    surfaceVariant = Color(0x09000000),
    tertiary = SeaGreen,
-   secondary = NgaBlue
+   secondary = NgaBlue,
 )
 
 val DarkColorPalette = darkColorScheme(
@@ -59,17 +59,10 @@ fun MsiEmbarkTheme (
    )
 }
 
+val ColorScheme.add: Color @Composable get() = Add
+val ColorScheme.remove: Color @Composable get() = Remove
 val ColorScheme.onSurfaceDisabled: Color @Composable
    get() = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
 
-val ColorScheme.screenBackground: Color @Composable
-   get() = Color(0x09000000)
 
-val ColorScheme.add: Color @Composable get() = Add
-
-val ColorScheme.remove: Color @Composable get() = Remove
-
-val Colors.screenBackground: Color @Composable get() = Color(0x09000000)
-val Colors.add: Color @Composable get() = Add
-val Colors.remove: Color @Composable get() = Remove
 

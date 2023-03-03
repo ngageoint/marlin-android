@@ -31,7 +31,6 @@ import mil.nga.msi.ui.map.BaseMapType
 import mil.nga.msi.ui.map.MapClip
 import mil.nga.msi.ui.navigation.Point
 import mil.nga.msi.ui.theme.onSurfaceDisabled
-import mil.nga.msi.ui.theme.screenBackground
 
 @Composable
 fun DgpsStationDetailScreen(
@@ -71,7 +70,6 @@ private fun RadioBeaconDetailContent(
 ) {
    if (dgpsStation != null) {
       Surface(
-         color = MaterialTheme.colorScheme.screenBackground,
          modifier = Modifier.fillMaxHeight()
       ) {
          Column(

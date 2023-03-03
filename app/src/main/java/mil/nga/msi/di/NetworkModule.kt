@@ -26,6 +26,7 @@ import mil.nga.msi.network.asam.AsamsTypeAdapter
 import mil.nga.msi.network.dgpsstations.DgpsStationService
 import mil.nga.msi.network.dgpsstations.DgpsStationsTypeAdapter
 import mil.nga.msi.network.electronicpublication.ElectronicPublicationTypeAdapter
+import mil.nga.msi.network.layer.LayerService
 import mil.nga.msi.network.light.LightService
 import mil.nga.msi.network.light.LightsTypeAdapter
 import mil.nga.msi.network.modu.ModuService
@@ -114,6 +115,12 @@ class NetworkModule {
    @Singleton
    fun provideNavigationalWarningService(retrofit: Retrofit): NavigationalWarningService {
       return retrofit.create(NavigationalWarningService::class.java)
+   }
+
+   @Provides
+   @Singleton
+   fun provideLayerService(retrofit: Retrofit): LayerService {
+      return retrofit.create(LayerService::class.java)
    }
 
    @Provides

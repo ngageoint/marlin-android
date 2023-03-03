@@ -34,7 +34,6 @@ import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.navigation.Point
 import mil.nga.msi.ui.port.PortAction
 import mil.nga.msi.ui.port.PortRoute
-import mil.nga.msi.ui.theme.screenBackground
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -113,7 +112,6 @@ private fun Ports(
 ) {
    val lazyItems = pagingState.collectAsLazyPagingItems()
    Surface(
-      color = MaterialTheme.colorScheme.screenBackground,
       modifier = Modifier.fillMaxHeight()
    ) {
       LazyColumn(

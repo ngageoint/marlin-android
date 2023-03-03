@@ -44,7 +44,6 @@ import mil.nga.msi.ui.map.BaseMapType
 import mil.nga.msi.ui.map.MapClip
 import mil.nga.msi.ui.navigation.Point
 import mil.nga.msi.ui.theme.onSurfaceDisabled
-import mil.nga.msi.ui.theme.screenBackground
 
 @Composable
 fun LightDetailScreen(
@@ -84,7 +83,6 @@ private fun LightDetailContent(
 ) {
    if (lights.isNotEmpty()) {
       Surface(
-         color = MaterialTheme.colorScheme.screenBackground,
          modifier = Modifier.fillMaxHeight()
       ) {
          Column(

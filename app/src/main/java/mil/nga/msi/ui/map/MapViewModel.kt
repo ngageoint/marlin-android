@@ -1,18 +1,17 @@
 package mil.nga.msi.ui.map
 
 import android.app.Application
+import android.net.Uri
 import androidx.lifecycle.*
 import com.google.android.gms.maps.model.TileProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.filter.MapBoundsFilter
+import mil.nga.msi.datasource.layer.LayerType
 import mil.nga.msi.filter.ComparatorType
 import mil.nga.msi.filter.Filter
 import mil.nga.msi.filter.FilterParameter
@@ -23,6 +22,7 @@ import mil.nga.msi.repository.asam.AsamRepository
 import mil.nga.msi.repository.dgpsstation.DgpsStationKey
 import mil.nga.msi.repository.dgpsstation.DgpsStationRepository
 import mil.nga.msi.repository.geocoder.GeocoderRemoteDataSource
+import mil.nga.msi.repository.layer.LayerRepository
 import mil.nga.msi.repository.light.LightKey
 import mil.nga.msi.repository.light.LightRepository
 import mil.nga.msi.repository.map.*
@@ -54,6 +54,7 @@ enum class TileProviderType {
 class MapViewModel @Inject constructor(
    private val application: Application,
    private val filterRepository: FilterRepository,
+   layerRepository: LayerRepository,
    private val asamRepository: AsamRepository,
    private val asamTileRepository: AsamTileRepository,
    private val moduRepository: ModuRepository,
@@ -81,6 +82,13 @@ class MapViewModel @Inject constructor(
    val showLocation = userPreferencesRepository.showLocation.asLiveData()
    val fetching = dataSourceRepository.fetching
    val mapped = userPreferencesRepository.mapped.asLiveData()
+   val layers = layerRepository.observeVisibleLayers().transform { layers ->
+      val tileProviders = layers.filter {
+         it.type == LayerType.XYZ || it.type == LayerType.TMS
+      }.map { GridTileProvider(baseUrl = Uri.parse(it.url)) }
+
+      emit(tileProviders)
+   }.asLiveData()
 
    private val _zoom = MutableLiveData<Int>()
 

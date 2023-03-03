@@ -26,7 +26,6 @@ import mil.nga.msi.repository.noticetomariners.NoticeToMarinersGraphic
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.noticetomariners.NoticeToMarinersRoute
 import mil.nga.msi.ui.theme.onSurfaceDisabled
-import mil.nga.msi.ui.theme.screenBackground
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -126,7 +125,6 @@ private fun NoticeToMariners(
    val scrollState = rememberScrollState()
 
    Surface(
-      color = MaterialTheme.colorScheme.screenBackground,
       modifier = Modifier.fillMaxHeight()
    ) {
       Column(

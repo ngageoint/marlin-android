@@ -21,9 +21,7 @@ import mil.nga.msi.sort.SortDirection
 import mil.nga.msi.sort.SortParameter
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.theme.add
-import mil.nga.msi.ui.theme.onSurfaceDisabled
 import mil.nga.msi.ui.theme.remove
-import mil.nga.msi.ui.theme.screenBackground
 
 enum class SortField {
    PRIMARY, SECONDARY
@@ -92,7 +90,7 @@ private fun Sort(
       Modifier
          .fillMaxSize()
          .verticalScroll(scrollState)
-         .background(MaterialTheme.colorScheme.screenBackground)
+         .background(MaterialTheme.colorScheme.surfaceVariant)
          .padding(bottom = 16.dp)
    ) {
       if (options.isNotEmpty()) {

@@ -33,7 +33,6 @@ import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mil.nga.msi.datasource.electronicpublication.ElectronicPublication
 import mil.nga.msi.ui.main.TopBar
-import mil.nga.msi.ui.theme.screenBackground
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -103,7 +102,7 @@ fun ElectronicPublicationTypeBrowseScreen(
             navigationIcon = Icons.Default.ArrowBack,
             onNavigationClicked = onBackClick,
         )
-        Surface(color = MaterialTheme.colorScheme.screenBackground) {
+        Surface {
             when (currentNodeLinks) {
                 is Publications -> {
                     PublicationList(
@@ -148,7 +147,7 @@ fun PublicationSectionsList(
                         Text(
                             style = MaterialTheme.typography.titleSmall,
                             modifier = Modifier
-                                .background(MaterialTheme.colorScheme.screenBackground)
+//                                .background(MaterialTheme.colorScheme.screenBackground)
                                 .padding(6.dp)
                                 .fillMaxWidth(),
                             text = section.title,

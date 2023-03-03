@@ -26,4 +26,5 @@ message UserPreferences {
   map<string, Sort> sort = 9;
   NoticeToMarinersFilter noticeToMarinersFilter = 10;
   int32 version = 11;
+  repeated int32 layers = 12;
 }

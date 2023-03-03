@@ -18,7 +18,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.SubcomposeAsyncImage
 import kotlinx.coroutines.launch
 import mil.nga.msi.ui.main.TopBar
-import mil.nga.msi.ui.theme.screenBackground
 import mil.nga.msi.repository.noticetomariners.NoticeToMarinersGraphic
 
 @Composable
@@ -61,7 +60,6 @@ fun NoticeToMarinersGraphicScreen(
       )
 
       Surface(
-         color = MaterialTheme.colorScheme.screenBackground,
          modifier = Modifier.fillMaxWidth()
       ) {
          if (downloading) {

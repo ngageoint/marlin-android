@@ -6,7 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.noticetomariners.NoticeToMarinersRoute
-import mil.nga.msi.ui.theme.screenBackground
+import mil.nga.msi.ui.theme.onSurfaceDisabled
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -50,9 +50,7 @@ private fun NoticeToMarinersItems(
    notices: Map<String, List<Int>>,
    onTap: (Int) -> Unit,
 ) {
-   Surface(
-      color = MaterialTheme.colors.screenBackground
-   ) {
+   Surface {
       LazyColumn {
          notices.forEach { (year, notices) ->
             stickyHeader {
@@ -78,14 +76,14 @@ private fun NoticeHeader(
       Box(
          modifier = Modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colors.screenBackground)
+            .background(MaterialTheme.colorScheme.surfaceVariant)
             .padding(horizontal = 8.dp, vertical = 8.dp)
       ) {
-         CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
+         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceDisabled) {
             Text(
                text = year,
                fontWeight = FontWeight.Medium,
-               style = MaterialTheme.typography.caption
+               style = MaterialTheme.typography.bodySmall
             )
          }
       }
@@ -116,14 +114,14 @@ private fun NoticeToMarinersItem(
 
       Text(
          text = noticeNumber.toString(),
-         style = MaterialTheme.typography.subtitle1,
+         style = MaterialTheme.typography.titleMedium,
          modifier = Modifier.padding(bottom = 4.dp)
       )
 
-      CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+      CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
          Text(
             text = "$start - $end",
-            style = MaterialTheme.typography.subtitle2
+            style = MaterialTheme.typography.titleSmall
          )
       }
    }

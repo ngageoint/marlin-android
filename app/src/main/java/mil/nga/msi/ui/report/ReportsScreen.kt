@@ -19,7 +19,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.drawable.toBitmap
 import mil.nga.msi.ui.main.TopBar
-import mil.nga.msi.ui.theme.screenBackground
 
 @Composable
 fun ReportsScreen(
@@ -38,7 +37,7 @@ fun ReportsScreen(
          Modifier
             .fillMaxSize()
             .verticalScroll(scrollState)
-            .background(MaterialTheme.colorScheme.screenBackground)
+            .background(MaterialTheme.colorScheme.surfaceVariant)
             .padding(bottom = 16.dp)
       ) {
          CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {

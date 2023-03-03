@@ -21,7 +21,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import mil.nga.msi.datasource.noticetomariners.ChartCorrection
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.noticetomariners.NoticeToMarinersRoute
-import mil.nga.msi.ui.theme.screenBackground
 import java.time.Year
 
 @Composable
@@ -84,7 +83,6 @@ private fun ChartCorrections(
    var expanded by remember { mutableStateOf<Map<String, Boolean>>(emptyMap()) }
 
    Surface(
-      color = MaterialTheme.colorScheme.screenBackground,
       modifier = Modifier.fillMaxHeight()
    ) {
       Column(

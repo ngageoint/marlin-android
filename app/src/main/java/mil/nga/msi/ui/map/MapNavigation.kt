@@ -13,6 +13,7 @@ import com.google.accompanist.navigation.material.ExperimentalMaterialNavigation
 import com.google.accompanist.navigation.material.bottomSheet
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import mil.nga.msi.datasource.layer.LayerType
 import mil.nga.msi.repository.dgpsstation.DgpsStationKey
 import mil.nga.msi.repository.light.LightKey
 import mil.nga.msi.repository.radiobeacon.RadioBeaconKey
@@ -23,6 +24,9 @@ import mil.nga.msi.ui.map.cluster.MapAnnotation
 import mil.nga.msi.ui.map.filter.MapFilterScreen
 import mil.nga.msi.ui.map.settings.MapLightSettingsScreen
 import mil.nga.msi.ui.map.settings.MapSettingsScreen
+import mil.nga.msi.ui.map.settings.layers.MapConfirmLayerScreen
+import mil.nga.msi.ui.map.settings.layers.MapLayersScreen
+import mil.nga.msi.ui.map.settings.layers.MapNewLayerScreen
 import mil.nga.msi.ui.modu.ModuRoute
 import mil.nga.msi.ui.navigation.MapAnnotationsType
 import mil.nga.msi.ui.navigation.Point
@@ -30,6 +34,9 @@ import mil.nga.msi.ui.navigation.Route
 import mil.nga.msi.ui.port.PortRoute
 import mil.nga.msi.ui.radiobeacon.RadioBeaconRoute
 import mil.nga.msi.ui.sheet.PagingSheet
+import java.net.URLDecoder
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 
 sealed class MapRoute(
    override val name: String,
@@ -39,6 +46,9 @@ sealed class MapRoute(
 ): Route {
    object Map: MapRoute("map", "Map")
    object Settings: MapRoute("mapSettings", "Map Settings")
+   object Layers: MapRoute("mapLayers", "Map Layers")
+   object NewLayer: MapRoute("mapNewLayer", "New Layer")
+   object ConfirmLayer: MapRoute("mapConfirmLayer", "New Layer")
    object LightSettings: MapRoute("lightSettings", "Light Settings")
    object PagerSheet: MapRoute("annotationPagerSheet", "Map")
    object Filter: MapRoute("mapFilter", "Filters", "Filters")
@@ -124,11 +134,69 @@ fun NavGraphBuilder.mapGraph(
       bottomBarVisibility(false)
 
       MapSettingsScreen(
+         onLayers = {
+            navController.navigate(MapRoute.Layers.name)
+         },
          onLightSettings = {
             navController.navigate(MapRoute.LightSettings.name)
          },
          onClose = {
             navController.popBackStack()
+         }
+      )
+   }
+
+   composable(MapRoute.Layers.name) {
+      bottomBarVisibility(false)
+
+      MapLayersScreen(
+         onAddLayer = {
+            val route = MapRoute.NewLayer.name
+            navController.navigate(route) {
+               popUpTo(route) {
+                  inclusive = true
+               }
+            }
+         },
+         onClose = {
+            navController.popBackStack()
+         }
+      )
+   }
+
+   composable(MapRoute.NewLayer.name) {
+      bottomBarVisibility(false)
+
+      MapNewLayerScreen(
+         onConfirm =  {
+            val encoded = URLEncoder.encode(it.url, StandardCharsets.UTF_8.toString())
+            val route = "${MapRoute.ConfirmLayer.name}?type=${it.type}&url=${encoded}"
+            navController.navigate(route) {
+               popUpTo(route) {
+                  inclusive = true
+               }
+            }
+         },
+         onClose = {
+            navController.popBackStack(MapRoute.Layers.name, false)
+         }
+      )
+   }
+
+   composable("${MapRoute.ConfirmLayer.name}?type={type}&url={url}") { backstackEntry ->
+      bottomBarVisibility(false)
+
+      val typeArgument = backstackEntry.arguments?.getString("type")
+      requireNotNull(typeArgument) { "'type' argument is required" }
+
+      val urlArgument =  backstackEntry.arguments?.getString("url")
+      requireNotNull(urlArgument) { "'url' is required" }
+
+      MapConfirmLayerScreen(
+         type = LayerType.valueOf(typeArgument),
+         url = URLDecoder.decode(urlArgument, StandardCharsets.UTF_8.toString()),
+         onClose = {
+            navController.popBackStack(MapRoute.Layers.name, false)
          }
       )
    }

@@ -189,4 +189,17 @@ class UserPreferencesRepository @Inject constructor(
          builder.build()
       }
    }
+
+   val layers: Flow<List<Int>> = preferencesDataStore.data.map {
+      it.layersList
+   }.distinctUntilChanged()
+
+   suspend fun setLayers(layers: List<Int>) {
+      preferencesDataStore.updateData { preferences ->
+         preferences.toBuilder()
+            .clearLayers()
+            .addAllLayers(layers)
+            .build()
+      }
+   }
 }

@@ -6,7 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Mail
@@ -22,7 +22,6 @@ import androidx.compose.ui.unit.dp
 import androidx.core.graphics.drawable.toBitmap
 import mil.nga.msi.R
 import mil.nga.msi.ui.main.TopBar
-import mil.nga.msi.ui.theme.screenBackground
 
 @Composable
 fun AboutScreen(
@@ -58,12 +57,12 @@ private fun About(
    Column(
       modifier = Modifier
          .fillMaxHeight()
-         .background(MaterialTheme.colors.screenBackground)
+         .background(MaterialTheme.colorScheme.surfaceVariant)
    ) {
       Column(
          Modifier
             .padding(top = 32.dp)
-            .background(MaterialTheme.colors.surface)
+            .background(MaterialTheme.colorScheme.surface)
       ) {
          Disclaimer() { onDisclaimer() }
          Divider(Modifier.padding(start = 16.dp))
@@ -89,7 +88,7 @@ private fun Disclaimer(
       Row(
          verticalAlignment = Alignment.CenterVertically
       ) {
-         CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
             Icon(
                Icons.Default.PrivacyTip,
                modifier = Modifier.padding(end = 8.dp),
@@ -99,7 +98,7 @@ private fun Disclaimer(
 
          Text(
             text = AboutRoute.Disclaimer.title,
-            style = MaterialTheme.typography.body2,
+            style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.Medium
          )
       }
@@ -121,7 +120,7 @@ private fun Contact(
       Row(
          verticalAlignment = Alignment.CenterVertically
       ) {
-         CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
             Icon(
                Icons.Default.Mail,
                modifier = Modifier.padding(end = 8.dp),
@@ -131,7 +130,7 @@ private fun Contact(
 
          Text(
             text = "Contact Us",
-            style = MaterialTheme.typography.body2,
+            style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.Medium
          )
       }
@@ -153,7 +152,7 @@ private fun Version() {
       Row(
          verticalAlignment = Alignment.CenterVertically
       ) {
-         CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
             val bitmap = AppCompatResources.getDrawable(LocalContext.current, R.drawable.ic_marlin_600dp)!!.toBitmap().asImageBitmap()
             Icon(
                bitmap,
@@ -166,7 +165,7 @@ private fun Version() {
 
          Text(
             text = "Marlin Version ${packageInfo.versionName}",
-            style = MaterialTheme.typography.body2,
+            style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.Medium
          )
       }

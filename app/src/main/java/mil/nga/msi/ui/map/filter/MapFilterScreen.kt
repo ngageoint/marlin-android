@@ -33,7 +33,6 @@ import mil.nga.msi.ui.filter.Filter
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.MapRoute
 import mil.nga.msi.ui.navigation.mainRouteFor
-import mil.nga.msi.ui.theme.screenBackground
 
 @Composable
 fun MapFilterScreen(
@@ -54,7 +53,7 @@ fun MapFilterScreen(
       Column(
          Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.screenBackground)
+            .background(MaterialTheme.colorScheme.surfaceVariant)
             .verticalScroll(scrollState)
       ) {
          DataSources(dataSources = dataSources, location = location)

@@ -90,6 +90,7 @@ fun MapScreen(
    val fetching by viewModel.fetching.observeAsState(emptyMap())
    var fetchingVisibility by rememberSaveable { mutableStateOf(true) }
    val baseMap by viewModel.baseMap.observeAsState()
+   val layers by viewModel.layers.observeAsState(emptyList())
    val mapOrigin by viewModel.mapLocation.observeAsState()
    var destination by remember { mutableStateOf(mapDestination) }
    val location by viewModel.locationPolicy.bestLocationProvider.observeAsState()
@@ -190,6 +191,7 @@ fun MapScreen(
             origin,
             destination,
             baseMap,
+            layers,
             locationSource,
             locationPermissionState.status.isGranted,
             tileProviders,
@@ -361,6 +363,7 @@ private fun Map(
    origin: MapLocation?,
    destination: MapPosition?,
    baseMap: BaseMapType?,
+   layers: List<TileProvider>,
    locationSource: LocationSource,
    locationEnabled: Boolean,
    tileProviders: Map<TileProviderType, TileProvider>,
@@ -426,16 +429,18 @@ private fun Map(
                }
             }
          }
-         mgrsTileProvider?.let { TileOverlay(tileProvider = it)}
-         garsTileProvider?.let { TileOverlay(tileProvider = it)}
-         osmTileProvider?.let { TileOverlay(tileProvider = it)}
+         mgrsTileProvider?.let { TileOverlay(tileProvider = it) }
+         garsTileProvider?.let { TileOverlay(tileProvider = it) }
+         osmTileProvider?.let { TileOverlay(tileProvider = it) }
 
-         asamTileProvider?.let { TileOverlay(tileProvider = it)}
-         moduTileProvider?.let { TileOverlay(tileProvider = it)}
-         lightTileProvider?.let { TileOverlay(tileProvider = it)}
-         portTileProvider?.let { TileOverlay(tileProvider = it)}
-         beaconTileProvider?.let { TileOverlay(tileProvider = it)}
-         dgpsStationTileProvider?.let { TileOverlay(tileProvider = it)}
+         layers.forEach { TileOverlay(tileProvider = it) }
+
+         asamTileProvider?.let { TileOverlay(tileProvider = it) }
+         moduTileProvider?.let { TileOverlay(tileProvider = it) }
+         lightTileProvider?.let { TileOverlay(tileProvider = it) }
+         portTileProvider?.let { TileOverlay(tileProvider = it) }
+         beaconTileProvider?.let { TileOverlay(tileProvider = it) }
+         dgpsStationTileProvider?.let { TileOverlay(tileProvider = it) }
       }
 
       searchResults.forEach { result ->

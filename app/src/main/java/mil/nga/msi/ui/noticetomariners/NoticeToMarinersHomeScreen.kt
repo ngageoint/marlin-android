@@ -10,7 +10,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import mil.nga.msi.ui.main.TopBar
-import mil.nga.msi.ui.theme.screenBackground
 
 enum class NoticeToMarinersHomeChoice {
    ALL,
@@ -38,7 +37,7 @@ private fun NoticeToMariners(
    onTap: (NoticeToMarinersHomeChoice) -> Unit,
 ) {
    Surface(
-      color = MaterialTheme.colorScheme.screenBackground,
+      color = MaterialTheme.colorScheme.surfaceVariant,
       modifier = Modifier.fillMaxSize()
    ) {
       Column(Modifier.padding(top = 32.dp)) {

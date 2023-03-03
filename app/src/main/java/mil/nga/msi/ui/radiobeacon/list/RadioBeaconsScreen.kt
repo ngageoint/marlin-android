@@ -33,7 +33,6 @@ import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.navigation.Point
 import mil.nga.msi.ui.radiobeacon.RadioBeaconAction
 import mil.nga.msi.ui.radiobeacon.RadioBeaconRoute
-import mil.nga.msi.ui.theme.screenBackground
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -110,7 +109,6 @@ private fun RadioBeacons(
    val lazyItems = pagingState.collectAsLazyPagingItems()
 
    Surface(
-      color = MaterialTheme.colorScheme.screenBackground,
       modifier = Modifier.fillMaxHeight()
    ) {
 

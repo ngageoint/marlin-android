@@ -10,6 +10,7 @@ import mil.nga.msi.datasource.MsiDatabase
 import mil.nga.msi.datasource.asam.AsamDao
 import mil.nga.msi.datasource.dgpsstation.DgpsStationDao
 import mil.nga.msi.datasource.electronicpublication.ElectronicPublicationDao
+import mil.nga.msi.datasource.layer.LayerDao
 import mil.nga.msi.datasource.light.LightDao
 import mil.nga.msi.datasource.modu.ModuDao
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarningDao
@@ -46,6 +47,12 @@ class RoomModule {
    @Singleton
    fun provideNavigationalWarningDao(database: MsiDatabase): NavigationalWarningDao {
       return database.navigationalWarning()
+   }
+
+   @Provides
+   @Singleton
+   fun provideLayerDao(database: MsiDatabase): LayerDao {
+      return database.layerDao()
    }
 
    @Provides
