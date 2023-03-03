@@ -89,8 +89,12 @@ fun MapLayersScreen(
                onRemove = {
                   viewModel.deleteLayer(it)
                },
-               onReorder = { layers ->
-                  viewModel.setLayerOrder(layers.map { it.id.toInt() })
+               onLayerReorder = { fromIndex, toIndex ->
+                  val ordered = layers.toMutableList().apply {
+                     val removed = removeAt(fromIndex)
+                     add(toIndex, removed)
+                  }
+                  viewModel.setLayerOrder(ordered.map { it.id.toInt() })
                }
             )
          }
@@ -104,20 +108,13 @@ private fun Layers(
    layers: List<Layer>,
    onToggle: (Layer, Boolean) -> Unit,
    onRemove: (Layer) -> Unit,
-   onReorder: (List<Layer>) -> Unit
+   onLayerReorder: (fromIndex: Int, toIndex: Int) -> Unit
 ) {
    Log.i("Log", "orig list $layers")
 
    val listState = rememberLazyListState()
    val dragDropState = rememberDragDropState(listState) { fromIndex, toIndex ->
-      Log.i("Log", "reorder from: $fromIndex to $toIndex")
-      Log.i("Log", "layers list is $layers")
-
-      val ordered = layers.toMutableList().apply {
-         val removed = removeAt(fromIndex)
-         add(toIndex, removed)
-      }
-//      onReorder(ordered)
+      onLayerReorder(fromIndex, toIndex)
    }
 
    Column(
