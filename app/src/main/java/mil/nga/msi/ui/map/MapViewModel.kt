@@ -115,11 +115,9 @@ class MapViewModel @Inject constructor(
 
    val searchResults = searchText
       .map {
-         val stuff = if (it.isNotEmpty()) {
+         if (it.isNotEmpty()) {
             geocoderRemoteDataSource.geocode(it)
          } else emptyList()
-
-         stuff
       }.asLiveData()
 
    fun toggleOnMap(dataSource: DataSource) {
