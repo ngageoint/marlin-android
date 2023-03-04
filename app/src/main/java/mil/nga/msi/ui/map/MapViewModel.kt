@@ -82,7 +82,11 @@ class MapViewModel @Inject constructor(
    val showLocation = userPreferencesRepository.showLocation.asLiveData()
    val fetching = dataSourceRepository.fetching
    val mapped = userPreferencesRepository.mapped.asLiveData()
-   val layers = layerRepository.observeVisibleLayers().transform { layers ->
+
+   val layers = combine(userPreferencesRepository.layers, layerRepository.observeVisibleLayers()) { order, layers ->
+      val orderById = order.withIndex().associate { (index, it) -> it to index }
+      layers.sortedBy { orderById[it.id.toInt()] }
+   }.transform { layers ->
       val tileProviders = layers.filter {
          it.type == LayerType.XYZ || it.type == LayerType.TMS
       }.map { GridTileProvider(baseUrl = Uri.parse(it.url)) }

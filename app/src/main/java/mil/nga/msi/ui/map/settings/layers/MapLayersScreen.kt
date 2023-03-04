@@ -1,6 +1,5 @@
 package mil.nga.msi.ui.map.settings.layers
 
-import android.util.Log
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -32,6 +31,7 @@ import mil.nga.msi.ui.drag.dragContainer
 import mil.nga.msi.ui.drag.rememberDragDropState
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.MapRoute
+import mil.nga.msi.ui.theme.onSurfaceDisabled
 
 @Composable
 fun MapLayersScreen(
@@ -108,13 +108,11 @@ private fun Layers(
    layers: List<Layer>,
    onToggle: (Layer, Boolean) -> Unit,
    onRemove: (Layer) -> Unit,
-   onLayerReorder: (fromIndex: Int, toIndex: Int) -> Unit
+   onLayerReorder: (from: Int, to: Int) -> Unit
 ) {
-   Log.i("Log", "orig list $layers")
-
    val listState = rememberLazyListState()
-   val dragDropState = rememberDragDropState(listState) { fromIndex, toIndex ->
-      onLayerReorder(fromIndex, toIndex)
+   val dragDropState = rememberDragDropState(listState) { from, to ->
+      onLayerReorder(from, to)
    }
 
    Column(
@@ -123,8 +121,16 @@ private fun Layers(
    ) {
       CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
          Text(
-            text = "ADDITIONAL LAYERS",
+            text = "MAP LAYERS",
             style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(start = 16.dp, top = 16.dp)
+         )
+      }
+
+      CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceDisabled) {
+         Text(
+            text = "Drag to reorder layers on map.",
+            style = MaterialTheme.typography.labelLarge,
             modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 16.dp)
          )
       }

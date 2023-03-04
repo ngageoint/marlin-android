@@ -1,6 +1,5 @@
 package mil.nga.msi.ui.map.settings.layers
 
-import android.util.Log
 import androidx.lifecycle.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.combine
@@ -16,13 +15,11 @@ class MapLayersViewModel @Inject constructor(
    private val userPreferencesRepository: UserPreferencesRepository
 ): ViewModel() {
    val layers = combine(userPreferencesRepository.layers, layerRepository.observeLayers()) { order, layers ->
-      layers.sortedBy {
-         order.getOrNull(it.id.toInt()) ?: it.id.toInt()
-      }
+      val orderById = order.withIndex().associate { (index, it) -> it to index }
+      layers.sortedBy { orderById[it.id.toInt()] }
    }.asLiveData()
 
    fun setLayerOrder(layers: List<Int>) {
-      Log.i("Billy", "layer order is $layers")
       viewModelScope.launch {
          userPreferencesRepository.setLayers(layers)
       }
