@@ -1,5 +1,6 @@
 package mil.nga.msi.ui.map.settings.layers
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -11,6 +12,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.outlined.AddBox
 import androidx.compose.material3.*
@@ -32,6 +34,7 @@ import mil.nga.msi.ui.drag.rememberDragDropState
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.MapRoute
 import mil.nga.msi.ui.theme.onSurfaceDisabled
+import mil.nga.msi.ui.theme.remove
 
 @Composable
 fun MapLayersScreen(
@@ -102,7 +105,7 @@ fun MapLayersScreen(
    }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 private fun Layers(
    layers: List<Layer>,
@@ -147,58 +150,51 @@ private fun Layers(
                key = { _, item -> item.id }
             ) { index, layer ->
                DraggableItem(dragDropState, index) { isDragging ->
-                  Layer(
-                     layer = layer,
-                     isDragging = isDragging,
-                     onToggle = { layer, enabled ->
-                        onToggle(layer, enabled)
-                     }
-                  )
+                  val dismissState = rememberDismissState()
 
-//                  val dismissState = rememberDismissState()
-//
-//                  if (dismissState.isDismissed(DismissDirection.EndToStart)) {
-//                     onRemove(layer)
-//                  }
-//
-//                  SwipeToDismiss(
-//                     state = dismissState,
-//                     directions = setOf(DismissDirection.EndToStart),
-//                     background = {
-//                        val color by animateColorAsState(
-//                           when (dismissState.targetValue) {
-//                              DismissValue.Default -> MaterialTheme.colorScheme.surface
-//                              else -> MaterialTheme.colorScheme.remove
-//                           }
-//                        )
-//
-//                        Surface(
-//                           color = MaterialTheme.colorScheme.remove
-//                        ) {
-//                           Box(
-//                              Modifier
-//                                 .fillMaxSize()
-//                                 .background(color)
-//                                 .padding(horizontal = 16.dp),
-//                              contentAlignment = Alignment.CenterEnd
-//                           ) {
-//                              Icon(
-//                                 Icons.Default.Delete,
-//                                 tint = MaterialTheme.colorScheme.onPrimary,
-//                                 contentDescription = "Delete Icon"
-//                              )
-//                           }
-//                        }
-//
-//                     }
-//                  ) {
-//                     Layer(
-//                        layer = layer,
-//                        onToggle = { layer, enabled ->
-//                           onToggle(layer, enabled)
-//                        }
-//                     )
-//                  }
+                  if (dismissState.isDismissed(DismissDirection.EndToStart)) {
+                     onRemove(layer)
+                  }
+
+                  SwipeToDismiss(
+                     state = dismissState,
+                     directions = setOf(DismissDirection.EndToStart),
+                     background = {
+                        val color by animateColorAsState(
+                           when (dismissState.targetValue) {
+                              DismissValue.Default -> MaterialTheme.colorScheme.surface
+                              else -> MaterialTheme.colorScheme.remove
+                           }
+                        )
+
+                        Surface(
+                           color = MaterialTheme.colorScheme.remove
+                        ) {
+                           Box(
+                              Modifier
+                                 .fillMaxSize()
+                                 .background(color)
+                                 .padding(horizontal = 16.dp),
+                              contentAlignment = Alignment.CenterEnd
+                           ) {
+                              Icon(
+                                 Icons.Default.Delete,
+                                 tint = MaterialTheme.colorScheme.onPrimary,
+                                 contentDescription = "Delete Icon"
+                              )
+                           }
+                        }
+
+                     }
+                  ) {
+                     Layer(
+                        layer = layer,
+                        isDragging = isDragging,
+                        onToggle = { layer, enabled ->
+                           onToggle(layer, enabled)
+                        }
+                     )
+                  }
                }
             }
          }
