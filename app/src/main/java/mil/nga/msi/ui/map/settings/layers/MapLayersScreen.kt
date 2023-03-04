@@ -126,15 +126,15 @@ private fun Layers(
          Text(
             text = "MAP LAYERS",
             style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(start = 16.dp, top = 16.dp)
+            modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 4.dp)
          )
       }
 
       CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceDisabled) {
          Text(
-            text = "Drag to reorder layers on map.",
-            style = MaterialTheme.typography.labelLarge,
-            modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 16.dp)
+            text = "Reorder layers on map with long press and drag.",
+            style = MaterialTheme.typography.labelMedium,
+            modifier = Modifier.padding(start = 16.dp, bottom = 16.dp)
          )
       }
 
@@ -215,6 +215,7 @@ private fun Layer(
       tonalElevation = elevation,
       shadowElevation = elevation,
       headlineText = { Text(layer.displayName) },
+      supportingText = { Text(layer.url) },
       leadingContent = {
          Icon(
             Icons.Default.Menu,
