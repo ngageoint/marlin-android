@@ -1,6 +1,7 @@
 package mil.nga.msi.repository.layer
 
 import mil.nga.msi.datasource.layer.Layer
+import mil.nga.msi.network.layer.wms.WMSCapabilities
 import javax.inject.Inject
 
 class LayerRepository @Inject constructor(
@@ -12,6 +13,10 @@ class LayerRepository @Inject constructor(
 
    suspend fun getTile(url: String): Boolean {
       return remoteDataSource.getTile(url)
+   }
+
+   suspend fun getWMSCapabilities(url: String): WMSCapabilities? {
+      return remoteDataSource.getWMSCapabilities(url)
    }
 
    suspend fun createLayer(layer: Layer) {

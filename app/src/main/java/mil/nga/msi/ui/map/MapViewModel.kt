@@ -83,17 +83,6 @@ class MapViewModel @Inject constructor(
    val fetching = dataSourceRepository.fetching
    val mapped = userPreferencesRepository.mapped.asLiveData()
 
-   val layers = combine(userPreferencesRepository.layers, layerRepository.observeVisibleLayers()) { order, layers ->
-      val orderById = order.withIndex().associate { (index, it) -> it to index }
-      layers.sortedBy { orderById[it.id.toInt()] }
-   }.transform { layers ->
-      val tileProviders = layers.filter {
-         it.type == LayerType.XYZ || it.type == LayerType.TMS
-      }.map { GridTileProvider(baseUrl = Uri.parse(it.url)) }
-
-      emit(tileProviders)
-   }.asLiveData()
-
    private val _zoom = MutableLiveData<Int>()
 
    suspend fun setMapLocation(mapLocation: MapLocation, zoom: Int) {
@@ -128,6 +117,23 @@ class MapViewModel @Inject constructor(
 
    val filterCount = filterRepository.filters.map { entry ->
       entry.values.fold(0) { count, filters -> count + filters.size }
+   }.asLiveData()
+
+   val layers = combine(userPreferencesRepository.layers, layerRepository.observeVisibleLayers()) { order, layers ->
+      val orderById = order.withIndex().associate { (index, it) -> it to index }
+      layers.sortedBy { orderById[it.id.toInt()] }
+   }.transform { layers ->
+      val tileProviders = layers.map {  layer ->
+         when (layer.type) {
+            LayerType.WMS -> {
+               WMSTileProvider(layer = layer)
+            } else -> {
+               GridTileProvider(baseUrl = Uri.parse(layer.url))
+            }
+         }
+      }
+
+      emit(tileProviders)
    }.asLiveData()
 
    val tileProviders: LiveData<Map<TileProviderType, TileProvider>> = MediatorLiveData<Map<TileProviderType, TileProvider>>().apply {

@@ -1,6 +1,7 @@
 package mil.nga.msi.ui.map.settings.layers
 
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -9,6 +10,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import mil.nga.msi.network.layer.wms.WMSCapabilities
 import mil.nga.msi.repository.layer.LayerRepository
 import javax.inject.Inject
 
@@ -21,8 +23,8 @@ class MapNewLayerViewModel @Inject constructor(
    val tileUrl: LiveData<Uri> = _tileUrl
 
    private var wmsUrlJob: Job? = null
-   private val _wmsUrl = MutableLiveData<Uri>()
-   val wmsUrl: LiveData<Uri> = _wmsUrl
+   private val _wmsCapabilities = MutableLiveData<WMSCapabilities?>()
+   val wmsCapabilities: LiveData<WMSCapabilities?> = _wmsCapabilities
 
    fun onLayerUrl(url: String) {
       tileUrlJob?.cancel()
@@ -36,9 +38,7 @@ class MapNewLayerViewModel @Inject constructor(
       wmsUrlJob?.cancel()
       wmsUrlJob = viewModelScope.launch {
          delay(DEBOUNCE_TIMEOUT_MILLIS)
-//         if (layerRepository.getTile(url)) {
-//            _wmsUrl.value = Uri.parse(url)
-//         }
+         _wmsCapabilities.value = layerRepository.getWMSCapabilities(url)
       }
    }
 

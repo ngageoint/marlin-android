@@ -14,6 +14,7 @@ import com.google.accompanist.navigation.material.bottomSheet
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import mil.nga.msi.datasource.layer.LayerType
+import mil.nga.msi.network.layer.wms.WMSCapabilities
 import mil.nga.msi.repository.dgpsstation.DgpsStationKey
 import mil.nga.msi.repository.light.LightKey
 import mil.nga.msi.repository.radiobeacon.RadioBeaconKey
@@ -24,13 +25,12 @@ import mil.nga.msi.ui.map.cluster.MapAnnotation
 import mil.nga.msi.ui.map.filter.MapFilterScreen
 import mil.nga.msi.ui.map.settings.MapLightSettingsScreen
 import mil.nga.msi.ui.map.settings.MapSettingsScreen
-import mil.nga.msi.ui.map.settings.layers.MapConfirmLayerScreen
-import mil.nga.msi.ui.map.settings.layers.MapLayersScreen
-import mil.nga.msi.ui.map.settings.layers.MapNewLayerScreen
+import mil.nga.msi.ui.map.settings.layers.*
+import mil.nga.msi.ui.map.settings.layers.grid.MapGridLayerScreen
+import mil.nga.msi.ui.map.settings.layers.wms.MapWMSLayerScreen
+import mil.nga.msi.ui.map.settings.layers.wms.MapWMSLayerSettingsScreen
 import mil.nga.msi.ui.modu.ModuRoute
-import mil.nga.msi.ui.navigation.MapAnnotationsType
-import mil.nga.msi.ui.navigation.Point
-import mil.nga.msi.ui.navigation.Route
+import mil.nga.msi.ui.navigation.*
 import mil.nga.msi.ui.port.PortRoute
 import mil.nga.msi.ui.radiobeacon.RadioBeaconRoute
 import mil.nga.msi.ui.sheet.PagingSheet
@@ -48,7 +48,9 @@ sealed class MapRoute(
    object Settings: MapRoute("mapSettings", "Map Settings")
    object Layers: MapRoute("mapLayers", "Map Layers")
    object NewLayer: MapRoute("mapNewLayer", "New Layer")
-   object ConfirmLayer: MapRoute("mapConfirmLayer", "New Layer")
+   object GridLayer: MapRoute("mapGridLayer", "Grid Layer")
+   object WMSLayerSettings: MapRoute("mapWMSLayerSettings", "WMS Layer")
+   object WMSLayer: MapRoute("mapWMSLayer", "WMS Layer")
    object LightSettings: MapRoute("lightSettings", "Light Settings")
    object PagerSheet: MapRoute("annotationPagerSheet", "Map")
    object Filter: MapRoute("mapFilter", "Filters", "Filters")
@@ -153,9 +155,7 @@ fun NavGraphBuilder.mapGraph(
          onAddLayer = {
             val route = MapRoute.NewLayer.name
             navController.navigate(route) {
-               popUpTo(route) {
-                  inclusive = true
-               }
+               popUpTo(route) { inclusive = true }
             }
          },
          onClose = {
@@ -168,13 +168,18 @@ fun NavGraphBuilder.mapGraph(
       bottomBarVisibility(false)
 
       MapNewLayerScreen(
-         onConfirm =  {
-            val encoded = URLEncoder.encode(it.url, StandardCharsets.UTF_8.toString())
-            val route = "${MapRoute.ConfirmLayer.name}?type=${it.type}&url=${encoded}"
+         onGridLayer =  { type, url ->
+            val encoded = URLEncoder.encode(url, StandardCharsets.UTF_8.toString())
+            val route = "${MapRoute.GridLayer.name}?type=${type}&url=${encoded}"
             navController.navigate(route) {
-               popUpTo(route) {
-                  inclusive = true
-               }
+               popUpTo(route) { inclusive = true }
+            }
+         },
+         onWmsLayer = { url, wmsCapabilities ->
+            val encoded = Uri.encode(Json.encodeToString(wmsCapabilities))
+            val route = "${MapRoute.WMSLayerSettings.name}?url=${url}&wmsCapabilities=${encoded}"
+            navController.navigate(route) {
+               popUpTo(route) { inclusive = true }
             }
          },
          onClose = {
@@ -183,18 +188,60 @@ fun NavGraphBuilder.mapGraph(
       )
    }
 
-   composable("${MapRoute.ConfirmLayer.name}?type={type}&url={url}") { backstackEntry ->
+   composable("${MapRoute.GridLayer.name}?type={type}&url={url}") { backstackEntry ->
       bottomBarVisibility(false)
 
-      val typeArgument = backstackEntry.arguments?.getString("type")
-      requireNotNull(typeArgument) { "'type' argument is required" }
+      val type = backstackEntry.arguments?.getString("type")
+      requireNotNull(type) { "'type' argument is required" }
 
-      val urlArgument =  backstackEntry.arguments?.getString("url")
-      requireNotNull(urlArgument) { "'url' is required" }
+      val url = backstackEntry.arguments?.getString("url")
+      requireNotNull(url) { "'url' argument is required" }
 
-      MapConfirmLayerScreen(
-         type = LayerType.valueOf(typeArgument),
-         url = URLDecoder.decode(urlArgument, StandardCharsets.UTF_8.toString()),
+      MapGridLayerScreen(
+         type = LayerType.valueOf(type),
+         url = URLDecoder.decode(url, StandardCharsets.UTF_8.toString()),
+         onClose = {
+            navController.popBackStack(MapRoute.Layers.name, false)
+         }
+      )
+   }
+
+   composable(
+      route = "${MapRoute.WMSLayerSettings.name}?url={url}&wmsCapabilities={wmsCapabilities}",
+      arguments = listOf(navArgument("wmsCapabilities") { type = NavType.WMSCapabilities })
+   ) { backstackEntry ->
+      bottomBarVisibility(false)
+
+      val url = backstackEntry.arguments?.getString("url")
+      requireNotNull(url) { "'url' argument is required" }
+
+      val wmsCapabilities = backstackEntry.arguments?.getParcelable<WMSCapabilities>("wmsCapabilities")
+      requireNotNull(wmsCapabilities) { "'wmsCapabilities' argument is required" }
+
+      MapWMSLayerSettingsScreen(
+         url = URLDecoder.decode(url, StandardCharsets.UTF_8.toString()),
+         wmsCapabilities = wmsCapabilities,
+         done = { wmsUrl ->
+            val encoded = URLEncoder.encode(wmsUrl, StandardCharsets.UTF_8.toString())
+            val route = "${MapRoute.WMSLayer.name}?url=${encoded}"
+            navController.navigate(route) {
+               popUpTo(route) { inclusive = true }
+            }
+         },
+         onClose = {
+            navController.popBackStack(MapRoute.Layers.name, false)
+         }
+      )
+   }
+
+   composable("${MapRoute.WMSLayer.name}?url={url}") { backstackEntry ->
+      bottomBarVisibility(false)
+
+      val url = backstackEntry.arguments?.getString("url")
+      requireNotNull(url) { "'url' argument is required" }
+
+      MapWMSLayerScreen(
+         url = URLDecoder.decode(url, StandardCharsets.UTF_8.toString()),
          onClose = {
             navController.popBackStack(MapRoute.Layers.name, false)
          }

@@ -1,13 +1,18 @@
 package mil.nga.msi.ui.map.settings.layers
 
 import android.net.Uri
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.End
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -19,29 +24,34 @@ import com.google.maps.android.compose.*
 import com.google.maps.android.ktx.model.tileOverlayOptions
 import kotlinx.coroutines.launch
 import mil.nga.msi.datasource.layer.LayerType
+import mil.nga.msi.network.layer.wms.WMSCapabilities
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.MapRoute
 import mil.nga.msi.ui.map.overlay.GridTileProvider
 
-data class NewLayerState(
-   val url: String,
-   val type: LayerType
-)
-
 @Composable
 fun MapNewLayerScreen(
-   onConfirm: (NewLayerState) -> Unit,
    onClose: () -> Unit,
+   onGridLayer: (LayerType, String) -> Unit,
+   onWmsLayer: (String, WMSCapabilities) -> Unit,
    viewModel: MapNewLayerViewModel = hiltViewModel()
 ) {
    val scope = rememberCoroutineScope()
+   val scrollState = rememberScrollState()
    var url by remember { mutableStateOf("") }
    var type by remember { mutableStateOf<LayerType?>(null) }
    val tileServerUrl by viewModel.tileUrl.observeAsState()
+   val wmsCapabilities by viewModel.wmsCapabilities.observeAsState()
 
    LaunchedEffect(tileServerUrl) {
       if (tileServerUrl != null && type == null) {
          type = LayerType.XYZ
+      }
+   }
+
+   LaunchedEffect(wmsCapabilities) {
+      if (wmsCapabilities != null && type == null) {
+         type = LayerType.WMS
       }
    }
 
@@ -59,8 +69,9 @@ fun MapNewLayerScreen(
             Modifier
                .padding(horizontal = 16.dp)
                .fillMaxHeight()
+               .verticalScroll(scrollState)
          ) {
-            NewLayer(
+            WMSLayer(
                url = url,
                type = type,
                onUrlChanged = {
@@ -80,11 +91,21 @@ fun MapNewLayerScreen(
                )
             }
 
-            if (tileServerUrl != null) {
+            wmsCapabilities?.let { wmsCapabilities ->
+               WMSCapabilities(wmsCapabilities)
+            }
+
+            if (tileServerUrl != null || wmsCapabilities != null) {
                Button(
                   onClick = {
                      scope.launch {
-                        type?.let { onConfirm(NewLayerState(url, it)) }
+                        if (tileServerUrl != null) {
+                           type?.let { onGridLayer(it, url) }
+                        }
+
+                        wmsCapabilities?.let { wms ->
+                           onWmsLayer(url, wms)
+                        }
                      }
                   },
                   modifier = Modifier
@@ -101,7 +122,7 @@ fun MapNewLayerScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun NewLayer(
+private fun WMSLayer(
    url: String,
    type: LayerType?,
    onUrlChanged: (String) -> Unit,
@@ -185,30 +206,116 @@ private fun MapLayer(
    type: LayerType?,
    modifier: Modifier = Modifier
 ) {
-   // TODO if XYZ no zoom
-   // TODO if WMS zoom to bound if available
-
-//   val cameraPositionState = rememberCameraPositionState {
-//      position = CameraPosition.fromLatLngZoom(latLng, 16f)
-//   }
-
-   val uiSettings = MapUiSettings(
-      compassEnabled = false
-   )
-
-   val properties = MapProperties(
-      mapType = MapType.NORMAL
-   )
-
    GoogleMap(
-//      cameraPositionState = cameraPositionState,
-      properties = properties,
-      uiSettings = uiSettings,
+      properties = MapProperties(mapType = MapType.NORMAL),
+      uiSettings = MapUiSettings(compassEnabled = false),
       modifier = modifier
    ) {
       tileOverlayOptions {
          TileOverlay(
             tileProvider = GridTileProvider(url, invertYAxis = type == LayerType.TMS)
+         )
+      }
+   }
+}
+
+@Composable
+private fun WMSCapabilities(
+   wmsCapabilities: WMSCapabilities
+) {
+   var expanded by remember { mutableStateOf(false) }
+
+   CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+      Text(
+         text = "WMS SERVER INFORMATION",
+         style = MaterialTheme.typography.bodyMedium,
+         modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 24.dp)
+      )
+   }
+
+   Card {
+      Column(modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 8.dp)) {
+         Text(
+            text = wmsCapabilities.service?.title ?: "WMS Server",
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier
+               .fillMaxWidth()
+               .padding(top = 8.dp, bottom = 16.dp)
+         )
+
+         wmsCapabilities.service?.abstract?.let { abstract ->
+            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+               Text(
+                  text = abstract,
+                  style = MaterialTheme.typography.bodyMedium,
+                  modifier = Modifier
+                     .fillMaxWidth()
+                     .padding(bottom = 16.dp)
+               )
+            }
+         }
+
+         if (!expanded) {
+            IconButton(
+               onClick = { expanded = true },
+               modifier = Modifier.align(End)
+            ) {
+               Icon(Icons.Default.MoreHoriz,
+                  tint = MaterialTheme.colorScheme.primary,
+                  contentDescription = "Zoom to ASAM"
+               )
+            }
+         }
+
+         Column(Modifier.animateContentSize()) {
+            if (expanded) {
+               wmsCapabilities.version?.let {
+                  WMSServiceProperty(name = "WMS Version", value = it)
+               }
+
+               wmsCapabilities.service?.contactInformation?.person?.name?.let {
+                  WMSServiceProperty(name = "Contact Person", value = it)
+               }
+
+               wmsCapabilities.service?.contactInformation?.person?.organization?.let {
+                  WMSServiceProperty(name = "Contact Organization", value = it)
+               }
+
+               wmsCapabilities.service?.contactInformation?.phone?.let {
+                  WMSServiceProperty(name = "Contact Phone", value = it)
+               }
+
+               wmsCapabilities.service?.contactInformation?.email?.let {
+                  WMSServiceProperty(name = "Contact Phone", value = it)
+               }
+            }
+         }
+      }
+   }
+}
+
+@Composable
+private fun WMSServiceProperty(
+   name: String,
+   value: String
+) {
+   Column(
+      Modifier.padding(vertical = 8.dp)
+   ) {
+      CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+         Text(
+            text = name,
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.padding(bottom = 4.dp)
+         )
+      }
+
+      CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
+         Text(
+            text = value,
+            style = MaterialTheme.typography.bodyLarge
          )
       }
    }

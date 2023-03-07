@@ -21,6 +21,7 @@ import mil.nga.msi.datasource.noticetomariners.NoticeToMariners
 import mil.nga.msi.datasource.noticetomariners.NoticeToMarinersGraphics
 import mil.nga.msi.datasource.port.Port
 import mil.nga.msi.datasource.radiobeacon.RadioBeacon
+import mil.nga.msi.network.QualifiedTypeConverterFactory
 import mil.nga.msi.network.asam.AsamService
 import mil.nga.msi.network.asam.AsamsTypeAdapter
 import mil.nga.msi.network.dgpsstations.DgpsStationService
@@ -44,6 +45,7 @@ import mil.nga.msi.network.radiobeacon.RadioBeaconsTypeAdapter
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.converter.simplexml.SimpleXmlConverterFactory
 import java.util.List
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -88,7 +90,12 @@ class NetworkModule {
       okHttpClient: OkHttpClient,
    ): Retrofit {
      return Retrofit.Builder()
-         .addConverterFactory(GsonConverterFactory.create(gson))
+        .addConverterFactory(
+           QualifiedTypeConverterFactory(
+              GsonConverterFactory.create(gson),
+              SimpleXmlConverterFactory.create()
+           )
+        )
          .baseUrl("https://msi.nga.mil/api/")
          .client(okHttpClient)
          .build()
