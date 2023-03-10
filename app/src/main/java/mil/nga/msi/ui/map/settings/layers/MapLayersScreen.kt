@@ -25,9 +25,11 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import mil.nga.msi.datasource.layer.Layer
+import mil.nga.msi.datasource.layer.LayerType
 import mil.nga.msi.ui.drag.DraggableItem
 import mil.nga.msi.ui.drag.dragContainer
 import mil.nga.msi.ui.drag.rememberDragDropState
@@ -38,6 +40,7 @@ import mil.nga.msi.ui.theme.remove
 
 @Composable
 fun MapLayersScreen(
+   onTap: (Long, LayerType) -> Unit,
    onAddLayer: () -> Unit,
    onClose: () -> Unit,
    viewModel: MapLayersViewModel = hiltViewModel()
@@ -86,12 +89,9 @@ fun MapLayersScreen(
 
             Layers(
                layers,
-               onToggle = { layer, enabled ->
-                  viewModel.enableLayer(layer, enabled)
-               },
-               onRemove = {
-                  viewModel.deleteLayer(it)
-               },
+               onTap = { onTap(it.id, it.type) },
+               onToggle = { layer, enabled -> viewModel.enableLayer(layer, enabled) },
+               onRemove = { viewModel.deleteLayer(it) },
                onLayerReorder = { fromIndex, toIndex ->
                   val ordered = layers.toMutableList().apply {
                      val removed = removeAt(fromIndex)
@@ -109,6 +109,7 @@ fun MapLayersScreen(
 @Composable
 private fun Layers(
    layers: List<Layer>,
+   onTap: (Layer) -> Unit,
    onToggle: (Layer, Boolean) -> Unit,
    onRemove: (Layer) -> Unit,
    onLayerReorder: (from: Int, to: Int) -> Unit
@@ -190,6 +191,7 @@ private fun Layers(
                      Layer(
                         layer = layer,
                         isDragging = isDragging,
+                        onTap = { onTap(layer) },
                         onToggle = { layer, enabled ->
                            onToggle(layer, enabled)
                         }
@@ -207,6 +209,7 @@ private fun Layers(
 private fun Layer(
    layer: Layer,
    isDragging: Boolean,
+   onTap: () -> Unit,
    onToggle: (Layer, Boolean) -> Unit
 ) {
    val elevation by animateDpAsState(if (isDragging) 4.dp else 0.dp)
@@ -214,8 +217,14 @@ private fun Layer(
    ListItem(
       tonalElevation = elevation,
       shadowElevation = elevation,
-      headlineText = { Text(layer.displayName) },
-      supportingText = { Text(layer.url) },
+      headlineText = { Text(layer.name) },
+      supportingText = {
+         Text(
+            text = layer.url,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+         )
+      },
       leadingContent = {
          Icon(
             Icons.Default.Menu,
@@ -229,7 +238,8 @@ private fun Layer(
                onToggle(layer, !layer.visible)
             }
          )
-      }
+      },
+      modifier = Modifier.clickable { onTap() }
    )
 
    Divider()

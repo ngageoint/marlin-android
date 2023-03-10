@@ -11,23 +11,12 @@ class LayerRepository @Inject constructor(
    fun observeLayers() = localDataSource.observeLayers()
    fun observeVisibleLayers() = localDataSource.observeVisibleLayers()
 
-   suspend fun getTile(url: String): Boolean {
-      return remoteDataSource.getTile(url)
-   }
+   suspend fun getTile(url: String) = remoteDataSource.getTile(url)
+   suspend fun getWMSCapabilities(url: String) = remoteDataSource.getWMSCapabilities(url)
 
-   suspend fun getWMSCapabilities(url: String): WMSCapabilities? {
-      return remoteDataSource.getWMSCapabilities(url)
-   }
-
-   suspend fun createLayer(layer: Layer) {
-      localDataSource.insert(layer)
-   }
-
-   suspend fun enabledLayer(layer: Layer, enabled: Boolean) {
-      localDataSource.enable(layer, enabled)
-   }
-
-   suspend fun deleteLayer(layer: Layer) {
-      localDataSource.delete(layer)
-   }
+   suspend fun getLayer(id: Long) = localDataSource.getLayer(id)
+   suspend fun createLayer(layer: Layer) = localDataSource.insertLayer(layer)
+   suspend fun updateLayer(layer: Layer) = localDataSource.updateLayer(layer)
+   suspend fun enabledLayer(layer: Layer, enabled: Boolean) = localDataSource.enableLayer(layer, enabled)
+   suspend fun deleteLayer(layer: Layer) = localDataSource.deleteLayer(layer)
 }

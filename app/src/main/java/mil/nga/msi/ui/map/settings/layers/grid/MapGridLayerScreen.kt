@@ -6,71 +6,128 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.maps.android.compose.*
 import com.google.maps.android.ktx.model.tileOverlayOptions
-import kotlinx.coroutines.launch
+import mil.nga.msi.datasource.layer.Layer
 import mil.nga.msi.datasource.layer.LayerType
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.MapRoute
 import mil.nga.msi.ui.map.overlay.GridTileProvider
 
 @Composable
-fun MapGridLayerScreen(
+fun MapGridLayerCreateScreen(
    type: LayerType,
    url: String,
    onClose: () -> Unit,
    viewModel: MapGridLayerViewModel = hiltViewModel()
 ) {
-   val scope = rememberCoroutineScope()
    var name by remember { mutableStateOf("") }
 
    Column {
       TopBar(
-         title = MapRoute.GridLayer.title,
+         title = MapRoute.CreateGridLayer.title,
          navigationIcon = Icons.Default.Close,
          onNavigationClicked = { onClose() }
       )
 
-      Surface(
-         color = MaterialTheme.colorScheme.surfaceVariant
-      ) {
-         Column(Modifier.fillMaxHeight()) {
-            WMSLayer(
-               url = url,
-               type = type,
+      MapGridLayerScreen(
+         name = name,
+         type = type,
+         url = url,
+         onNameChanged = { name = it },
+         onSave = {
+            viewModel.createLayer(
                name = name,
-               onNameChanged = { name = it }
-            )
-
-            Map(
-               url = Uri.parse(url),
                type = type,
-               modifier = Modifier
-                  .fillMaxWidth()
-                  .weight(1f)
+               url = url
             )
+            onClose()
+         }
+      )
+   }
+}
 
-            Button(
-               enabled = name.isNotEmpty(),
-               onClick = {
-                  scope.launch {
-                     viewModel.saveLayer(
-                        name = name,
-                        type = type,
-                        url = url
-                     )
-                     onClose()
-                  }
-               },
-               modifier = Modifier
-                  .fillMaxWidth()
-                  .padding(16.dp)
-            ) {
-               Text(text = "Create Layer")
+@Composable
+fun MapGridLayerEditScreen(
+   id: Long,
+   onClose: () -> Unit,
+   viewModel: MapGridLayerViewModel = hiltViewModel()
+) {
+   var name by remember { mutableStateOf("") }
+   val layer by viewModel.layer.observeAsState()
+   viewModel.setId(id)
+
+   LaunchedEffect(layer) {
+      layer?.let { name = it.name }
+   }
+
+   Column {
+      TopBar(
+         title = layer?.name ?: "",
+         navigationIcon = Icons.Default.Close,
+         onNavigationClicked = { onClose() }
+      )
+
+      layer?.let { layer ->
+         MapGridLayerScreen(
+            name = name,
+            type = layer.type,
+            url = layer.url,
+            onNameChanged = { name = it },
+            onSave = {
+               val update = Layer(
+                  id = layer.id,
+                  name = name,
+                  type = layer.type,
+                  url = layer.url
+               )
+               viewModel.updateLayer(update)
+               onClose()
             }
+         )
+      }
+   }
+}
+
+@Composable
+private fun MapGridLayerScreen(
+   name: String,
+   type: LayerType,
+   url: String,
+   onNameChanged: (String) -> Unit,
+   onSave: () -> Unit
+) {
+   Surface(
+      color = MaterialTheme.colorScheme.surfaceVariant
+   ) {
+      Column(Modifier.fillMaxHeight()) {
+         GridLayer(
+            url = url,
+            type = type,
+            name = name,
+            onNameChanged = onNameChanged
+         )
+
+         Map(
+            url = Uri.parse(url),
+            type = type,
+            modifier = Modifier
+               .fillMaxWidth()
+               .weight(1f)
+         )
+
+         Button(
+            enabled = name.isNotEmpty(),
+            onClick = { onSave() },
+            modifier = Modifier
+               .fillMaxWidth()
+               .padding(16.dp)
+         ) {
+            Text(text = "Save Layer")
          }
       }
    }
@@ -78,10 +135,10 @@ fun MapGridLayerScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun WMSLayer(
+private fun GridLayer(
+   name: String,
    url: String,
    type: LayerType,
-   name: String,
    onNameChanged: (String) -> Unit
 ) {
    Column(Modifier.padding(16.dp)) {

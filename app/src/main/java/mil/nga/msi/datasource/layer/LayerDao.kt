@@ -20,6 +20,9 @@ interface LayerDao {
    @Query("SELECT COUNT(*) from layers")
    fun count(): Int
 
+   @Query("SELECT * FROM layers WHERE id = :id")
+   suspend fun getLayer(id: Long): Layer
+
    @Query("SELECT * FROM layers")
    fun observeLayers(): Flow<List<Layer>>
 

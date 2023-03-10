@@ -23,9 +23,6 @@ data class Layer(
    @ColumnInfo(name = "name")
    val name: String,
 
-   @ColumnInfo(name = "display_name")
-   val displayName: String,
-
    @ColumnInfo(name = "visible")
    var visible: Boolean = true
 ) {

@@ -11,9 +11,11 @@ import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material.icons.outlined.Layers
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.maps.android.compose.*
 import com.google.maps.android.ktx.model.tileOverlayOptions
 import mil.nga.msi.datasource.layer.Layer
@@ -22,16 +24,20 @@ import mil.nga.msi.network.layer.wms.WMSCapabilities
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.MapRoute
 import mil.nga.msi.ui.map.overlay.WMSTileProvider
+import mil.nga.msi.ui.map.settings.layers.MapNewLayerViewModel
 
 @Composable
 fun MapWMSLayerSettingsScreen(
    url: String,
-   wmsCapabilities: WMSCapabilities,
    done: (String) -> Unit,
-   onClose: () -> Unit
+   onClose: () -> Unit,
+   viewModel: MapNewLayerViewModel = hiltViewModel()
 ) {
    var wmsUrl by remember { mutableStateOf(url) }
    var wmsLayers by remember { mutableStateOf<Map<String, Boolean>>(emptyMap()) }
+   val wmsCapabilities by viewModel.wmsCapabilities.observeAsState()
+
+   viewModel.onLayerUrl(url)
 
    Column {
       TopBar(
@@ -40,30 +46,32 @@ fun MapWMSLayerSettingsScreen(
          onNavigationClicked = { onClose() }
       )
 
-      Surface(
-         color = MaterialTheme.colorScheme.surfaceVariant
-      ) {
-         Column(Modifier.fillMaxHeight()) {
-            WMSLayer(
-               wmsUrl = wmsUrl,
-               wmsLayers = wmsLayers,
-               wmsCapabilities = wmsCapabilities,
-               onLayerChecked = { name, checked ->
-                  wmsLayers = wmsLayers.toMutableMap().apply { this[name] = checked }
-                  wmsUrl = wmsUrl(url, wmsLayers.filter { it.value }.keys.toList(), wmsCapabilities)
-               },
-               modifier = Modifier
-                  .fillMaxWidth()
-                  .weight(1f)
-            )
+      wmsCapabilities?.let { wms ->
+         Surface(
+            color = MaterialTheme.colorScheme.surfaceVariant
+         ) {
+            Column(Modifier.fillMaxHeight()) {
+               WMSLayer(
+                  wmsUrl = wmsUrl,
+                  wmsLayers = wmsLayers,
+                  wmsCapabilities = wms,
+                  onLayerChecked = { name, checked ->
+                     wmsLayers = wmsLayers.toMutableMap().apply { this[name] = checked }
+                     wmsUrl = wmsUrl(url, wmsLayers.filter { it.value }.keys.toList(), wms)
+                  },
+                  modifier = Modifier
+                     .fillMaxWidth()
+                     .weight(1f)
+               )
 
-            Button(
-               onClick = { done(wmsUrl) },
-               modifier = Modifier
-                  .fillMaxWidth()
-                  .padding(16.dp)
-            ) {
-               Text(text = "Next")
+               Button(
+                  onClick = { done(wmsUrl) },
+                  modifier = Modifier
+                     .fillMaxWidth()
+                     .padding(16.dp)
+               ) {
+                  Text(text = "Next")
+               }
             }
          }
       }
@@ -95,7 +103,9 @@ private fun WMSLayer(
                .verticalScroll(scrollState)
                .weight(1f)
          ) {
-            wmsCapabilities.capability?.layers?.forEach { layer ->
+            wmsCapabilities.capability?.layers?.asSequence()?.filter { layer ->
+               layer.isWebMercator()
+            }?.forEach { layer ->
                WMSCapabilitiesLayer(
                   layer = layer,
                   wmsLayers = wmsLayers,
@@ -162,7 +172,7 @@ private fun WMSCapabilitiesLayer(
             onLayerChecked = onLayerChecked
          )
       }
-   } else if (layer.queryable > 0) {
+   } else if (layer.hasTiles()) {
       // TODO filter for 3857 or google epsg
       ListItem(
          headlineText = {
@@ -225,7 +235,7 @@ private fun Map(
       uiSettings = MapUiSettings(compassEnabled = false),
       modifier = modifier
    ) {
-      tileOverlayOptions { TileOverlay(tileProvider = WMSTileProvider(layer = layer)) }
+      tileOverlayOptions { TileOverlay(tileProvider = WMSTileProvider(url = layer.url)) }
    }
 }
 
@@ -234,12 +244,9 @@ private fun wmsUrl(
    layers: List<String>,
    wmsCapabilities: WMSCapabilities,
 ): String {
-   // TODO pick image/png or image/jpg from capabilities
-   val format = "image/png"
+   val format = wmsCapabilities.capability?.request?.map?.getImageFormat() ?: "image/png"
    val version = wmsCapabilities.version
-   val epsg = if (version == "1.3" || version == "1.3.0") {
-      "CRS"
-   } else "SRS"
+   val epsg = if (version == "1.3" || version == "1.3.0") "CRS" else "SRS"
 
    return Uri.parse(baseUrl).buildUpon()
       .appendQueryParameter("REQUEST", "GetMap")

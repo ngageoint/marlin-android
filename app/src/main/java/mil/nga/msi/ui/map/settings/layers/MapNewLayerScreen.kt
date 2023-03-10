@@ -33,7 +33,7 @@ import mil.nga.msi.ui.map.overlay.GridTileProvider
 fun MapNewLayerScreen(
    onClose: () -> Unit,
    onGridLayer: (LayerType, String) -> Unit,
-   onWmsLayer: (String, WMSCapabilities) -> Unit,
+   onWmsLayer: (String) -> Unit,
    viewModel: MapNewLayerViewModel = hiltViewModel()
 ) {
    val scope = rememberCoroutineScope()
@@ -95,7 +95,7 @@ fun MapNewLayerScreen(
                WMSCapabilities(wmsCapabilities)
             }
 
-            if (tileServerUrl != null || wmsCapabilities != null) {
+            if (tileServerUrl != null || wmsCapabilities?.isValid() == true) {
                Button(
                   onClick = {
                      scope.launch {
@@ -103,9 +103,7 @@ fun MapNewLayerScreen(
                            type?.let { onGridLayer(it, url) }
                         }
 
-                        wmsCapabilities?.let { wms ->
-                           onWmsLayer(url, wms)
-                        }
+                        wmsCapabilities?.let { onWmsLayer(url) }
                      }
                   },
                   modifier = Modifier
@@ -255,6 +253,17 @@ private fun WMSCapabilities(
                      .padding(bottom = 16.dp)
                )
             }
+         }
+
+         if (wmsCapabilities.capability?.request?.map?.hasImageFormat() != true) {
+            Text(
+               text = "WMS server does not support image tiles",
+               style = MaterialTheme.typography.titleMedium,
+               color = MaterialTheme.colorScheme.error,
+               modifier = Modifier
+                  .fillMaxWidth()
+                  .padding(top = 8.dp, bottom = 16.dp)
+            )
          }
 
          if (!expanded) {

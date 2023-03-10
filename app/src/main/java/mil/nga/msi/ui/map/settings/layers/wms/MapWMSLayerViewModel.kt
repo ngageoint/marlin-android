@@ -18,7 +18,6 @@ class MapWMSLayerViewModel @Inject constructor(
       val layer = Layer(
          url = url,
          name = name,
-         displayName = name,
          type = LayerType.WMS
       )
 

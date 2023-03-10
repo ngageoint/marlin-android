@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 3,
-    "identityHash": "9a32b30c7858eb96e21fe38e7e0ec4c2",
+    "identityHash": "ce0655e9989805152d0df78d96e24f02",
     "entities": [
       {
         "tableName": "asams",
@@ -413,7 +413,7 @@
       },
       {
         "tableName": "layers",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `type` TEXT NOT NULL, `url` TEXT NOT NULL, `name` TEXT NOT NULL, `display_name` TEXT NOT NULL, `visible` INTEGER NOT NULL, `group_name` TEXT, `min_zoom` INTEGER, `max_zoom` INTEGER, `file_path` TEXT, `refresh_rate` INTEGER)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `type` TEXT NOT NULL, `url` TEXT NOT NULL, `name` TEXT NOT NULL, `visible` INTEGER NOT NULL, `group_name` TEXT, `min_zoom` INTEGER, `max_zoom` INTEGER, `file_path` TEXT, `refresh_rate` INTEGER)",
         "fields": [
           {
             "fieldPath": "id",
@@ -436,12 +436,6 @@
           {
             "fieldPath": "name",
             "columnName": "name",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "displayName",
-            "columnName": "display_name",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -1798,7 +1792,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '9a32b30c7858eb96e21fe38e7e0ec4c2')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'ce0655e9989805152d0df78d96e24f02')"
     ]
   }
 }

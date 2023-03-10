@@ -14,7 +14,6 @@ import com.google.accompanist.navigation.material.bottomSheet
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import mil.nga.msi.datasource.layer.LayerType
-import mil.nga.msi.network.layer.wms.WMSCapabilities
 import mil.nga.msi.repository.dgpsstation.DgpsStationKey
 import mil.nga.msi.repository.light.LightKey
 import mil.nga.msi.repository.radiobeacon.RadioBeaconKey
@@ -26,7 +25,8 @@ import mil.nga.msi.ui.map.filter.MapFilterScreen
 import mil.nga.msi.ui.map.settings.MapLightSettingsScreen
 import mil.nga.msi.ui.map.settings.MapSettingsScreen
 import mil.nga.msi.ui.map.settings.layers.*
-import mil.nga.msi.ui.map.settings.layers.grid.MapGridLayerScreen
+import mil.nga.msi.ui.map.settings.layers.grid.MapGridLayerCreateScreen
+import mil.nga.msi.ui.map.settings.layers.grid.MapGridLayerEditScreen
 import mil.nga.msi.ui.map.settings.layers.wms.MapWMSLayerScreen
 import mil.nga.msi.ui.map.settings.layers.wms.MapWMSLayerSettingsScreen
 import mil.nga.msi.ui.modu.ModuRoute
@@ -48,7 +48,8 @@ sealed class MapRoute(
    object Settings: MapRoute("mapSettings", "Map Settings")
    object Layers: MapRoute("mapLayers", "Map Layers")
    object NewLayer: MapRoute("mapNewLayer", "New Layer")
-   object GridLayer: MapRoute("mapGridLayer", "Grid Layer")
+   object CreateGridLayer: MapRoute("mapCreateGridLayer", "Grid Layer")
+   object EditGridLayer: MapRoute("mapEditGridLayer", "Grid Layer")
    object WMSLayerSettings: MapRoute("mapWMSLayerSettings", "WMS Layer")
    object WMSLayer: MapRoute("mapWMSLayer", "WMS Layer")
    object LightSettings: MapRoute("lightSettings", "Light Settings")
@@ -152,6 +153,17 @@ fun NavGraphBuilder.mapGraph(
       bottomBarVisibility(false)
 
       MapLayersScreen(
+         onTap = { id, type ->
+            val route = when (type) {
+               LayerType.WMS -> {
+                  "${MapRoute.WMSLayerSettings.name}?id=${id}"
+               } else -> {
+                  "${MapRoute.EditGridLayer.name}?id=${id}"
+               }
+            }
+
+            navController.navigate(route)
+         },
          onAddLayer = {
             val route = MapRoute.NewLayer.name
             navController.navigate(route) {
@@ -170,14 +182,13 @@ fun NavGraphBuilder.mapGraph(
       MapNewLayerScreen(
          onGridLayer =  { type, url ->
             val encoded = URLEncoder.encode(url, StandardCharsets.UTF_8.toString())
-            val route = "${MapRoute.GridLayer.name}?type=${type}&url=${encoded}"
+            val route = "${MapRoute.CreateGridLayer.name}?type=${type}&url=${encoded}"
             navController.navigate(route) {
                popUpTo(route) { inclusive = true }
             }
          },
-         onWmsLayer = { url, wmsCapabilities ->
-            val encoded = Uri.encode(Json.encodeToString(wmsCapabilities))
-            val route = "${MapRoute.WMSLayerSettings.name}?url=${url}&wmsCapabilities=${encoded}"
+         onWmsLayer = { url ->
+            val route = "${MapRoute.WMSLayerSettings.name}?url=${url}"
             navController.navigate(route) {
                popUpTo(route) { inclusive = true }
             }
@@ -188,7 +199,7 @@ fun NavGraphBuilder.mapGraph(
       )
    }
 
-   composable("${MapRoute.GridLayer.name}?type={type}&url={url}") { backstackEntry ->
+   composable("${MapRoute.CreateGridLayer.name}?type={type}&url={url}") { backstackEntry ->
       bottomBarVisibility(false)
 
       val type = backstackEntry.arguments?.getString("type")
@@ -197,7 +208,7 @@ fun NavGraphBuilder.mapGraph(
       val url = backstackEntry.arguments?.getString("url")
       requireNotNull(url) { "'url' argument is required" }
 
-      MapGridLayerScreen(
+      MapGridLayerCreateScreen(
          type = LayerType.valueOf(type),
          url = URLDecoder.decode(url, StandardCharsets.UTF_8.toString()),
          onClose = {
@@ -206,21 +217,28 @@ fun NavGraphBuilder.mapGraph(
       )
    }
 
-   composable(
-      route = "${MapRoute.WMSLayerSettings.name}?url={url}&wmsCapabilities={wmsCapabilities}",
-      arguments = listOf(navArgument("wmsCapabilities") { type = NavType.WMSCapabilities })
-   ) { backstackEntry ->
+   composable("${MapRoute.EditGridLayer.name}?id={id}") { backstackEntry ->
+      bottomBarVisibility(false)
+
+      val id = backstackEntry.arguments?.getString("id")?.toLongOrNull()
+      requireNotNull(id) { "'id' argument is required" }
+
+      MapGridLayerEditScreen(
+         id = id,
+         onClose = {
+            navController.popBackStack(MapRoute.Layers.name, false)
+         }
+      )
+   }
+
+   composable(route = "${MapRoute.WMSLayerSettings.name}?url={url}") { backstackEntry ->
       bottomBarVisibility(false)
 
       val url = backstackEntry.arguments?.getString("url")
       requireNotNull(url) { "'url' argument is required" }
 
-      val wmsCapabilities = backstackEntry.arguments?.getParcelable<WMSCapabilities>("wmsCapabilities")
-      requireNotNull(wmsCapabilities) { "'wmsCapabilities' argument is required" }
-
       MapWMSLayerSettingsScreen(
          url = URLDecoder.decode(url, StandardCharsets.UTF_8.toString()),
-         wmsCapabilities = wmsCapabilities,
          done = { wmsUrl ->
             val encoded = URLEncoder.encode(wmsUrl, StandardCharsets.UTF_8.toString())
             val route = "${MapRoute.WMSLayer.name}?url=${encoded}"

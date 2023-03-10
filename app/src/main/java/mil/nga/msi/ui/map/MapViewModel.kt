@@ -126,7 +126,7 @@ class MapViewModel @Inject constructor(
       val tileProviders = layers.map {  layer ->
          when (layer.type) {
             LayerType.WMS -> {
-               WMSTileProvider(layer = layer)
+               WMSTileProvider(url = layer.url)
             } else -> {
                GridTileProvider(baseUrl = Uri.parse(layer.url))
             }
