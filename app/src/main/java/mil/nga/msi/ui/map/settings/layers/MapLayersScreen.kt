@@ -34,7 +34,6 @@ import mil.nga.msi.ui.drag.DraggableItem
 import mil.nga.msi.ui.drag.dragContainer
 import mil.nga.msi.ui.drag.rememberDragDropState
 import mil.nga.msi.ui.main.TopBar
-import mil.nga.msi.ui.map.MapRoute
 import mil.nga.msi.ui.theme.onSurfaceDisabled
 import mil.nga.msi.ui.theme.remove
 
@@ -49,7 +48,7 @@ fun MapLayersScreen(
 
    Column {
       TopBar(
-         title = MapRoute.Layers.title,
+         title = MapLayerRoute.Layers.title,
          navigationIcon = Icons.Default.ArrowBack,
          onNavigationClicked = { onClose() }
       )

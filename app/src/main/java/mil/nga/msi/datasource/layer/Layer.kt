@@ -1,14 +1,18 @@
 package mil.nga.msi.datasource.layer
 
+import android.os.Parcelable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import kotlinx.parcelize.Parcelize
 
 enum class LayerType {
    XYZ, TMS, WMS, GEOPACKAGE
 }
 
 @Entity(tableName = "layers")
+@Parcelize
+@kotlinx.serialization.Serializable
 data class Layer(
    @PrimaryKey(autoGenerate = true)
    @ColumnInfo(name = "id")
@@ -24,20 +28,17 @@ data class Layer(
    val name: String,
 
    @ColumnInfo(name = "visible")
-   var visible: Boolean = true
-) {
-   @ColumnInfo(name = "group_name")
-   var groupName: String? = null
+   var visible: Boolean = true,
 
    @ColumnInfo(name = "min_zoom")
-   var minZoom: Int? = null
+   var minZoom: Int? = null,
 
    @ColumnInfo(name = "max_zoom")
-   var maxZoom: Int? = null
+   var maxZoom: Int? = null,
 
    @ColumnInfo(name = "file_path")
-   var filePath: String? = null
+   var filePath: String? = null,
 
    @ColumnInfo(name = "refresh_rate")
    var refreshRate: Int? = null
-}
+): Parcelable

@@ -23,25 +23,27 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.maps.android.compose.*
 import com.google.maps.android.ktx.model.tileOverlayOptions
 import kotlinx.coroutines.launch
+import mil.nga.msi.datasource.layer.Layer
 import mil.nga.msi.datasource.layer.LayerType
 import mil.nga.msi.network.layer.wms.WMSCapabilities
 import mil.nga.msi.ui.main.TopBar
-import mil.nga.msi.ui.map.MapRoute
 import mil.nga.msi.ui.map.overlay.GridTileProvider
+import mil.nga.msi.ui.map.settings.layers.grid.MapGridLayerViewModel
+import mil.nga.msi.ui.map.settings.layers.wms.MapWMSLayerViewModel
 
 @Composable
 fun MapNewLayerScreen(
    onClose: () -> Unit,
-   onGridLayer: (LayerType, String) -> Unit,
-   onWmsLayer: (String) -> Unit,
-   viewModel: MapNewLayerViewModel = hiltViewModel()
+   onLayer: (Layer) -> Unit,
+   wmsViewModel: MapWMSLayerViewModel = hiltViewModel(),
+   gridViewModel: MapGridLayerViewModel = hiltViewModel()
 ) {
    val scope = rememberCoroutineScope()
    val scrollState = rememberScrollState()
    var url by remember { mutableStateOf("") }
    var type by remember { mutableStateOf<LayerType?>(null) }
-   val tileServerUrl by viewModel.tileUrl.observeAsState()
-   val wmsCapabilities by viewModel.wmsCapabilities.observeAsState()
+   val tileServerUrl by gridViewModel.tileUrl.observeAsState()
+   val wmsState by wmsViewModel.wmsState.observeAsState()
 
    LaunchedEffect(tileServerUrl) {
       if (tileServerUrl != null && type == null) {
@@ -49,15 +51,15 @@ fun MapNewLayerScreen(
       }
    }
 
-   LaunchedEffect(wmsCapabilities) {
-      if (wmsCapabilities != null && type == null) {
+   LaunchedEffect(wmsState?.wmsCapabilities) {
+      if (wmsState?.wmsCapabilities != null && type == null) {
          type = LayerType.WMS
       }
    }
 
    Column {
       TopBar(
-         title = MapRoute.NewLayer.title,
+         title = MapLayerRoute.NewLayer.title,
          navigationIcon = Icons.Default.Close,
          onNavigationClicked = { onClose() }
       )
@@ -71,12 +73,13 @@ fun MapNewLayerScreen(
                .fillMaxHeight()
                .verticalScroll(scrollState)
          ) {
-            WMSLayer(
+            Layer(
                url = url,
                type = type,
                onUrlChanged = {
                   url = it
-                  viewModel.onLayerUrl(it)
+                  wmsViewModel.setUrl(it)
+                  gridViewModel.setUrl(it)
                },
                onTypeChanged = { type = it }
             )
@@ -91,19 +94,34 @@ fun MapNewLayerScreen(
                )
             }
 
-            wmsCapabilities?.let { wmsCapabilities ->
+            wmsState?.wmsCapabilities?.let { wmsCapabilities ->
                WMSCapabilities(wmsCapabilities)
             }
 
-            if (tileServerUrl != null || wmsCapabilities?.isValid() == true) {
+            if (tileServerUrl != null || wmsState?.wmsCapabilities?.isValid() == true) {
                Button(
                   onClick = {
                      scope.launch {
                         if (tileServerUrl != null) {
-                           type?.let { onGridLayer(it, url) }
+                           type?.let {
+                              val layer = Layer(
+                                 name = "",
+                                 type = it,
+                                 url = tileServerUrl.toString()
+                              )
+                              onLayer(layer)
+                           }
                         }
 
-                        wmsCapabilities?.let { onWmsLayer(url) }
+                        wmsState?.wmsCapabilities?.let {
+                           val layer = Layer(
+                              name = "",
+                              type = LayerType.WMS,
+                              url = url
+                           )
+
+                           onLayer(layer)
+                        }
                      }
                   },
                   modifier = Modifier
@@ -120,7 +138,7 @@ fun MapNewLayerScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun WMSLayer(
+private fun Layer(
    url: String,
    type: LayerType?,
    onUrlChanged: (String) -> Unit,

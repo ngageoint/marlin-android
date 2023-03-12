@@ -1,11 +1,14 @@
 package mil.nga.msi.ui.map.settings.layers.grid
 
+import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import mil.nga.msi.datasource.layer.Layer
 import mil.nga.msi.datasource.layer.LayerType
@@ -16,9 +19,22 @@ import javax.inject.Inject
 class MapGridLayerViewModel @Inject constructor(
  private val layerRepository: LayerRepository
 ): ViewModel() {
-
    private val _layer = MutableLiveData<Layer>()
    val layer: LiveData<Layer> = _layer
+
+   private var tileUrlJob: Job? = null
+   private val _tileUrl = MutableLiveData<Uri>()
+   val tileUrl: LiveData<Uri> = _tileUrl
+
+   fun setUrl(url: String) {
+      tileUrlJob?.cancel()
+      tileUrlJob = viewModelScope.launch {
+         delay(DEBOUNCE_TIMEOUT_MILLIS)
+         if (layerRepository.getTile(url)) {
+            _tileUrl.value = Uri.parse(url)
+         }
+      }
+   }
 
    fun setId(id: Long) {
       viewModelScope.launch(Dispatchers.IO) {
@@ -26,28 +42,28 @@ class MapGridLayerViewModel @Inject constructor(
       }
    }
 
-   fun createLayer(
+   suspend fun createLayer(
       name: String,
       type: LayerType,
       url: String
    ) {
-      viewModelScope.launch {
-         val layer = Layer(
-            name = name,
-            type = type,
-            url = url,
-            visible = true
-         )
+      val layer = Layer(
+         name = name,
+         type = type,
+         url = url,
+         visible = true
+      )
 
-         layerRepository.createLayer(layer)
-      }
+      layerRepository.createLayer(layer)
    }
 
-   fun updateLayer(
+   suspend fun updateLayer(
       layer: Layer
    ) {
-      viewModelScope.launch {
-         layerRepository.updateLayer(layer)
-      }
+      layerRepository.updateLayer(layer)
+   }
+
+   companion object {
+      private const val DEBOUNCE_TIMEOUT_MILLIS = 300L
    }
 }

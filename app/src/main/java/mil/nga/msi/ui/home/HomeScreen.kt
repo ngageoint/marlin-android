@@ -9,6 +9,7 @@ import mil.nga.msi.ui.embark.embarkGraph
 import mil.nga.msi.ui.light.lightGraph
 import mil.nga.msi.ui.map.AnnotationProvider
 import mil.nga.msi.ui.map.mapGraph
+import mil.nga.msi.ui.map.settings.layers.mapLayerGraph
 import mil.nga.msi.ui.modu.moduGraph
 import mil.nga.msi.ui.navigationalwarning.navigationalWarningGraph
 import mil.nga.msi.ui.noticetomariners.noticeToMarinersGraph
@@ -37,6 +38,12 @@ fun NavGraphBuilder.homeGraph(
       showSnackbar = { showSnackbar(it) },
       annotationProvider = annotationProvider
    )
+
+   mapLayerGraph(
+      navController = navController,
+      bottomBarVisibility = { bottomBarVisibility(it) }
+   )
+
    asamGraph(
       navController = navController,
       bottomBarVisibility = { bottomBarVisibility(it) },

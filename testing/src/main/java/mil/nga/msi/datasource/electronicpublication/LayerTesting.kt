@@ -8,8 +8,6 @@ fun assertLayersEqual(expected: Layer, actual: Layer) {
     Assert.assertEquals(expected.type, actual.type)
     Assert.assertEquals(expected.url, actual.url)
     Assert.assertEquals(expected.name, actual.name)
-    Assert.assertEquals(expected.displayName, actual.displayName)
-    Assert.assertEquals(expected.groupName, actual.groupName)
     Assert.assertEquals(expected.minZoom, actual.minZoom)
     Assert.assertEquals(expected.maxZoom, actual.maxZoom)
     Assert.assertEquals(expected.visible, actual.visible)

@@ -1,6 +1,6 @@
 package mil.nga.msi.ui.map.settings.layers.wms
 
-import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -20,24 +20,22 @@ import com.google.maps.android.compose.*
 import com.google.maps.android.ktx.model.tileOverlayOptions
 import mil.nga.msi.datasource.layer.Layer
 import mil.nga.msi.datasource.layer.LayerType
-import mil.nga.msi.network.layer.wms.WMSCapabilities
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.MapRoute
 import mil.nga.msi.ui.map.overlay.WMSTileProvider
-import mil.nga.msi.ui.map.settings.layers.MapNewLayerViewModel
 
 @Composable
 fun MapWMSLayerSettingsScreen(
-   url: String,
-   done: (String) -> Unit,
+   id: Long,
+   done: (Layer) -> Unit,
    onClose: () -> Unit,
-   viewModel: MapNewLayerViewModel = hiltViewModel()
+   viewModel: MapWMSLayerViewModel = hiltViewModel()
 ) {
-   var wmsUrl by remember { mutableStateOf(url) }
-   var wmsLayers by remember { mutableStateOf<Map<String, Boolean>>(emptyMap()) }
-   val wmsCapabilities by viewModel.wmsCapabilities.observeAsState()
+   val wmsState by viewModel.wmsState.observeAsState()
 
-   viewModel.onLayerUrl(url)
+   LaunchedEffect(id) {
+      viewModel.setLayerId(id)
+   }
 
    Column {
       TopBar(
@@ -46,33 +44,71 @@ fun MapWMSLayerSettingsScreen(
          onNavigationClicked = { onClose() }
       )
 
-      wmsCapabilities?.let { wms ->
-         Surface(
-            color = MaterialTheme.colorScheme.surfaceVariant
-         ) {
-            Column(Modifier.fillMaxHeight()) {
-               WMSLayer(
-                  wmsUrl = wmsUrl,
-                  wmsLayers = wmsLayers,
-                  wmsCapabilities = wms,
-                  onLayerChecked = { name, checked ->
-                     wmsLayers = wmsLayers.toMutableMap().apply { this[name] = checked }
-                     wmsUrl = wmsUrl(url, wmsLayers.filter { it.value }.keys.toList(), wms)
-                  },
-                  modifier = Modifier
-                     .fillMaxWidth()
-                     .weight(1f)
-               )
+      wmsState?.let { wmsState ->
+         Column(Modifier.fillMaxHeight()) {
+            WMSLayer(
+               wmsState = wmsState,
+               onDone = {
+                  val layer = Layer(
+                     id = wmsState.layer?.id ?: 0,
+                     name = wmsState.layer?.name ?: "",
+                     url = wmsState.mapUrl,
+                     type = LayerType.WMS
+                  )
+                  done(layer)
+               },
+               onLayerChecked = { name, checked ->
+                  Log.i("Billy", "layer $name checked $checked")
+                  viewModel.setLayer(name, checked)
+               },
+               modifier = Modifier
+                  .fillMaxWidth()
+                  .weight(1f)
+            )
+         }
+      }
+   }
+}
 
-               Button(
-                  onClick = { done(wmsUrl) },
-                  modifier = Modifier
-                     .fillMaxWidth()
-                     .padding(16.dp)
-               ) {
-                  Text(text = "Next")
-               }
-            }
+@Composable
+fun MapWMSLayerSettingsScreen(
+   layer: Layer,
+   done: (Layer) -> Unit,
+   onClose: () -> Unit,
+   viewModel: MapWMSLayerViewModel = hiltViewModel()
+) {
+   val wmsState by viewModel.wmsState.observeAsState()
+
+   LaunchedEffect(layer.url) {
+      viewModel.setUrl(layer.url)
+   }
+
+   Column {
+      TopBar(
+         title = MapRoute.WMSLayer.title,
+         navigationIcon = Icons.Default.Close,
+         onNavigationClicked = { onClose() }
+      )
+
+      wmsState?.let { wmsState ->
+         Column(Modifier.fillMaxHeight()) {
+            WMSLayer(
+               wmsState = wmsState,
+               onDone = {
+                  done(Layer(
+                     id = layer.id,
+                     name = layer.name,
+                     url = wmsState.mapUrl,
+                     type = LayerType.WMS
+                  ))
+               },
+               onLayerChecked = { name, checked ->
+                  viewModel.setLayer(name, checked)
+               },
+               modifier = Modifier
+                  .fillMaxWidth()
+                  .weight(1f)
+            )
          }
       }
    }
@@ -80,16 +116,17 @@ fun MapWMSLayerSettingsScreen(
 
 @Composable
 private fun WMSLayer(
-   wmsUrl: String,
-   wmsLayers: Map<String, Boolean>,
-   wmsCapabilities: WMSCapabilities,
+   wmsState: WmsState,
+   onDone: () -> Unit,
    onLayerChecked: (String, Boolean) -> Unit,
    modifier: Modifier = Modifier
 ) {
    val scrollState = rememberScrollState()
 
-   Column(modifier = modifier) {
-      Column() {
+   Surface(
+      color = MaterialTheme.colorScheme.surfaceVariant
+   ) {
+      Column(modifier = modifier) {
          CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
             Text(
                text = "LAYERS",
@@ -103,21 +140,30 @@ private fun WMSLayer(
                .verticalScroll(scrollState)
                .weight(1f)
          ) {
-            wmsCapabilities.capability?.layers?.asSequence()?.filter { layer ->
+            wmsState.wmsCapabilities.capability?.layers?.asSequence()?.filter { layer ->
                layer.isWebMercator()
             }?.forEach { layer ->
                WMSCapabilitiesLayer(
                   layer = layer,
-                  wmsLayers = wmsLayers,
+                  wmsLayers = wmsState.layers,
                   onLayerChecked = onLayerChecked
                )
             }
          }
 
          Map(
-            wmsUrl = wmsUrl,
+            wmsUrl = wmsState.mapUrl,
             modifier = Modifier.height(250.dp)
          )
+
+         Button(
+            onClick = { onDone() },
+            modifier = Modifier
+               .fillMaxWidth()
+               .padding(16.dp)
+         ) {
+            Text(text = "Next")
+         }
       }
    }
 }
@@ -126,9 +172,10 @@ private fun WMSLayer(
 @Composable
 private fun WMSCapabilitiesLayer(
    layer: mil.nga.msi.network.layer.wms.Layer,
-   wmsLayers: Map<String, Boolean>,
+   wmsLayers: List<String>,
    onLayerChecked: (String, Boolean) -> Unit
 ) {
+   Log.i("Billy", "Wms layers $wmsLayers")
    if (layer.layers.isNotEmpty()) {
       ListItem(
          headlineText = {
@@ -199,7 +246,7 @@ private fun WMSCapabilitiesLayer(
          },
          trailingContent = {
             Checkbox(
-               checked = wmsLayers[layer.name] == true,
+               checked = wmsLayers.contains(layer.name),
                onCheckedChange = { checked ->
                   layer.name?.let { name -> onLayerChecked(name, checked) }
                }
@@ -215,13 +262,6 @@ private fun Map(
    wmsUrl: String,
    modifier: Modifier = Modifier
 ) {
-   val layer = Layer(
-      url = wmsUrl,
-      name = "",
-      displayName = "",
-      type = LayerType.WMS
-   )
-
    CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
       Text(
          text = "MAP",
@@ -235,28 +275,6 @@ private fun Map(
       uiSettings = MapUiSettings(compassEnabled = false),
       modifier = modifier
    ) {
-      tileOverlayOptions { TileOverlay(tileProvider = WMSTileProvider(url = layer.url)) }
+      tileOverlayOptions { TileOverlay(tileProvider = WMSTileProvider(url = wmsUrl)) }
    }
-}
-
-private fun wmsUrl(
-   baseUrl: String,
-   layers: List<String>,
-   wmsCapabilities: WMSCapabilities,
-): String {
-   val format = wmsCapabilities.capability?.request?.map?.getImageFormat() ?: "image/png"
-   val version = wmsCapabilities.version
-   val epsg = if (version == "1.3" || version == "1.3.0") "CRS" else "SRS"
-
-   return Uri.parse(baseUrl).buildUpon()
-      .appendQueryParameter("REQUEST", "GetMap")
-      .appendQueryParameter("SERVICE", "WMS")
-      .appendQueryParameter(epsg, "EPSG:3857")
-      .appendQueryParameter("WIDTH", "256")
-      .appendQueryParameter("HEIGHT", "256")
-      .appendQueryParameter("FORMAT", format)
-      .appendQueryParameter("TRANSPARENT", "false")
-      .appendQueryParameter("LAYERS", layers.joinToString(","))
-      .build()
-      .toString()
 }

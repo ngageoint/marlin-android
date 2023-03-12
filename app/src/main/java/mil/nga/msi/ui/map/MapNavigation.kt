@@ -13,7 +13,6 @@ import com.google.accompanist.navigation.material.ExperimentalMaterialNavigation
 import com.google.accompanist.navigation.material.bottomSheet
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import mil.nga.msi.datasource.layer.LayerType
 import mil.nga.msi.repository.dgpsstation.DgpsStationKey
 import mil.nga.msi.repository.light.LightKey
 import mil.nga.msi.repository.radiobeacon.RadioBeaconKey
@@ -25,18 +24,11 @@ import mil.nga.msi.ui.map.filter.MapFilterScreen
 import mil.nga.msi.ui.map.settings.MapLightSettingsScreen
 import mil.nga.msi.ui.map.settings.MapSettingsScreen
 import mil.nga.msi.ui.map.settings.layers.*
-import mil.nga.msi.ui.map.settings.layers.grid.MapGridLayerCreateScreen
-import mil.nga.msi.ui.map.settings.layers.grid.MapGridLayerEditScreen
-import mil.nga.msi.ui.map.settings.layers.wms.MapWMSLayerScreen
-import mil.nga.msi.ui.map.settings.layers.wms.MapWMSLayerSettingsScreen
 import mil.nga.msi.ui.modu.ModuRoute
 import mil.nga.msi.ui.navigation.*
 import mil.nga.msi.ui.port.PortRoute
 import mil.nga.msi.ui.radiobeacon.RadioBeaconRoute
 import mil.nga.msi.ui.sheet.PagingSheet
-import java.net.URLDecoder
-import java.net.URLEncoder
-import java.nio.charset.StandardCharsets
 
 sealed class MapRoute(
    override val name: String,
@@ -46,11 +38,6 @@ sealed class MapRoute(
 ): Route {
    object Map: MapRoute("map", "Map")
    object Settings: MapRoute("mapSettings", "Map Settings")
-   object Layers: MapRoute("mapLayers", "Map Layers")
-   object NewLayer: MapRoute("mapNewLayer", "New Layer")
-   object CreateGridLayer: MapRoute("mapCreateGridLayer", "Grid Layer")
-   object EditGridLayer: MapRoute("mapEditGridLayer", "Grid Layer")
-   object WMSLayerSettings: MapRoute("mapWMSLayerSettings", "WMS Layer")
    object WMSLayer: MapRoute("mapWMSLayer", "WMS Layer")
    object LightSettings: MapRoute("lightSettings", "Light Settings")
    object PagerSheet: MapRoute("annotationPagerSheet", "Map")
@@ -138,130 +125,13 @@ fun NavGraphBuilder.mapGraph(
 
       MapSettingsScreen(
          onLayers = {
-            navController.navigate(MapRoute.Layers.name)
+            navController.navigate(MapLayerRoute.Layers.name)
          },
          onLightSettings = {
             navController.navigate(MapRoute.LightSettings.name)
          },
          onClose = {
             navController.popBackStack()
-         }
-      )
-   }
-
-   composable(MapRoute.Layers.name) {
-      bottomBarVisibility(false)
-
-      MapLayersScreen(
-         onTap = { id, type ->
-            val route = when (type) {
-               LayerType.WMS -> {
-                  "${MapRoute.WMSLayerSettings.name}?id=${id}"
-               } else -> {
-                  "${MapRoute.EditGridLayer.name}?id=${id}"
-               }
-            }
-
-            navController.navigate(route)
-         },
-         onAddLayer = {
-            val route = MapRoute.NewLayer.name
-            navController.navigate(route) {
-               popUpTo(route) { inclusive = true }
-            }
-         },
-         onClose = {
-            navController.popBackStack()
-         }
-      )
-   }
-
-   composable(MapRoute.NewLayer.name) {
-      bottomBarVisibility(false)
-
-      MapNewLayerScreen(
-         onGridLayer =  { type, url ->
-            val encoded = URLEncoder.encode(url, StandardCharsets.UTF_8.toString())
-            val route = "${MapRoute.CreateGridLayer.name}?type=${type}&url=${encoded}"
-            navController.navigate(route) {
-               popUpTo(route) { inclusive = true }
-            }
-         },
-         onWmsLayer = { url ->
-            val route = "${MapRoute.WMSLayerSettings.name}?url=${url}"
-            navController.navigate(route) {
-               popUpTo(route) { inclusive = true }
-            }
-         },
-         onClose = {
-            navController.popBackStack(MapRoute.Layers.name, false)
-         }
-      )
-   }
-
-   composable("${MapRoute.CreateGridLayer.name}?type={type}&url={url}") { backstackEntry ->
-      bottomBarVisibility(false)
-
-      val type = backstackEntry.arguments?.getString("type")
-      requireNotNull(type) { "'type' argument is required" }
-
-      val url = backstackEntry.arguments?.getString("url")
-      requireNotNull(url) { "'url' argument is required" }
-
-      MapGridLayerCreateScreen(
-         type = LayerType.valueOf(type),
-         url = URLDecoder.decode(url, StandardCharsets.UTF_8.toString()),
-         onClose = {
-            navController.popBackStack(MapRoute.Layers.name, false)
-         }
-      )
-   }
-
-   composable("${MapRoute.EditGridLayer.name}?id={id}") { backstackEntry ->
-      bottomBarVisibility(false)
-
-      val id = backstackEntry.arguments?.getString("id")?.toLongOrNull()
-      requireNotNull(id) { "'id' argument is required" }
-
-      MapGridLayerEditScreen(
-         id = id,
-         onClose = {
-            navController.popBackStack(MapRoute.Layers.name, false)
-         }
-      )
-   }
-
-   composable(route = "${MapRoute.WMSLayerSettings.name}?url={url}") { backstackEntry ->
-      bottomBarVisibility(false)
-
-      val url = backstackEntry.arguments?.getString("url")
-      requireNotNull(url) { "'url' argument is required" }
-
-      MapWMSLayerSettingsScreen(
-         url = URLDecoder.decode(url, StandardCharsets.UTF_8.toString()),
-         done = { wmsUrl ->
-            val encoded = URLEncoder.encode(wmsUrl, StandardCharsets.UTF_8.toString())
-            val route = "${MapRoute.WMSLayer.name}?url=${encoded}"
-            navController.navigate(route) {
-               popUpTo(route) { inclusive = true }
-            }
-         },
-         onClose = {
-            navController.popBackStack(MapRoute.Layers.name, false)
-         }
-      )
-   }
-
-   composable("${MapRoute.WMSLayer.name}?url={url}") { backstackEntry ->
-      bottomBarVisibility(false)
-
-      val url = backstackEntry.arguments?.getString("url")
-      requireNotNull(url) { "'url' argument is required" }
-
-      MapWMSLayerScreen(
-         url = URLDecoder.decode(url, StandardCharsets.UTF_8.toString()),
-         onClose = {
-            navController.popBackStack(MapRoute.Layers.name, false)
          }
       )
    }

@@ -12,51 +12,55 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.maps.android.compose.*
 import com.google.maps.android.ktx.model.tileOverlayOptions
+import kotlinx.coroutines.launch
 import mil.nga.msi.datasource.layer.Layer
 import mil.nga.msi.datasource.layer.LayerType
 import mil.nga.msi.ui.main.TopBar
-import mil.nga.msi.ui.map.MapRoute
 import mil.nga.msi.ui.map.overlay.GridTileProvider
+import mil.nga.msi.ui.map.settings.layers.MapLayerRoute
 
 @Composable
-fun MapGridLayerCreateScreen(
-   type: LayerType,
-   url: String,
+fun MapGridLayerScreen(
+   layer: Layer,
    onClose: () -> Unit,
    viewModel: MapGridLayerViewModel = hiltViewModel()
 ) {
+   val scope = rememberCoroutineScope()
    var name by remember { mutableStateOf("") }
 
    Column {
       TopBar(
-         title = MapRoute.CreateGridLayer.title,
+         title = MapLayerRoute.CreateGridLayer.title,
          navigationIcon = Icons.Default.Close,
          onNavigationClicked = { onClose() }
       )
 
       MapGridLayerScreen(
          name = name,
-         type = type,
-         url = url,
+         type = layer.type,
+         url = layer.url,
          onNameChanged = { name = it },
          onSave = {
-            viewModel.createLayer(
-               name = name,
-               type = type,
-               url = url
-            )
-            onClose()
+            scope.launch {
+               viewModel.createLayer(
+                  name = name,
+                  type = layer.type,
+                  url = layer.url
+               )
+               onClose()
+            }
          }
       )
    }
 }
 
 @Composable
-fun MapGridLayerEditScreen(
+fun MapGridLayerScreen(
    id: Long,
    onClose: () -> Unit,
    viewModel: MapGridLayerViewModel = hiltViewModel()
 ) {
+   val scope = rememberCoroutineScope()
    var name by remember { mutableStateOf("") }
    val layer by viewModel.layer.observeAsState()
    viewModel.setId(id)
@@ -79,14 +83,16 @@ fun MapGridLayerEditScreen(
             url = layer.url,
             onNameChanged = { name = it },
             onSave = {
-               val update = Layer(
-                  id = layer.id,
-                  name = name,
-                  type = layer.type,
-                  url = layer.url
-               )
-               viewModel.updateLayer(update)
-               onClose()
+               scope.launch {
+                  val update = Layer(
+                     id = layer.id,
+                     name = name,
+                     type = layer.type,
+                     url = layer.url
+                  )
+                  viewModel.updateLayer(update)
+                  onClose()
+               }
             }
          )
       }
@@ -176,8 +182,8 @@ private fun Map(
    CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
       Text(
          text = "MAP",
-         style = MaterialTheme.typography.bodyMedium,
-         modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 16.dp)
+         style = MaterialTheme.typography.titleMedium,
+         modifier = Modifier.padding(start = 16.dp, top = 0.dp, bottom = 16.dp)
       )
    }
 
