@@ -5,6 +5,8 @@ Marlin adheres to [Semantic Versioning](http://semver.org/).
 ---
 ## Pending on [`develop`](https://github.com/ngageoint/mage-server/tree/develop)
 
+## 1.0.1
+
 ##### Features
 * Add map to location filter
 
