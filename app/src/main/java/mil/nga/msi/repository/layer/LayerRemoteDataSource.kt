@@ -25,8 +25,6 @@ class LayerRemoteDataSource @Inject constructor(
    }
 
    suspend fun getWMSCapabilities(url: String): WMSCapabilities? {
-      Log.i("Billy", "get capabilities URL: $url")
-
       return url.toUri()?.let { uri ->
          val wmsUri = uri.buildUpon()
             .appendQueryParameter("service", "WMS")
@@ -35,8 +33,6 @@ class LayerRemoteDataSource @Inject constructor(
             .build()
 
          try {
-            Log.i("Billy", "get capabilities URL: $wmsUri")
-
             val response = service.getWMSCapabilities(wmsUri.toString())
             if (response.isSuccessful) {
                val wms = response.body()

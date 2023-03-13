@@ -95,11 +95,7 @@ class MapWMSLayerViewModel @Inject constructor(
             if (enabled) add(layer) else remove(layer)
          }.toList()
 
-         val state = wmsState.copy(
-            layers = layers
-         )
-         Log.i("Billy", "new state is $state")
-         _wmsState.value = state
+         _wmsState.value = wmsState.copy(layers = layers)
       }
    }
 

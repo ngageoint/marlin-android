@@ -16,8 +16,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
 import com.google.maps.android.compose.*
 import com.google.maps.android.ktx.model.tileOverlayOptions
+import kotlinx.coroutines.launch
 import mil.nga.msi.datasource.layer.Layer
 import mil.nga.msi.datasource.layer.LayerType
 import mil.nga.msi.ui.main.TopBar
@@ -58,7 +62,6 @@ fun MapWMSLayerSettingsScreen(
                   done(layer)
                },
                onLayerChecked = { name, checked ->
-                  Log.i("Billy", "layer $name checked $checked")
                   viewModel.setLayer(name, checked)
                },
                modifier = Modifier
@@ -122,6 +125,7 @@ private fun WMSLayer(
    modifier: Modifier = Modifier
 ) {
    val scrollState = rememberScrollState()
+   var latLngBounds by remember { mutableStateOf<LatLngBounds?>(null) }
 
    Surface(
       color = MaterialTheme.colorScheme.surfaceVariant
@@ -146,13 +150,26 @@ private fun WMSLayer(
                WMSCapabilitiesLayer(
                   layer = layer,
                   wmsLayers = wmsState.layers,
-                  onLayerChecked = onLayerChecked
+                  onLayerChecked = { layer, name, checked ->
+                     if (checked) {
+                        latLngBounds = layer.boundingBoxes.firstOrNull {
+                           it.crs.equals("CRS:84", ignoreCase = true)
+                        }?.let {
+                           val southwest = LatLng(it.minY, it.minX)
+                           val northeast = LatLng(it.maxY, it.maxX)
+                           LatLngBounds(southwest, northeast)
+                        }
+                     }
+
+                     onLayerChecked(name, checked)
+                  }
                )
             }
          }
 
          Map(
             wmsUrl = wmsState.mapUrl,
+            latLngBounds = latLngBounds,
             modifier = Modifier.height(250.dp)
          )
 
@@ -173,9 +190,8 @@ private fun WMSLayer(
 private fun WMSCapabilitiesLayer(
    layer: mil.nga.msi.network.layer.wms.Layer,
    wmsLayers: List<String>,
-   onLayerChecked: (String, Boolean) -> Unit
+   onLayerChecked: (mil.nga.msi.network.layer.wms.Layer, String, Boolean) -> Unit
 ) {
-   Log.i("Billy", "Wms layers $wmsLayers")
    if (layer.layers.isNotEmpty()) {
       ListItem(
          headlineText = {
@@ -248,7 +264,7 @@ private fun WMSCapabilitiesLayer(
             Checkbox(
                checked = wmsLayers.contains(layer.name),
                onCheckedChange = { checked ->
-                  layer.name?.let { name -> onLayerChecked(name, checked) }
+                  layer.name?.let { name -> onLayerChecked(layer, name, checked) }
                }
             )
          },
@@ -260,8 +276,20 @@ private fun WMSCapabilitiesLayer(
 @Composable
 private fun Map(
    wmsUrl: String,
+   latLngBounds: LatLngBounds?,
    modifier: Modifier = Modifier
 ) {
+   val scope = rememberCoroutineScope()
+   val cameraPositionState = rememberCameraPositionState()
+
+   LaunchedEffect(latLngBounds) {
+      latLngBounds?.let {
+         scope.launch {
+            cameraPositionState.animate(CameraUpdateFactory.newLatLngBounds(latLngBounds, 0))
+         }
+      }
+   }
+
    CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
       Text(
          text = "MAP",
@@ -271,6 +299,7 @@ private fun Map(
    }
 
    GoogleMap(
+      cameraPositionState = cameraPositionState,
       properties = MapProperties(mapType = MapType.NORMAL),
       uiSettings = MapUiSettings(compassEnabled = false),
       modifier = modifier

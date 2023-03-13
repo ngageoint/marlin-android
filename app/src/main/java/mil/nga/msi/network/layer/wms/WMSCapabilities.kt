@@ -34,7 +34,7 @@ data class Service(
 )
 
 @Root(name = "ContactInformation", strict = false)
-class ContactInformation(
+data class ContactInformation(
    @field:Element(name = "ContactPersonPrimary", required = false)
    var person: ContactPersonPrimary? = null,
 
@@ -46,7 +46,7 @@ class ContactInformation(
 )
 
 @Root(name = "ContactPersonPrimary", strict = false)
-class ContactPersonPrimary(
+data class ContactPersonPrimary(
    @field:Element(name = "ContactPerson", required = false)
    var name: String? = null,
 
@@ -55,7 +55,7 @@ class ContactPersonPrimary(
 )
 
 @Root(name = "Capability", strict = false)
-class Capability(
+data class Capability(
    @field:Element(name = "Request", required = false)
    var request: Request? = null,
 
@@ -65,13 +65,13 @@ class Capability(
 
 
 @Root(name = "Request", strict = false)
-class Request(
+data class Request(
    @field:Element(name = "GetMap", required = false)
    var map: GetMap? = null
 )
 
 @Root(name = "GetMap", strict = false)
-class GetMap(
+data class GetMap(
    @field:ElementList(name = "Format", inline = true)
    var formats: List<Format> = mutableListOf()
 ) {
@@ -88,13 +88,13 @@ class GetMap(
 }
 
 @Root(name = "Format", strict = false)
-class Format(
+data class Format(
    @field:Text
    var format: String? = null
 )
 
 @Root(name = "Layer", strict = false)
-class Layer(
+data class Layer(
    @field:Element(name = "Title")
    var title: String? = null,
 
@@ -107,8 +107,8 @@ class Layer(
    @field:ElementList(name = "CRS", inline = true, required = false)
    var crs: List<CRS> = mutableListOf(),
 
-   @field:Path("BoundingBox")
-   var boundingBox: BoundingBox? = null,
+   @field:ElementList(name = "BoundingBox", inline = true, required = false)
+   var boundingBoxes: List<BoundingBox> = mutableListOf(),
 
    @field:ElementList(name = "Layer", inline = true, required = false)
    var layers: List<Layer> = mutableListOf()
@@ -130,25 +130,25 @@ class Layer(
 }
 
 @Root(name = "CRS", strict = false)
-class CRS(
+data class CRS(
    @field:Text
    var crs: String? = null
 )
 
 @Root(name = "BoundingBox", strict = false)
-class BoundingBox(
-   @field:Attribute(name = "SRS", required = false)
-   var srs: String? = null,
+class BoundingBox {
+   @field:Attribute(name = "CRS", required = false)
+   lateinit var crs: String
 
    @field:Attribute(name = "minx", required = false)
-   var minX: Boolean = false,
+   var minX: Double = 0.0
 
    @field:Attribute(name = "miny", required = false)
-   var minY: Boolean = false,
+   var minY: Double = 0.0
 
    @field:Attribute(name = "maxx", required = false)
-   var maxX: Boolean = false,
+   var maxX: Double = 0.0
 
    @field:Attribute(name = "maxy", required = false)
-   var maxY: Boolean = false
-)
+   var maxY: Double = 0.0
+}
