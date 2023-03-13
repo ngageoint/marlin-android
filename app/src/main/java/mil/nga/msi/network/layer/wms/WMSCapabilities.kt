@@ -63,7 +63,6 @@ data class Capability(
    var layers: List<Layer> = mutableListOf()
 )
 
-
 @Root(name = "Request", strict = false)
 data class Request(
    @field:Element(name = "GetMap", required = false)
@@ -72,8 +71,8 @@ data class Request(
 
 @Root(name = "GetMap", strict = false)
 data class GetMap(
-   @field:ElementList(name = "Format", inline = true)
-   var formats: List<Format> = mutableListOf()
+   @field:ElementList(name="Format", entry="Format", inline = true, required = false, type = String::class)
+   var formats: List<String> = mutableListOf()
 ) {
    fun hasImageFormat(): Boolean {
       return getImageFormat() != null
@@ -81,17 +80,11 @@ data class GetMap(
 
    fun getImageFormat(): String? {
       return formats.firstOrNull {
-         it.format.equals("image/png", ignoreCase = true) ||
-         it.format.equals("image/jpeg", ignoreCase = true)
-      }?.format
+         it.equals("image/png", ignoreCase = true) ||
+         it.equals("image/jpeg", ignoreCase = true)
+      }
    }
 }
-
-@Root(name = "Format", strict = false)
-data class Format(
-   @field:Text
-   var format: String? = null
-)
 
 @Root(name = "Layer", strict = false)
 data class Layer(
@@ -104,8 +97,8 @@ data class Layer(
    @field:Element(name = "Name", required = false)
    var name: String? = null,
 
-   @field:ElementList(name = "CRS", inline = true, required = false)
-   var crs: List<CRS> = mutableListOf(),
+   @field:ElementList(name="CRS", entry="CRS", inline = true, required = false, type = String::class)
+   var crs: List<String> = mutableListOf(),
 
    @field:ElementList(name = "BoundingBox", inline = true, required = false)
    var boundingBoxes: List<BoundingBox> = mutableListOf(),
@@ -119,8 +112,8 @@ data class Layer(
 
    fun isWebMercator(): Boolean {
       return if (crs.any {
-            it.crs.equals("EPSG:3857", ignoreCase = true) ||
-            it.crs.equals("EPSG:900913", ignoreCase = true)
+            it.equals("EPSG:3857", ignoreCase = true) ||
+            it.equals("EPSG:900913", ignoreCase = true)
          }) {
          true
       } else {
@@ -128,12 +121,6 @@ data class Layer(
       }
    }
 }
-
-@Root(name = "CRS", strict = false)
-data class CRS(
-   @field:Text
-   var crs: String? = null
-)
 
 @Root(name = "BoundingBox", strict = false)
 class BoundingBox {
