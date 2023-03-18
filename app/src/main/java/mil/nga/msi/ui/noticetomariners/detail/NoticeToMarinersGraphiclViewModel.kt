@@ -14,7 +14,7 @@ class NoticeToMarinersGraphicViewModel @Inject constructor(
    private val _downloading = MutableLiveData(false)
    val downloading: LiveData<Boolean> = _downloading
 
-   suspend fun getNoticeToMarinersGraphic(graphic: NoticeToMarinersGraphic): Uri {
+   suspend fun getNoticeToMarinersGraphic(graphic: NoticeToMarinersGraphic): Uri? {
       _downloading.value = true
       val uri = noticeToMarinersRepository.getNoticeToMarinersGraphic(graphic)
       _downloading.value = false

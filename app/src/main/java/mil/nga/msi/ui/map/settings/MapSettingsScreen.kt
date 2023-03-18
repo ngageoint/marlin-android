@@ -45,31 +45,33 @@ fun MapSettingsScreen(
          onNavigationClicked = { onClose() }
       )
 
-      Column(
-         Modifier
-            .fillMaxSize()
-            .verticalScroll(scrollState)
-            .padding(bottom = 16.dp)
-      ) {
-         baseMap?.let { baseMap ->
-            BaseMapLayer(baseMap) {
-               viewModel.setBaseLayer(it)
+      Surface {
+         Column(
+            Modifier
+               .fillMaxSize()
+               .verticalScroll(scrollState)
+               .padding(bottom = 16.dp)
+         ) {
+            baseMap?.let { baseMap ->
+               BaseMapLayer(baseMap) {
+                  viewModel.setBaseLayer(it)
+               }
             }
+
+            GridLayers(
+               gars = gars,
+               mgrs = mgrs,
+               onGarsToggled = { viewModel.setGARS(it) },
+               onMgrsToggled = { viewModel.setMGRS(it) }
+            )
+
+            DataSourceSettings(onLightSettings)
+
+            DisplaySettings(
+               showLocation = showLocation,
+               onShowLocationToggled = { viewModel.setShowLocation(it) }
+            )
          }
-
-         GridLayers(
-            gars = gars,
-            mgrs = mgrs,
-            onGarsToggled = { viewModel.setGARS(it) },
-            onMgrsToggled = { viewModel.setMGRS(it) }
-         )
-
-         DataSourceSettings(onLightSettings)
-
-         DisplaySettings(
-            showLocation = showLocation,
-            onShowLocationToggled = { viewModel.setShowLocation(it) }
-         )
       }
    }
 }
@@ -84,7 +86,6 @@ private fun BaseMapLayer(
    Column(Modifier.padding(bottom = 16.dp)) {
       Text(
          text = "Map",
-         color = MaterialTheme.colorScheme.primary,
          style = MaterialTheme.typography.titleMedium,
          fontWeight = FontWeight.Medium,
          modifier = Modifier.padding(top = 32.dp, bottom = 16.dp, start = 32.dp, end = 32.dp)
@@ -171,8 +172,7 @@ private fun GridLayers(
    Column(Modifier.padding(bottom = 16.dp)) {
       Text(
          text = "Grids",
-         color = MaterialTheme.colorScheme.primary,
-         style= MaterialTheme.typography.titleMedium,
+         style = MaterialTheme.typography.titleMedium,
          fontWeight = FontWeight.Medium,
          modifier = Modifier.padding(vertical = 16.dp, horizontal = 32.dp)
       )
@@ -254,7 +254,6 @@ private fun LightSettings(
    ) {
       Text(
          text = "Data Source",
-         color = MaterialTheme.colorScheme.primary,
          style = MaterialTheme.typography.titleMedium,
          fontWeight = FontWeight.Medium,
          modifier = Modifier.padding(vertical = 16.dp, horizontal = 32.dp)
@@ -300,7 +299,6 @@ private fun DisplaySettings(
       ) {
          Text(
             text = "Display",
-            color = MaterialTheme.colorScheme.primary,
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Medium,
             modifier = Modifier.padding(vertical = 16.dp, horizontal = 32.dp)

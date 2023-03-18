@@ -38,32 +38,34 @@ private fun NoticeToMariners(
    onTap: (NoticeToMarinersHomeChoice) -> Unit,
 ) {
    Surface(
-      color = MaterialTheme.colorScheme.screenBackground,
+      color = MaterialTheme.colorScheme.surfaceVariant,
       modifier = Modifier.fillMaxSize()
    ) {
       Column(Modifier.padding(top = 32.dp)) {
-         Box(Modifier
-            .fillMaxWidth()
-            .clickable { onTap(NoticeToMarinersHomeChoice.ALL) }
-            .background(MaterialTheme.colorScheme.surface)
-            .padding(16.dp)
-         ) {
-            Text(
-               text = "View All Notice to Mariners"
-            )
+         Surface {
+            Box(Modifier
+               .fillMaxWidth()
+               .clickable { onTap(NoticeToMarinersHomeChoice.ALL) }
+               .padding(16.dp)
+            ) {
+               Text(
+                  text = "View All Notice to Mariners"
+               )
+            }
          }
 
          Divider(Modifier.fillMaxWidth())
 
-         Box(Modifier
-            .fillMaxWidth()
-            .clickable { onTap(NoticeToMarinersHomeChoice.QUERY) }
-            .background(MaterialTheme.colorScheme.surface)
-            .padding(16.dp)
-         ) {
-            Text(
-               text = "Chart Corrections",
-            )
+         Surface() {
+            Box(Modifier
+               .fillMaxWidth()
+               .clickable { onTap(NoticeToMarinersHomeChoice.QUERY) }
+               .padding(16.dp)
+            ) {
+               Text(
+                  text = "Chart Corrections",
+               )
+            }
          }
       }
    }

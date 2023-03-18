@@ -44,26 +44,30 @@ fun NoticeToMarinersQueryScreen(
          onNavigationClicked = { close() }
       )
 
-      NoticeToMarinersChartCorrections(
-         location = location,
-         locationParameter = viewModel.locationParameter,
-         locationFilter = locationFilter,
-         noticeParameter = viewModel.noticeParameter,
-         noticeFilter = noticeFilter,
-         onAddLocationFilter = { viewModel.addLocationFilter(it) },
-         onRemoveLocationFilter = { viewModel.removeLocationFilter() },
-         onAddNoticeFilter = { viewModel.addNoticeFilter(it) },
-         onRemoveNoticeFilter = { viewModel.removeNoticeFilter() }
-      )
+      Surface(Modifier.fillMaxHeight()) {
+         Column {
+            NoticeToMarinersChartCorrections(
+               location = location,
+               locationParameter = viewModel.locationParameter,
+               locationFilter = locationFilter,
+               noticeParameter = viewModel.noticeParameter,
+               noticeFilter = noticeFilter,
+               onAddLocationFilter = { viewModel.addLocationFilter(it) },
+               onRemoveLocationFilter = { viewModel.removeLocationFilter() },
+               onAddNoticeFilter = { viewModel.addNoticeFilter(it) },
+               onRemoveNoticeFilter = { viewModel.removeNoticeFilter() }
+            )
 
-      Button(
-         onClick = { onQuery() },
-         enabled = locationFilter != null,
-         modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 16.dp)
-      ) {
-         Text("Query")
+            Button(
+               onClick = { onQuery() },
+               enabled = locationFilter != null,
+               modifier = Modifier
+                  .fillMaxWidth()
+                  .padding(horizontal = 16.dp, vertical = 16.dp)
+            ) {
+               Text("Query")
+            }
+         }
       }
    }
 }

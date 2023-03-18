@@ -21,7 +21,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import mil.nga.msi.datasource.noticetomariners.ChartCorrection
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.noticetomariners.NoticeToMarinersRoute
-import mil.nga.msi.ui.theme.screenBackground
 import java.time.Year
 
 @Composable
@@ -42,34 +41,39 @@ fun NoticeToMarinersCorrectionsScreen(
          onNavigationClicked = { close() }
       )
 
-      Box {
-         if (loading) {
-            Box(
-               contentAlignment = Alignment.Center,
-               modifier = Modifier
-                  .fillMaxSize()
-                  .padding(horizontal = 16.dp)
-            ) {
-               Column(
-                  horizontalAlignment = Alignment.CenterHorizontally,
+      Surface(Modifier.fillMaxHeight()) {
+         Box {
+            if (loading) {
+               Box(
+                  contentAlignment = Alignment.Center,
+                  modifier = Modifier
+                     .fillMaxSize()
+                     .padding(horizontal = 16.dp)
                ) {
-                  CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-                     Text(
-                        text = "Loading Chart Corrections...",
-                        style = MaterialTheme.typography.headlineSmall,
-                        modifier = Modifier.padding(bottom = 16.dp)
+                  Column(
+                     horizontalAlignment = Alignment.CenterHorizontally,
+                  ) {
+                     CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+                        Text(
+                           text = "Loading Chart Corrections...",
+                           style = MaterialTheme.typography.headlineSmall,
+                           modifier = Modifier.padding(bottom = 16.dp)
+                        )
+                     }
+
+                     LinearProgressIndicator(
+                        color = MaterialTheme.colorScheme.tertiary,
+                        modifier = Modifier.fillMaxWidth()
                      )
                   }
 
-                  LinearProgressIndicator(Modifier.fillMaxWidth())
                }
-
+            } else {
+               ChartCorrections(
+                  corrections = corrections,
+                  onNoticeTap = { onNoticeTap(it.noticeNumber) }
+               )
             }
-         } else {
-            ChartCorrections(
-               corrections = corrections,
-               onNoticeTap = { onNoticeTap(it.noticeNumber) }
-            )
          }
       }
    }
@@ -83,27 +87,22 @@ private fun ChartCorrections(
    val scrollState = rememberScrollState()
    var expanded by remember { mutableStateOf<Map<String, Boolean>>(emptyMap()) }
 
-   Surface(
-      color = MaterialTheme.colorScheme.screenBackground,
-      modifier = Modifier.fillMaxHeight()
+   Column(
+      modifier = Modifier.verticalScroll(scrollState)
    ) {
-      Column(
-         modifier = Modifier.verticalScroll(scrollState)
-      ) {
-         corrections.forEach { entry ->
-            val chartNumber = entry.value.first().chartNumber
-            Chart(
-               correction = entry.value.first(),
-               notices = entry.value,
-               expand = expanded[chartNumber] ?: false,
-               onExpand = { expand ->
-                  expanded = expanded.toMutableMap().apply {
-                     put(chartNumber, expand)
-                  }
-               },
-               onNoticeTap = { onNoticeTap(it) }
-            )
-         }
+      corrections.forEach { entry ->
+         val chartNumber = entry.value.first().chartNumber
+         Chart(
+            correction = entry.value.first(),
+            notices = entry.value,
+            expand = expanded[chartNumber] ?: false,
+            onExpand = { expand ->
+               expanded = expanded.toMutableMap().apply {
+                  put(chartNumber, expand)
+               }
+            },
+            onNoticeTap = { onNoticeTap(it) }
+         )
       }
    }
 }
@@ -176,7 +175,10 @@ private fun Chart(
 
                   if (correction.noticeDecade >= 99 && correction.noticeWeek >= 29 || correction.noticeDecade <= Year.now().value % 1000) {
                      TextButton(
-                        onClick = { onNoticeTap(correction) }
+                        onClick = { onNoticeTap(correction) },
+                        colors = ButtonDefaults.textButtonColors(
+                           contentColor = MaterialTheme.colorScheme.tertiary
+                        )
                      ) {
                         Text("NTM ${correction.currentNoticeNumber} Details")
                      }
@@ -189,7 +191,7 @@ private fun Chart(
             ) {
                Icon(
                   imageVector = Icons.Default.ExpandMore,
-                  tint = MaterialTheme.colorScheme.primary,
+                  tint = MaterialTheme.colorScheme.tertiary,
                   modifier = Modifier.rotate(angle),
                   contentDescription = "Expand Filter"
                )
@@ -267,7 +269,10 @@ private fun Notices(
          ) {
             if (notice.noticeDecade >= 99 && notice.noticeWeek >= 29 || notice.noticeDecade <= Year.now().value % 1000) {
                TextButton(
-                  onClick = { onNoticeTap(notice) }
+                  onClick = { onNoticeTap(notice) },
+                  colors = ButtonDefaults.textButtonColors(
+                     contentColor = MaterialTheme.colorScheme.tertiary
+                  )
                ) {
                   Text("NTM ${notice.currentNoticeNumber} Details")
                }

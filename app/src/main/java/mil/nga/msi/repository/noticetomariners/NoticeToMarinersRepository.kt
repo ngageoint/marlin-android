@@ -49,7 +49,7 @@ class NoticeToMarinersRepository @Inject constructor(
       return localDataSource.getNoticeToMariners()
    }
 
-   suspend fun getNoticeToMarinersPublication(notice: NoticeToMariners): Uri {
+   suspend fun getNoticeToMarinersPublication(notice: NoticeToMariners): Uri? {
       return remoteDataSource.fetchNoticeToMarinersPublication(notice)
    }
 
@@ -57,7 +57,7 @@ class NoticeToMarinersRepository @Inject constructor(
       localDataSource.deleteNoticeToMarinersPublication(notice)
    }
 
-   suspend fun getNoticeToMarinersGraphic(graphic: NoticeToMarinersGraphic): Uri {
+   suspend fun getNoticeToMarinersGraphic(graphic: NoticeToMarinersGraphic): Uri? {
       return remoteDataSource.fetchNoticeToMarinersGraphic(graphic)
    }
 

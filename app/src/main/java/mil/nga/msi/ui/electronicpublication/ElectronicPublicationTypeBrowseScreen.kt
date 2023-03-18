@@ -103,7 +103,7 @@ fun ElectronicPublicationTypeBrowseScreen(
             navigationIcon = Icons.Default.ArrowBack,
             onNavigationClicked = onBackClick,
         )
-        Surface(color = MaterialTheme.colorScheme.screenBackground) {
+        Surface {
             when (currentNodeLinks) {
                 is Publications -> {
                     PublicationList(
@@ -203,10 +203,20 @@ fun PublicationListItem(
             Arrangement.End
         ) {
             if (ePub.isDownloaded) {
-                TextButton(onClick = { actions.onViewClick(ePub) }) {
+                TextButton(
+                    onClick = { actions.onViewClick(ePub) },
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = MaterialTheme.colorScheme.tertiary
+                    )
+                ) {
                     Text("View", style = MaterialTheme.typography.labelLarge)
                 }
-                TextButton(onClick = { actions.onDeleteClick(ePub) }) {
+                TextButton(
+                    onClick = { actions.onDeleteClick(ePub) },
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = MaterialTheme.colorScheme.tertiary
+                    )
+                ) {
                     Text("Delete", style = MaterialTheme.typography.labelLarge)
                 }
             } else if (ePub.isDownloading) {
@@ -223,12 +233,20 @@ fun PublicationListItem(
                         modifier = Modifier.align(Alignment.CenterVertically)
                     )
                 }
-                TextButton(onClick = { actions.onCancelDownloadClick(ePub) }) {
+                TextButton(
+                    onClick = { actions.onCancelDownloadClick(ePub) },
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = MaterialTheme.colorScheme.tertiary
+                    )
+                ) {
                     Text("Cancel", style = MaterialTheme.typography.labelLarge)
                 }
             } else {
                 TextButton(
-                    onClick = { actions.onDownloadClick(ePub) }
+                    onClick = { actions.onDownloadClick(ePub) },
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = MaterialTheme.colorScheme.tertiary
+                    )
                 ) {
                     Text("Download", style = MaterialTheme.typography.labelLarge)
                 }
@@ -349,26 +367,28 @@ fun PublicationList(
     formatByteCount: (Long?) -> String?,
     actions: PublicationActions,
 ) {
-    LazyColumn {
-        publicationLinks.publications.forEachIndexed { pos, pubLink ->
-            item { 
-                PublicationListItem(
-                    ePub = pubLink.publication,
-                    formatDateTime = formatDateTime,
-                    formatByteCount = formatByteCount,
-                    actions = actions,
-                )
-                if (pos < publicationLinks.publications.size - 1) {
-                    Divider(
-                        modifier = Modifier
-                            .padding(start = 16.dp)
-                            .background(MaterialTheme.colorScheme.background)
+    Surface(Modifier.fillMaxSize()) {
+        LazyColumn {
+            publicationLinks.publications.forEachIndexed { pos, pubLink ->
+                item {
+                    PublicationListItem(
+                        ePub = pubLink.publication,
+                        formatDateTime = formatDateTime,
+                        formatByteCount = formatByteCount,
+                        actions = actions,
                     )
+                    if (pos < publicationLinks.publications.size - 1) {
+                        Divider(
+                            modifier = Modifier
+                                .padding(start = 16.dp)
+                                .background(MaterialTheme.colorScheme.background)
+                        )
+                    }
                 }
             }
-        }
-        item {
-            Divider()
+            item {
+                Divider()
+            }
         }
     }
 }
@@ -379,7 +399,7 @@ fun PublicationFolderList(
     folderLinks: PublicationFolders,
     onLinkClick: (PublicationFolderLink) -> Unit
 ) {
-    Surface {
+    Surface(Modifier.fillMaxSize()) {
         LazyColumn {
             items(count = folderLinks.folders.size) {
                 val folderLink = folderLinks.folders[it]

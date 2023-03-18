@@ -18,6 +18,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -102,9 +103,7 @@ private fun NavigationalWarnings(
       }
    }
 
-   Surface(
-      color = MaterialTheme.colorScheme.screenBackground
-   ) {
+   Surface {
       Box {
          LazyColumn(
             state = listState,
@@ -138,33 +137,35 @@ private fun NavigationalWarnings(
                   .fillMaxWidth()
                   .padding(top = 8.dp)
             ) {
-               Row(
-                  verticalAlignment = Alignment.CenterVertically,
-                  modifier = Modifier
-                     .height(40.dp)
-                     .clip(RoundedCornerShape(20.dp))
-                     .background(MaterialTheme.colorScheme.primary)
-                     .clickable {
-                        scope.launch {
-                           listState.animateScrollToItem(0)
-                        }
-                     }
-                     .padding(horizontal = 16.dp)
+               Surface(
+                  contentColor = MaterialTheme.colorScheme.onPrimary
                ) {
-                  Icon(Icons.Default.ArrowUpward,
-                     contentDescription = "Scroll to new warnings",
-                     tint = MaterialTheme.colorScheme.contentColorFor(MaterialTheme.colorScheme.primary),
+                  Row(
+                     verticalAlignment = Alignment.CenterVertically,
                      modifier = Modifier
-                        .padding(end = 4.dp)
-                        .height(16.dp)
-                        .width(16.dp)
-                  )
+                        .height(40.dp)
+                        .clip(RoundedCornerShape(20.dp))
+                        .background(MaterialTheme.colorScheme.primary)
+                        .clickable {
+                           scope.launch {
+                              listState.animateScrollToItem(0)
+                           }
+                        }
+                        .padding(horizontal = 16.dp)
+                  ) {
+                     Icon(Icons.Default.ArrowUpward,
+                        contentDescription = "Scroll to new warnings",
+                        modifier = Modifier
+                           .padding(end = 4.dp)
+                           .height(16.dp)
+                           .width(16.dp)
+                     )
 
-                  Text(
-                     text = "$index Unread ${if (index == 1) "Warning" else "Warnings"}",
-                     style = MaterialTheme.typography.bodyMedium,
-                     color = MaterialTheme.colorScheme.contentColorFor(MaterialTheme.colorScheme.primary)
-                  )
+                     Text(
+                        text = "$index Unread ${if (index == 1) "Warning" else "Warnings"}",
+                        style = MaterialTheme.typography.bodyMedium,
+                     )
+                  }
                }
             }
          }
@@ -285,7 +286,7 @@ private fun NavigationalWarningActions(
          onClick = { onShare() }
       ) {
          Icon(Icons.Default.Share,
-            tint = MaterialTheme.colorScheme.primary,
+            tint = MaterialTheme.colorScheme.tertiary,
             contentDescription = "Share Navigational Warning"
          )
       }

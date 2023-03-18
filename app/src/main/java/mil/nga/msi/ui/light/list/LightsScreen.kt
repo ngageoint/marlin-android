@@ -109,11 +109,7 @@ private fun Lights(
 ) {
    val lazyItems = pagingState.collectAsLazyPagingItems()
 
-   Surface(
-      color = MaterialTheme.colorScheme.screenBackground,
-      modifier = Modifier.fillMaxHeight()
-   ) {
-
+   Surface(Modifier.fillMaxSize()) {
       LazyColumn(
          modifier = Modifier.padding(horizontal = 8.dp),
          contentPadding = PaddingValues(top = 16.dp)
@@ -255,13 +251,13 @@ private fun LightActions(
          onClick = { onShare() }
       ) {
          Icon(Icons.Default.Share,
-            tint = MaterialTheme.colorScheme.primary,
+            tint = MaterialTheme.colorScheme.tertiary,
             contentDescription = "Share Light"
          )
       }
       IconButton(onClick = { onZoom() }) {
          Icon(Icons.Default.GpsFixed,
-            tint = MaterialTheme.colorScheme.primary,
+            tint = MaterialTheme.colorScheme.tertiary,
             contentDescription = "Zoom to Light"
          )
       }
