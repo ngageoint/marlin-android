@@ -73,7 +73,6 @@ private fun RadioBeaconDetailContent(
 ) {
    if (beacon != null) {
       Surface(
-         color = MaterialTheme.colorScheme.screenBackground,
          modifier = Modifier.fillMaxHeight()
       ) {
          Column(
@@ -210,13 +209,13 @@ private fun RadioBeaconActions(
    Row {
       IconButton(onClick = { onShare() }) {
          Icon(Icons.Default.Share,
-            tint = MaterialTheme.colorScheme.primary,
+            tint = MaterialTheme.colorScheme.tertiary,
             contentDescription = "Share Radio Beacon"
          )
       }
       IconButton(onClick = { onZoom() }) {
          Icon(Icons.Default.GpsFixed,
-            tint = MaterialTheme.colorScheme.primary,
+            tint = MaterialTheme.colorScheme.tertiary,
             contentDescription = "Zoom to Radio Beacon"
          )
       }

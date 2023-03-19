@@ -7,13 +7,10 @@ import android.graphics.Bitmap
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -35,6 +32,7 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
@@ -328,7 +326,7 @@ fun MapScreen(
                },
                onLocationTap = {
                   destination = MapPosition(
-                     name = "Hello Map",
+                     name = "Map",
                      location = MapLocation.newBuilder()
                         .setLatitude(it.latitude)
                         .setLongitude(it.longitude)
@@ -396,13 +394,19 @@ private fun Map(
    val beaconTileProvider = tileProviders[TileProviderType.RADIO_BEACON]
    val dgpsStationTileProvider = tileProviders[TileProviderType.DGPS_STATION]
 
+   val mapStyleOptions = if (isSystemInDarkTheme()) {
+      MapStyleOptions.loadRawResourceStyle(context, R.raw.map_theme_night)
+   } else null
+
    GoogleMap(
       cameraPositionState = cameraPositionState,
       onMapLoaded = { isMapLoaded = true },
       properties = MapProperties(
          minZoomPreference = 0f,
          mapType = baseMap?.asMapType() ?: BaseMapType.NORMAL.asMapType(),
-         isMyLocationEnabled = locationEnabled
+         isMyLocationEnabled = locationEnabled,
+         mapStyleOptions = mapStyleOptions
+
       ),
       uiSettings = MapUiSettings(
          mapToolbarEnabled = false,
@@ -516,12 +520,12 @@ private fun Settings(
    onTap: () -> Unit
 ) {
    FloatingActionButton(
+      containerColor = MaterialTheme.colorScheme.primaryContainer,
       onClick = { onTap() },
-//      backgroundColor = MaterialTheme.colorScheme.background,
       modifier = Modifier.size(40.dp)
    ) {
       Icon(Icons.Outlined.Map,
-         tint = MaterialTheme.colorScheme.primary,
+         tint = MaterialTheme.colorScheme.tertiary,
          contentDescription = "Map Settings"
       )
    }
@@ -533,6 +537,7 @@ private fun Zoom(
    onZoom: () -> Unit
 ) {
    FloatingActionButton(
+      containerColor = MaterialTheme.colorScheme.primaryContainer,
       onClick = {
          onZoom()
       },
@@ -541,7 +546,7 @@ private fun Zoom(
       var tint =  MaterialTheme.colorScheme.onSurfaceDisabled
       if (located) {
          icon = Icons.Outlined.MyLocation
-         tint = MaterialTheme.colorScheme.primary
+         tint = MaterialTheme.colorScheme.tertiary
       }
       Icon(
          imageVector = icon,
@@ -587,6 +592,9 @@ private fun Search(
                text = it
                onTextChanged(it)
             },
+            textStyle = TextStyle(
+               color = MaterialTheme.colorScheme.onPrimaryContainer
+            ),
             interactionSource = interactionSource,
             enabled = expanded,
             singleLine = true,
@@ -606,6 +614,7 @@ private fun Search(
                singleLine = true,
                enabled = expanded,
                colors  = TextFieldDefaults.textFieldColors(
+                  textColor = MaterialTheme.colorScheme.onPrimary,
                   containerColor = MaterialTheme.colorScheme.primaryContainer,
                   focusedIndicatorColor = MaterialTheme.colorScheme.primaryContainer,
                   unfocusedIndicatorColor = MaterialTheme.colorScheme.primaryContainer,
@@ -615,7 +624,7 @@ private fun Search(
                   IconButton(onClick = { onExpand() }) {
                      Icon(
                         imageVector = Icons.Default.Search,
-                        tint = MaterialTheme.colorScheme.primary,
+                        tint = MaterialTheme.colorScheme.tertiary,
                         contentDescription = "Search"
                      )
                   }
@@ -661,12 +670,15 @@ private fun Search(
                      modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 8.dp)
                   ) {
                      Column(Modifier.weight(1f)) {
-                        Text(
-                           text = result.name,
-                           style = MaterialTheme.typography.titleMedium,
-                           fontWeight = FontWeight.Medium
-                        )
-                        CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceDisabled) {
+                        CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
+                           Text(
+                              text = result.name,
+                              style = MaterialTheme.typography.titleMedium,
+                              fontWeight = FontWeight.Medium
+                           )
+                        }
+
+                        CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                            Text(
                               text = result.address ?: "",
                               style = MaterialTheme.typography.titleSmall
@@ -685,7 +697,7 @@ private fun Search(
                         ) {
                            Icon(
                               imageVector = Icons.Default.LocationSearching,
-                              tint = MaterialTheme.colorScheme.primary,
+                              tint = MaterialTheme.colorScheme.tertiary,
                               contentDescription = "Zoom To Search Result"
                            )
                         }

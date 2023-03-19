@@ -5,10 +5,7 @@ import androidx.lifecycle.*
 import com.google.android.gms.maps.model.TileProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mil.nga.msi.datasource.DataSource
@@ -103,12 +100,11 @@ class MapViewModel @Inject constructor(
 
    val searchResults = searchText
       .map {
-         val stuff = if (it.isNotEmpty()) {
+         if (it.isNotEmpty()) {
             geocoderRemoteDataSource.geocode(it)
          } else emptyList()
-
-         stuff
-      }.asLiveData()
+      }.flowOn(Dispatchers.IO)
+      .asLiveData()
 
    fun toggleOnMap(dataSource: DataSource) {
       viewModelScope.launch {

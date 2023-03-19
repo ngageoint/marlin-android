@@ -19,6 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.drawable.toBitmap
 import mil.nga.msi.ui.main.TopBar
+import mil.nga.msi.ui.map.overlay.images.colorImage
 import mil.nga.msi.ui.theme.screenBackground
 
 @Composable
@@ -34,48 +35,53 @@ fun ReportsScreen(
          onNavigationClicked = { close() }
       )
 
-      Column(
-         Modifier
-            .fillMaxSize()
-            .verticalScroll(scrollState)
-            .background(MaterialTheme.colorScheme.screenBackground)
-            .padding(bottom = 16.dp)
+      Surface(
+         color = MaterialTheme.colorScheme.surfaceVariant,
+         modifier = Modifier.fillMaxSize()
       ) {
-         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-            Text(
-               text = "Submit Reports to NGA",
-               style = MaterialTheme.typography.bodyMedium,
-               fontWeight = FontWeight.Medium,
-               modifier = Modifier.padding(start = 8.dp, top = 32.dp, bottom = 16.dp)
-            )
-         }
+         Column(
+            Modifier
+               .fillMaxSize()
+               .verticalScroll(scrollState)
+               .background(MaterialTheme.colorScheme.screenBackground)
+               .padding(bottom = 16.dp)
+         ) {
+            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+               Text(
+                  text = "Submit Reports to NGA",
+                  style = MaterialTheme.typography.bodyMedium,
+                  fontWeight = FontWeight.Medium,
+                  modifier = Modifier.padding(start = 8.dp, top = 32.dp, bottom = 16.dp)
+               )
+            }
 
-         Reports(ReportRoute.ASAM) {
-            onTap(ReportRoute.ASAM)
-         }
+            Reports(ReportRoute.ASAM) {
+               onTap(ReportRoute.ASAM)
+            }
 
-         Divider()
+            Divider()
 
-         Reports(ReportRoute.Observer) {
-            onTap(ReportRoute.Observer)
-         }
+            Reports(ReportRoute.Observer) {
+               onTap(ReportRoute.Observer)
+            }
 
-         Divider()
+            Divider()
 
-         Reports(ReportRoute.MODU) {
-            onTap(ReportRoute.MODU)
-         }
+            Reports(ReportRoute.MODU) {
+               onTap(ReportRoute.MODU)
+            }
 
-         Divider()
+            Divider()
 
-         Reports(ReportRoute.PortVisit) {
-            onTap(ReportRoute.PortVisit)
-         }
+            Reports(ReportRoute.PortVisit) {
+               onTap(ReportRoute.PortVisit)
+            }
 
-         Divider()
+            Divider()
 
-         Reports(ReportRoute.HostileShip) {
-            onTap(ReportRoute.HostileShip)
+            Reports(ReportRoute.HostileShip) {
+               onTap(ReportRoute.HostileShip)
+            }
          }
       }
    }
@@ -100,42 +106,41 @@ private fun Report(
 ) {
    val bitmap = AppCompatResources.getDrawable(LocalContext.current, route.icon)!!.toBitmap().asImageBitmap()
 
-   Row(
-      verticalAlignment = Alignment.CenterVertically,
-      modifier = Modifier
-         .fillMaxWidth()
-         .background(MaterialTheme.colorScheme.background)
-         .clickable {
-            onTap()
-         }
-   ) {
-
-      CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-         Icon(
-            bitmap = bitmap,
-            modifier = Modifier.padding(start = 8.dp),
-            contentDescription = "Report Icon"
-         )
-      }
-
-      Column(
-         verticalArrangement = Arrangement.Center,
-         modifier = Modifier.fillMaxWidth()
+   Surface {
+      Row(
+         verticalAlignment = Alignment.CenterVertically,
+         modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onTap() }
       ) {
-         Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier
-               .height(56.dp)
-               .fillMaxWidth()
-               .padding(horizontal = 8.dp)
+
+         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+            Icon(
+               bitmap = bitmap,
+               modifier = Modifier.padding(start = 8.dp),
+               contentDescription = "Report Icon"
+            )
+         }
+
+         Column(
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier.fillMaxWidth()
          ) {
-            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
-               Text(
-                  text = route.title,
-                  style = MaterialTheme.typography.bodyMedium,
-                  fontWeight = FontWeight.Medium
-               )
+            Row(
+               verticalAlignment = Alignment.CenterVertically,
+               horizontalArrangement = Arrangement.SpaceBetween,
+               modifier = Modifier
+                  .height(56.dp)
+                  .fillMaxWidth()
+                  .padding(horizontal = 8.dp)
+            ) {
+               CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
+                  Text(
+                     text = route.title,
+                     style = MaterialTheme.typography.bodyMedium,
+                     fontWeight = FontWeight.Medium
+                  )
+               }
             }
          }
       }

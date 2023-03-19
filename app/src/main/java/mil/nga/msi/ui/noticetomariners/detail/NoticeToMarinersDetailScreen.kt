@@ -65,50 +65,58 @@ fun NoticeToMarinersDetailScreen(
          onNavigationClicked = { close() }
       )
 
-      Box {
-         if (loading) {
-            LinearProgressIndicator(Modifier.fillMaxWidth())
-         } else {
-            NoticeToMariners(
-               noticeToMariners = noticeToMariners,
-               available = available,
-               downloading = downloading,
-               onGraphicTap = { onGraphicTap(it) },
-               onView = { notice ->
-                  scope.launch {
-                     downloading = downloading.toMutableMap().apply {
-                        this[notice.odsEntryId] = true
+      Surface(Modifier.fillMaxHeight()) {
+         Box {
+            if (loading) {
+               LinearProgressIndicator(Modifier.fillMaxWidth())
+            } else {
+               NoticeToMariners(
+                  noticeToMariners = noticeToMariners,
+                  available = available,
+                  downloading = downloading,
+                  onGraphicTap = { onGraphicTap(it) },
+                  onView = { notice ->
+                     scope.launch {
+                        downloading = downloading.toMutableMap().apply {
+                           this[notice.odsEntryId] = true
+                        }
+
+                        val uri = viewModel.getNoticeToMarinersPublication(notice)
+                        if (uri != null) {
+                           available = available.toMutableMap().apply {
+                              this[notice.odsEntryId] = true
+                           }
+
+                           val shareIntent = Intent.createChooser(Intent().apply {
+                              action = Intent.ACTION_SEND
+                              type = context.contentResolver.getType(uri)
+                              putExtra(Intent.EXTRA_STREAM, uri)
+                           }, "Notice to Mariners Publication")
+
+                           context.startActivity(shareIntent)
+                        } else {
+                           // TODO show download error here
+                           downloading = downloading.toMutableMap().apply {
+                              this[notice.odsEntryId] = false
+                           }
+                        }
                      }
+                  },
+                  onDelete = { notice ->
+                     scope.launch {
+                        viewModel.deleteNoticeToMarinersPublication(notice)
 
-                     val uri = viewModel.getNoticeToMarinersPublication(notice)
+                        downloading = downloading.toMutableMap().apply {
+                           this[notice.odsEntryId] = false
+                        }
 
-                     available = available.toMutableMap().apply {
-                        this[notice.odsEntryId] = true
+                        available = available.toMutableMap().apply {
+                           this[notice.odsEntryId] = false
+                        }
                      }
-
-                     val shareIntent = Intent.createChooser(Intent().apply {
-                        action = Intent.ACTION_SEND
-                        type = context.contentResolver.getType(uri)
-                        putExtra(Intent.EXTRA_STREAM, uri)
-                     }, "Notice to Mariners Publication")
-
-                     context.startActivity(shareIntent)
                   }
-               },
-               onDelete = { notice ->
-                  scope.launch {
-                     viewModel.deleteNoticeToMarinersPublication(notice)
-
-                     downloading = downloading.toMutableMap().apply {
-                        this[notice.odsEntryId] = false
-                     }
-
-                     available = available.toMutableMap().apply {
-                        this[notice.odsEntryId] = false
-                     }
-                  }
-               }
-            )
+               )
+            }
          }
       }
    }
@@ -125,36 +133,31 @@ private fun NoticeToMariners(
 ) {
    val scrollState = rememberScrollState()
 
-   Surface(
-      color = MaterialTheme.colorScheme.screenBackground,
-      modifier = Modifier.fillMaxHeight()
+   Column(
+      Modifier
+         .fillMaxWidth()
+         .padding(16.dp)
+         .verticalScroll(scrollState)
    ) {
-      Column(
-         Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-            .verticalScroll(scrollState)
-      ) {
-         NoticeToMarinersCharts(graphics = noticeToMariners?.graphics ?: emptyList()) {
-            onGraphicTap(it)
-         }
+      NoticeToMarinersCharts(graphics = noticeToMariners?.graphics ?: emptyList()) {
+         onGraphicTap(it)
+      }
 
-         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceDisabled) {
-            Text(
-               text = "FILES",
-               style = MaterialTheme.typography.titleMedium,
-               modifier = Modifier.padding(top = 8.dp)
-            )
-         }
-
-         NoticeToMarinersPublications(
-            state = noticeToMariners,
-            available = available,
-            downloading = downloading,
-            onView = { onView(it) },
-            onDelete = { onDelete(it) }
+      CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+         Text(
+            text = "FILES",
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(top = 8.dp)
          )
       }
+
+      NoticeToMarinersPublications(
+         state = noticeToMariners,
+         available = available,
+         downloading = downloading,
+         onView = { onView(it) },
+         onDelete = { onDelete(it) }
+      )
    }
 }
 
@@ -166,7 +169,7 @@ private fun NoticeToMarinersCharts(
    val group = graphics.groupBy { it.graphicType }.toSortedMap()
    group.forEach { entry ->
       if (entry.value.isNotEmpty()) {
-         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceDisabled) {
+         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
             Text(
                text = entry.key.uppercase(Locale.getDefault()),
                style = MaterialTheme.typography.titleMedium,
@@ -292,6 +295,7 @@ private fun NoticeToMarinersPublications(
                ) {
                   if (isDownloading && !isAvailable) {
                      LinearProgressIndicator(
+                        color = MaterialTheme.colorScheme.tertiary,
                         modifier = Modifier
                            .weight(1f)
                            .padding(end = 16.dp)
@@ -300,7 +304,10 @@ private fun NoticeToMarinersPublications(
 
                   if (isAvailable) {
                      TextButton(
-                        onClick = { onDelete(publication.notice) }
+                        onClick = { onDelete(publication.notice) },
+                        colors = ButtonDefaults.textButtonColors(
+                           contentColor = MaterialTheme.colorScheme.tertiary
+                        )
                      ) {
                         Text("Delete")
                      }
@@ -308,7 +315,10 @@ private fun NoticeToMarinersPublications(
 
                   TextButton(
                      enabled = !isDownloading || isAvailable,
-                     onClick = { onView(publication.notice) }
+                     onClick = { onView(publication.notice) },
+                     colors = ButtonDefaults.textButtonColors(
+                        contentColor = MaterialTheme.colorScheme.tertiary
+                     )
                   ) {
                      Text(if (!isAvailable) "Download" else "View")
                   }

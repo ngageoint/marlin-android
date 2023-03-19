@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -51,13 +52,16 @@ fun MapFilterScreen(
          onNavigationClicked = { close() }
       )
 
-      Column(
-         Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.screenBackground)
-            .verticalScroll(scrollState)
+      Surface(
+         color = MaterialTheme.colorScheme.surfaceVariant
       ) {
-         DataSources(dataSources = dataSources, location = location)
+         Column(
+            Modifier
+               .fillMaxSize()
+               .verticalScroll(scrollState)
+         ) {
+            DataSources(dataSources = dataSources, location = location)
+         }
       }
    }
 }
@@ -70,20 +74,18 @@ private fun DataSources(
    var expanded by remember { mutableStateOf<Map<DataSource, Boolean>>(emptyMap()) }
 
    dataSources.forEach { dataSourceModel ->
-      DataSource(
-         dataSourceModel = dataSourceModel,
-         location = location,
-         expand = expanded[dataSourceModel.dataSource] ?: false,
-         onExpand = { expand ->
-            expanded = expanded.toMutableMap().apply {
-               put(dataSourceModel.dataSource, expand)
+      Column(Modifier.padding(bottom = 16.dp)) {
+         DataSource(
+            dataSourceModel = dataSourceModel,
+            location = location,
+            expand = expanded[dataSourceModel.dataSource] ?: false,
+            onExpand = { expand ->
+               expanded = expanded.toMutableMap().apply {
+                  put(dataSourceModel.dataSource, expand)
+               }
             }
-         }
-      )
-
-      Spacer(modifier = Modifier
-         .height(8.dp)
-         .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)))
+         )
+      }
    }
 }
 
@@ -102,82 +104,87 @@ private fun DataSource(
       )
    )
 
-   Column(Modifier.background(dataSourceModel.dataSource.color)) {
-      Column(
-         modifier = Modifier
-            .padding(start = 8.dp)
+   Surface(
+      color = dataSourceModel.dataSource.color
+   ) {
+      Surface(
+         modifier = Modifier.padding(start = 8.dp).fillMaxWidth()
       ) {
-         Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-               .fillMaxWidth()
-               .height(72.dp)
-               .background(MaterialTheme.colorScheme.background)
-               .clickable { onExpand(!expand) }
-         ) {
-            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-               val bitmap = AppCompatResources.getDrawable(LocalContext.current, dataSourceModel.dataSource.icon)!!.toBitmap().asImageBitmap()
-               Icon(
-                  bitmap = bitmap,
-                  modifier = Modifier.padding(start = 8.dp),
-                  contentDescription = "Navigation Tab Icon"
-               )
-            }
-
+         Column(Modifier.fillMaxWidth()) {
             Row(
                verticalAlignment = Alignment.CenterVertically,
-               horizontalArrangement = Arrangement.SpaceBetween,
                modifier = Modifier
-                  .height(72.dp)
                   .fillMaxWidth()
-                  .weight(1f)
-                  .padding(horizontal = 8.dp)
+                  .height(72.dp)
+                  .clickable { onExpand(!expand) }
             ) {
-               CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
-                  Text(
-                     text = mainRouteFor(dataSourceModel.dataSource).title,
-                     style = MaterialTheme.typography.bodyMedium,
-                     fontWeight = FontWeight.Medium
+               CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+                  val bitmap = AppCompatResources.getDrawable(
+                     LocalContext.current,
+                     dataSourceModel.dataSource.icon
+                  )!!.toBitmap().asImageBitmap()
+                  Icon(
+                     bitmap = bitmap,
+                     modifier = Modifier.padding(start = 8.dp),
+                     contentDescription = "Navigation Tab Icon"
                   )
                }
 
-               Row(modifier = Modifier.padding(end = 16.dp)) {
-                  if (dataSourceModel.numberOfFilters > 0) {
-                     Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier
-                           .padding(end = 16.dp)
-                           .clip(CircleShape)
-                           .height(24.dp)
-                           .background(MaterialTheme.colorScheme.secondary)
-                     ) {
-                        Text(
-                           text = dataSourceModel.numberOfFilters.toString(),
-                           style = MaterialTheme.typography.bodyMedium,
-                           modifier = Modifier.padding(horizontal = 8.dp),
-                           color = MaterialTheme.colorScheme.onPrimary
-                        )
-                     }
+               Row(
+                  verticalAlignment = Alignment.CenterVertically,
+                  horizontalArrangement = Arrangement.SpaceBetween,
+                  modifier = Modifier
+                     .height(72.dp)
+                     .fillMaxWidth()
+                     .weight(1f)
+                     .padding(horizontal = 8.dp)
+               ) {
+                  CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
+                     Text(
+                        text = mainRouteFor(dataSourceModel.dataSource).title,
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Medium
+                     )
                   }
 
-                  Icon(
-                     imageVector = Icons.Default.ExpandMore,
-                     tint = MaterialTheme.colorScheme.primary,
-                     modifier = Modifier.rotate(angle),
-                     contentDescription = "Expand Filter"
-                  )
+                  Row(modifier = Modifier.padding(end = 16.dp)) {
+                     if (dataSourceModel.numberOfFilters > 0) {
+                        Box(
+                           contentAlignment = Alignment.Center,
+                           modifier = Modifier
+                              .padding(end = 16.dp)
+                              .clip(CircleShape)
+                              .height(24.dp)
+                              .background(MaterialTheme.colorScheme.primary)
+                        ) {
+                           Text(
+                              text = dataSourceModel.numberOfFilters.toString(),
+                              style = MaterialTheme.typography.bodyMedium,
+                              modifier = Modifier.padding(horizontal = 8.dp),
+                              color = MaterialTheme.colorScheme.onPrimary
+                           )
+                        }
+                     }
+
+                     Icon(
+                        imageVector = Icons.Default.ExpandMore,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.rotate(angle),
+                        contentDescription = "Expand Filter"
+                     )
+                  }
                }
             }
-         }
 
-         Column(
-            Modifier
-               .fillMaxWidth()
-               .background(MaterialTheme.colorScheme.background)
-               .animateContentSize()
-         ) {
-            if (expand) {
-               Filter(dataSource = dataSourceModel.dataSource, location = location)
+            Column(
+               Modifier
+                  .fillMaxWidth()
+                  .background(MaterialTheme.colorScheme.background)
+                  .animateContentSize()
+            ) {
+               if (expand) {
+                  Filter(dataSource = dataSourceModel.dataSource, location = location)
+               }
             }
          }
       }

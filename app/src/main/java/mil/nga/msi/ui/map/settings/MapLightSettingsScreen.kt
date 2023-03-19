@@ -2,6 +2,7 @@ package mil.nga.msi.ui.map.settings
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
@@ -14,13 +15,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.TileProvider
 import com.google.maps.android.compose.*
+import mil.nga.msi.R
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.BaseMapType
 import mil.nga.msi.ui.theme.onSurfaceDisabled
@@ -49,16 +53,18 @@ fun MapLightSettingsScreen(
          tileProvider = lightTileProvider
       )
 
-      Options(
-         lightRange = showLightRanges,
-         sectorLightRange = showSectorLightRanges,
-         onLightRangeToggle = {
-            viewModel.setShowLightRanges(it)
-         },
-         onSectorLightRangeToggle = {
-            viewModel.setShowSectorLightRanges(it)
-         }
-      )
+      Surface {
+         Options(
+            lightRange = showLightRanges,
+            sectorLightRange = showSectorLightRanges,
+            onLightRangeToggle = {
+               viewModel.setShowLightRanges(it)
+            },
+            onSectorLightRangeToggle = {
+               viewModel.setShowSectorLightRanges(it)
+            }
+         )
+      }
    }
 }
 
@@ -77,8 +83,15 @@ private fun Map(
       compassEnabled = false
    )
 
+   val mapStyleOptions = if (isSystemInDarkTheme()) {
+      MapStyleOptions.loadRawResourceStyle(LocalContext.current, R.raw.map_theme_night)
+   } else null
+
    val properties = baseMap?.let {
-      MapProperties(mapType = it.asMapType())
+      MapProperties(
+         mapType = it.asMapType(),
+         mapStyleOptions = mapStyleOptions
+      )
    } ?: MapProperties()
 
    GoogleMap(

@@ -55,7 +55,6 @@ private fun NavigationalWarningDetailContent(
 ) {
    if (warning != null) {
       Surface(
-         color = MaterialTheme.colorScheme.screenBackground,
          modifier = Modifier.fillMaxHeight()
       ) {
          Column(
@@ -133,7 +132,7 @@ private fun NavigationalWarningActions(
 ) {
    IconButton(onClick = { onShare() }) {
       Icon(Icons.Default.Share,
-         tint = MaterialTheme.colorScheme.primary,
+         tint = MaterialTheme.colorScheme.tertiary,
          contentDescription = "Share Navigational Warning"
       )
    }

@@ -113,174 +113,181 @@ fun NavigationDrawer(
    val tabs = previousTabs
    val nonTabs = previousNonTabs
    if (tabs != null && nonTabs != null) {
-      LazyColumn(
-         state = listState,
-         contentPadding = PaddingValues(bottom = 16.dp),
-         modifier = Modifier
-            .fillMaxHeight()
-            .dragContainer(dragDropState)
-            .background(MaterialTheme.colorScheme.screenBackground)
+      Surface(
+         color = MaterialTheme.colorScheme.surfaceVariant
       ) {
-         item {
-            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-               Text(
-                  text = "Data Source Tabs (Drag to reorder, $MAX_TABS max.)",
-                  style = MaterialTheme.typography.bodyMedium,
-                  fontWeight = FontWeight.Medium,
-                  modifier = Modifier.padding(start = 8.dp, top = 32.dp, bottom = 16.dp)
-               )
+         LazyColumn(
+            state = listState,
+            contentPadding = PaddingValues(bottom = 16.dp),
+            modifier = Modifier
+               .fillMaxHeight()
+               .dragContainer(dragDropState)
+               .background(MaterialTheme.colorScheme.screenBackground)
+         ) {
+            item {
+               CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+                  Text(
+                     text = "Data Source Tabs (Drag to reorder, $MAX_TABS max.)",
+                     style = MaterialTheme.typography.bodyMedium,
+                     fontWeight = FontWeight.Medium,
+                     modifier = Modifier.padding(start = 8.dp, top = 32.dp, bottom = 16.dp)
+                  )
+               }
             }
-         }
 
-         itemsIndexed(
-            tabs,
-            key = { _, tab -> tab.name }
-         ) { index, tab ->
-            DraggableItem(dragDropState, index + 1) { isDragging ->
-               val isMapped = mapped?.get(tab) ?: false
-               NavigationRow(
-                  tab = tab,
-                  loading = loadingState[tab],
-                  isMapped = isMapped,
-                  isDragging = isDragging,
-                  onMapClicked = {
-                     viewModel.toggleOnMap(tab)
-                  },
-                  onDestinationClicked = {
-                     onDestinationClicked(it.name)
-                  }
-               )
-            }
-         }
-
-         item {
-            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-               Text(
-                  text = "Other Data Sources (Drag to add to tabs)",
-                  style = MaterialTheme.typography.bodyMedium,
-                  fontWeight = FontWeight.Medium,
-                  modifier = Modifier.padding(start = 8.dp, top = 32.dp, bottom = 16.dp)
-               )
-            }
-         }
-
-         itemsIndexed(
-            nonTabs,
-            key = { _, tab -> tab.name }
-         ) { index, tab ->
-            DraggableItem(dragDropState, tabs.size + index + 2) { isDragging ->
-               val isMapped = mapped?.get(tab) ?: false
-
-               NavigationRow(
-                  tab = tab,
-                  loading = loadingState[tab],
-                  isMapped = isMapped,
-                  isDragging = isDragging,
-                  onMapClicked = {
-                     scope.launch {
+            itemsIndexed(
+               tabs,
+               key = { _, tab -> tab.name }
+            ) { index, tab ->
+               DraggableItem(dragDropState, index + 1) { isDragging ->
+                  val isMapped = mapped?.get(tab) ?: false
+                  NavigationRow(
+                     tab = tab,
+                     loading = loadingState[tab],
+                     isMapped = isMapped,
+                     isDragging = isDragging,
+                     onMapClicked = {
                         viewModel.toggleOnMap(tab)
+                     },
+                     onDestinationClicked = {
+                        onDestinationClicked(it.name)
                      }
-                  },
-                  onDestinationClicked = {
-                     onDestinationClicked(it.name)
-                  }
-               )
+                  )
+               }
             }
-         }
 
-         item {
-            Column(
-               Modifier
-                  .padding(top = 32.dp)
-                  .height(56.dp)
-                  .fillMaxWidth()
-            ) {
-               Row(
-                  verticalAlignment = Alignment.CenterVertically,
-                  modifier = Modifier
-                     .fillMaxSize()
-                     .background(MaterialTheme.colorScheme.background)
-                     .clickable {
-                        onDestinationClicked(ReportRoute.Main.name)
+            item {
+               CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+                  Text(
+                     text = "Other Data Sources (Drag to add to tabs)",
+                     style = MaterialTheme.typography.bodyMedium,
+                     fontWeight = FontWeight.Medium,
+                     modifier = Modifier.padding(start = 8.dp, top = 32.dp, bottom = 16.dp)
+                  )
+               }
+            }
+
+            itemsIndexed(
+               nonTabs,
+               key = { _, tab -> tab.name }
+            ) { index, tab ->
+               DraggableItem(dragDropState, tabs.size + index + 2) { isDragging ->
+                  val isMapped = mapped?.get(tab) ?: false
+
+                  NavigationRow(
+                     tab = tab,
+                     loading = loadingState[tab],
+                     isMapped = isMapped,
+                     isDragging = isDragging,
+                     onMapClicked = {
+                        scope.launch {
+                           viewModel.toggleOnMap(tab)
+                        }
+                     },
+                     onDestinationClicked = {
+                        onDestinationClicked(it.name)
                      }
+                  )
+               }
+            }
+
+            item {
+
+               Column(
+                  Modifier
+                     .padding(top = 32.dp)
+                     .height(56.dp)
+                     .fillMaxWidth()
                ) {
-
-                  CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-                     Icon(
-                        Icons.Filled.NoteAdd,
-                        modifier = Modifier.padding(start = 8.dp),
-                        contentDescription = "Submit Report to NGA"
-                     )
-                  }
-
-                  Column(
-                     verticalArrangement = Arrangement.Center,
-                     modifier = Modifier.fillMaxWidth()
-                  ) {
+                  Surface {
                      Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween,
                         modifier = Modifier
-                           .height(72.dp)
-                           .fillMaxWidth()
-                           .weight(1f)
-                           .padding(horizontal = 8.dp)
+                           .fillMaxSize()
+                           .clickable {
+                              onDestinationClicked(ReportRoute.Main.name)
+                           }
                      ) {
+
                         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-                           Text(
-                              text = ReportRoute.Main.title,
-                              style = MaterialTheme.typography.bodyMedium,
-                              fontWeight = FontWeight.Medium
+                           Icon(
+                              Icons.Filled.NoteAdd,
+                              modifier = Modifier.padding(start = 8.dp),
+                              contentDescription = "Submit Report to NGA"
                            )
+                        }
+
+                        Column(
+                           verticalArrangement = Arrangement.Center,
+                           modifier = Modifier.fillMaxWidth()
+                        ) {
+                           Row(
+                              verticalAlignment = Alignment.CenterVertically,
+                              horizontalArrangement = Arrangement.SpaceBetween,
+                              modifier = Modifier
+                                 .height(72.dp)
+                                 .fillMaxWidth()
+                                 .weight(1f)
+                                 .padding(horizontal = 8.dp)
+                           ) {
+                              CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+                                 Text(
+                                    text = ReportRoute.Main.title,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.Medium
+                                 )
+                              }
+                           }
                         }
                      }
                   }
                }
-            }
 
-            Column(
-               Modifier
-                  .padding(top = 32.dp)
-                  .height(56.dp)
-                  .fillMaxWidth()
-            ) {
-               Row(
-                  verticalAlignment = Alignment.CenterVertically,
-                  modifier = Modifier
-                     .fillMaxSize()
-                     .background(MaterialTheme.colorScheme.background)
-                     .clickable {
-                        onDestinationClicked(AboutRoute.Main.name)
-                     }
+               Column(
+                  Modifier
+                     .padding(top = 32.dp)
+                     .height(56.dp)
+                     .fillMaxWidth()
                ) {
-
-                  CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-                     Icon(
-                        Icons.Default.Info,
-                        modifier = Modifier.padding(start = 8.dp),
-                        contentDescription = "About"
-                     )
-                  }
-
-                  Column(
-                     verticalArrangement = Arrangement.Center,
-                     modifier = Modifier.fillMaxWidth()
-                  ) {
+                  Surface {
                      Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween,
                         modifier = Modifier
-                           .height(72.dp)
-                           .fillMaxWidth()
-                           .weight(1f)
-                           .padding(horizontal = 8.dp)
+                           .fillMaxSize()
+                           .clickable {
+                              onDestinationClicked(AboutRoute.Main.name)
+                           }
                      ) {
+
                         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-                           Text(
-                              text = AboutRoute.Main.title,
-                              style = MaterialTheme.typography.bodyMedium,
-                              fontWeight = FontWeight.Medium
+                           Icon(
+                              Icons.Default.Info,
+                              modifier = Modifier.padding(start = 8.dp),
+                              contentDescription = "About"
                            )
+                        }
+
+                        Column(
+                           verticalArrangement = Arrangement.Center,
+                           modifier = Modifier.fillMaxWidth()
+                        ) {
+                           Row(
+                              verticalAlignment = Alignment.CenterVertically,
+                              horizontalArrangement = Arrangement.SpaceBetween,
+                              modifier = Modifier
+                                 .height(72.dp)
+                                 .fillMaxWidth()
+                                 .weight(1f)
+                                 .padding(horizontal = 8.dp)
+                           ) {
+                              CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+                                 Text(
+                                    text = AboutRoute.Main.title,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.Medium
+                                 )
+                              }
+                           }
                         }
                      }
                   }
@@ -315,7 +322,6 @@ private fun NavigationRow(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                .fillMaxSize()
-               .background(MaterialTheme.colorScheme.background)
                .clickable {
                   onDestinationClicked(mainRouteFor(tab))
                }

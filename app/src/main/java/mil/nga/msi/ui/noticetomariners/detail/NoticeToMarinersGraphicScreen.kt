@@ -41,17 +41,18 @@ fun NoticeToMarinersGraphicScreen(
                enabled = !downloading,
                onClick = {
                   scope.launch {
-                     val uri = viewModel.getNoticeToMarinersGraphic(graphic)
-                     val shareIntent = Intent.createChooser(Intent().apply {
-                        clipData = ClipData.newRawUri("", uri);
-                        action = Intent.ACTION_SEND
-                        putExtra(Intent.EXTRA_TITLE, "NTM Graphic")
-                        putExtra(Intent.EXTRA_STREAM, uri)
-                        type = context.contentResolver.getType(uri)
-                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                     }, "NTM Graphic")
+                     viewModel.getNoticeToMarinersGraphic(graphic)?.let { uri ->
+                        val shareIntent = Intent.createChooser(Intent().apply {
+                           clipData = ClipData.newRawUri("", uri);
+                           action = Intent.ACTION_SEND
+                           putExtra(Intent.EXTRA_TITLE, "NTM Graphic")
+                           putExtra(Intent.EXTRA_STREAM, uri)
+                           type = context.contentResolver.getType(uri)
+                           addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        }, "NTM Graphic")
 
-                     context.startActivity(shareIntent)
+                        context.startActivity(shareIntent)
+                     }
                   }
                }
             ) {

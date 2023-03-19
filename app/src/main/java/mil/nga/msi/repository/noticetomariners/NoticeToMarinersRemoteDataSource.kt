@@ -69,42 +69,46 @@ class NoticeToMarinersRemoteDataSource @Inject constructor(
       return graphics
    }
 
-   suspend fun fetchNoticeToMarinersPublication(notice: NoticeToMariners): Uri =
+   suspend fun fetchNoticeToMarinersPublication(notice: NoticeToMariners): Uri? =
       withContext(Dispatchers.IO) {
-         val response = service.getNoticeToMarinersPublication(key = notice.odsKey)
-         val cacheFile = NoticeToMariners.cachePath(application, notice.filename)
-         Files.createDirectories(cacheFile.parent)
+         try {
+            val response = service.getNoticeToMarinersPublication(key = notice.odsKey)
+            val cacheFile = NoticeToMariners.cachePath(application, notice.filename)
+            Files.createDirectories(cacheFile.parent)
 
-         if (response.isSuccessful) {
-            response.body()?.byteStream()?.use { input ->
-               Files.copy(input, cacheFile, StandardCopyOption.REPLACE_EXISTING)
-            }
-         }
+            if (response.isSuccessful) {
+               response.body()?.byteStream()?.use { input ->
+                  Files.copy(input, cacheFile, StandardCopyOption.REPLACE_EXISTING)
+               }
 
-         // Done streaming from server, move to non cache directory
-         val file = NoticeToMariners.externalFilesPath(application, notice.filename)
-         Files.createDirectories(file.parent)
-         Files.copy(cacheFile, file, StandardCopyOption.REPLACE_EXISTING)
-         Files.delete(cacheFile)
+               // Done streaming from server, move to non cache directory
+               val file = NoticeToMariners.externalFilesPath(application, notice.filename)
+               Files.createDirectories(file.parent)
+               Files.copy(cacheFile, file, StandardCopyOption.REPLACE_EXISTING)
+               Files.delete(cacheFile)
 
-         getUriForFile(application, "${application.packageName}.fileprovider", file.toFile())
+               getUriForFile(application, "${application.packageName}.fileprovider", file.toFile())
+            } else null
+         } catch (e: Exception) { null }
       }
 
-   suspend fun fetchNoticeToMarinersGraphic(graphic: NoticeToMarinersGraphic): Uri =
+   suspend fun fetchNoticeToMarinersGraphic(graphic: NoticeToMarinersGraphic): Uri? =
       withContext(Dispatchers.IO) {
-         val response = service.getNoticeToMarinersGraphic(key = graphic.key)
-         val directory = Paths.get(application.cacheDir.absolutePath, "notice_to_mariners")
-         Files.createDirectories(directory)
-         val file = File(directory.toFile(), graphic.fileName)
-         if (response.isSuccessful) {
-            response.body()?.byteStream()?.use { input ->
-               file.outputStream().use { output ->
-                  input.copyTo(output)
+         try {
+            val response = service.getNoticeToMarinersGraphic(key = graphic.key)
+            val directory = Paths.get(application.cacheDir.absolutePath, "notice_to_mariners")
+            Files.createDirectories(directory)
+            val file = File(directory.toFile(), graphic.fileName)
+            if (response.isSuccessful) {
+               response.body()?.byteStream()?.use { input ->
+                  file.outputStream().use { output ->
+                     input.copyTo(output)
+                  }
                }
-            }
-         }
 
-         getUriForFile(application, "${application.packageName}.fileprovider", file)
+               getUriForFile(application, "${application.packageName}.fileprovider", file)
+            } else null
+         } catch (e: Exception) { null }
       }
 
    suspend fun getNoticeToMarinersCorrections(
