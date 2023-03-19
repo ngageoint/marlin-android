@@ -67,6 +67,8 @@ fun MapSettingsScreen(
                onMgrsToggled = { viewModel.setMGRS(it) }
             )
 
+            Layers() { onLayers() }
+
             DataSourceSettings(onLightSettings)
 
             DisplaySettings(
@@ -74,22 +76,6 @@ fun MapSettingsScreen(
                onShowLocationToggled = { viewModel.setShowLocation(it) }
             )
          }
-
-         GridLayers(
-            gars = gars,
-            mgrs = mgrs,
-            onGarsToggled = { viewModel.setGARS(it) },
-            onMgrsToggled = { viewModel.setMGRS(it) }
-         )
-
-         Layers() { onLayers() }
-
-         DataSourceSettings(onLightSettings)
-
-         DisplaySettings(
-            showLocation = showLocation,
-            onShowLocationToggled = { viewModel.setShowLocation(it) }
-         )
       }
    }
 }
@@ -266,14 +252,6 @@ private fun Layers(
    Column(
       Modifier.padding(bottom = 16.dp)
    ) {
-      Text(
-         text = "Data Source",
-         color = MaterialTheme.colorScheme.primary,
-         style = MaterialTheme.typography.titleMedium,
-         fontWeight = FontWeight.Medium,
-         modifier = Modifier.padding(vertical = 16.dp, horizontal = 32.dp)
-      )
-
       Row(
          verticalAlignment = Alignment.CenterVertically,
          modifier = Modifier
