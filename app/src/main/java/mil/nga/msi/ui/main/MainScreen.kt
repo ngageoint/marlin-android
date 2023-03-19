@@ -7,7 +7,6 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -93,6 +92,7 @@ fun MainScreen(
       Scaffold(
          scaffoldState = scaffoldState,
          drawerGesturesEnabled = scaffoldState.drawerState.isOpen,
+         backgroundColor = MaterialTheme.colorScheme.surface,
          drawerContent = {
             NavigationDrawer(
                onDestinationClicked = { route ->
@@ -110,36 +110,67 @@ fun MainScreen(
             )
          },
          bottomBar = {
-            Box(Modifier.background(MaterialTheme.colorScheme.surface)) {
-               AnimatedVisibility(
-                  visible = bottomBarVisibility,
-                  enter = fadeIn(animationSpec = tween()),
-                  exit = fadeOut(animationSpec = tween()),
-                  content = {
-                     BottomNavigation(
-                        backgroundColor = MaterialTheme.colorScheme.background
-                     ) {
-                        val navBackStackEntry by navController.currentBackStackEntryAsState()
-                        val currentDestination = navBackStackEntry?.destination
+            AnimatedVisibility(
+               visible = bottomBarVisibility,
+               enter = fadeIn(animationSpec = tween()),
+               exit = fadeOut(animationSpec = tween()),
+               content = {
+                  BottomNavigation(
+                     backgroundColor = MaterialTheme.colorScheme.background
+                  ) {
+                     val navBackStackEntry by navController.currentBackStackEntryAsState()
+                     val currentDestination = navBackStackEntry?.destination
 
+                     BottomNavigationItem(
+                        icon = {
+                           Icon(
+                              imageVector = ImageVector.vectorResource(id = R.drawable.ic_outline_map_24),
+                              contentDescription = "Map Icon"
+                           )
+                        },
+                        label = { Text("Map") },
+                        selectedContentColor = MaterialTheme.colorScheme.tertiary,
+                        unselectedContentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = ContentAlpha.disabled),
+                        selected = currentDestination?.hierarchy?.any {
+                           it.route?.substringBefore(
+                              "?"
+                           ) == MapRoute.Map.name
+                        } == true,
+                        onClick = {
+                           if (currentDestination?.route?.substringBefore("?") != MapRoute.Map.name) {
+                              navController.navigate(MapRoute.Map.name) {
+                                 popUpTo(navController.graph.findStartDestination().id) {
+                                    saveState = true
+                                 }
+                                 launchSingleTop = true
+                                 restoreState = true
+                              }
+                           }
+                        }
+                     )
+
+                     tabs.forEach { tab ->
+                        val tabRoute = mainRouteFor(tab)
                         BottomNavigationItem(
                            icon = {
                               Icon(
-                                 imageVector = ImageVector.vectorResource(id = R.drawable.ic_outline_map_24),
-                                 contentDescription = "Map Icon"
+                                 imageVector = ImageVector.vectorResource(id = tab.icon),
+                                 contentDescription = tabRoute.title
                               )
                            },
-                           label = { Text("Map") },
+                           label = { Text(tabRoute.shortTitle) },
                            selectedContentColor = MaterialTheme.colorScheme.tertiary,
-                           unselectedContentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = ContentAlpha.disabled),
+                           unselectedContentColor = MaterialTheme.colorScheme.onSurface.copy(
+                              alpha = ContentAlpha.disabled
+                           ),
                            selected = currentDestination?.hierarchy?.any {
                               it.route?.substringBefore(
                                  "?"
-                              ) == MapRoute.Map.name
+                              ) == tabRoute.name
                            } == true,
                            onClick = {
-                              if (currentDestination?.route?.substringBefore("?") != MapRoute.Map.name) {
-                                 navController.navigate(MapRoute.Map.name) {
+                              if (currentDestination?.route?.substringBefore("?") != tabRoute.name) {
+                                 navController.navigate(tabRoute.name) {
                                     popUpTo(navController.graph.findStartDestination().id) {
                                        saveState = true
                                     }
@@ -149,43 +180,10 @@ fun MainScreen(
                               }
                            }
                         )
-
-                        tabs.forEach { tab ->
-                           val tabRoute = mainRouteFor(tab)
-                           BottomNavigationItem(
-                              icon = {
-                                 Icon(
-                                    imageVector = ImageVector.vectorResource(id = tab.icon),
-                                    contentDescription = tabRoute.title
-                                 )
-                              },
-                              label = { Text(tabRoute.shortTitle) },
-                              selectedContentColor = MaterialTheme.colorScheme.tertiary,
-                              unselectedContentColor = MaterialTheme.colorScheme.onSurface.copy(
-                                 alpha = ContentAlpha.disabled
-                              ),
-                              selected = currentDestination?.hierarchy?.any {
-                                 it.route?.substringBefore(
-                                    "?"
-                                 ) == tabRoute.name
-                              } == true,
-                              onClick = {
-                                 if (currentDestination?.route?.substringBefore("?") != tabRoute.name) {
-                                    navController.navigate(tabRoute.name) {
-                                       popUpTo(navController.graph.findStartDestination().id) {
-                                          saveState = true
-                                       }
-                                       launchSingleTop = true
-                                       restoreState = true
-                                    }
-                                 }
-                              }
-                           )
-                        }
                      }
                   }
-               )
-            }
+               }
+            )
          }
       ) { paddingValues ->
          NavHost(

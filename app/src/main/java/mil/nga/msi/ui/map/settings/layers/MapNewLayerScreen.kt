@@ -42,11 +42,13 @@ fun MapNewLayerScreen(
    val scrollState = rememberScrollState()
    var url by remember { mutableStateOf("") }
    var type by remember { mutableStateOf<LayerType?>(null) }
-   val tileServerUrl by gridViewModel.tileUrl.observeAsState()
+   val tileUrl by gridViewModel.tileUrl.observeAsState()
+   val tileError by gridViewModel.fetchError.observeAsState(false)
    val wmsState by wmsViewModel.wmsState.observeAsState()
+   val wmsError by wmsViewModel.fetchError.observeAsState(false)
 
-   LaunchedEffect(tileServerUrl) {
-      if (tileServerUrl != null && type == null) {
+   LaunchedEffect(tileUrl) {
+      if (tileUrl != null && type == null) {
          type = LayerType.XYZ
       }
    }
@@ -64,9 +66,7 @@ fun MapNewLayerScreen(
          onNavigationClicked = { onClose() }
       )
 
-      Surface(
-         color = MaterialTheme.colorScheme.surfaceVariant
-      ) {
+      Surface {
          Column(
             Modifier
                .padding(horizontal = 16.dp)
@@ -76,6 +76,7 @@ fun MapNewLayerScreen(
             Layer(
                url = url,
                type = type,
+               serverError = tileError && wmsError,
                onUrlChanged = {
                   url = it
                   wmsViewModel.setUrl(it)
@@ -84,7 +85,7 @@ fun MapNewLayerScreen(
                onTypeChanged = { type = it }
             )
 
-            tileServerUrl?.let { uri ->
+            tileUrl?.let { uri ->
                MapLayer(
                   url = uri,
                   type = type,
@@ -98,16 +99,16 @@ fun MapNewLayerScreen(
                WMSCapabilities(wmsCapabilities)
             }
 
-            if (tileServerUrl != null || wmsState?.wmsCapabilities?.isValid() == true) {
+            if (tileUrl != null || wmsState?.wmsCapabilities?.isValid() == true) {
                Button(
                   onClick = {
                      scope.launch {
-                        if (tileServerUrl != null) {
+                        if (tileUrl != null) {
                            type?.let {
                               val layer = Layer(
                                  name = "",
                                  type = it,
-                                 url = tileServerUrl.toString()
+                                 url = tileUrl.toString()
                               )
                               onLayer(layer)
                            }
@@ -136,11 +137,47 @@ fun MapNewLayerScreen(
    }
 }
 
+@Composable
+private fun NoServer() {
+   Card {
+      Column(Modifier.padding(16.dp)) {
+         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
+            Text(
+               text = "Unable to retrieve WMS Capabilities Document or an X/Y/Z tile.  If you believe the url is correct please choose the tile server type below to continue.",
+               style = MaterialTheme.typography.bodyMedium,
+               modifier = Modifier
+                  .fillMaxWidth()
+                  .padding(bottom = 16.dp)
+            )
+         }
+
+         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+            Text(
+               text = "- or -",
+               style = MaterialTheme.typography.bodyMedium,
+               modifier = Modifier
+                  .fillMaxWidth()
+                  .padding(bottom = 16.dp)
+            )
+         }
+
+         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
+            Text(
+               text = "Continue typing",
+               style = MaterialTheme.typography.bodyMedium,
+               modifier = Modifier.fillMaxWidth()
+            )
+         }
+      }
+   }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun Layer(
    url: String,
    type: LayerType?,
+   serverError: Boolean,
    onUrlChanged: (String) -> Unit,
    onTypeChanged: (LayerType) -> Unit
 ) {
@@ -169,6 +206,10 @@ private fun Layer(
             .fillMaxWidth()
             .padding(bottom = 16.dp)
       )
+
+      if (serverError) {
+         NoServer()
+      }
 
       Row(
          horizontalArrangement = Arrangement.Center,

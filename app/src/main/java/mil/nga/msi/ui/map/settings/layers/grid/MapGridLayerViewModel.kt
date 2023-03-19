@@ -22,9 +22,12 @@ class MapGridLayerViewModel @Inject constructor(
    private val _layer = MutableLiveData<Layer>()
    val layer: LiveData<Layer> = _layer
 
+   private val _fetchError = MutableLiveData(false)
+   val fetchError: LiveData<Boolean> = _fetchError
+
    private var tileUrlJob: Job? = null
-   private val _tileUrl = MutableLiveData<Uri>()
-   val tileUrl: LiveData<Uri> = _tileUrl
+   private val _tileUrl = MutableLiveData<Uri?>()
+   val tileUrl: LiveData<Uri?> = _tileUrl
 
    fun setUrl(url: String) {
       tileUrlJob?.cancel()
@@ -32,6 +35,10 @@ class MapGridLayerViewModel @Inject constructor(
          delay(DEBOUNCE_TIMEOUT_MILLIS)
          if (layerRepository.getTile(url)) {
             _tileUrl.value = Uri.parse(url)
+            _fetchError.value = false
+         } else {
+            _tileUrl.value = null
+            _fetchError.value = true
          }
       }
    }

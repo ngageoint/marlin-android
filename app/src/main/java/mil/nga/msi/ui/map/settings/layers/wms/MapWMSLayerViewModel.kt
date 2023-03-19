@@ -1,7 +1,6 @@
 package mil.nga.msi.ui.map.settings.layers.wms
 
 import android.net.Uri
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -51,6 +50,9 @@ class MapWMSLayerViewModel @Inject constructor(
    private val _wmsState = MutableLiveData<WmsState?>()
    val wmsState: LiveData<WmsState?> = _wmsState
 
+   private val _fetchError = MutableLiveData(false)
+   val fetchError: LiveData<Boolean> = _fetchError
+
    fun setLayerId(id: Long) {
       wmsUrlJob?.cancel()
       wmsUrlJob = viewModelScope.launch {
@@ -77,7 +79,8 @@ class MapWMSLayerViewModel @Inject constructor(
 
    fun setUrl(url: String) {
       viewModelScope.launch {
-         layerRepository.getWMSCapabilities(url)?.let { wmsCapabilities ->
+         val wmsCapabilities = layerRepository.getWMSCapabilities(url)
+         if (wmsCapabilities != null) {
             _wmsState.postValue(
                WmsState(
                   baseUrl = url,
@@ -85,6 +88,10 @@ class MapWMSLayerViewModel @Inject constructor(
                   wmsCapabilities = wmsCapabilities
                )
             )
+            _fetchError.postValue(false)
+         } else {
+            _wmsState.postValue(null)
+            _fetchError.postValue(true)
          }
       }
    }
