@@ -8,6 +8,7 @@ import androidx.compose.ui.graphics.Color
 val LightColorPalette = lightColorScheme(
    primary = SeaGreen,
    primaryContainer = Color.White,
+   secondaryContainer = NgaBlue,
    surfaceVariant = Color(red = 245, green = 242, blue = 245),
    tertiary = SeaGreen,
    secondary = NgaBlue
@@ -17,18 +18,28 @@ val DarkColorPalette = darkColorScheme(
    primary = NgaBlue,
    secondary = Color(0xDDFFFFFF),
    primaryContainer = NgaBlue,
+   secondaryContainer = SeaGreen,
    tertiary = Color(0xDDFFFFFF),
    surfaceVariant = Color(red = 42, green = 41, blue = 45),
    onPrimary = Color.White
 )
 
-val EmbarkColorPalette = lightColorScheme(
+val EmbarkLightColorPalette = lightColorScheme(
    primary = SeaGreen,
    primaryContainer = Color.White,
    surface = SeaGreen,
    surfaceVariant = Color(0x09000000),
    tertiary = SeaGreen,
    secondary = NgaBlue
+)
+
+val EmbarkDarkColorPalette = lightColorScheme(
+   primary = NgaBlue,
+   primaryContainer = Color.White,
+   surface = SeaGreen,
+   surfaceVariant = Color(0x09000000),
+   tertiary = SeaGreen,
+   secondary = SeaGreen
 )
 
 @Composable
@@ -50,10 +61,17 @@ fun MsiTheme(
 
 @Composable
 fun MsiEmbarkTheme (
+   darkTheme: Boolean = isSystemInDarkTheme(),
    content: @Composable () -> Unit
 ) {
+   val colorScheme = if (darkTheme) {
+      EmbarkDarkColorPalette
+   } else {
+      EmbarkLightColorPalette
+   }
+
    MaterialTheme(
-      colorScheme = EmbarkColorPalette,
+      colorScheme = colorScheme,
       content = content
    )
 }

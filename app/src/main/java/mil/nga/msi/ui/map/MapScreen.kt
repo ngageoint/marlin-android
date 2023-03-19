@@ -583,7 +583,7 @@ private fun Search(
       shadowElevation = 6.dp,
       shape = FloatingActionButtonDefaults.shape,
       color = MaterialTheme.colorScheme.primaryContainer,
-      contentColor = MaterialTheme.colorScheme.primaryContainer,
+      contentColor = MaterialTheme.colorScheme.primaryContainer
    ) {
       Column {
          BasicTextField(
@@ -593,7 +593,7 @@ private fun Search(
                onTextChanged(it)
             },
             textStyle = TextStyle(
-               color = MaterialTheme.colorScheme.onPrimary
+               color = MaterialTheme.colorScheme.onPrimaryContainer
             ),
             interactionSource = interactionSource,
             enabled = expanded,
