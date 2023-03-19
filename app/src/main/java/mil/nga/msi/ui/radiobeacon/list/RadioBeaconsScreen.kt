@@ -61,7 +61,7 @@ fun RadioBeaconsScreen(
                badge = {
                   if (filters.isNotEmpty()) {
                      Badge(
-                        containerColor = MaterialTheme.colorScheme.secondary,
+                        containerColor = MaterialTheme.colorScheme.tertiary,
                         modifier = Modifier.offset(x = (-12).dp, y = 12.dp)
                      ) {
                         Text("${filters.size}")
@@ -108,10 +108,7 @@ private fun RadioBeacons(
 ) {
    val lazyItems = pagingState.collectAsLazyPagingItems()
 
-   Surface(
-      modifier = Modifier.fillMaxHeight()
-   ) {
-
+   Surface(Modifier.fillMaxSize()) {
       LazyColumn(
          modifier = Modifier.padding(horizontal = 8.dp),
          contentPadding = PaddingValues(top = 16.dp)
@@ -291,13 +288,13 @@ private fun RadioBeaconActions(
          onClick = { onShare() }
       ) {
          Icon(Icons.Default.Share,
-            tint = MaterialTheme.colorScheme.primary,
+            tint = MaterialTheme.colorScheme.tertiary,
             contentDescription = "Share Radio Beacon"
          )
       }
       IconButton(onClick = { onZoom() }) {
          Icon(Icons.Default.GpsFixed,
-            tint = MaterialTheme.colorScheme.primary,
+            tint = MaterialTheme.colorScheme.tertiary,
             contentDescription = "Zoom to Radio Beacon"
          )
       }

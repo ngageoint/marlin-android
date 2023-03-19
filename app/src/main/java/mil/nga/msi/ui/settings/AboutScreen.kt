@@ -29,13 +29,7 @@ fun AboutScreen(
    onDisclaimer: () -> Unit,
    onContact: () -> Unit,
 ) {
-   val scrollState = rememberScrollState()
-
-   Column(
-      modifier = Modifier
-         .fillMaxSize()
-         .verticalScroll(scrollState)
-   ) {
+   Column {
       TopBar(
          title = AboutRoute.Main.title,
          navigationIcon = Icons.Filled.Close,
@@ -54,15 +48,17 @@ private fun About(
    onDisclaimer: () -> Unit,
    onContact: () -> Unit
 ) {
-   Column(
-      modifier = Modifier
-         .fillMaxHeight()
-         .background(MaterialTheme.colorScheme.surfaceVariant)
+   val scrollState = rememberScrollState()
+
+   Surface(
+      color = MaterialTheme.colorScheme.surfaceVariant,
+      modifier = Modifier.fillMaxSize()
    ) {
       Column(
          Modifier
+            .fillMaxHeight()
             .padding(top = 32.dp)
-            .background(MaterialTheme.colorScheme.surface)
+            .verticalScroll(scrollState)
       ) {
          Disclaimer() { onDisclaimer() }
          Divider(Modifier.padding(start = 16.dp))
@@ -77,30 +73,32 @@ private fun About(
 private fun Disclaimer(
    onTap: () -> Unit
 ) {
-   Column(
-      verticalArrangement = Arrangement.Center,
-      modifier = Modifier
-         .height(48.dp)
-         .fillMaxWidth()
-         .clickable { onTap() }
-         .padding(horizontal = 16.dp)
-   ) {
-      Row(
-         verticalAlignment = Alignment.CenterVertically
+   Surface {
+      Column(
+         verticalArrangement = Arrangement.Center,
+         modifier = Modifier
+            .height(48.dp)
+            .fillMaxWidth()
+            .clickable { onTap() }
+            .padding(horizontal = 16.dp)
       ) {
-         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-            Icon(
-               Icons.Default.PrivacyTip,
-               modifier = Modifier.padding(end = 8.dp),
-               contentDescription = "About"
+         Row(
+            verticalAlignment = Alignment.CenterVertically
+         ) {
+            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+               Icon(
+                  Icons.Default.PrivacyTip,
+                  modifier = Modifier.padding(end = 16.dp),
+                  contentDescription = "About"
+               )
+            }
+
+            Text(
+               text = AboutRoute.Disclaimer.title,
+               style = MaterialTheme.typography.bodyMedium,
+               fontWeight = FontWeight.Medium
             )
          }
-
-         Text(
-            text = AboutRoute.Disclaimer.title,
-            style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.Medium
-         )
       }
    }
 }
@@ -109,30 +107,32 @@ private fun Disclaimer(
 private fun Contact(
    onTap: () -> Unit
 ) {
-   Column(
-      verticalArrangement = Arrangement.Center,
-      modifier = Modifier
-         .height(48.dp)
-         .fillMaxWidth()
-         .clickable { onTap() }
-         .padding(horizontal = 16.dp)
-   ) {
-      Row(
-         verticalAlignment = Alignment.CenterVertically
+   Surface {
+      Column(
+         verticalArrangement = Arrangement.Center,
+         modifier = Modifier
+            .height(48.dp)
+            .fillMaxWidth()
+            .clickable { onTap() }
+            .padding(horizontal = 16.dp)
       ) {
-         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-            Icon(
-               Icons.Default.Mail,
-               modifier = Modifier.padding(end = 8.dp),
-               contentDescription = "About"
+         Row(
+            verticalAlignment = Alignment.CenterVertically
+         ) {
+            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+               Icon(
+                  Icons.Default.Mail,
+                  modifier = Modifier.padding(end = 16.dp),
+                  contentDescription = "About"
+               )
+            }
+
+            Text(
+               text = "Contact Us",
+               style = MaterialTheme.typography.bodyMedium,
+               fontWeight = FontWeight.Medium
             )
          }
-
-         Text(
-            text = "Contact Us",
-            style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.Medium
-         )
       }
    }
 }
@@ -142,32 +142,36 @@ private fun Version() {
    val context =  LocalContext.current
    val packageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
 
-   Column(
-      verticalArrangement = Arrangement.Center,
-      modifier = Modifier
-         .height(48.dp)
-         .fillMaxWidth()
-         .padding(horizontal = 16.dp)
-   ) {
-      Row(
-         verticalAlignment = Alignment.CenterVertically
+   Surface {
+      Column(
+         verticalArrangement = Arrangement.Center,
+         modifier = Modifier
+            .height(48.dp)
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
       ) {
-         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-            val bitmap = AppCompatResources.getDrawable(LocalContext.current, R.drawable.ic_marlin_600dp)!!.toBitmap().asImageBitmap()
-            Icon(
-               bitmap,
-               modifier = Modifier
-                  .padding(end = 2.dp)
-                  .size(28.dp),
-               contentDescription = "About"
+         Row(
+            verticalAlignment = Alignment.CenterVertically
+         ) {
+            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+               val bitmap =
+                  AppCompatResources.getDrawable(LocalContext.current, R.drawable.ic_marlin_600dp)!!
+                     .toBitmap().asImageBitmap()
+               Icon(
+                  bitmap,
+                  modifier = Modifier
+                     .padding(end = 10.dp)
+                     .size(28.dp),
+                  contentDescription = "About"
+               )
+            }
+
+            Text(
+               text = "Marlin Version ${packageInfo.versionName}",
+               style = MaterialTheme.typography.bodyMedium,
+               fontWeight = FontWeight.Medium
             )
          }
-
-         Text(
-            text = "Marlin Version ${packageInfo.versionName}",
-            style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.Medium
-         )
       }
    }
 }

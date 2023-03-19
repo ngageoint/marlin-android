@@ -40,7 +40,7 @@ fun LocationTextButton(
 
    TextButton(
       colors = ButtonDefaults.textButtonColors(
-         contentColor = MaterialTheme.colorScheme.primary
+         contentColor = MaterialTheme.colorScheme.tertiary
       ),
       onClick = {
          clipboardManager.setText(AnnotatedString(text))

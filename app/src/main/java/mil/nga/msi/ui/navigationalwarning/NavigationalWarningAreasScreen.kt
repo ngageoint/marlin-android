@@ -2,12 +2,9 @@ package mil.nga.msi.ui.navigationalwarning
 
 import android.content.Context
 import android.location.Location
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.*
@@ -26,6 +23,7 @@ import com.google.accompanist.permissions.rememberPermissionState
 import com.google.android.gms.maps.LocationSource
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.TileProvider
 import com.google.maps.android.compose.*
 import mil.nga.geopackage.GeoPackageFactory
@@ -67,31 +65,38 @@ fun NavigationalWarningGroupScreen(
          onNavigationClicked = { openDrawer() }
       )
 
-      NavigationAreaMap(
-         height = screenHeight * .30f,
-         location = location,
-         locationPermissionState = locationPermissionState,
-         naturalEarthTileProvider = viewModel.naturalEarthTileProvider,
-         navigationAreaTileProvider = viewModel.navigationAreaTileProvider
-      )
+      Surface(
+         color = MaterialTheme.colorScheme.surfaceVariant,
+         modifier = Modifier.fillMaxHeight()
+      ) {
+         Column {
+            NavigationAreaMap(
+               height = screenHeight * .30f,
+               location = location,
+               locationPermissionState = locationPermissionState,
+               naturalEarthTileProvider = viewModel.naturalEarthTileProvider,
+               navigationAreaTileProvider = viewModel.navigationAreaTileProvider
+            )
 
-      val navigationArea = location?.let { getNavigationArea(LocalContext.current, it) }
-      val sortedAreas = warningsByArea.sortedWith { a, b ->
-         when {
-            a.navigationArea == navigationArea -> -1
-            a.navigationArea.title > b.navigationArea.title -> 1
-            a.navigationArea.title < b.navigationArea.title -> -1
-            else -> 0
-         }
-      }.toMutableList()
+            val navigationArea = location?.let { getNavigationArea(LocalContext.current, it) }
+            val sortedAreas = warningsByArea.sortedWith { a, b ->
+               when {
+                  a.navigationArea == navigationArea -> -1
+                  a.navigationArea.title > b.navigationArea.title -> 1
+                  a.navigationArea.title < b.navigationArea.title -> -1
+                  else -> 0
+               }
+            }.toMutableList()
 
-      Column(Modifier.verticalScroll(scrollState)) {
-         sortedAreas.forEach { group ->
-            NavigationalWarnings(group) {
-               onGroupTap(group.navigationArea)
+            Column(Modifier.verticalScroll(scrollState)) {
+               sortedAreas.forEach { group ->
+                  NavigationalWarnings(group) {
+                     onGroupTap(group.navigationArea)
+                  }
+
+                  Divider()
+               }
             }
-
-            Divider()
          }
       }
    }
@@ -127,6 +132,10 @@ private fun NavigationAreaMap(
       override fun deactivate() {}
    }
 
+   val mapStyleOptions = if (isSystemInDarkTheme()) {
+      MapStyleOptions.loadRawResourceStyle(LocalContext.current, R.raw.map_theme_night)
+   } else null
+
    GoogleMap(
       modifier = Modifier
          .height(height.dp)
@@ -134,6 +143,7 @@ private fun NavigationAreaMap(
       cameraPositionState = cameraPositionState,
       properties = MapProperties(
          mapType = MapType.NONE,
+         mapStyleOptions = mapStyleOptions,
          isMyLocationEnabled = locationPermissionState.status.isGranted
       ),
       uiSettings = MapUiSettings(
@@ -149,6 +159,7 @@ private fun NavigationAreaMap(
    }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun NavigationalWarnings(
    group: NavigationalWarningGroup,
@@ -162,50 +173,52 @@ private fun NavigationalWarnings(
       NavigationArea.NAVAREA_XII to Color(0xFF8BCC6B)
    )
    val color = colorMap[group.navigationArea]
-
-   Row(modifier = Modifier
-      .fillMaxSize()
-      .height(IntrinsicSize.Min)
-      .clickable { onGroupTap() }
-   ) {
-      Box(modifier = Modifier
-         .width(6.dp)
-         .fillMaxHeight()
-         .background(color ?: Color.Transparent)
-      )
-
-      Row(
-         horizontalArrangement = Arrangement.SpaceBetween,
-         verticalAlignment = Alignment.CenterVertically,
-         modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp)
+   Surface {
+      Row(modifier = Modifier
+         .fillMaxSize()
+         .height(IntrinsicSize.Min)
+         .clickable { onGroupTap() }
       ) {
-         Column(modifier = Modifier.padding(vertical = 16.dp)) {
-            Text(
-               text = group.navigationArea.title,
-               style = MaterialTheme.typography.subtitle2
-            )
+         Box(
+            modifier = Modifier
+               .width(6.dp)
+               .fillMaxHeight()
+               .background(color ?: Color.Transparent)
+         )
 
-            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+         Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+               .fillMaxWidth()
+               .padding(horizontal = 16.dp)
+         ) {
+            Column(modifier = Modifier.padding(vertical = 16.dp)) {
                Text(
-                  text = "${group.total} Active",
-                  style = MaterialTheme.typography.subtitle1
+                  text = group.navigationArea.title,
+                  style = MaterialTheme.typography.titleSmall
                )
+
+               CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+                  Text(
+                     text = "${group.total} Active",
+                     style = MaterialTheme.typography.titleMedium
+                  )
+               }
             }
-         }
 
-         if (group.unread > 0) {
-            Badge(
-               backgroundColor = MaterialTheme.colors.error.copy(alpha = .87f),
-               contentColor = MaterialTheme.colors.contentColorFor(MaterialTheme.colors.error),
-               modifier = Modifier.padding(end = 8.dp)
-            ) {
-               Text(
-                  text = "${group.unread}",
-                  style = MaterialTheme.typography.body2,
-                  modifier = Modifier.padding(2.dp)
-               )
+            if (group.unread > 0) {
+               Badge(
+                  containerColor = MaterialTheme.colorScheme.error.copy(alpha = .87f),
+                  contentColor = MaterialTheme.colorScheme.contentColorFor(MaterialTheme.colorScheme.error),
+                  modifier = Modifier.padding(end = 8.dp)
+               ) {
+                  Text(
+                     text = "${group.unread}",
+                     style = MaterialTheme.typography.bodyMedium,
+                     modifier = Modifier.padding(2.dp)
+                  )
+               }
             }
          }
       }

@@ -13,6 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import mil.nga.msi.datasource.DataSource
@@ -46,29 +47,33 @@ fun SortScreen(
          onNavigationClicked = { close() }
       )
 
-      Sort(
-         section = section,
-         options = options,
-         parameters = parameters,
-         addSort = { field, parameter ->
-            when (field) {
-               SortField.PRIMARY -> viewModel.addPrimarySort(dataSource, parameter)
-               SortField.SECONDARY -> viewModel.addSecondarySort(dataSource, parameter)
+      Surface(
+         color = MaterialTheme.colorScheme.surfaceVariant
+      ) {
+         Sort(
+            section = section,
+            options = options,
+            parameters = parameters,
+            addSort = { field, parameter ->
+               when (field) {
+                  SortField.PRIMARY -> viewModel.addPrimarySort(dataSource, parameter)
+                  SortField.SECONDARY -> viewModel.addSecondarySort(dataSource, parameter)
+               }
+            },
+            removeSort = { field ->
+               when (field) {
+                  SortField.PRIMARY -> viewModel.removePrimarySort(dataSource)
+                  SortField.SECONDARY -> viewModel.removeSecondarySort(dataSource)
+               }
+            },
+            resetSort = {
+               viewModel.reset(dataSource)
+            },
+            setSection = {
+               viewModel.setSection(dataSource, it)
             }
-         },
-         removeSort = { field ->
-            when (field) {
-               SortField.PRIMARY -> viewModel.removePrimarySort(dataSource)
-               SortField.SECONDARY -> viewModel.removeSecondarySort(dataSource)
-            }
-         },
-         resetSort = {
-            viewModel.reset(dataSource)
-         },
-         setSection = {
-            viewModel.setSection(dataSource, it)
-         }
-      )
+         )
+      }
    }
 }
 
@@ -90,7 +95,6 @@ private fun Sort(
       Modifier
          .fillMaxSize()
          .verticalScroll(scrollState)
-         .background(MaterialTheme.colorScheme.surfaceVariant)
          .padding(bottom = 16.dp)
    ) {
       if (options.isNotEmpty()) {
@@ -149,7 +153,12 @@ private fun Sort(
          .fillMaxWidth()
          .padding(16.dp)
    ) {
-      TextButton(onClick = { onReset() }) {
+      TextButton(
+         onClick = { onReset() },
+         colors = ButtonDefaults.textButtonColors(
+            contentColor = MaterialTheme.colorScheme.tertiary
+         )
+      ) {
          Text("Reset to Default")
       }
    }
@@ -160,22 +169,25 @@ private fun Section(
    section: Boolean,
    onSection: (Boolean) -> Unit,
 ) {
-   Row(
-      horizontalArrangement = Arrangement.SpaceBetween,
-      verticalAlignment = Alignment.CenterVertically,
-      modifier = Modifier
-         .fillMaxWidth()
-         .background(MaterialTheme.colorScheme.background)
-         .padding(16.dp)
+   Surface(
+      modifier = Modifier.fillMaxWidth()
    ) {
-      CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-         Text(text = "Group by primary sort field")
-      }
+      Row(
+         horizontalArrangement = Arrangement.SpaceBetween,
+         verticalAlignment = Alignment.CenterVertically,
+         modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+      ) {
+         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+            Text(text = "Group by primary sort field")
+         }
 
-      Switch(
-         checked = section,
-         onCheckedChange = onSection
-      )
+         Switch(
+            checked = section,
+            onCheckedChange = onSection
+         )
+      }
    }
 }
 
@@ -187,37 +199,35 @@ private fun SortField(
    addSort: (SortParameter) -> Unit,
    removeSort: (SortParameter) -> Unit
 ) {
-   Column(
-      Modifier
-         .background(MaterialTheme.colorScheme.background)
-         .padding(16.dp)
-   ) {
-      if (parameter == null) {
-         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-            Text(
-               text = title,
-               style = MaterialTheme.typography.titleSmall
-            )
-         }
-
-         SortPicker(
-            sortParameters = sortOptions,
-            addSort = addSort
-         )
-      } else {
-         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-            Text(
-               text = title,
-               style = MaterialTheme.typography.titleSmall,
-            )
-         }
-
-         SortValue(
-            parameter = parameter,
-            removeSort = {
-               removeSort(parameter)
+   Surface {
+      Column(Modifier.padding(16.dp)) {
+         if (parameter == null) {
+            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+               Text(
+                  text = title,
+                  style = MaterialTheme.typography.titleSmall
+               )
             }
-         )
+
+            SortPicker(
+               sortParameters = sortOptions,
+               addSort = addSort
+            )
+         } else {
+            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+               Text(
+                  text = title,
+                  style = MaterialTheme.typography.titleSmall,
+               )
+            }
+
+            SortValue(
+               parameter = parameter,
+               removeSort = {
+                  removeSort(parameter)
+               }
+            )
+         }
       }
    }
 }
@@ -297,12 +307,10 @@ private fun ParameterSelection(
       ) {
          Text(
             text = selectedParameter.title,
-            style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.primary
+            style = MaterialTheme.typography.titleMedium
          )
          Icon(
             imageVector = Icons.Default.ExpandMore,
-            tint = MaterialTheme.colorScheme.primary,
             contentDescription = "Parameters"
          )
       }
@@ -358,12 +366,10 @@ private fun DirectionSelection(
       ) {
          Text(
             text = selectedDirection.title,
-            style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.primary
+            style = MaterialTheme.typography.titleMedium
          )
          Icon(
             imageVector = Icons.Default.ExpandMore,
-            tint = MaterialTheme.colorScheme.primary,
             contentDescription = "Directions"
          )
       }

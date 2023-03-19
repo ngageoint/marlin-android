@@ -131,7 +131,7 @@ private fun NavigationalWarningActions(
 ) {
    IconButton(onClick = { onShare() }) {
       Icon(Icons.Default.Share,
-         tint = MaterialTheme.colorScheme.primary,
+         tint = MaterialTheme.colorScheme.tertiary,
          contentDescription = "Share Navigational Warning"
       )
    }

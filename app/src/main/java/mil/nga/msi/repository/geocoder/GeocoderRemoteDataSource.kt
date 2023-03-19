@@ -18,8 +18,7 @@ data class GeocoderState(
 class GeocoderRemoteDataSource @Inject constructor(
    private val geocoder: Geocoder
 ) {
-
-   fun geocode(text: String): List<GeocoderState> {
+   suspend fun geocode(text: String): List<GeocoderState> {
       val dms = DMS.from(text)
       return if (dms != null) {
          val state = GeocoderState(
@@ -42,7 +41,9 @@ class GeocoderRemoteDataSource @Inject constructor(
          )
          listOf(state)
       } else {
-         val addresses = fetchAddresses(text)
+         val addresses = try {
+            fetchAddresses(text)
+         } catch (e: Exception) { emptyList() }
 
          val location = WGS84.from(text)?.let { latLng ->
             listOf(
@@ -57,7 +58,7 @@ class GeocoderRemoteDataSource @Inject constructor(
       }
    }
 
-   private fun fetchAddresses(text: String): List<GeocoderState> {
+   private suspend fun fetchAddresses(text: String): List<GeocoderState> {
       val results = geocoder.getFromLocationName(text, 10) ?: emptyList()
 
       return results.mapNotNull {

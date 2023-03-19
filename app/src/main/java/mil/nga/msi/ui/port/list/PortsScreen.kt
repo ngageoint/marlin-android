@@ -1,11 +1,9 @@
 package mil.nga.msi.ui.port.list
 
 import android.location.Location
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -16,7 +14,6 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -63,7 +60,7 @@ fun PortsScreen(
                badge = {
                   if (filters.isNotEmpty()) {
                      Badge(
-                        containerColor = MaterialTheme.colorScheme.secondary,
+                        containerColor = MaterialTheme.colorScheme.tertiary,
                         modifier = Modifier.offset(x = (-12).dp, y = 12.dp)
                      ) {
                         Text("${filters.size}")
@@ -111,9 +108,7 @@ private fun Ports(
    onCopyLocation: (String) -> Unit
 ) {
    val lazyItems = pagingState.collectAsLazyPagingItems()
-   Surface(
-      modifier = Modifier.fillMaxHeight()
-   ) {
+   Surface(Modifier.fillMaxSize()) {
       LazyColumn(
          modifier = Modifier.padding(horizontal = 8.dp),
          contentPadding = PaddingValues(top = 16.dp)
@@ -267,13 +262,13 @@ private fun PortActions(
          onClick = { onShare() }
       ) {
          Icon(Icons.Default.Share,
-            tint = MaterialTheme.colorScheme.primary,
+            tint = MaterialTheme.colorScheme.tertiary,
             contentDescription = "Share Port"
          )
       }
       IconButton(onClick = { onZoom() }) {
          Icon(Icons.Default.GpsFixed,
-            tint = MaterialTheme.colorScheme.primary,
+            tint = MaterialTheme.colorScheme.tertiary,
             contentDescription = "Zoom to Port"
          )
       }

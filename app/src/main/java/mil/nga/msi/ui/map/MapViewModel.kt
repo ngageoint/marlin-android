@@ -107,7 +107,8 @@ class MapViewModel @Inject constructor(
          if (it.isNotEmpty()) {
             geocoderRemoteDataSource.geocode(it)
          } else emptyList()
-      }.asLiveData()
+      }.flowOn(Dispatchers.IO)
+      .asLiveData()
 
    fun toggleOnMap(dataSource: DataSource) {
       viewModelScope.launch {

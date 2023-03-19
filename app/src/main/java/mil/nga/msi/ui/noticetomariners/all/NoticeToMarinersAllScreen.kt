@@ -20,6 +20,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.noticetomariners.NoticeToMarinersRoute
 import mil.nga.msi.ui.theme.onSurfaceDisabled
+import mil.nga.msi.ui.theme.screenBackground
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -38,8 +39,10 @@ fun NoticeToMarinersAllScreen(
          onNavigationClicked = { close() }
       )
 
-      NoticeToMarinersItems(notices) {
-         onTap(it)
+      Surface(Modifier.fillMaxSize()) {
+         NoticeToMarinersItems(notices) {
+            onTap(it)
+         }
       }
    }
 }
@@ -50,19 +53,17 @@ private fun NoticeToMarinersItems(
    notices: Map<String, List<Int>>,
    onTap: (Int) -> Unit,
 ) {
-   Surface {
-      LazyColumn {
-         notices.forEach { (year, notices) ->
-            stickyHeader {
-               NoticeHeader(year = year)
-            }
+   LazyColumn {
+      notices.forEach { (year, notices) ->
+         stickyHeader {
+            NoticeHeader(year = year)
+         }
 
-            items(notices) { item ->
-               NoticeToMarinersItem(
-                  noticeNumber = item,
-                  onTap = { onTap(item) }
-               )
-            }
+         items(notices) { item ->
+            NoticeToMarinersItem(
+               noticeNumber = item,
+               onTap = { onTap(item) }
+            )
          }
       }
    }
@@ -76,9 +77,10 @@ private fun NoticeHeader(
       Box(
          modifier = Modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .background(MaterialTheme.colorScheme.screenBackground)
             .padding(horizontal = 8.dp, vertical = 8.dp)
       ) {
+
          CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceDisabled) {
             Text(
                text = year,
@@ -90,6 +92,7 @@ private fun NoticeHeader(
    }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun NoticeToMarinersItem(
    noticeNumber: Int,
@@ -106,23 +109,26 @@ private fun NoticeToMarinersItem(
    calendar.add(Calendar.DAY_OF_WEEK, 6)
    val end = SimpleDateFormat("MMMM d",Locale.getDefault()).format(calendar.time)
 
-   Column(
-      Modifier
+   ListItem(
+      headlineText = {
+         Text(
+            text = noticeNumber.toString(),
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(bottom = 4.dp)
+         )
+      },
+      supportingText = {
+         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+            Text(
+               text = "$start - $end",
+               style = MaterialTheme.typography.titleSmall
+            )
+         }
+      },
+      modifier = Modifier
          .fillMaxWidth()
          .clickable { onTap(noticeNumber) }
-         .padding(16.dp)) {
+   )
 
-      Text(
-         text = noticeNumber.toString(),
-         style = MaterialTheme.typography.titleMedium,
-         modifier = Modifier.padding(bottom = 4.dp)
-      )
-
-      CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-         Text(
-            text = "$start - $end",
-            style = MaterialTheme.typography.titleSmall
-         )
-      }
-   }
+   Divider(Modifier.padding(start = 16.dp))
 }

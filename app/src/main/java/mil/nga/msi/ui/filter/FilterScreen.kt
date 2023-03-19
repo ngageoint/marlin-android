@@ -6,6 +6,7 @@ import android.location.Location
 import android.widget.DatePicker
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
@@ -36,10 +37,7 @@ import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.CameraPosition
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.LatLngBounds
+import com.google.android.gms.maps.model.*
 import com.google.maps.android.compose.*
 import mil.nga.msi.R
 import mil.nga.msi.datasource.DataSource
@@ -78,15 +76,20 @@ fun FilterScreen(
          onNavigationClicked = { close() }
       )
 
-      Column(
-         Modifier
-            .fillMaxSize()
-            .verticalScroll(scrollState)
+      Surface(
+         color = MaterialTheme.colorScheme.surfaceVariant,
+         modifier = Modifier.fillMaxSize()
       ) {
-         Filter(
-            dataSource = dataSource,
-            location = location
-         )
+         Column(
+            Modifier
+               .fillMaxSize()
+               .verticalScroll(scrollState)
+         ) {
+            Filter(
+               dataSource = dataSource,
+               location = location
+            )
+         }
       }
    }
 }
@@ -129,37 +132,39 @@ private fun Filters(
    removeFilter: (Filter) -> Unit
 ) {
    filters.forEach { filter ->
-      Column(
-         Modifier.fillMaxWidth()
-      ) {
-         Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-               .padding(horizontal = 16.dp, vertical = 8.dp)
-               .fillMaxWidth()
+      Surface {
+         Column(
+            Modifier.fillMaxWidth()
          ) {
-            Row(Modifier.weight(1f)) {
-               Text(buildAnnotatedString {
-                  withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                     append("${filter.parameter.title} ")
-                  }
-
-                  append(" ${filter.comparator.title} ")
-
-                  withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                     append("${valueString(parameter = filter.parameter, value = filter.value)} ")
-                  }
-               })
-            }
-
-            IconButton(
-               onClick = { removeFilter(filter) }
+            Row(
+               verticalAlignment = Alignment.CenterVertically,
+               modifier = Modifier
+                  .padding(horizontal = 16.dp, vertical = 8.dp)
+                  .fillMaxWidth()
             ) {
-               Icon(
-                  imageVector = Icons.Filled.RemoveCircle,
-                  tint = MaterialTheme.colorScheme.remove,
-                  contentDescription = "Remove Filter",
-               )
+               Row(Modifier.weight(1f)) {
+                  Text(buildAnnotatedString {
+                     withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                        append("${filter.parameter.title} ")
+                     }
+
+                     append(" ${filter.comparator.title} ")
+
+                     withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                        append("${valueString(parameter = filter.parameter, value = filter.value)} ")
+                     }
+                  })
+               }
+
+               IconButton(
+                  onClick = { removeFilter(filter) }
+               ) {
+                  Icon(
+                     imageVector = Icons.Filled.RemoveCircle,
+                     tint = MaterialTheme.colorScheme.remove,
+                     contentDescription = "Remove Filter",
+                  )
+               }
             }
          }
       }
@@ -251,48 +256,66 @@ private fun FilterHeader(
    var comparator by remember { mutableStateOf(defaultComparator) }
    var value by remember { mutableStateOf(getDefaultValue(defaultParameter)) }
 
-   Row(
-      verticalAlignment = Alignment.CenterVertically,
-      modifier = Modifier
-         .padding(16.dp)
-         .fillMaxWidth()
+   Surface(
+      contentColor = MaterialTheme.colorScheme.onSurface,
+      modifier = Modifier.fillMaxSize()
    ) {
-      Column(
-         Modifier
-            .weight(1f)
+      Row(
+         verticalAlignment = Alignment.CenterVertically,
+         modifier = Modifier
+            .padding(16.dp)
             .fillMaxWidth()
       ) {
-         Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
+         Column(
+            Modifier
+               .weight(1f)
+               .fillMaxWidth()
          ) {
-            ParameterSelection(
-               filterParameters = filterParameters,
-               selectedParameter = parameter,
-               onSelectParameter = {
-                  parameter = it
-                  comparator = parameter.type.comparators.first()
-                  value = getDefaultValue(parameter)
+            Row(
+               horizontalArrangement = Arrangement.SpaceBetween,
+               verticalAlignment = Alignment.CenterVertically,
+               modifier = Modifier.fillMaxWidth()
+            ) {
+               ParameterSelection(
+                  filterParameters = filterParameters,
+                  selectedParameter = parameter,
+                  onSelectParameter = {
+                     parameter = it
+                     comparator = parameter.type.comparators.first()
+                     value = getDefaultValue(parameter)
+                  },
+                  modifier = Modifier.padding(end = 16.dp)
+               )
+
+               ComparatorSelection(
+                  parameter = parameter,
+                  selectedComparator = comparator,
+                  onSelectComparator = { comparator = it }
+               )
+
+               if (parameter.type != FilterParameterType.STRING && parameter.type != FilterParameterType.LOCATION) {
+                  Row(
+                     Modifier
+                        .weight(1f)
+                        .padding(horizontal = 16.dp)
+                  ) {
+                     ValueSelection(
+                        location = location,
+                        parameter = parameter,
+                        comparator = comparator,
+                        value = value,
+                        onValueChanged = { value = it }
+                     )
+                  }
                }
-            )
+            }
 
-            ComparatorSelection(
-               parameter = parameter,
-               selectedComparator = comparator,
-               onSelectComparator = { comparator = it }
-            )
-
-            if (parameter.type != FilterParameterType.STRING && parameter.type != FilterParameterType.LOCATION) {
-               Row(
-                  Modifier
-                     .weight(1f)
-                     .padding(horizontal = 16.dp)
-               ) {
+            if (parameter.type == FilterParameterType.STRING || parameter.type == FilterParameterType.LOCATION) {
+               Column(Modifier.padding(top = 16.dp)) {
                   ValueSelection(
                      location = location,
-                     parameter = parameter,
                      comparator = comparator,
+                     parameter = parameter,
                      value = value,
                      onValueChanged = { value = it }
                   )
@@ -300,35 +323,23 @@ private fun FilterHeader(
             }
          }
 
-         if (parameter.type == FilterParameterType.STRING || parameter.type == FilterParameterType.LOCATION) {
-            Column(Modifier.padding(top = 16.dp)) {
-               ValueSelection(
-                  location = location,
-                  comparator = comparator,
-                  parameter = parameter,
-                  value = value,
-                  onValueChanged = { value = it }
+         IconButton(
+            onClick = {
+               addFilter(
+                  Filter(
+                     parameter = parameter,
+                     comparator = comparator,
+                     value = value
+                  )
                )
             }
-         }
-      }
-
-      IconButton(
-         onClick = {
-            addFilter(
-               Filter(
-                  parameter = parameter,
-                  comparator = comparator,
-                  value = value
-               )
+         ) {
+            Icon(
+               imageVector = Icons.Filled.AddCircle,
+               tint = MaterialTheme.colorScheme.add,
+               contentDescription = "Add Filter",
             )
          }
-      ) {
-         Icon(
-            imageVector = Icons.Filled.AddCircle,
-            tint = MaterialTheme.colorScheme.add,
-            contentDescription = "Add Filter",
-         )
       }
    }
 }
@@ -350,12 +361,10 @@ private fun ParameterSelection(
       ) {
          Text(
             text = selectedParameter.title,
-            style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.primary
+            style = MaterialTheme.typography.titleMedium
          )
          Icon(
             imageVector = Icons.Default.ExpandMore,
-            tint = MaterialTheme.colorScheme.primary,
             contentDescription = "Parameters"
          )
       }
@@ -388,8 +397,8 @@ private fun ParameterSelection(
                         modifier = Modifier.padding(start = 8.dp)
                      )
                   }
-
-               })
+               }
+            )
          }
       }
    }
@@ -412,12 +421,10 @@ fun ComparatorSelection(
       ) {
          Text(
             text = selectedComparator.title,
-            style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.primary
+            style = MaterialTheme.typography.titleMedium
          )
          Icon(
             imageVector = Icons.Default.ExpandMore,
-            tint = MaterialTheme.colorScheme.primary,
             contentDescription = "Parameters"
          )
       }
@@ -487,12 +494,10 @@ private fun ValueSelection(
          ) {
             Text(
                text = (value as EnumerationType).title,
-               style = MaterialTheme.typography.titleMedium,
-               color = MaterialTheme.colorScheme.primary
+               style = MaterialTheme.typography.titleMedium
             )
             Icon(
                imageVector = Icons.Default.ExpandMore,
-               tint = MaterialTheme.colorScheme.primary,
                contentDescription = "Select new enumeration"
             )
          }
@@ -576,12 +581,10 @@ private fun DateValue(
          ) {
             Text(
                text = value?.toString() ?: "",
-               style = MaterialTheme.typography.titleMedium,
-               color = MaterialTheme.colorScheme.primary
+               style = MaterialTheme.typography.titleMedium
             )
             Icon(
                imageVector = Icons.Default.ExpandMore,
-               tint = MaterialTheme.colorScheme.primary,
                contentDescription = "Date Value"
             )
          }
@@ -723,9 +726,14 @@ fun LocationValue(
       compassEnabled = false
    )
 
+   val mapStyleOptions = if (isSystemInDarkTheme()) {
+      MapStyleOptions.loadRawResourceStyle(LocalContext.current, R.raw.map_theme_night)
+   } else null
+
    val mapProperties = MapProperties(
       minZoomPreference = 0f,
-      isMyLocationEnabled = locationPermissionState.status.isGranted
+      isMyLocationEnabled = locationPermissionState.status.isGranted,
+      mapStyleOptions = mapStyleOptions
    )
 
    LocationPermission(locationPermissionState)

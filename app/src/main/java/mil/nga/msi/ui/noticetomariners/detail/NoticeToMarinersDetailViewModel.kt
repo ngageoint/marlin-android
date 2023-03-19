@@ -60,7 +60,7 @@ class NoticeToMarinersDetailViewModel @Inject constructor(
       }
    }
 
-   suspend fun getNoticeToMarinersPublication(notice: NoticeToMariners): Uri {
+   suspend fun getNoticeToMarinersPublication(notice: NoticeToMariners): Uri? {
       return noticeToMarinersPublicationUri(notice.filename)
          ?: noticeToMarinersRepository.getNoticeToMarinersPublication(notice)
    }
