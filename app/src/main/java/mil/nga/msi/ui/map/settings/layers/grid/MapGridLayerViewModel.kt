@@ -52,13 +52,17 @@ class MapGridLayerViewModel @Inject constructor(
    suspend fun createLayer(
       name: String,
       type: LayerType,
-      url: String
+      url: String,
+      minZoom: Int?,
+      maxZoom: Int?
    ) {
       val layer = Layer(
          name = name,
          type = type,
          url = url,
-         visible = true
+         visible = true,
+         minZoom = minZoom,
+         maxZoom = maxZoom
       )
 
       layerRepository.createLayer(layer)

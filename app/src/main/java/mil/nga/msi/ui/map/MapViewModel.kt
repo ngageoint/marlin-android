@@ -129,7 +129,7 @@ class MapViewModel @Inject constructor(
             LayerType.WMS -> {
                WMSTileProvider(url = layer.url)
             } else -> {
-               GridTileProvider(baseUrl = Uri.parse(layer.url))
+               GridTileProvider(layer = layer)
             }
          }
       }

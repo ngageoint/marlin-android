@@ -11,10 +11,14 @@ import kotlin.math.*
 class WMSTileProvider(
    width: Int = 256,
    height: Int = 256,
-   private val url: String
-) : UrlTileProvider(width, height) {
+   private val url: String,
+   private val minZoom: Int? = null,
+   private val maxZoom: Int? = null
+) : MarlinTileProvider(width, height) {
 
    override fun getTileUrl(x: Int, y: Int, z: Int): URL? {
+      if (!withinZoom(z, minZoom, maxZoom)) return null
+
       val builder = Uri.parse(url).buildUpon()
          .appendQueryParameter("BBOX", bbox(x, y, z))
 
