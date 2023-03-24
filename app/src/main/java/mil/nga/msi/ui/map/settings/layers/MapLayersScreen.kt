@@ -218,8 +218,13 @@ private fun Layer(
       shadowElevation = elevation,
       headlineText = { Text(layer.name) },
       supportingText = {
+         val text = when (layer.type) {
+            LayerType.GEOPACKAGE -> "GeoPackage"
+            else -> layer.url
+         }
+
          Text(
-            text = layer.url,
+            text = text,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
          )

@@ -39,6 +39,9 @@ data class Layer(
    @ColumnInfo(name = "file_path")
    var filePath: String? = null,
 
+   @ColumnInfo(name = "tables")
+   var tables: List<String> = mutableListOf(),
+
    @ColumnInfo(name = "refresh_rate")
    var refreshRate: Int? = null
 ): Parcelable

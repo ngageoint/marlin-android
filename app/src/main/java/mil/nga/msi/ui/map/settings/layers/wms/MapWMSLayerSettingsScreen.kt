@@ -267,8 +267,7 @@ private fun WMSCapabilitiesLayer(
                   layer.name?.let { name -> onLayerChecked(layer, name, checked) }
                }
             )
-         },
-         modifier = Modifier.padding(start = 8.dp)
+         }
       )
    }
 }

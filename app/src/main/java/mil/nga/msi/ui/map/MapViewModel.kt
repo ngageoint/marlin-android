@@ -2,6 +2,7 @@ package mil.nga.msi.ui.map
 
 import android.app.Application
 import android.net.Uri
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.*
 import com.google.android.gms.maps.model.TileProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -9,6 +10,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import mil.nga.geopackage.GeoPackageManager
+import mil.nga.geopackage.map.tiles.overlay.FeatureOverlay
+import mil.nga.geopackage.map.tiles.overlay.XYZGeoPackageOverlay
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.filter.MapBoundsFilter
 import mil.nga.msi.datasource.layer.LayerType
@@ -55,6 +59,7 @@ class MapViewModel @Inject constructor(
    private val application: Application,
    private val filterRepository: FilterRepository,
    layerRepository: LayerRepository,
+   private val geoPackageManager: GeoPackageManager,
    private val asamRepository: AsamRepository,
    private val asamTileRepository: AsamTileRepository,
    private val moduRepository: ModuRepository,
@@ -124,12 +129,30 @@ class MapViewModel @Inject constructor(
       val orderById = order.withIndex().associate { (index, it) -> it to index }
       layers.sortedBy { orderById[it.id.toInt()] }
    }.transform { layers ->
-      val tileProviders = layers.map {  layer ->
+      val tileProviders = layers.flatMap {  layer ->
          when (layer.type) {
             LayerType.WMS -> {
-               WMSTileProvider(url = layer.url)
-            } else -> {
-               GridTileProvider(layer = layer)
+               listOf(WMSTileProvider(url = layer.url))
+            }
+            LayerType.XYZ, LayerType.TMS -> {
+               listOf(GridTileProvider(layer = layer))
+            }
+            LayerType.GEOPACKAGE -> {
+               val geoPackage = geoPackageManager.openExternal(layer.filePath)
+               layer.tables.map { table ->
+                  if (geoPackage.tileTables.contains(table)) {
+                     val tileDao = geoPackage.getTileDao(table)
+                     XYZGeoPackageOverlay(tileDao)
+                  } else {
+                     val featureDao = geoPackage.getFeatureDao(table)
+                     val featureTiles = mil.nga.geopackage.tiles.features.DefaultFeatureTiles(
+                        application,
+                        geoPackage,
+                        featureDao
+                     )
+                     FeatureOverlay(featureTiles)
+                  }
+               }
             }
          }
       }

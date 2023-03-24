@@ -1,6 +1,8 @@
 package mil.nga.msi.ui.map.settings.layers
 
 import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -12,11 +14,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.End
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -28,6 +30,7 @@ import mil.nga.msi.datasource.layer.LayerType
 import mil.nga.msi.network.layer.wms.WMSCapabilities
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.overlay.GridTileProvider
+import mil.nga.msi.ui.map.settings.layers.geopackage.GeopackageLayerViewModel
 import mil.nga.msi.ui.map.settings.layers.grid.MapGridLayerViewModel
 import mil.nga.msi.ui.map.settings.layers.wms.MapWMSLayerViewModel
 
@@ -36,7 +39,8 @@ fun MapNewLayerScreen(
    onClose: () -> Unit,
    onLayer: (Layer) -> Unit,
    wmsViewModel: MapWMSLayerViewModel = hiltViewModel(),
-   gridViewModel: MapGridLayerViewModel = hiltViewModel()
+   gridViewModel: MapGridLayerViewModel = hiltViewModel(),
+   geoPackageViewModel: GeopackageLayerViewModel = hiltViewModel()
 ) {
    val scope = rememberCoroutineScope()
    val scrollState = rememberScrollState()
@@ -82,7 +86,18 @@ fun MapNewLayerScreen(
                   wmsViewModel.setUrl(it)
                   gridViewModel.setUrl(it)
                },
-               onTypeChanged = { type = it }
+               onTypeChanged = { type = it },
+               onGeoPackageUri = { uri ->
+                  scope.launch {
+                     val geopackageFile = geoPackageViewModel.setUri(uri)
+                     onLayer(Layer(
+                        name = "",
+                        type = LayerType.GEOPACKAGE,
+                        url = Uri.fromFile(geopackageFile).toString(),
+                        filePath = geopackageFile?.absolutePath
+                     ))
+                  }
+               }
             )
 
             tileUrl?.let { uri ->
@@ -179,13 +194,42 @@ private fun Layer(
    type: LayerType?,
    serverError: Boolean,
    onUrlChanged: (String) -> Unit,
-   onTypeChanged: (LayerType) -> Unit
+   onTypeChanged: (LayerType) -> Unit,
+   onGeoPackageUri: (Uri) -> Unit
 ) {
-   Column(Modifier.padding(vertical = 16.dp)) {
+   val launcher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+      uri?.let { onGeoPackageUri(uri) }
+   }
+
+   Column(
+      horizontalAlignment = Alignment.CenterHorizontally,
+      modifier = Modifier
+         .fillMaxWidth()
+         .padding(vertical = 24.dp)
+   ) {
+      Button(
+         onClick = {
+            launcher.launch(arrayOf("*/gpkg", "*/gpkx", "application/octet-stream"))
+         }
+      ) {
+         Text("Import GeoPackage File")
+      }
+
+      CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+         Text(
+            text = "- or -",
+            style = MaterialTheme.typography.titleMedium,
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+               .fillMaxWidth()
+               .padding(vertical = 16.dp)
+         )
+      }
+
       CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
          Text(
             text = buildAnnotatedString {
-               append("Please enter your layer URL, Marlin will do its best to auto detect the type of your layer.")
+               append("Enter a layer URL, Marlin will do its best to auto detect the type of your layer.")
 
                withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
                   append(" NOTE: If tiles appear misaligned toggle between XYZ and TMS types.")
@@ -328,7 +372,7 @@ private fun WMSCapabilities(
          if (!expanded) {
             IconButton(
                onClick = { expanded = true },
-               modifier = Modifier.align(End)
+               modifier = Modifier.align(Alignment.End)
             ) {
                Icon(Icons.Default.MoreHoriz,
                   tint = MaterialTheme.colorScheme.primary,

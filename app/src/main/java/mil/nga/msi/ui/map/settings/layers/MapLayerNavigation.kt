@@ -11,6 +11,8 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import mil.nga.msi.datasource.layer.Layer
 import mil.nga.msi.datasource.layer.LayerType
+import mil.nga.msi.ui.map.settings.layers.geopackage.MapGeoPackageLayerScreen
+import mil.nga.msi.ui.map.settings.layers.geopackage.MapGeoPackageLayerSettingsScreen
 import mil.nga.msi.ui.map.settings.layers.grid.MapGridLayerScreen
 import mil.nga.msi.ui.map.settings.layers.wms.MapWMSLayerScreen
 import mil.nga.msi.ui.map.settings.layers.wms.MapWMSLayerSettingsScreen
@@ -29,6 +31,8 @@ sealed class MapLayerRoute(
    object WMSLayerCreateSettings: MapLayerRoute("mapWMSCreateLayerSettings", "WMS Layer")
    object WMSLayerEditSettings: MapLayerRoute("mapWMSEditLayerSettings", "WMS Layer")
    object WMSLayer: MapLayerRoute("mapWMSLayer", "WMS Layer")
+   object GeoPackageLayerCreateSettings: MapLayerRoute("mapGPCreateLayerSettings", "GeoPackage Layer")
+   object GeoPackageLayer: MapLayerRoute("mapGPLayer", "GeoPackage Layer")
 }
 
 fun NavGraphBuilder.mapLayerGraph(
@@ -77,8 +81,15 @@ fun NavGraphBuilder.mapLayerGraph(
                   navController.navigate(route) {
                      popUpTo(route) { inclusive = true }
                   }
-               } else -> {
+               }
+               LayerType.TMS, LayerType.XYZ -> {
                   val route = "${MapLayerRoute.CreateGridLayer.name}?layer=${encoded}"
+                  navController.navigate(route) {
+                     popUpTo(route) { inclusive = true }
+                  }
+               }
+               LayerType.GEOPACKAGE -> {
+                  val route = "${MapLayerRoute.GeoPackageLayerCreateSettings.name}?layer=${encoded}"
                   navController.navigate(route) {
                      popUpTo(route) { inclusive = true }
                   }
@@ -183,4 +194,46 @@ fun NavGraphBuilder.mapLayerGraph(
          }
       )
    }
+
+   composable(
+      route = "${MapLayerRoute.GeoPackageLayerCreateSettings.name}?layer={layer}",
+      arguments = listOf(navArgument("layer") { type = NavType.Layer })
+   ) { backstackEntry ->
+      bottomBarVisibility(false)
+
+      val layer = backstackEntry.arguments?.getParcelable<Layer>("layer")
+      requireNotNull(layer) { "'layer' argument is required" }
+
+      MapGeoPackageLayerSettingsScreen(
+         layer = layer,
+         done = { layer ->
+            val encoded = Uri.encode(Json.encodeToString(layer))
+            val route = "${MapLayerRoute.GeoPackageLayer.name}?layer=${encoded}"
+            navController.navigate(route) {
+               popUpTo(route) { inclusive = true }
+            }
+         },
+         onClose = {
+            navController.popBackStack(MapLayerRoute.Layers.name, false)
+         }
+      )
+   }
+
+   composable(
+      route = "${MapLayerRoute.GeoPackageLayer.name}?layer={layer}",
+      arguments = listOf(navArgument("layer") { type = NavType.Layer })
+   ) { backstackEntry ->
+      bottomBarVisibility(false)
+
+      val layer = backstackEntry.arguments?.getParcelable<Layer>("layer")
+      requireNotNull(layer) { "'layer' argument is required" }
+
+      MapGeoPackageLayerScreen(
+         layer = layer,
+         onClose = {
+            navController.popBackStack(MapLayerRoute.Layers.name, false)
+         }
+      )
+   }
+
 }

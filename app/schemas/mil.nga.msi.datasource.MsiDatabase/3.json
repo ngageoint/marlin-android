@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 3,
-    "identityHash": "65f823055ed8dec1716daceeb4bc5379",
+    "identityHash": "c2652fb87acaecc616990a3fac85e07d",
     "entities": [
       {
         "tableName": "asams",
@@ -413,7 +413,7 @@
       },
       {
         "tableName": "layers",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `type` TEXT NOT NULL, `url` TEXT NOT NULL, `name` TEXT NOT NULL, `visible` INTEGER NOT NULL, `min_zoom` INTEGER, `max_zoom` INTEGER, `file_path` TEXT, `refresh_rate` INTEGER)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `type` TEXT NOT NULL, `url` TEXT NOT NULL, `name` TEXT NOT NULL, `visible` INTEGER NOT NULL, `min_zoom` INTEGER, `max_zoom` INTEGER, `file_path` TEXT, `tables` TEXT NOT NULL, `refresh_rate` INTEGER)",
         "fields": [
           {
             "fieldPath": "id",
@@ -462,6 +462,12 @@
             "columnName": "file_path",
             "affinity": "TEXT",
             "notNull": false
+          },
+          {
+            "fieldPath": "tables",
+            "columnName": "tables",
+            "affinity": "TEXT",
+            "notNull": true
           },
           {
             "fieldPath": "refreshRate",
@@ -1786,7 +1792,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '65f823055ed8dec1716daceeb4bc5379')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'c2652fb87acaecc616990a3fac85e07d')"
     ]
   }
 }

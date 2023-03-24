@@ -35,14 +35,9 @@ class LayerRemoteDataSource @Inject constructor(
          try {
             val response = service.getWMSCapabilities(wmsUri.toString())
             if (response.isSuccessful) {
-               val wms = response.body()
-               wms
+               response.body()
             } else null
-         } catch (e: Exception) {
-            Log.e("Billy", "error wms", e)
-            Log.i("Billy", "error wms $e")
-            null
-         }
+         } catch (e: Exception) { null }
       }
    }
 
