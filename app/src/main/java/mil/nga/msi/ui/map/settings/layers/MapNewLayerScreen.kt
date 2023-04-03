@@ -89,7 +89,7 @@ fun MapNewLayerScreen(
                onTypeChanged = { type = it },
                onGeoPackageUri = { uri ->
                   scope.launch {
-                     val geopackageFile = geoPackageViewModel.setUri(uri)
+                     val geopackageFile = geoPackageViewModel.getGeoPackage(uri)
                      onLayer(Layer(
                         name = "",
                         type = LayerType.GEOPACKAGE,

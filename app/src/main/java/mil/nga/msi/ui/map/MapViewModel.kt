@@ -139,7 +139,7 @@ class MapViewModel @Inject constructor(
             }
             LayerType.GEOPACKAGE -> {
                val geoPackage = geoPackageManager.openExternal(layer.filePath)
-               layer.tables.map { table ->
+               layer.url.split(",").filter { it.isNotEmpty() }.map { table ->
                   if (geoPackage.tileTables.contains(table)) {
                      val tileDao = geoPackage.getTileDao(table)
                      XYZGeoPackageOverlay(tileDao)

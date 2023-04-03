@@ -13,6 +13,7 @@ import kotlinx.coroutines.withContext
 import mil.nga.geopackage.GeoPackage
 import mil.nga.geopackage.GeoPackageManager
 import mil.nga.msi.datasource.layer.Layer
+import mil.nga.msi.datasource.layer.LayerType
 import mil.nga.msi.repository.layer.LayerRepository
 import java.io.File
 import javax.inject.Inject
@@ -40,12 +41,60 @@ class GeopackageLayerViewModel @Inject constructor(
    private val _geopackageState = MutableLiveData<GeoPackageState>()
    val geopackageState: LiveData<GeoPackageState> = _geopackageState
 
-   suspend fun setUri(uri: Uri): File? = withContext(Dispatchers.IO) {
+   suspend fun getGeoPackage(uri: Uri): File? = withContext(Dispatchers.IO) {
       val file = layerRepository.stageGeoPackageFile(uri)
       try {
          geoPackageManager.openExternal(file)
          file
       } catch (e: Exception) { null }
+   }
+
+   fun setLayerId(id: Long) {
+      viewModelScope.launch {
+         val layer = layerRepository.getLayer(id)
+
+         try {
+            val geoPackage = geoPackageManager.openExternal(layer.filePath)
+            val layers =
+               geoPackage.tileTables.map { GeoPackageLayer(table = it, type = GeoPackageLayerType.TILE) } +
+               geoPackage.featureTables.map { GeoPackageLayer(table = it, type = GeoPackageLayerType.FEATURE) }
+
+            _geopackageState.postValue(
+               GeoPackageState(
+                  layer = layer,
+                  geoPackage = geoPackage,
+                  layers = layers,
+                  selectedLayers = layer.url.split(",")
+               )
+            )
+         } catch (_: Exception) { }
+      }
+   }
+
+   fun setUri(uri: Uri) {
+      viewModelScope.launch(Dispatchers.IO) {
+         val file = layerRepository.stageGeoPackageFile(uri)
+         try {
+            val geoPackage = geoPackageManager.openExternal(file)
+            val layers =
+               geoPackage.tileTables.map { GeoPackageLayer(table = it, type = GeoPackageLayerType.TILE) } +
+               geoPackage.featureTables.map { GeoPackageLayer(table = it, type = GeoPackageLayerType.FEATURE) }
+
+            _geopackageState.postValue(
+               GeoPackageState(
+                  layer = Layer(
+                     id = 0,
+                     type = LayerType.GEOPACKAGE,
+                     name = "",
+                     url = "",
+                     filePath = file.absolutePath
+                  ),
+                  geoPackage = geoPackage,
+                  layers = layers
+               )
+            )
+         } catch (_: Exception) { }
+      }
    }
 
    fun setLayer(layer: Layer) {

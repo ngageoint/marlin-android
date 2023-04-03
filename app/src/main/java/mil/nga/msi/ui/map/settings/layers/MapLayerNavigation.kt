@@ -1,16 +1,17 @@
 package mil.nga.msi.ui.map.settings.layers
 
+import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import androidx.compose.ui.graphics.Color
-import androidx.navigation.NavController
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavType
+import androidx.navigation.*
 import androidx.navigation.compose.composable
-import androidx.navigation.navArgument
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import mil.nga.msi.datasource.layer.Layer
 import mil.nga.msi.datasource.layer.LayerType
+import mil.nga.msi.ui.embark.EmbarkRoute
+import mil.nga.msi.ui.map.MapRoute
 import mil.nga.msi.ui.map.settings.layers.geopackage.MapGeoPackageLayerScreen
 import mil.nga.msi.ui.map.settings.layers.geopackage.MapGeoPackageLayerSettingsScreen
 import mil.nga.msi.ui.map.settings.layers.grid.MapGridLayerScreen
@@ -32,6 +33,7 @@ sealed class MapLayerRoute(
    object WMSLayerEditSettings: MapLayerRoute("mapWMSEditLayerSettings", "WMS Layer")
    object WMSLayer: MapLayerRoute("mapWMSLayer", "WMS Layer")
    object GeoPackageLayerCreateSettings: MapLayerRoute("mapGPCreateLayerSettings", "GeoPackage Layer")
+   object GeoPackageLayerEditSettings: MapLayerRoute("mapEditGPLayer", "GeoPackage Layer")
    object GeoPackageLayer: MapLayerRoute("mapGPLayer", "GeoPackage Layer")
 }
 
@@ -47,8 +49,12 @@ fun NavGraphBuilder.mapLayerGraph(
             val route = when (type) {
                LayerType.WMS -> {
                   "${MapLayerRoute.WMSLayerEditSettings.name}?id=${id}"
-               } else -> {
+               }
+               LayerType.XYZ, LayerType.TMS -> {
                   "${MapLayerRoute.EditGridLayer.name}?id=${id}"
+               }
+               LayerType.GEOPACKAGE -> {
+                  "${MapLayerRoute.GeoPackageLayerEditSettings.name}?id=${id}"
                }
             }
 
@@ -196,7 +202,7 @@ fun NavGraphBuilder.mapLayerGraph(
    }
 
    composable(
-      route = "${MapLayerRoute.GeoPackageLayerCreateSettings.name}?layer={layer}",
+      route = "${MapLayerRoute.GeoPackageLayerCreateSettings.name}?layer={layer}&import={import}",
       arguments = listOf(navArgument("layer") { type = NavType.Layer })
    ) { backstackEntry ->
       bottomBarVisibility(false)
@@ -204,8 +210,31 @@ fun NavGraphBuilder.mapLayerGraph(
       val layer = backstackEntry.arguments?.getParcelable<Layer>("layer")
       requireNotNull(layer) { "'layer' argument is required" }
 
+      val import = backstackEntry.arguments?.getString("import")?.toBoolean() ?: false
+
       MapGeoPackageLayerSettingsScreen(
          layer = layer,
+         done = { layer ->
+            val encoded = Uri.encode(Json.encodeToString(layer))
+            val route = "${MapLayerRoute.GeoPackageLayer.name}?layer=${encoded}&import=${import}"
+            navController.navigate(route) {
+               popUpTo(route) { inclusive = true }
+            }
+         },
+         onClose = {
+            navController.popBackStack(MapLayerRoute.Layers.name, false)
+         }
+      )
+   }
+
+   composable(route = "${MapLayerRoute.GeoPackageLayerEditSettings.name}?id={id}") { backstackEntry ->
+      bottomBarVisibility(false)
+
+      val id = backstackEntry.arguments?.getString("id")?.toLongOrNull()
+      requireNotNull(id) { "'id' argument is required" }
+
+      MapGeoPackageLayerSettingsScreen(
+         id = id,
          done = { layer ->
             val encoded = Uri.encode(Json.encodeToString(layer))
             val route = "${MapLayerRoute.GeoPackageLayer.name}?layer=${encoded}"
@@ -220,7 +249,7 @@ fun NavGraphBuilder.mapLayerGraph(
    }
 
    composable(
-      route = "${MapLayerRoute.GeoPackageLayer.name}?layer={layer}",
+      route = "${MapLayerRoute.GeoPackageLayer.name}?layer={layer}&import={import}&embark={embark}",
       arguments = listOf(navArgument("layer") { type = NavType.Layer })
    ) { backstackEntry ->
       bottomBarVisibility(false)
@@ -228,12 +257,28 @@ fun NavGraphBuilder.mapLayerGraph(
       val layer = backstackEntry.arguments?.getParcelable<Layer>("layer")
       requireNotNull(layer) { "'layer' argument is required" }
 
+      val import = backstackEntry.arguments?.getString("import")?.toBoolean() ?: false
+      val embark = backstackEntry.arguments?.getString("embark")?.toBoolean() ?: false
+
       MapGeoPackageLayerScreen(
          layer = layer,
          onClose = {
-            navController.popBackStack(MapLayerRoute.Layers.name, false)
+            if (import) {
+               if (embark) {
+                  val route = MapRoute.Map.name
+                  navController.navigate(route) {
+                     popUpTo(route) { inclusive = true }
+                  }
+               } else {
+                  val route = EmbarkRoute.Welcome.name
+                  navController.navigate(EmbarkRoute.Welcome.name) {
+                     popUpTo(route) { inclusive = true }
+                  }
+               }
+            } else {
+               navController.popBackStack(MapLayerRoute.Layers.name, false)
+            }
          }
       )
    }
-
 }

@@ -18,20 +18,15 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
-import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.navigation.material.BottomSheetNavigator
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import com.google.accompanist.navigation.material.ModalBottomSheetLayout
 import kotlinx.coroutines.launch
 import mil.nga.msi.R
-import mil.nga.msi.ui.embark.EmbarkRoute
 import mil.nga.msi.ui.home.homeGraph
 import mil.nga.msi.ui.map.MapRoute
 import mil.nga.msi.ui.navigation.NavigationDrawer
@@ -40,6 +35,9 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.graphics.Color
+import androidx.navigation.NavController
+import androidx.navigation.NavDestination
+import androidx.navigation.compose.rememberNavController
 
 @OptIn(ExperimentalMaterialNavigationApi::class, ExperimentalMaterialApi::class)
 @Composable
@@ -51,6 +49,7 @@ fun MainScreen(
    val embark by viewModel.embark.observeAsState()
    val tabs by viewModel.tabs.observeAsState(emptyList())
    var bottomBarVisibility by remember { (mutableStateOf(false)) }
+   val scaffoldState = rememberScaffoldState()
 
    val bottomSheetState = rememberModalBottomSheetState(
       initialValue = ModalBottomSheetValue.Hidden,
@@ -61,7 +60,6 @@ fun MainScreen(
       BottomSheetNavigator(sheetState = bottomSheetState)
    }
 
-   val scaffoldState = rememberScaffoldState()
    val navController = rememberNavController(bottomSheetNavigator)
    navController.addOnDestinationChangedListener { _: NavController, destination: NavDestination, _: Bundle? ->
       viewModel.track(destination)
@@ -191,27 +189,12 @@ fun MainScreen(
             startDestination = "main",
             modifier = Modifier.padding(paddingValues)
          ) {
-            composable("main") {
-               bottomBarVisibility = false
-
-               LaunchedEffect(embark) {
-                  embark?.let { embark ->
-                     if (embark) {
-                        navController.navigate(MapRoute.Map.name)
-                     } else {
-                        navController.navigate(EmbarkRoute.Welcome.name) {
-                           launchSingleTop = true
-                        }
-                     }
-                  }
-               }
-            }
-
             homeGraph(
                navController = navController,
                bottomBarVisibility = { visible ->
                   bottomBarVisibility = visible && tabs.isNotEmpty()
                },
+               embark = embark == true,
                share = { share(it) },
                showSnackbar = { showSnackbar(it) },
                openNavigationDrawer = { openDrawer() },

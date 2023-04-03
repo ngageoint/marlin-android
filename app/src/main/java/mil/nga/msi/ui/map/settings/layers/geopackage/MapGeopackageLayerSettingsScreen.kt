@@ -1,6 +1,6 @@
 package mil.nga.msi.ui.map.settings.layers.geopackage
 
-import android.util.Log
+import android.net.Uri
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -34,6 +34,87 @@ fun MapGeoPackageLayerSettingsScreen(
    onClose: () -> Unit,
    viewModel: GeopackageLayerViewModel = hiltViewModel()
 ) {
+   val geoPackageState by viewModel.geopackageState.observeAsState()
+
+   LaunchedEffect(id) {
+      viewModel.setLayerId(id)
+   }
+
+   Column {
+      TopBar(
+         title = MapLayerRoute.GeoPackageLayerCreateSettings.title,
+         navigationIcon = Icons.Default.Close,
+         onNavigationClicked = { onClose() }
+      )
+
+      geoPackageState?.let { state ->
+         Column(Modifier.fillMaxHeight()) {
+            GeoPackageLayer(
+               geoPackageState = state,
+               onDone = {
+                  done(Layer(
+                     id = state.layer?.id ?: 0,
+                     name = state.layer?.name ?: "",
+                     url = state.selectedLayers.joinToString(",") { it },
+                     filePath = state.layer?.filePath,
+                     tables = geoPackageState?.layers?.map { it.table } ?: emptyList(),
+                     type = LayerType.GEOPACKAGE
+                  ))
+               },
+               onLayerChecked = { name, checked ->
+                  viewModel.setLayer(name, checked)
+               },
+               modifier = Modifier
+                  .fillMaxWidth()
+                  .weight(1f)
+            )
+         }
+      }
+   }
+}
+
+@Composable
+fun MapGeoPackageLayerSettingsScreen(
+   uri: Uri?,
+   done: (Layer) -> Unit,
+   onClose: () -> Unit,
+   viewModel: GeopackageLayerViewModel = hiltViewModel()
+) {
+   val geoPackageState by viewModel.geopackageState.observeAsState()
+
+   LaunchedEffect(uri) { uri?.let { viewModel.setUri(it) } }
+
+   Column {
+      TopBar(
+         title = MapLayerRoute.GeoPackageLayerCreateSettings.title,
+         navigationIcon = Icons.Default.Close,
+         onNavigationClicked = { onClose() }
+      )
+
+      geoPackageState?.let { state ->
+         Column(Modifier.fillMaxHeight()) {
+            GeoPackageLayer(
+               geoPackageState = state,
+               onDone = {
+                  done(Layer(
+                     id = state.layer?.id ?: 0,
+                     name = state.layer?.name ?: "",
+                     url = state.selectedLayers.joinToString(",") { it },
+                     filePath = state.layer?.filePath,
+                     tables = state.layers.map { it.table },
+                     type = LayerType.GEOPACKAGE
+                  ))
+               },
+               onLayerChecked = { name, checked ->
+                  viewModel.setLayer(name, checked)
+               },
+               modifier = Modifier
+                  .fillMaxWidth()
+                  .weight(1f)
+            )
+         }
+      }
+   }
 }
 
 @Composable
@@ -45,9 +126,7 @@ fun MapGeoPackageLayerSettingsScreen(
 ) {
    val geoPackageState by viewModel.geopackageState.observeAsState()
 
-   LaunchedEffect(layer) {
-      viewModel.setLayer(layer)
-   }
+   LaunchedEffect(layer) { viewModel.setLayer(layer) }
 
    Column {
       TopBar(
@@ -64,9 +143,9 @@ fun MapGeoPackageLayerSettingsScreen(
                   done(Layer(
                      id = layer.id,
                      name = layer.name,
-                     url = geoPackageState?.layers?.map { it.table }?.joinToString(",") ?: "",
+                     url = state.layers?.map { it.table }?.joinToString(",") ?: "",
                      filePath = layer.filePath,
-                     tables = geoPackageState?.layers?.map { it.table } ?: emptyList(),
+                     tables = state.layers.map { it.table },
                      type = LayerType.GEOPACKAGE
                   ))
                },
