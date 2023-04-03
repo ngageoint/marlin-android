@@ -11,7 +11,7 @@ val LightColorPalette = lightColorScheme(
    secondaryContainer = NgaBlue,
    surfaceVariant = Color(red = 245, green = 242, blue = 245),
    tertiary = SeaGreen,
-   secondary = NgaBlue
+   secondary = NgaBlue,
 )
 
 val DarkColorPalette = darkColorScheme(
@@ -83,5 +83,4 @@ val ColorScheme.screenBackground: Color @Composable
    get() = Color(0x09000000)
 
 val ColorScheme.add: Color @Composable get() = Add
-
 val ColorScheme.remove: Color @Composable get() = Remove

@@ -33,7 +33,6 @@ import mil.nga.msi.ui.radiobeacon.RadioBeaconAction
 import mil.nga.msi.ui.radiobeacon.RadioBeaconRoute
 import mil.nga.msi.ui.radiobeacon.RadioBeaconViewModel
 import mil.nga.msi.ui.theme.onSurfaceDisabled
-import mil.nga.msi.ui.theme.screenBackground
 
 @Composable
 fun RadioBeaconDetailScreen(

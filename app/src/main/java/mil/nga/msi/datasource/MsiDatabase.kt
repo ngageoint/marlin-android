@@ -9,6 +9,8 @@ import mil.nga.msi.datasource.dgpsstation.DgpsStation
 import mil.nga.msi.datasource.dgpsstation.DgpsStationDao
 import mil.nga.msi.datasource.electronicpublication.ElectronicPublication
 import mil.nga.msi.datasource.electronicpublication.ElectronicPublicationDao
+import mil.nga.msi.datasource.layer.Layer
+import mil.nga.msi.datasource.layer.LayerDao
 import mil.nga.msi.datasource.light.Light
 import mil.nga.msi.datasource.light.LightDao
 import mil.nga.msi.datasource.modu.Modu
@@ -28,6 +30,7 @@ import mil.nga.msi.datasource.radiobeacon.RadioBeaconDao
       Asam::class,
       DgpsStation::class,
       ElectronicPublication::class,
+      Layer::class,
       Light::class,
       NoticeToMariners::class,
       Modu::class,
@@ -43,12 +46,13 @@ import mil.nga.msi.datasource.radiobeacon.RadioBeaconDao
 abstract class MsiDatabase : RoomDatabase() {
 
    companion object {
-      const val VERSION = 2
+      const val VERSION = 3
    }
 
    abstract fun asamDao(): AsamDao
    abstract fun dgpsStationDao(): DgpsStationDao
    abstract fun electronicPublicationDao(): ElectronicPublicationDao
+   abstract fun layerDao(): LayerDao
    abstract fun lightDao(): LightDao
    abstract fun noticeToMarinersDao(): NoticeToMarinersDao
    abstract fun moduDao(): ModuDao

@@ -29,7 +29,6 @@ import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.modu.ModuAction
 import mil.nga.msi.ui.modu.ModuRoute
 import mil.nga.msi.ui.navigation.Point
-import mil.nga.msi.ui.theme.screenBackground
 import java.text.SimpleDateFormat
 import java.util.*
 

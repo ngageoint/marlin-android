@@ -30,7 +30,6 @@ import mil.nga.msi.ui.modu.ModuAction
 import mil.nga.msi.ui.modu.ModuViewModel
 import mil.nga.msi.ui.navigation.Point
 import mil.nga.msi.ui.theme.onSurfaceDisabled
-import mil.nga.msi.ui.theme.screenBackground
 import java.text.SimpleDateFormat
 import java.util.*
 

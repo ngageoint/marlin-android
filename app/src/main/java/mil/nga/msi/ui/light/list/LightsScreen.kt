@@ -33,7 +33,6 @@ import mil.nga.msi.ui.light.LightRoute
 import mil.nga.msi.ui.location.LocationTextButton
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.navigation.Point
-import mil.nga.msi.ui.theme.screenBackground
 
 @Composable
 fun LightsScreen(

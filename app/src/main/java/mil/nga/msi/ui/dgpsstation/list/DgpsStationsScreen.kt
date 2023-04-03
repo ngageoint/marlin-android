@@ -30,7 +30,6 @@ import mil.nga.msi.ui.dgpsstation.DgpsStationRoute
 import mil.nga.msi.ui.location.LocationTextButton
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.navigation.Point
-import mil.nga.msi.ui.theme.screenBackground
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

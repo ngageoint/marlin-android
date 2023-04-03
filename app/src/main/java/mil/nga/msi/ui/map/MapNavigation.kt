@@ -23,10 +23,9 @@ import mil.nga.msi.ui.map.cluster.MapAnnotation
 import mil.nga.msi.ui.map.filter.MapFilterScreen
 import mil.nga.msi.ui.map.settings.MapLightSettingsScreen
 import mil.nga.msi.ui.map.settings.MapSettingsScreen
+import mil.nga.msi.ui.map.settings.layers.*
 import mil.nga.msi.ui.modu.ModuRoute
-import mil.nga.msi.ui.navigation.MapAnnotationsType
-import mil.nga.msi.ui.navigation.Point
-import mil.nga.msi.ui.navigation.Route
+import mil.nga.msi.ui.navigation.*
 import mil.nga.msi.ui.port.PortRoute
 import mil.nga.msi.ui.radiobeacon.RadioBeaconRoute
 import mil.nga.msi.ui.sheet.PagingSheet
@@ -39,6 +38,7 @@ sealed class MapRoute(
 ): Route {
    object Map: MapRoute("map", "Map")
    object Settings: MapRoute("mapSettings", "Map Settings")
+   object WMSLayer: MapRoute("mapWMSLayer", "WMS Layer")
    object LightSettings: MapRoute("lightSettings", "Light Settings")
    object PagerSheet: MapRoute("annotationPagerSheet", "Map")
    object Filter: MapRoute("mapFilter", "Filters", "Filters")
@@ -124,6 +124,9 @@ fun NavGraphBuilder.mapGraph(
       bottomBarVisibility(false)
 
       MapSettingsScreen(
+         onLayers = {
+            navController.navigate(MapLayerRoute.Layers.name)
+         },
          onLightSettings = {
             navController.navigate(MapRoute.LightSettings.name)
          },

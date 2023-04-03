@@ -31,7 +31,6 @@ import mil.nga.msi.ui.navigation.Point
 import mil.nga.msi.ui.port.PortAction
 import mil.nga.msi.ui.port.PortViewModel
 import mil.nga.msi.ui.theme.onSurfaceDisabled
-import mil.nga.msi.ui.theme.screenBackground
 
 fun Int.asNonZeroOrNull(): Int? {
    return if(this != 0) {

@@ -27,8 +27,6 @@ import com.google.maps.android.compose.*
 import mil.nga.msi.R
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.BaseMapType
-import mil.nga.msi.ui.theme.onSurfaceDisabled
-import mil.nga.msi.ui.theme.screenBackground
 
 @Composable
 fun MapLightSettingsScreen(
@@ -116,7 +114,7 @@ private fun Options(
    Column(
       Modifier
          .fillMaxSize()
-         .background(MaterialTheme.colorScheme.screenBackground)
+         .background(MaterialTheme.colorScheme.surfaceVariant)
    ) {
       CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
          Text(

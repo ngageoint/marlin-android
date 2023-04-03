@@ -22,7 +22,6 @@ import mil.nga.msi.repository.navigationalwarning.NavigationalWarningKey
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.navigationalwarning.NavigationalWarningAction
 import mil.nga.msi.ui.navigationalwarning.NavigationalWarningViewModel
-import mil.nga.msi.ui.theme.screenBackground
 import java.text.SimpleDateFormat
 import java.util.*
 

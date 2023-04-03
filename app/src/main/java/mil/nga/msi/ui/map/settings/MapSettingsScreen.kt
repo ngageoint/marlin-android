@@ -10,6 +10,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Layers
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -27,6 +28,7 @@ import mil.nga.msi.ui.map.BaseMapType
 
 @Composable
 fun MapSettingsScreen(
+   onLayers: () -> Unit,
    onLightSettings: () -> Unit,
    onClose: () -> Unit,
    viewModel: MapSettingsViewModel = hiltViewModel()
@@ -64,6 +66,8 @@ fun MapSettingsScreen(
                onGarsToggled = { viewModel.setGARS(it) },
                onMgrsToggled = { viewModel.setMGRS(it) }
             )
+
+            Layers() { onLayers() }
 
             DataSourceSettings(onLightSettings)
 
@@ -132,13 +136,15 @@ fun MapLayerDialog(
          shape = RoundedCornerShape(4.dp)
       ) {
          Column(Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp)) {
-            Text(
-               text = "Base Map",
-               style = MaterialTheme.typography.titleLarge,
-               modifier = Modifier
-                  .height(64.dp)
-                  .wrapContentHeight(align = Alignment.CenterVertically)
-            )
+            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
+               Text(
+                  text = "Base Map",
+                  style = MaterialTheme.typography.titleLarge,
+                  modifier = Modifier
+                     .height(64.dp)
+                     .wrapContentHeight(align = Alignment.CenterVertically)
+               )
+            }
 
             BaseMapType.values().forEach { mapType ->
                Row(
@@ -186,10 +192,12 @@ private fun GridLayers(
             .padding(vertical = 8.dp, horizontal = 32.dp)
       ) {
          Column {
-            Text(
-               text = "GARS",
-               style = MaterialTheme.typography.bodyLarge
-            )
+            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
+               Text(
+                  text = "GARS",
+                  style = MaterialTheme.typography.bodyLarge
+               )
+            }
 
             CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                Text(
@@ -214,10 +222,12 @@ private fun GridLayers(
             .padding(vertical = 16.dp, horizontal = 32.dp)
       ) {
          Column {
-            Text(
-               text = "MGRS",
-               style = MaterialTheme.typography.bodyLarge
-            )
+            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
+               Text(
+                  text = "MGRS",
+                  style = MaterialTheme.typography.bodyLarge
+               )
+            }
 
             CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                Text(
@@ -236,9 +246,39 @@ private fun GridLayers(
 }
 
 @Composable
+private fun Layers(
+   onTap: () -> Unit
+) {
+   Column(
+      Modifier.padding(bottom = 16.dp)
+   ) {
+      Row(
+         verticalAlignment = Alignment.CenterVertically,
+         modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onTap() }
+            .padding(vertical = 16.dp, horizontal = 32.dp)
+      ) {
+         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+            Icon(Icons.Default.Layers,
+               modifier = Modifier.padding(end = 16.dp),
+               contentDescription = "Additional Map Layers"
+            )
+         }
+
+         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
+            Text(
+               text = "Additional Map Layers",
+               style = MaterialTheme.typography.bodyLarge
+            )
+         }
+      }
+   }
+}
+
+@Composable
 private fun DataSourceSettings(
    onLightSettings: () -> Unit
-
 ) {
    LightSettings(
       onSettings = onLightSettings

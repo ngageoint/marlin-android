@@ -1,5 +1,6 @@
 <resources>
-    <style name="Theme.Msi" parent="android:Theme.Material.Light.NoActionBar">
+    <style name="Theme.Msi" parent="android:Theme.Material.NoActionBar">
         <item name="android:statusBarColor">@color/nga_blue</item>
+        <item name="android:windowBackground">@android:color/black</item>
     </style>
 </resources>

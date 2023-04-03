@@ -28,7 +28,6 @@ import mil.nga.msi.ui.asam.AsamRoute
 import mil.nga.msi.ui.location.LocationTextButton
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.navigation.Point
-import mil.nga.msi.ui.theme.screenBackground
 import java.text.SimpleDateFormat
 import java.util.*
 import androidx.compose.material3.*
