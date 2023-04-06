@@ -64,7 +64,8 @@ import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.seconds
 
 data class MapPosition(
-   val location: MapLocation,
+   val location: MapLocation? = null,
+   val bounds: LatLngBounds? = null,
    val name: String? = null
 )
 
@@ -421,14 +422,21 @@ private fun Map(
    ) {
       if (isMapLoaded) {
          LaunchedEffect(destination) {
-            destination?.let { destination ->
+            destination?.location?.let { location ->
                scope.launch {
                   val update = CameraUpdateFactory.newLatLngZoom(
                      LatLng(
-                        destination.location.latitude,
-                        destination.location.longitude
-                     ), destination.location.zoom.toFloat()
+                        location.latitude,
+                        location.longitude
+                     ), location.zoom.toFloat()
                   )
+                  cameraPositionState.animate(update)
+               }
+            }
+
+            destination?.bounds?.let { bounds ->
+               scope.launch {
+                  val update = CameraUpdateFactory.newLatLngBounds(bounds, 0)
                   cameraPositionState.animate(update)
                }
             }

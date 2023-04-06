@@ -6,12 +6,12 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.outlined.Layers
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -19,9 +19,6 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.maps.android.compose.*
 import kotlinx.coroutines.launch
-import mil.nga.geopackage.map.tiles.overlay.FeatureOverlay
-import mil.nga.geopackage.map.tiles.overlay.XYZGeoPackageOverlay
-import mil.nga.geopackage.tiles.features.DefaultFeatureTiles
 import mil.nga.msi.datasource.layer.Layer
 import mil.nga.msi.datasource.layer.LayerType
 import mil.nga.msi.ui.main.TopBar
@@ -55,14 +52,15 @@ fun MapGeoPackageLayerSettingsScreen(
                   done(Layer(
                      id = state.layer?.id ?: 0,
                      name = state.layer?.name ?: "",
+                     type = LayerType.GEOPACKAGE,
                      url = state.selectedLayers.joinToString(",") { it },
                      filePath = state.layer?.filePath,
-                     tables = geoPackageState?.layers?.map { it.table } ?: emptyList(),
-                     type = LayerType.GEOPACKAGE
+                     tables = geoPackageState?.overlays?.map { it.table } ?: emptyList(),
+                     boundingBox = state.boundingBox
                   ))
                },
                onLayerChecked = { name, checked ->
-                  viewModel.setLayer(name, checked)
+                  viewModel.enableLayer(name, checked)
                },
                modifier = Modifier
                   .fillMaxWidth()
@@ -99,14 +97,15 @@ fun MapGeoPackageLayerSettingsScreen(
                   done(Layer(
                      id = state.layer?.id ?: 0,
                      name = state.layer?.name ?: "",
+                     type = LayerType.GEOPACKAGE,
                      url = state.selectedLayers.joinToString(",") { it },
                      filePath = state.layer?.filePath,
-                     tables = state.layers.map { it.table },
-                     type = LayerType.GEOPACKAGE
+                     tables = state.overlays.map { it.table },
+                     boundingBox = state.boundingBox
                   ))
                },
                onLayerChecked = { name, checked ->
-                  viewModel.setLayer(name, checked)
+                  viewModel.enableLayer(name, checked)
                },
                modifier = Modifier
                   .fillMaxWidth()
@@ -126,7 +125,7 @@ fun MapGeoPackageLayerSettingsScreen(
 ) {
    val geoPackageState by viewModel.geopackageState.observeAsState()
 
-   LaunchedEffect(layer) { viewModel.setLayer(layer) }
+   LaunchedEffect(layer) { viewModel.enableLayer(layer) }
 
    Column {
       TopBar(
@@ -143,14 +142,15 @@ fun MapGeoPackageLayerSettingsScreen(
                   done(Layer(
                      id = layer.id,
                      name = layer.name,
-                     url = state.layers?.map { it.table }?.joinToString(",") ?: "",
+                     type = LayerType.GEOPACKAGE,
+                     url = state.selectedLayers.joinToString(",") { it },
                      filePath = layer.filePath,
-                     tables = state.layers.map { it.table },
-                     type = LayerType.GEOPACKAGE
+                     tables = state.overlays.map { it.table },
+                     boundingBox = state.boundingBox
                   ))
                },
                onLayerChecked = { name, checked ->
-                  viewModel.setLayer(name, checked)
+                  viewModel.enableLayer(name, checked)
                },
                modifier = Modifier
                   .fillMaxWidth()
@@ -188,10 +188,13 @@ private fun GeoPackageLayer(
                .verticalScroll(scrollState)
                .weight(1f)
          ) {
-            geoPackageState.layers.forEach { layer ->
+            geoPackageState.overlays.forEach { overlay ->
                Table(
-                  table = layer.table,
+                  table = overlay.table,
                   layers = geoPackageState.selectedLayers,
+                  onZoom = {
+                     latLngBounds = overlay.boundingBox
+                  },
                   onLayerChecked = onLayerChecked
                )
             }
@@ -220,6 +223,7 @@ private fun GeoPackageLayer(
 private fun Table(
    table: String,
    layers: List<String>,
+   onZoom: () -> Unit,
    onLayerChecked: (String, Boolean) -> Unit
 ) {
    ListItem(
@@ -237,12 +241,18 @@ private fun Table(
          )
       },
       trailingContent = {
-         Checkbox(
-            checked = layers.contains(table),
-            onCheckedChange = { checked ->
-               onLayerChecked(table, checked)
+         Row {
+            IconButton(onClick = { onZoom() }) {
+               Icon(Icons.Default.MyLocation, contentDescription = "Zoom to GeoPackage Bounds")
             }
-         )
+
+            Checkbox(
+               checked = layers.contains(table),
+               onCheckedChange = { checked ->
+                  onLayerChecked(table, checked)
+               }
+            )
+         }
       }
    )
 }
@@ -279,20 +289,8 @@ private fun Map(
       modifier = modifier
    ) {
       geoPackageState.selectedLayers.forEach { table ->
-         geoPackageState.layers.find { it.table == table }?.let { layer ->
-            val tileProvider = when(layer.type) {
-               GeoPackageLayerType.TILE -> {
-                  val tileDao = geoPackageState.geoPackage.getTileDao(layer.table)
-                  XYZGeoPackageOverlay(tileDao)
-               }
-               GeoPackageLayerType.FEATURE -> {
-                  val featureDao = geoPackageState.geoPackage.getFeatureDao(layer.table)
-                  val featureTiles = DefaultFeatureTiles(LocalContext.current, geoPackageState.geoPackage, featureDao)
-                  FeatureOverlay(featureTiles)
-               }
-            }
-
-            TileOverlay(tileProvider = tileProvider)
+         geoPackageState.overlays.find { it.table == table }?.let { overlay ->
+            TileOverlay(tileProvider = overlay.tileProvider)
          }
       }
    }

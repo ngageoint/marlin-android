@@ -1,7 +1,6 @@
 package mil.nga.msi.location
 
 import android.location.Location
-import android.util.Log
 import androidx.lifecycle.Observer
 import androidx.lifecycle.asLiveData
 import kotlinx.coroutines.flow.first

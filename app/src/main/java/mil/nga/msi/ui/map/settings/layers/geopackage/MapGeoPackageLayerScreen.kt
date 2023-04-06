@@ -11,12 +11,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.maps.android.compose.*
 import kotlinx.coroutines.launch
 import mil.nga.msi.datasource.layer.Layer
-import mil.nga.msi.datasource.layer.LayerType
 import mil.nga.msi.ui.main.TopBar
-import mil.nga.msi.ui.map.MapRoute
 import mil.nga.msi.ui.map.settings.layers.MapLayerRoute
-import java.net.URLDecoder
-import java.nio.charset.StandardCharsets
 
 @Composable
 fun MapGeoPackageLayerScreen(
@@ -39,7 +35,6 @@ fun MapGeoPackageLayerScreen(
       ) {
          Column(Modifier.fillMaxHeight()) {
             GeoPackageLayer(
-               url = layer.url,
                name = name,
                onNameChanged = { name = it }
             )
@@ -66,7 +61,6 @@ fun MapGeoPackageLayerScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun GeoPackageLayer(
-   url: String,
    name: String,
    onNameChanged: (String) -> Unit
 ) {

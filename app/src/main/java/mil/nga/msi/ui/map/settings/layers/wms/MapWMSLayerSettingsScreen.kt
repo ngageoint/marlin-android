@@ -7,6 +7,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material.icons.outlined.Layers
 import androidx.compose.material3.*
@@ -57,12 +58,13 @@ fun MapWMSLayerSettingsScreen(
                      id = wmsState.layer?.id ?: 0,
                      name = wmsState.layer?.name ?: "",
                      url = wmsState.mapUrl,
-                     type = LayerType.WMS
+                     type = LayerType.WMS,
+                     boundingBox = wmsState.boundingBox
                   )
                   done(layer)
                },
-               onLayerChecked = { name, checked ->
-                  viewModel.setLayer(name, checked)
+               onLayerChecked = { layer, name, checked ->
+                  viewModel.setLayer(layer, name, checked)
                },
                modifier = Modifier
                   .fillMaxWidth()
@@ -102,11 +104,12 @@ fun MapWMSLayerSettingsScreen(
                      id = layer.id,
                      name = layer.name,
                      url = wmsState.mapUrl,
-                     type = LayerType.WMS
+                     type = LayerType.WMS,
+                     boundingBox = layer.boundingBox
                   ))
                },
-               onLayerChecked = { name, checked ->
-                  viewModel.setLayer(name, checked)
+               onLayerChecked = { layer, name, checked ->
+                  viewModel.setLayer(layer, name, checked)
                },
                modifier = Modifier
                   .fillMaxWidth()
@@ -121,7 +124,7 @@ fun MapWMSLayerSettingsScreen(
 private fun WMSLayer(
    wmsState: WmsState,
    onDone: () -> Unit,
-   onLayerChecked: (String, Boolean) -> Unit,
+   onLayerChecked: (mil.nga.msi.network.layer.wms.Layer, String, Boolean) -> Unit,
    modifier: Modifier = Modifier
 ) {
    val scrollState = rememberScrollState()
@@ -150,19 +153,16 @@ private fun WMSLayer(
                WMSCapabilitiesLayer(
                   layer = layer,
                   wmsLayers = wmsState.layers,
-                  onLayerChecked = { layer, name, checked ->
-                     if (checked) {
-                        latLngBounds = layer.boundingBoxes.firstOrNull {
-                           it.crs.equals("CRS:84", ignoreCase = true)
-                        }?.let {
-                           val southwest = LatLng(it.minY, it.minX)
-                           val northeast = LatLng(it.maxY, it.maxX)
-                           LatLngBounds(southwest, northeast)
-                        }
+                  onZoom = { zoomLayer ->
+                     latLngBounds = zoomLayer.boundingBoxes.firstOrNull {
+                        it.crs.equals("CRS:84", ignoreCase = true)
+                     }?.let {
+                        val southwest = LatLng(it.minY, it.minX)
+                        val northeast = LatLng(it.maxY, it.maxX)
+                        LatLngBounds(southwest, northeast)
                      }
-
-                     onLayerChecked(name, checked)
-                  }
+                  },
+                  onLayerChecked = onLayerChecked
                )
             }
          }
@@ -190,6 +190,7 @@ private fun WMSLayer(
 private fun WMSCapabilitiesLayer(
    layer: mil.nga.msi.network.layer.wms.Layer,
    wmsLayers: List<String>,
+   onZoom: (mil.nga.msi.network.layer.wms.Layer) -> Unit,
    onLayerChecked: (mil.nga.msi.network.layer.wms.Layer, String, Boolean) -> Unit
 ) {
    if (layer.layers.isNotEmpty()) {
@@ -218,7 +219,7 @@ private fun WMSCapabilitiesLayer(
          },
          trailingContent = {
             IconButton(
-               onClick = { }
+               onClick = { onZoom(layer) }
             ) {
                Icon(
                   Icons.Default.ExpandMore,
@@ -232,11 +233,11 @@ private fun WMSCapabilitiesLayer(
          WMSCapabilitiesLayer(
             layer = it,
             wmsLayers = wmsLayers,
+            onZoom = onZoom,
             onLayerChecked = onLayerChecked
          )
       }
    } else if (layer.hasTiles()) {
-      // TODO filter for 3857 or google epsg
       ListItem(
          headlineText = {
             Text(
@@ -261,12 +262,18 @@ private fun WMSCapabilitiesLayer(
             )
          },
          trailingContent = {
-            Checkbox(
-               checked = wmsLayers.contains(layer.name),
-               onCheckedChange = { checked ->
-                  layer.name?.let { name -> onLayerChecked(layer, name, checked) }
+            Row {
+               IconButton(onClick = { onZoom(layer) }) {
+                  Icon(Icons.Default.MyLocation, contentDescription = "Zoom to GeoPackage Bounds")
                }
-            )
+
+               Checkbox(
+                  checked = wmsLayers.contains(layer.name),
+                  onCheckedChange = { checked ->
+                     layer.name?.let { name -> onLayerChecked(layer, name, checked) }
+                  }
+               )
+            }
          }
       )
    }

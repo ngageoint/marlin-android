@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 3,
-    "identityHash": "c2652fb87acaecc616990a3fac85e07d",
+    "identityHash": "74dbb3f22b55d635e6a95fdb256332ac",
     "entities": [
       {
         "tableName": "asams",
@@ -413,7 +413,7 @@
       },
       {
         "tableName": "layers",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `type` TEXT NOT NULL, `url` TEXT NOT NULL, `name` TEXT NOT NULL, `visible` INTEGER NOT NULL, `min_zoom` INTEGER, `max_zoom` INTEGER, `file_path` TEXT, `tables` TEXT NOT NULL, `refresh_rate` INTEGER)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `type` TEXT NOT NULL, `url` TEXT NOT NULL, `name` TEXT NOT NULL, `visible` INTEGER NOT NULL, `min_zoom` INTEGER, `max_zoom` INTEGER, `file_path` TEXT, `tables` TEXT NOT NULL, `refresh_rate` INTEGER, `minLatitude` REAL, `minLongitude` REAL, `maxLatitude` REAL, `maxLongitude` REAL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -473,6 +473,30 @@
             "fieldPath": "refreshRate",
             "columnName": "refresh_rate",
             "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "boundingBox.minLatitude",
+            "columnName": "minLatitude",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "boundingBox.minLongitude",
+            "columnName": "minLongitude",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "boundingBox.maxLatitude",
+            "columnName": "maxLatitude",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "boundingBox.maxLongitude",
+            "columnName": "maxLongitude",
+            "affinity": "REAL",
             "notNull": false
           }
         ],
@@ -1792,7 +1816,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'c2652fb87acaecc616990a3fac85e07d')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '74dbb3f22b55d635e6a95fdb256332ac')"
     ]
   }
 }

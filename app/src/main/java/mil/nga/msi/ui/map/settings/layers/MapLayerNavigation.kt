@@ -1,8 +1,6 @@
 package mil.nga.msi.ui.map.settings.layers
 
-import android.content.Intent
 import android.net.Uri
-import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.*
 import androidx.navigation.compose.composable
@@ -59,6 +57,13 @@ fun NavGraphBuilder.mapLayerGraph(
             }
 
             navController.navigate(route)
+         },
+         onZoom = { bounds ->
+            val encoded = Uri.encode(Json.encodeToString(Bounds.fromLatLngBounds(bounds)))
+            val route = "${MapRoute.Map.name}?bounds=${encoded}"
+            navController.navigate(route) {
+               popUpTo(route) { inclusive = true }
+            }
          },
          onAddLayer = {
             val route = MapLayerRoute.NewLayer.name

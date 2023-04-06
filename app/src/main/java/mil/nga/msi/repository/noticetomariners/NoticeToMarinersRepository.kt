@@ -1,7 +1,6 @@
 package mil.nga.msi.repository.noticetomariners
 
 import android.net.Uri
-import android.util.Log
 import androidx.lifecycle.map
 import androidx.work.WorkInfo
 import androidx.work.WorkManager

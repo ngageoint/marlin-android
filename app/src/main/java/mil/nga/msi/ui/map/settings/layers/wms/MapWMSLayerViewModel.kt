@@ -5,10 +5,13 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import mil.nga.msi.datasource.layer.BoundingBox
 import mil.nga.msi.datasource.layer.Layer
 import mil.nga.msi.network.layer.wms.WMSCapabilities
 import mil.nga.msi.repository.layer.LayerRepository
@@ -18,6 +21,7 @@ data class WmsState(
    val layer: Layer? = null,
    val baseUrl: String,
    val layers: List<String>,
+   val boundingBox: BoundingBox? = null,
    val wmsCapabilities: WMSCapabilities
 ) {
    val mapUrl = mapUrl()
@@ -96,13 +100,34 @@ class MapWMSLayerViewModel @Inject constructor(
       }
    }
 
-   fun setLayer(layer: String, enabled: Boolean) {
+   fun setLayer(layer: mil.nga.msi.network.layer.wms.Layer, name: String, enabled: Boolean) {
       wmsState.value?.let { wmsState ->
-         val layers = wmsState.layers.toMutableSet().apply {
-            if (enabled) add(layer) else remove(layer)
+         val layerNames = wmsState.layers.toMutableSet().apply {
+            if (enabled) add(name) else remove(name)
          }.toList()
 
-         _wmsState.value = wmsState.copy(layers = layers)
+         val builder = LatLngBounds.Builder()
+         layerNames.mapNotNull {
+            getLayer(it, layer)
+         }.forEach {
+            it.boundingBoxes.firstOrNull { boundingBox ->
+               boundingBox.crs.equals("CRS:84", ignoreCase = true)
+            }?.let { boundingBox ->
+               val southwest = LatLng(boundingBox.minY, boundingBox.minX)
+               val northeast = LatLng(boundingBox.maxY, boundingBox.maxX)
+               builder.include(southwest)
+               builder.include(northeast)
+            }
+         }
+
+         val boundingBox = try {
+            BoundingBox.fromLatLngBounds(builder.build())
+         } catch (_: Exception) { null }
+
+         _wmsState.value = wmsState.copy(
+            layers = layerNames,
+            boundingBox = boundingBox
+         )
       }
    }
 
@@ -111,6 +136,21 @@ class MapWMSLayerViewModel @Inject constructor(
          layerRepository.createLayer(layer)
       } else {
          layerRepository.updateLayer(layer)
+      }
+   }
+
+   private fun getLayer(
+      name: String,
+      layer: mil.nga.msi.network.layer.wms.Layer
+   ): mil.nga.msi.network.layer.wms.Layer? {
+      return if (layer.name == name) {
+         layer
+      } else if (layer.layers.isNotEmpty()) {
+         layer.layers.first {
+            getLayer(name, it) != null
+         }
+      } else {
+         null
       }
    }
 

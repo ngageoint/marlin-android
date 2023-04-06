@@ -1,6 +1,7 @@
 package mil.nga.msi.ui.map.settings.layers
 
 import androidx.lifecycle.*
+import com.google.android.gms.maps.model.LatLngBounds
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
@@ -9,6 +10,11 @@ import mil.nga.msi.repository.layer.LayerRepository
 import mil.nga.msi.repository.preferences.UserPreferencesRepository
 import javax.inject.Inject
 
+data class LayerState(
+   val layer: Layer,
+   val latLngBounds: LatLngBounds? = null
+)
+
 @HiltViewModel
 class MapLayersViewModel @Inject constructor(
    private val layerRepository: LayerRepository,
@@ -16,7 +22,11 @@ class MapLayersViewModel @Inject constructor(
 ): ViewModel() {
    val layers = combine(userPreferencesRepository.layers, layerRepository.observeLayers()) { order, layers ->
       val orderById = order.withIndex().associate { (index, it) -> it to index }
-      layers.sortedBy { orderById[it.id.toInt()] }
+      layers
+         .sortedBy { orderById[it.id.toInt()] }
+         .map {
+            LayerState(layer = it)
+         }
    }.asLiveData()
 
    fun setLayerOrder(layers: List<Int>) {

@@ -11,11 +11,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.maps.android.compose.*
 import kotlinx.coroutines.launch
 import mil.nga.msi.datasource.layer.Layer
-import mil.nga.msi.datasource.layer.LayerType
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.MapRoute
 import java.net.URLDecoder
-import java.nio.charset.StandardCharsets
 
 @Composable
 fun MapWMSLayerScreen(
@@ -83,7 +81,7 @@ private fun WMSLayer(
       )
 
       Text(
-         text = URLDecoder.decode(url),
+         text = URLDecoder.decode(url, "UTF-8"),
          style = MaterialTheme.typography.titleMedium,
          modifier = Modifier.padding(bottom = 4.dp)
       )

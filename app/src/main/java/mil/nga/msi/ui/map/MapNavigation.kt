@@ -53,18 +53,27 @@ fun NavGraphBuilder.mapGraph(
    annotationProvider: AnnotationProvider
 ) {
    composable(
-      route = "${MapRoute.Map.name}?point={point}",
-      arguments = listOf(navArgument("point") {
+      route = "${MapRoute.Map.name}?point={point}&bounds={bounds}",
+      arguments = listOf(
+         navArgument("point") {
             defaultValue = null
             type = NavType.Point
+            nullable = true
+         },
+         navArgument("bounds") {
+            defaultValue = null
+            type = NavType.Bounds
             nullable = true
          }
       )
    ) { backstackEntry ->
       bottomBarVisibility(true)
       val location = backstackEntry.arguments?.getParcelable<Point?>("point")?.asMapLocation(16f)
-      val destination: MapPosition? = if (location != null) {
-         MapPosition(location)
+      val latLngBounds = backstackEntry.arguments?.getParcelable<Bounds?>("bounds")?.asLatLngBounds()
+      val destination = if (location != null) {
+         MapPosition(location = location)
+      } else if (latLngBounds != null) {
+         MapPosition(bounds = latLngBounds)
       } else null
 
       val navStackBackEntry by navController.currentBackStackEntryAsState()

@@ -1,9 +1,6 @@
 package mil.nga.msi.ui.map.overlay
 
 import android.net.Uri
-import android.util.Log
-import com.google.android.gms.maps.model.UrlTileProvider
-import mil.nga.msi.datasource.layer.Layer
 import java.net.MalformedURLException
 import java.net.URL
 import kotlin.math.*

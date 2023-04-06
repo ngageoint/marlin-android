@@ -2,21 +2,13 @@ package mil.nga.msi.ui.home
 
 import android.content.Intent
 import android.net.Uri
-import android.util.Log
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
-import androidx.navigation.NavDeepLink
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navDeepLink
-import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import mil.nga.msi.datasource.layer.Layer
-import mil.nga.msi.datasource.layer.LayerType
 import mil.nga.msi.ui.asam.asamGraph
 import mil.nga.msi.ui.dgpsstation.dgpsStationGraph
 import mil.nga.msi.ui.electronicpublication.electronicPublicationGraph

@@ -2,13 +2,10 @@ package mil.nga.msi.datasource.layer
 
 import android.os.Parcelable
 import androidx.room.ColumnInfo
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import kotlinx.parcelize.Parcelize
-
-enum class LayerType {
-   XYZ, TMS, WMS, GEOPACKAGE
-}
 
 @Entity(tableName = "layers")
 @Parcelize
@@ -43,5 +40,8 @@ data class Layer(
    var tables: List<String> = mutableListOf(),
 
    @ColumnInfo(name = "refresh_rate")
-   var refreshRate: Int? = null
+   var refreshRate: Int? = null,
+
+   @Embedded
+   var boundingBox: BoundingBox? = null
 ): Parcelable

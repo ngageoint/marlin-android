@@ -11,11 +11,10 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.AddBox
 import androidx.compose.material3.*
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
@@ -28,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.google.android.gms.maps.model.LatLngBounds
 import mil.nga.msi.datasource.layer.Layer
 import mil.nga.msi.datasource.layer.LayerType
 import mil.nga.msi.ui.drag.DraggableItem
@@ -40,6 +40,7 @@ import mil.nga.msi.ui.theme.remove
 @Composable
 fun MapLayersScreen(
    onTap: (Long, LayerType) -> Unit,
+   onZoom: (LatLngBounds) -> Unit,
    onAddLayer: () -> Unit,
    onClose: () -> Unit,
    viewModel: MapLayersViewModel = hiltViewModel()
@@ -57,38 +58,15 @@ fun MapLayersScreen(
          color = MaterialTheme.colorScheme.surfaceVariant
       ) {
          Column(
-            Modifier
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
                .fillMaxSize()
                .padding(vertical = 32.dp)
          ) {
-            Row(
-               verticalAlignment = Alignment.CenterVertically,
-               modifier = Modifier
-                  .fillMaxWidth()
-                  .background(MaterialTheme.colorScheme.surface)
-                  .clickable {
-                     onAddLayer()
-                  }
-                  .padding(vertical = 16.dp, horizontal = 16.dp)
-            ) {
-               CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-                  Icon(Icons.Outlined.AddBox,
-                     modifier = Modifier.padding(end = 16.dp),
-                     contentDescription = "Add New Layer"
-                  )
-               }
-
-               CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
-                  Text(
-                     text = "Add New Layer",
-                     style = MaterialTheme.typography.bodyLarge
-                  )
-               }
-            }
-
             Layers(
                layers,
                onTap = { onTap(it.id, it.type) },
+               onZoom = onZoom,
                onToggle = { layer, enabled -> viewModel.enableLayer(layer, enabled) },
                onRemove = { viewModel.deleteLayer(it) },
                onLayerReorder = { fromIndex, toIndex ->
@@ -96,9 +74,23 @@ fun MapLayersScreen(
                      val removed = removeAt(fromIndex)
                      add(toIndex, removed)
                   }
-                  viewModel.setLayerOrder(ordered.map { it.id.toInt() })
-               }
+                  viewModel.setLayerOrder(ordered.map { it.layer.id.toInt() })
+               },
+               modifier = Modifier
+                  .weight(1f)
+                  .padding(bottom = 24.dp)
             )
+
+            androidx.compose.material3.ExtendedFloatingActionButton(
+               onClick = { onAddLayer() }
+            ) {
+               Icon(
+                  imageVector = Icons.Outlined.AddBox,
+                  contentDescription = "Zoom to ASAM"
+               )
+               Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+               Text("Add New Layer")
+            }
          }
       }
    }
@@ -107,11 +99,13 @@ fun MapLayersScreen(
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 private fun Layers(
-   layers: List<Layer>,
+   layers: List<LayerState>,
    onTap: (Layer) -> Unit,
+   onZoom: (LatLngBounds) -> Unit,
    onToggle: (Layer, Boolean) -> Unit,
    onRemove: (Layer) -> Unit,
-   onLayerReorder: (from: Int, to: Int) -> Unit
+   onLayerReorder: (from: Int, to: Int) -> Unit,
+   modifier: Modifier = Modifier
 ) {
    val listState = rememberLazyListState()
    val dragDropState = rememberDragDropState(listState) { from, to ->
@@ -119,8 +113,7 @@ private fun Layers(
    }
 
    Column(
-      Modifier
-         .padding(vertical = 16.dp)
+      modifier = modifier
    ) {
       CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
          Text(
@@ -147,13 +140,13 @@ private fun Layers(
          ) {
             itemsIndexed(
                items = layers,
-               key = { _, item -> item.id }
-            ) { index, layer ->
+               key = { _, state -> state.layer.id }
+            ) { index, state ->
                DraggableItem(dragDropState, index) { isDragging ->
                   val dismissState = rememberDismissState()
 
                   if (dismissState.isDismissed(DismissDirection.EndToStart)) {
-                     onRemove(layer)
+                     onRemove(state.layer)
                   }
 
                   SwipeToDismiss(
@@ -188,12 +181,11 @@ private fun Layers(
                      }
                   ) {
                      Layer(
-                        layer = layer,
+                        state = state,
                         isDragging = isDragging,
-                        onTap = { onTap(layer) },
-                        onToggle = { layer, enabled ->
-                           onToggle(layer, enabled)
-                        }
+                        onTap = { onTap(state.layer) },
+                        onZoom = onZoom,
+                        onToggle = { layer, enabled -> onToggle(layer, enabled) }
                      )
                   }
                }
@@ -206,9 +198,10 @@ private fun Layers(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun Layer(
-   layer: Layer,
+   state: LayerState,
    isDragging: Boolean,
    onTap: () -> Unit,
+   onZoom: (LatLngBounds) -> Unit,
    onToggle: (Layer, Boolean) -> Unit
 ) {
    val elevation by animateDpAsState(if (isDragging) 4.dp else 0.dp)
@@ -216,11 +209,11 @@ private fun Layer(
    ListItem(
       tonalElevation = elevation,
       shadowElevation = elevation,
-      headlineText = { Text(layer.name) },
+      headlineText = { Text(state.layer.name) },
       supportingText = {
-         val text = when (layer.type) {
+         val text = when (state.layer.type) {
             LayerType.GEOPACKAGE -> "GeoPackage"
-            else -> layer.url
+            else -> state.layer.url
          }
 
          Text(
@@ -236,12 +229,22 @@ private fun Layer(
          )
       },
       trailingContent = {
-         androidx.compose.material3.Checkbox(
-            checked = layer.visible,
-            onCheckedChange = {
-               onToggle(layer, !layer.visible)
+         Row {
+            state.layer.boundingBox?.let { boundingBox ->
+               androidx.compose.material3.IconButton(
+                  onClick = { onZoom(boundingBox.latLngBounds) }
+               ) {
+                  Icon(Icons.Default.MyLocation, contentDescription = "Zoom to GeoPackage")
+               }
             }
-         )
+
+            androidx.compose.material3.Checkbox(
+               checked = state.layer.visible,
+               onCheckedChange = {
+                  onToggle(state.layer, !state.layer.visible)
+               }
+            )
+         }
       },
       modifier = Modifier.clickable { onTap() }
    )
