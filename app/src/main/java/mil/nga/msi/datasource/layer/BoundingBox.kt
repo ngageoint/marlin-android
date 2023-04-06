@@ -4,6 +4,7 @@ import android.os.Parcelable
 import androidx.room.Ignore
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
+import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
@@ -18,6 +19,7 @@ data class BoundingBox(
 ): Parcelable {
    @Ignore
    @Transient
+   @IgnoredOnParcel
    val latLngBounds = LatLngBounds(
       LatLng(minLatitude, minLongitude),
       LatLng(maxLatitude, maxLongitude)

@@ -82,6 +82,7 @@ fun MapLayersScreen(
             )
 
             androidx.compose.material3.ExtendedFloatingActionButton(
+               containerColor = MaterialTheme.colorScheme.primary,
                onClick = { onAddLayer() }
             ) {
                Icon(

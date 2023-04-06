@@ -20,33 +20,20 @@ interface NoticeToMarinersDao {
    fun count(): Int
 
    @Query("SELECT * FROM notice_to_mariners")
+   @RewriteQueriesToDropUnusedColumns
    fun observeNoticeToMariners(): PagingSource<Int, NoticeToMarinersListItem>
 
    @Query("SELECT * FROM notice_to_mariners ORDER BY notice_number DESC LIMIT 1")
    suspend fun getLatestNoticeToMariners(): NoticeToMariners?
-
-//   @Query("SELECT * FROM asams WHERE reference = :reference")
-//   fun observeAsam(reference: String): LiveData<Asam>
 
    @Query("SELECT * FROM notice_to_mariners")
    suspend fun getNoticeToMariners(): List<NoticeToMariners>
 
    @Query("SELECT * FROM notice_to_mariners WHERE notice_number = :noticeNumber")
    suspend fun getNoticeToMariners(noticeNumber: Int): List<NoticeToMariners>
-//
-//   @RawQuery(observedEntities = [Asam::class])
-//   @RewriteQueriesToDropUnusedColumns
-//   fun getAsams(query: SupportSQLiteQuery): List<Asam>
-//
-//   @Query("SELECT * FROM asams WHERE reference = :reference")
-//   suspend fun getAsam(reference: String): Asam?
-//
+
    @Query("SELECT * FROM notice_to_mariners ORDER BY notice_number DESC")
    fun getNoticeToMarinersListItems(): Flow<List<NoticeToMariners>>
-//
-//   @RawQuery(observedEntities = [Asam::class])
-//   @RewriteQueriesToDropUnusedColumns
-//   fun observeAsamMapItems(query: SupportSQLiteQuery): Flow<List<AsamMapItem>>
 
    @Query("SELECT * FROM notice_to_mariners WHERE ods_entry_id IN (:odsEntryIds)")
    suspend fun existingNoticeToMariners(odsEntryIds: List<Int>): List<NoticeToMariners>

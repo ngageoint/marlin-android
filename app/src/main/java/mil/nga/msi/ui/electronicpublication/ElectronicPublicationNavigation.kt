@@ -47,7 +47,7 @@ fun NavGraphBuilder.electronicPublicationGraph(
         composable(
             route = "${ElectronicPublicationRoute.List.name}/{pubType}",
             arguments = listOf(navArgument("pubType") { type = NavType.IntType })
-        ) { navBackStackEntry ->
+        ) {
             bottomBarVisibility(true)
             ElectronicPublicationTypeBrowseRoute(
                 onBackToRoot = { navController.popBackStack() },

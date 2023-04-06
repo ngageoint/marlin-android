@@ -21,6 +21,7 @@ interface AsamDao {
    fun count(): Int
 
    @Query("SELECT * FROM asams")
+   @RewriteQueriesToDropUnusedColumns
    fun observeAsams(): PagingSource<Int, AsamListItem>
 
    @Query("SELECT * FROM asams WHERE reference = :reference")

@@ -15,6 +15,7 @@ interface ElectronicPublicationDao {
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     suspend fun update(x: ElectronicPublication)
+
     @Update(onConflict = OnConflictStrategy.ABORT)
     suspend fun update(allThese: List<ElectronicPublication>)
 
@@ -34,7 +35,9 @@ interface ElectronicPublicationDao {
     suspend fun findDownloadingElectronicPublications(): List<ElectronicPublication>
 
     @Query("select * from epubs order by s3_key asc")
+    @RewriteQueriesToDropUnusedColumns
     fun observeElectronicPublications(): PagingSource<Int, ElectronicPublicationListItem>
+
     @Query("select * from epubs where pub_type_id = :typeId order by pub_download_order asc, section_order asc, s3_key asc")
     fun observeElectronicPublicationsOfType(typeId: Int): Flow<List<ElectronicPublication>>
 

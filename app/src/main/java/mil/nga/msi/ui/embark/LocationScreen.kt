@@ -47,7 +47,6 @@ private fun Location(
    done: () -> Unit,
 ) {
    var height by remember { mutableStateOf(0) }
-   val scrollState = rememberScrollState()
    val locationPermissionState = rememberMultiplePermissionsState(
       listOf(
          android.Manifest.permission.ACCESS_FINE_LOCATION,

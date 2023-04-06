@@ -155,8 +155,8 @@ fun NavGraphBuilder.mapLayerGraph(
 
       MapWMSLayerSettingsScreen(
          layer = layer,
-         done = { layer ->
-            val encoded = Uri.encode(Json.encodeToString(layer))
+         done = {
+            val encoded = Uri.encode(Json.encodeToString(it))
             val route = "${MapLayerRoute.WMSLayer.name}?layer=${encoded}"
             navController.navigate(route) {
                popUpTo(route) { inclusive = true }
@@ -219,8 +219,8 @@ fun NavGraphBuilder.mapLayerGraph(
 
       MapGeoPackageLayerSettingsScreen(
          layer = layer,
-         done = { layer ->
-            val encoded = Uri.encode(Json.encodeToString(layer))
+         done = {
+            val encoded = Uri.encode(Json.encodeToString(it))
             val route = "${MapLayerRoute.GeoPackageLayer.name}?layer=${encoded}&import=${import}"
             navController.navigate(route) {
                popUpTo(route) { inclusive = true }

@@ -26,10 +26,10 @@ class ElectronicPublicationTypeBrowseViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val pubTypeArg: Int = checkNotNull(savedStateHandle["pubType"], { "missing pubType argument" })
-    val pubTypeState: State<ElectronicPublicationType> = derivedStateOf { ElectronicPublicationType.fromTypeCode(pubTypeArg) }
+    private val pubTypeState: State<ElectronicPublicationType> = derivedStateOf { ElectronicPublicationType.fromTypeCode(pubTypeArg) }
 
     private val publications = ePubRepo.observeElectronicPublicationsOfType(pubTypeState.value)
-        .onEach { pubs ->
+        .onEach {
             mutableCurrentNodeState.update {
                 if (it is PublicationsLoadingNode) {
                     val parent = it.parent

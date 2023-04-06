@@ -40,11 +40,10 @@ class LocationProvider @Inject constructor(
             }
 
             Log.v(LOG_NAME, "request location updates")
-            val locationRequest = LocationRequest.create().apply {
-                interval = 5000
-                fastestInterval = 5000
-                priority = PRIORITY_HIGH_ACCURACY // TODO need to check if they enabled course or high
-            }
+            val locationRequest = LocationRequest.Builder(5000)
+                .setMinUpdateIntervalMillis(5000)
+                .setPriority(PRIORITY_HIGH_ACCURACY)
+                .build()
 
             fusedLocationClient?.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
         } catch (ignore: SecurityException) {}
