@@ -163,7 +163,7 @@ private fun GeoPackageLayer(
    Surface(
       color = MaterialTheme.colorScheme.surfaceVariant
    ) {
-      Column() {
+      Column {
          CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
             Text(
                text = "LAYERS",
@@ -205,7 +205,6 @@ private fun GeoPackageLayer(
    }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun Table(
    table: String,
@@ -214,7 +213,7 @@ private fun Table(
    onLayerChecked: (String, Boolean) -> Unit
 ) {
    ListItem(
-      headlineText = {
+      headlineContent = {
          Text(
             text = table,
             maxLines = 1,

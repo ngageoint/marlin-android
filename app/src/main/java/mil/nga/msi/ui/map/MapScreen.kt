@@ -621,18 +621,16 @@ private fun Search(
                .width(width)
                .focusRequester(focusRequester)
          ) {
-            TextFieldDefaults.TextFieldDecorationBox(
+            TextFieldDefaults.DecorationBox(
                value = text,
                innerTextField = it,
-               singleLine = true,
                enabled = expanded,
-               colors  = TextFieldDefaults.textFieldColors(
-                  textColor = MaterialTheme.colorScheme.onPrimary,
-                  containerColor = MaterialTheme.colorScheme.primaryContainer,
-                  focusedIndicatorColor = MaterialTheme.colorScheme.primaryContainer,
-                  unfocusedIndicatorColor = MaterialTheme.colorScheme.primaryContainer,
-                  disabledIndicatorColor = MaterialTheme.colorScheme.primaryContainer
-               ),
+               singleLine = true,
+               visualTransformation = VisualTransformation.None,
+               interactionSource = interactionSource,
+               placeholder = {
+                  Text(text = "Search")
+               },
                leadingIcon = {
                   IconButton(onClick = { onExpand() }) {
                      Icon(
@@ -656,12 +654,20 @@ private fun Search(
                      )
                   }
                },
-               visualTransformation = VisualTransformation.None,
-               placeholder = {
-                  Text(text = "Search")
-               },
-               interactionSource = interactionSource,
-               contentPadding = TextFieldDefaults.textFieldWithoutLabelPadding(top = 0.dp, bottom = 0.dp)
+               colors = TextFieldDefaults.colors(
+                  focusedTextColor = MaterialTheme.colorScheme.onPrimary,
+                  unfocusedTextColor = MaterialTheme.colorScheme.onPrimary,
+                  unfocusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                  disabledContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                  focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                  focusedIndicatorColor = MaterialTheme.colorScheme.primaryContainer,
+                  unfocusedIndicatorColor = MaterialTheme.colorScheme.primaryContainer,
+                  disabledIndicatorColor = MaterialTheme.colorScheme.primaryContainer
+               ),
+               contentPadding = TextFieldDefaults.contentPaddingWithoutLabel(
+                  top = 0.dp,
+                  bottom = 0.dp,
+               )
             )
          }
 

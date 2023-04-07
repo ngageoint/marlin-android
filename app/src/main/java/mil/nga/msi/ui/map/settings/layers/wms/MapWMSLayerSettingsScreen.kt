@@ -193,14 +193,14 @@ private fun WMSCapabilitiesLayer(
 ) {
    if (layer.layers.isNotEmpty()) {
       ListItem(
-         headlineText = {
+         headlineContent = {
             Text(
                text = layer.title ?: "Folder",
                maxLines = 1,
                overflow = TextOverflow.Ellipsis
             )
          },
-         supportingText = {
+         supportingContent = {
             layer.abstract?.let {
                Text(
                   text = it,
@@ -237,14 +237,14 @@ private fun WMSCapabilitiesLayer(
       }
    } else if (layer.hasTiles()) {
       ListItem(
-         headlineText = {
+         headlineContent = {
             Text(
                text = layer.title ?: "Layer",
                maxLines = 1,
                overflow = TextOverflow.Ellipsis
             )
          },
-         supportingText = {
+         supportingContent = {
             layer.abstract?.let {
                Text(
                   text = it,

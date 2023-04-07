@@ -1,8 +1,6 @@
 package mil.nga.msi.ui.map.settings.layers
 
 import android.content.res.Configuration
-import android.util.Log
-import android.widget.Toast
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -12,12 +10,12 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.AddBox
 import androidx.compose.material3.*
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DismissDirection
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
@@ -28,13 +26,11 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.android.gms.maps.model.LatLngBounds
-import kotlinx.coroutines.launch
 import mil.nga.msi.datasource.layer.Layer
 import mil.nga.msi.datasource.layer.LayerType
 import mil.nga.msi.ui.drag.DraggableItem
@@ -93,7 +89,7 @@ fun MapLayersScreen(
                .align(Alignment.BottomCenter)
                .padding(bottom = 16.dp)
          ) {
-            androidx.compose.material3.ExtendedFloatingActionButton(
+            ExtendedFloatingActionButton(
                containerColor = MaterialTheme.colorScheme.primary,
                onClick = { onAddLayer() }
             ) {
@@ -148,7 +144,7 @@ private fun Empty() {
    }
 }
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 private fun Layers(
    layers: List<LayerState>,
@@ -159,7 +155,6 @@ private fun Layers(
    onLayerReorder: (from: Int, to: Int) -> Unit,
    modifier: Modifier = Modifier
 ) {
-   val scope = rememberCoroutineScope()
    val listState = rememberLazyListState()
    val dragDropState = rememberDragDropState(listState) { from, to ->
       onLayerReorder(from, to)
@@ -198,7 +193,7 @@ private fun Layers(
                key = { _, state -> state.layer.id }
             ) { index, state ->
                val dismissState = rememberDismissState(
-                  confirmStateChange = {
+                  confirmValueChange = {
                      onDelete(state.layer)
                      true
                   }
@@ -234,16 +229,17 @@ private fun Layers(
                            }
                         }
 
+                     },
+                     dismissContent = {
+                        Layer(
+                           state = state,
+                           isDragging = isDragging,
+                           onTap = { onTap(state.layer) },
+                           onZoom = onZoom,
+                           onToggle = { layer, enabled -> onToggle(layer, enabled) }
+                        )
                      }
-                  ) {
-                     Layer(
-                        state = state,
-                        isDragging = isDragging,
-                        onTap = { onTap(state.layer) },
-                        onZoom = onZoom,
-                        onToggle = { layer, enabled -> onToggle(layer, enabled) }
-                     )
-                  }
+                  )
                }
             }
          }
@@ -251,7 +247,6 @@ private fun Layers(
    }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun Layer(
    state: LayerState,
@@ -265,8 +260,8 @@ private fun Layer(
    ListItem(
       tonalElevation = elevation,
       shadowElevation = elevation,
-      headlineText = { Text(state.layer.name) },
-      supportingText = {
+      headlineContent = { Text(state.layer.name) },
+      supportingContent = {
          val text = when (state.layer.type) {
             LayerType.GEOPACKAGE -> "GeoPackage"
             else -> state.layer.url
@@ -287,14 +282,14 @@ private fun Layer(
       trailingContent = {
          Row {
             state.layer.boundingBox?.let { boundingBox ->
-               androidx.compose.material3.IconButton(
+               IconButton(
                   onClick = { onZoom(boundingBox.latLngBounds) }
                ) {
                   Icon(Icons.Default.MyLocation, contentDescription = "Zoom to GeoPackage")
                }
             }
 
-            androidx.compose.material3.Checkbox(
+            Checkbox(
                checked = state.layer.visible,
                onCheckedChange = {
                   onToggle(state.layer, !state.layer.visible)

@@ -110,14 +110,14 @@ private fun NoticeToMarinersItem(
    val end = SimpleDateFormat("MMMM d",Locale.getDefault()).format(calendar.time)
 
    ListItem(
-      headlineText = {
+      headlineContent = {
          Text(
             text = noticeNumber.toString(),
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(bottom = 4.dp)
          )
       },
-      supportingText = {
+      supportingContent = {
          CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
             Text(
                text = "$start - $end",

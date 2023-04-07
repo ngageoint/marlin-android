@@ -1,7 +1,9 @@
 package mil.nga.msi.ui.sheet
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronLeft
@@ -15,9 +17,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.rememberPagerState
 import kotlinx.coroutines.launch
 import mil.nga.msi.repository.dgpsstation.DgpsStationKey
 import mil.nga.msi.repository.light.LightKey
@@ -30,7 +29,7 @@ import mil.nga.msi.ui.modu.sheet.ModuSheetScreen
 import mil.nga.msi.ui.port.sheet.PortSheetScreen
 import mil.nga.msi.ui.radiobeacon.sheet.RadioBeaconSheetScreen
 
-@OptIn(ExperimentalPagerApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun PagingSheet(
    mapAnnotations: List<MapAnnotation>,
@@ -38,7 +37,7 @@ fun PagingSheet(
    viewModel: PagingSheetViewModel = hiltViewModel()
 ) {
    val scope = rememberCoroutineScope()
-   val pagerState = rememberPagerState()
+   val pagerState = androidx.compose.foundation.pager.rememberPagerState()
    var badgeColor = remember(pagerState.currentPage) {
       mapAnnotations[pagerState.currentPage].key.type.route.color
    }
@@ -53,7 +52,7 @@ fun PagingSheet(
 
       Box {
          HorizontalPager(
-            count = mapAnnotations.size,
+            pageCount = mapAnnotations.size,
             state = pagerState,
             modifier = Modifier.fillMaxWidth(),
          ) {
