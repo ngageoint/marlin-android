@@ -40,7 +40,7 @@ class ModusViewModel @Inject constructor(
       }
    }
 
-   val modus = Transformations.switchMap(queryParameters) { pair ->
+   val modus = queryParameters.switchMap { pair ->
       val filters = pair.first
       val sort = pair.second
       Pager(PagingConfig(pageSize = 20), null) {

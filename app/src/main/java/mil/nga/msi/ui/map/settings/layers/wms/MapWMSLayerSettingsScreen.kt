@@ -1,9 +1,8 @@
 package mil.nga.msi.ui.map.settings.layers.wms
 
-import android.util.Log
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ExpandMore
@@ -105,7 +104,7 @@ fun MapWMSLayerSettingsScreen(
                      name = layer.name,
                      url = wmsState.mapUrl,
                      type = LayerType.WMS,
-                     boundingBox = layer.boundingBox
+                     boundingBox = wmsState.boundingBox
                   ))
                },
                onLayerChecked = { layer, name, checked ->
@@ -127,7 +126,6 @@ private fun WMSLayer(
    onLayerChecked: (mil.nga.msi.network.layer.wms.Layer, String, Boolean) -> Unit,
    modifier: Modifier = Modifier
 ) {
-   val scrollState = rememberScrollState()
    var latLngBounds by remember { mutableStateOf<LatLngBounds?>(null) }
 
    Surface(
@@ -142,14 +140,14 @@ private fun WMSLayer(
             )
          }
 
-         Column(
-            Modifier
-               .verticalScroll(scrollState)
-               .weight(1f)
+         LazyColumn(
+            modifier = Modifier.heightIn(0.dp, 250.dp)
          ) {
-            wmsState.wmsCapabilities.capability?.layers?.asSequence()?.filter { layer ->
-               layer.isWebMercator()
-            }?.forEach { layer ->
+            items(
+               wmsState.wmsCapabilities.capability?.layers?.filter {
+                  it.isWebMercator()
+               } ?: emptyList()
+            ) { layer ->
                WMSCapabilitiesLayer(
                   layer = layer,
                   wmsLayers = wmsState.layers,

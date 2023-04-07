@@ -38,7 +38,7 @@ class RadioBeaconsViewModel @Inject constructor(
       }
    }
 
-   val radioBeacons = Transformations.switchMap(queryParameters) { pair ->
+   val radioBeacons = queryParameters.switchMap { pair ->
       val filters = pair.first
       val sort = pair.second
       Pager(PagingConfig(pageSize = 20), null) {

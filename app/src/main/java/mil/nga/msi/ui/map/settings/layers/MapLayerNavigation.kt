@@ -9,6 +9,7 @@ import kotlinx.serialization.json.Json
 import mil.nga.msi.datasource.layer.Layer
 import mil.nga.msi.datasource.layer.LayerType
 import mil.nga.msi.ui.embark.EmbarkRoute
+import mil.nga.msi.ui.main.SnackbarState
 import mil.nga.msi.ui.map.MapRoute
 import mil.nga.msi.ui.map.settings.layers.geopackage.MapGeoPackageLayerScreen
 import mil.nga.msi.ui.map.settings.layers.geopackage.MapGeoPackageLayerSettingsScreen
@@ -37,6 +38,7 @@ sealed class MapLayerRoute(
 
 fun NavGraphBuilder.mapLayerGraph(
    navController: NavController,
+   showSnackbar: (SnackbarState) -> Unit,
    bottomBarVisibility: (Boolean) -> Unit
 ) {
    composable(MapLayerRoute.Layers.name) {
@@ -70,6 +72,14 @@ fun NavGraphBuilder.mapLayerGraph(
             navController.navigate(route) {
                popUpTo(route) { inclusive = true }
             }
+         },
+         onDeleteLayer = { undo ->
+            val snackbarState = SnackbarState(
+               message = "Layer Delete",
+               actionLabel = "Undo",
+               actionPerformed = { undo() }
+            )
+            showSnackbar(snackbarState)
          },
          onClose = {
             navController.popBackStack()

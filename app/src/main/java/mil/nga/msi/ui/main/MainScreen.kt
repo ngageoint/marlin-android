@@ -39,6 +39,13 @@ import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.compose.rememberNavController
 
+data class SnackbarState(
+   val message: String,
+   val actionLabel: String? = null,
+   val actionDismissed: (() -> Unit)? = null,
+   val actionPerformed: (() -> Unit)? = null
+)
+
 @OptIn(ExperimentalMaterialNavigationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun MainScreen(
@@ -80,15 +87,26 @@ fun MainScreen(
       context.startActivity(shareIntent)
    }
 
-   val showSnackbar: (String) -> Unit = { message ->
+   val showSnackbar: (SnackbarState) -> Unit = { state ->
       scope.launch {
-         scaffoldState.snackbarHostState.showSnackbar(message)
+         when (scaffoldState.snackbarHostState.showSnackbar(state.message, state.actionLabel)) {
+            SnackbarResult.Dismissed -> { state.actionDismissed?.invoke() }
+            SnackbarResult.ActionPerformed -> { state.actionPerformed?.invoke() }
+         }
       }
    }
 
    ModalBottomSheetLayout(bottomSheetNavigator) {
       Scaffold(
          scaffoldState = scaffoldState,
+         snackbarHost = {
+            SnackbarHost(it) { data ->
+               Snackbar(
+                  actionColor = MaterialTheme.colorScheme.primary,
+                  snackbarData = data
+               )
+            }
+         },
          drawerGesturesEnabled = scaffoldState.drawerState.isOpen,
          backgroundColor = MaterialTheme.colorScheme.surface,
          drawerContent = {

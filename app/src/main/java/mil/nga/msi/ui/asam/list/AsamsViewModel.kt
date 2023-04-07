@@ -41,7 +41,7 @@ class AsamsViewModel @Inject constructor(
       }
    }
 
-   val asams = Transformations.switchMap(queryParameters) { pair ->
+   val asams = queryParameters.switchMap { pair ->
       val filters = pair.first
       val sort = pair.second
       Pager(PagingConfig(pageSize = 20), null) {

@@ -26,15 +26,14 @@ open class LocationFilterService @Inject constructor(
       }
    }
 
-   override fun onChanged(location: Location?) {
+   override fun onChanged(value: Location) {
       val filters = runBlocking { filterRepository.filters.first() }
-      updateLocationFilter(location, filters)
+      updateLocationFilter(value, filters)
    }
 
    private fun updateLocationFilter(location: Location?, filters: Map<DataSource, List<Filter>>) {
       if (location == null) return
       this.location = location
-
 
       filters.forEach { entry ->
          val locationFilter = entry.value.find { it.parameter.type == FilterParameterType.LOCATION && it.comparator.name == ComparatorType.NEAR_ME.name }

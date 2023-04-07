@@ -39,7 +39,7 @@ class LightsViewModel @Inject constructor(
       }
    }
 
-   val lights = Transformations.switchMap(queryParameters) { pair ->
+   val lights = queryParameters.switchMap { pair ->
       val filters = pair.first
       val sort = pair.second
       Pager(PagingConfig(pageSize = 20), null) {

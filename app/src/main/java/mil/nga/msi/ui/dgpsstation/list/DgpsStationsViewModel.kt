@@ -38,7 +38,7 @@ class DgpsStationsViewModel @Inject constructor(
       }
    }
 
-   val dgpsStations = Transformations.switchMap(queryParameters) { pair ->
+   val dgpsStations = queryParameters.switchMap { pair ->
       val filters = pair.first
       val sort = pair.second
       Pager(PagingConfig(pageSize = 20), null) {

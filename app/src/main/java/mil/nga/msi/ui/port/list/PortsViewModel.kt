@@ -42,7 +42,7 @@ class PortsViewModel @Inject constructor(
       }
    }
 
-   val ports: Flow<PagingData<PortListItem>> = Transformations.switchMap(queryParameters) { pair ->
+   val ports: Flow<PagingData<PortListItem>> = queryParameters.switchMap { pair ->
       val filters = pair.first
       val sort = pair.second
       Pager(PagingConfig(pageSize = 20), null) {

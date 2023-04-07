@@ -28,7 +28,7 @@ class FilterViewModel @Inject constructor(
       _dataSource.value = dataSource
    }
 
-   val title = Transformations.map(_dataSource) { dataSource ->
+   val title = _dataSource.map { dataSource ->
       when(dataSource) {
          DataSource.ASAM -> AsamRoute.Filter.shortTitle
          DataSource.MODU -> ModuRoute.Filter.shortTitle
@@ -40,11 +40,11 @@ class FilterViewModel @Inject constructor(
       }
    }
 
-   val filterParameters = Transformations.map(_dataSource) { dataSource ->
+   val filterParameters = _dataSource.map { dataSource ->
       filterParameterMap[dataSource] ?: emptyList()
    }
 
-   val filters = Transformations.switchMap(_dataSource) { dataSource ->
+   val filters = _dataSource.switchMap { dataSource ->
       filterRepository.filters.transform { filters ->
          emit(filters[dataSource] ?: emptyList())
       }.asLiveData()

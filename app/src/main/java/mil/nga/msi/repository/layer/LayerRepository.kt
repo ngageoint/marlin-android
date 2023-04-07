@@ -31,6 +31,7 @@ class LayerRepository @Inject constructor(
    suspend fun getWMSCapabilities(url: String) = remoteDataSource.getWMSCapabilities(url)
 
    suspend fun getLayer(id: Long) = localDataSource.getLayer(id)
+   suspend fun insertLayer(layer: Layer) = localDataSource.insertLayer(layer)
    suspend fun updateLayer(layer: Layer) = localDataSource.updateLayer(layer)
    suspend fun enabledLayer(layer: Layer, enabled: Boolean) = localDataSource.enableLayer(layer, enabled)
    suspend fun deleteLayer(layer: Layer) = localDataSource.deleteLayer(layer)

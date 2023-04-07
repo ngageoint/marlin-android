@@ -15,6 +15,7 @@ import mil.nga.msi.ui.electronicpublication.electronicPublicationGraph
 import mil.nga.msi.ui.embark.EmbarkRoute
 import mil.nga.msi.ui.embark.embarkGraph
 import mil.nga.msi.ui.light.lightGraph
+import mil.nga.msi.ui.main.SnackbarState
 import mil.nga.msi.ui.map.AnnotationProvider
 import mil.nga.msi.ui.map.MapRoute
 import mil.nga.msi.ui.map.mapGraph
@@ -34,7 +35,7 @@ fun NavGraphBuilder.homeGraph(
    embark: Boolean,
    bottomBarVisibility: (Boolean) -> Unit,
    share: (Pair<String, String>) -> Unit,
-   showSnackbar: (String) -> Unit,
+   showSnackbar: (SnackbarState) -> Unit,
    openNavigationDrawer: () -> Unit,
    annotationProvider: AnnotationProvider
 ) {
@@ -99,27 +100,28 @@ fun NavGraphBuilder.homeGraph(
       navController = navController,
       bottomBarVisibility = { bottomBarVisibility(it) },
       openNavigationDrawer = openNavigationDrawer,
-      showSnackbar = { showSnackbar(it) },
+      showSnackbar = { showSnackbar(SnackbarState(message = it)) },
       annotationProvider = annotationProvider
    )
 
    mapLayerGraph(
       navController = navController,
-      bottomBarVisibility = { bottomBarVisibility(it) }
+      bottomBarVisibility = { bottomBarVisibility(it) },
+      showSnackbar = { showSnackbar(it) }
    )
 
    asamGraph(
       navController = navController,
       bottomBarVisibility = { bottomBarVisibility(it) },
       share = { share(it) },
-      showSnackbar = { showSnackbar(it) },
+      showSnackbar = { showSnackbar(SnackbarState(message = it)) },
       openNavigationDrawer = openNavigationDrawer
    )
    moduGraph(
       navController = navController,
       bottomBarVisibility = { bottomBarVisibility(it) },
       share = { share(it) },
-      showSnackbar = { showSnackbar(it) },
+      showSnackbar = { showSnackbar(SnackbarState(message = it)) },
       openNavigationDrawer = openNavigationDrawer
    )
    navigationalWarningGraph(
@@ -132,28 +134,28 @@ fun NavGraphBuilder.homeGraph(
       navController = navController,
       bottomBarVisibility = { bottomBarVisibility(it) },
       share = { share(it) },
-      showSnackbar = { showSnackbar(it) },
+      showSnackbar = { showSnackbar(SnackbarState(message = it)) },
       openNavigationDrawer = openNavigationDrawer
    )
    portGraph(
       navController = navController,
       bottomBarVisibility = { bottomBarVisibility(it) },
       share = { share(it) },
-      showSnackbar = { showSnackbar(it) },
+      showSnackbar = { showSnackbar(SnackbarState(message = it)) },
       openNavigationDrawer = openNavigationDrawer
    )
    radioBeaconGraph(
       navController = navController,
       bottomBarVisibility = { bottomBarVisibility(it) },
       share = { share(it) },
-      showSnackbar = { showSnackbar(it) },
+      showSnackbar = { showSnackbar(SnackbarState(message = it)) },
       openNavigationDrawer = openNavigationDrawer
    )
    dgpsStationGraph(
       navController = navController,
       bottomBarVisibility = { bottomBarVisibility(it) },
       share = { share(it) },
-      showSnackbar = { showSnackbar(it) },
+      showSnackbar = { showSnackbar(SnackbarState(message = it)) },
       openNavigationDrawer = openNavigationDrawer
    )
    electronicPublicationGraph(

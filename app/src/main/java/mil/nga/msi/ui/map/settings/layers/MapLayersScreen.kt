@@ -1,5 +1,8 @@
 package mil.nga.msi.ui.map.settings.layers
 
+import android.content.res.Configuration
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -24,10 +27,14 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.android.gms.maps.model.LatLngBounds
+import kotlinx.coroutines.launch
 import mil.nga.msi.datasource.layer.Layer
 import mil.nga.msi.datasource.layer.LayerType
 import mil.nga.msi.ui.drag.DraggableItem
@@ -42,6 +49,7 @@ fun MapLayersScreen(
    onTap: (Long, LayerType) -> Unit,
    onZoom: (LatLngBounds) -> Unit,
    onAddLayer: () -> Unit,
+   onDeleteLayer: (() -> Unit) -> Unit,
    onClose: () -> Unit,
    viewModel: MapLayersViewModel = hiltViewModel()
 ) {
@@ -54,21 +62,19 @@ fun MapLayersScreen(
          onNavigationClicked = { onClose() }
       )
 
-      Surface(
-         color = MaterialTheme.colorScheme.surfaceVariant
-      ) {
-         Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-               .fillMaxSize()
-               .padding(vertical = 32.dp)
-         ) {
+      Box {
+         if (layers.isEmpty()) {
+            Empty()
+         } else {
             Layers(
-               layers,
+               layers = layers,
                onTap = { onTap(it.id, it.type) },
                onZoom = onZoom,
                onToggle = { layer, enabled -> viewModel.enableLayer(layer, enabled) },
-               onRemove = { viewModel.deleteLayer(it) },
+               onDelete = { layer ->
+                  viewModel.deleteLayer(layer)
+                  onDeleteLayer { viewModel.addLayer(layer) }
+               },
                onLayerReorder = { fromIndex, toIndex ->
                   val ordered = layers.toMutableList().apply {
                      val removed = removeAt(fromIndex)
@@ -76,23 +82,68 @@ fun MapLayersScreen(
                   }
                   viewModel.setLayerOrder(ordered.map { it.layer.id.toInt() })
                },
-               modifier = Modifier
-                  .weight(1f)
-                  .padding(bottom = 24.dp)
+               modifier = Modifier.fillMaxSize()
             )
+         }
 
+         Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+               .fillMaxWidth()
+               .align(Alignment.BottomCenter)
+               .padding(bottom = 16.dp)
+         ) {
             androidx.compose.material3.ExtendedFloatingActionButton(
                containerColor = MaterialTheme.colorScheme.primary,
                onClick = { onAddLayer() }
             ) {
                Icon(
                   imageVector = Icons.Outlined.AddBox,
-                  contentDescription = "Zoom to ASAM"
+                  contentDescription = "Add Layer"
                )
                Spacer(Modifier.size(ButtonDefaults.IconSpacing))
                Text("Add New Layer")
             }
          }
+      }
+   }
+}
+
+@Composable
+private fun Empty() {
+   Column(
+      verticalArrangement = Arrangement.Center,
+      horizontalAlignment = Alignment.CenterHorizontally,
+      modifier = Modifier
+         .fillMaxSize()
+         .padding(start = 16.dp, end = 16.dp, bottom = 48.dp)
+   ) {
+      if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT) {
+         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)) {
+            Icon(
+               imageVector = Icons.Filled.Layers,
+               contentDescription = "No Layers",
+               modifier = Modifier
+                  .size(260.dp)
+                  .padding(bottom = 8.dp)
+            )
+         }
+      }
+
+      CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
+         Text(
+            text = "No Layers",
+            style = MaterialTheme.typography.headlineMedium,
+            modifier = Modifier.padding(bottom = 8.dp)
+         )
+      }
+
+      CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)) {
+         Text(
+            text = "Create a new layer and it will show up here.",
+            style = MaterialTheme.typography.titleMedium,
+            textAlign = TextAlign.Center
+         )
       }
    }
 }
@@ -104,10 +155,11 @@ private fun Layers(
    onTap: (Layer) -> Unit,
    onZoom: (LatLngBounds) -> Unit,
    onToggle: (Layer, Boolean) -> Unit,
-   onRemove: (Layer) -> Unit,
+   onDelete: (Layer) -> Unit,
    onLayerReorder: (from: Int, to: Int) -> Unit,
    modifier: Modifier = Modifier
 ) {
+   val scope = rememberCoroutineScope()
    val listState = rememberLazyListState()
    val dragDropState = rememberDragDropState(listState) { from, to ->
       onLayerReorder(from, to)
@@ -133,23 +185,26 @@ private fun Layers(
       }
 
       Surface(
-         color = MaterialTheme.colorScheme.surface
+         color = MaterialTheme.colorScheme.surface,
+         modifier = Modifier.fillMaxSize()
       ) {
          LazyColumn(
             state = listState,
+            contentPadding = PaddingValues(bottom = 72.dp),
             modifier = Modifier.dragContainer(dragDropState)
          ) {
             itemsIndexed(
                items = layers,
                key = { _, state -> state.layer.id }
             ) { index, state ->
-               DraggableItem(dragDropState, index) { isDragging ->
-                  val dismissState = rememberDismissState()
-
-                  if (dismissState.isDismissed(DismissDirection.EndToStart)) {
-                     onRemove(state.layer)
+               val dismissState = rememberDismissState(
+                  confirmStateChange = {
+                     onDelete(state.layer)
+                     true
                   }
+               )
 
+               DraggableItem(dragDropState, index) { isDragging ->
                   SwipeToDismiss(
                      state = dismissState,
                      directions = setOf(DismissDirection.EndToStart),

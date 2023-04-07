@@ -26,7 +26,7 @@ class SortViewModel @Inject constructor(
       _dataSource.value = dataSource
    }
 
-   val title = Transformations.map(_dataSource) { dataSource ->
+   val title = _dataSource.map { dataSource ->
       when(dataSource) {
          DataSource.ASAM -> AsamRoute.Sort.shortTitle
          DataSource.MODU -> ModuRoute.Sort.shortTitle
@@ -38,17 +38,17 @@ class SortViewModel @Inject constructor(
       }
    }
 
-   val section = Transformations.switchMap(_dataSource) { dataSource ->
+   val section = _dataSource.switchMap { dataSource ->
       sortRepository.sort.transform { sort ->
          emit(sort[dataSource]?.section ?: false)
       }.asLiveData()
    }
 
-   val sortOptions = Transformations.map(_dataSource) { dataSource ->
+   val sortOptions = _dataSource.map { dataSource ->
       sortParameterMap[dataSource] ?: emptyList()
    }
 
-   val sortParameters = Transformations.switchMap(_dataSource) { dataSource ->
+   val sortParameters = _dataSource.switchMap { dataSource ->
       sortRepository.sort.transform { sort ->
          emit(sort[dataSource]?.parameters ?: emptyList())
       }.asLiveData()

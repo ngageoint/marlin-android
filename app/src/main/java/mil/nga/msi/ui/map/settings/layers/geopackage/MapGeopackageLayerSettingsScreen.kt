@@ -2,8 +2,8 @@ package mil.nga.msi.ui.map.settings.layers.geopackage
 
 import android.net.Uri
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.MyLocation
@@ -61,10 +61,7 @@ fun MapGeoPackageLayerSettingsScreen(
                },
                onLayerChecked = { name, checked ->
                   viewModel.enableLayer(name, checked)
-               },
-               modifier = Modifier
-                  .fillMaxWidth()
-                  .weight(1f)
+               }
             )
          }
       }
@@ -106,10 +103,7 @@ fun MapGeoPackageLayerSettingsScreen(
                },
                onLayerChecked = { name, checked ->
                   viewModel.enableLayer(name, checked)
-               },
-               modifier = Modifier
-                  .fillMaxWidth()
-                  .weight(1f)
+               }
             )
          }
       }
@@ -151,10 +145,7 @@ fun MapGeoPackageLayerSettingsScreen(
                },
                onLayerChecked = { name, checked ->
                   viewModel.enableLayer(name, checked)
-               },
-               modifier = Modifier
-                  .fillMaxWidth()
-                  .weight(1f)
+               }
             )
          }
       }
@@ -165,16 +156,14 @@ fun MapGeoPackageLayerSettingsScreen(
 private fun GeoPackageLayer(
    geoPackageState: GeoPackageState,
    onDone: () -> Unit,
-   onLayerChecked: (String, Boolean) -> Unit,
-   modifier: Modifier = Modifier
+   onLayerChecked: (String, Boolean) -> Unit
 ) {
-   val scrollState = rememberScrollState()
    var latLngBounds by remember { mutableStateOf<LatLngBounds?>(null) }
 
    Surface(
       color = MaterialTheme.colorScheme.surfaceVariant
    ) {
-      Column(modifier = modifier) {
+      Column() {
          CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
             Text(
                text = "LAYERS",
@@ -183,12 +172,10 @@ private fun GeoPackageLayer(
             )
          }
 
-         Column(
-            Modifier
-               .verticalScroll(scrollState)
-               .weight(1f)
+         LazyColumn(
+            modifier = Modifier.heightIn(0.dp, 250.dp)
          ) {
-            geoPackageState.overlays.forEach { overlay ->
+            items(geoPackageState.overlays) { overlay ->
                Table(
                   table = overlay.table,
                   layers = geoPackageState.selectedLayers,
@@ -203,7 +190,7 @@ private fun GeoPackageLayer(
          Map(
             geoPackageState = geoPackageState,
             latLngBounds = latLngBounds,
-            modifier = Modifier.height(250.dp)
+            modifier = Modifier.weight(1f)
          )
 
          Button(

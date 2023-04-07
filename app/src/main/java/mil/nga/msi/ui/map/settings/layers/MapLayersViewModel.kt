@@ -41,6 +41,12 @@ class MapLayersViewModel @Inject constructor(
       }
    }
 
+   fun addLayer(layer: Layer) {
+      viewModelScope.launch {
+         layerRepository.insertLayer(layer)
+      }
+   }
+
    fun deleteLayer(layer: Layer) {
       viewModelScope.launch {
          layerRepository.deleteLayer(layer)

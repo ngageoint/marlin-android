@@ -29,7 +29,6 @@ import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mil.nga.msi.datasource.electronicpublication.ElectronicPublication
 import mil.nga.msi.ui.main.TopBar
@@ -45,7 +44,6 @@ interface PublicationActions {
     fun onDeleteClick(ePub: ElectronicPublication)
 }
 
-@OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
 fun ElectronicPublicationTypeBrowseRoute(
     onBackToRoot: () -> Unit,
