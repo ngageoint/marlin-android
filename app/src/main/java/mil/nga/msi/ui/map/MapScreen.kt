@@ -441,11 +441,13 @@ private fun Map(
                }
             }
          }
-         mgrsTileProvider?.let { TileOverlay(tileProvider = it) }
-         garsTileProvider?.let { TileOverlay(tileProvider = it) }
+
          osmTileProvider?.let { TileOverlay(tileProvider = it) }
 
          layers.forEach { TileOverlay(tileProvider = it) }
+
+         mgrsTileProvider?.let { TileOverlay(tileProvider = it) }
+         garsTileProvider?.let { TileOverlay(tileProvider = it) }
 
          asamTileProvider?.let { TileOverlay(tileProvider = it) }
          moduTileProvider?.let { TileOverlay(tileProvider = it) }

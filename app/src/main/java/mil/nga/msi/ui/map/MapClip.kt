@@ -4,9 +4,12 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
@@ -18,8 +21,16 @@ import mil.nga.msi.R
 fun MapClip(
    latLng: LatLng,
    baseMap: BaseMapType?,
-   tileProvider: TileProvider? = null
+   tileProvider: TileProvider? = null,
+   viewModel: MapViewModel = hiltViewModel()
 ) {
+
+   val layers by viewModel.layers.observeAsState()
+   val tileProviders by viewModel.tileProviders.observeAsState()
+   val mgrsTileProvider = tileProviders?.get(TileProviderType.MGRS)
+   val garsTileProvider = tileProviders?.get(TileProviderType.GARS)
+   val osmTileProvider = tileProviders?.get(TileProviderType.OSM)
+
    val cameraPositionState = rememberCameraPositionState {
       position = CameraPosition.fromLatLngZoom(latLng, 16f)
    }
@@ -40,6 +51,7 @@ fun MapClip(
       )
    } ?: MapProperties()
 
+
    GoogleMap(
       cameraPositionState = cameraPositionState,
       properties = properties,
@@ -48,6 +60,13 @@ fun MapClip(
          .fillMaxWidth()
          .height(200.dp)
    ) {
-      tileProvider?.let { TileOverlay(tileProvider = it, zIndex = -1f) }
+      osmTileProvider?.let { TileOverlay(tileProvider = it) }
+
+      layers?.forEach { TileOverlay(tileProvider = it) }
+
+      mgrsTileProvider?.let { TileOverlay(tileProvider = it) }
+      garsTileProvider?.let { TileOverlay(tileProvider = it) }
+
+      tileProvider?.let { TileOverlay(tileProvider = it) }
    }
 }
