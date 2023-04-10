@@ -165,11 +165,12 @@ private fun WMSLayer(
             }
          }
 
-         Map(
-            wmsUrl = wmsState.mapUrl,
-            latLngBounds = latLngBounds,
-            modifier = Modifier.height(250.dp)
-         )
+         Box(Modifier.weight(1f)){
+            Map(
+               wmsUrl = wmsState.mapUrl,
+               latLngBounds = latLngBounds
+            )
+         }
 
          Button(
             onClick = { onDone() },
@@ -183,7 +184,6 @@ private fun WMSLayer(
    }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun WMSCapabilitiesLayer(
    layer: mil.nga.msi.network.layer.wms.Layer,
@@ -280,8 +280,7 @@ private fun WMSCapabilitiesLayer(
 @Composable
 private fun Map(
    wmsUrl: String,
-   latLngBounds: LatLngBounds?,
-   modifier: Modifier = Modifier
+   latLngBounds: LatLngBounds?
 ) {
    val scope = rememberCoroutineScope()
    val cameraPositionState = rememberCameraPositionState()
@@ -294,20 +293,22 @@ private fun Map(
       }
    }
 
-   CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-      Text(
-         text = "MAP",
-         style = MaterialTheme.typography.bodyMedium,
-         modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 16.dp)
-      )
-   }
+   Column(Modifier.fillMaxSize()) {
+      CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+         Text(
+            text = "MAP",
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 16.dp)
+         )
+      }
 
-   GoogleMap(
-      cameraPositionState = cameraPositionState,
-      properties = MapProperties(mapType = MapType.NORMAL),
-      uiSettings = MapUiSettings(compassEnabled = false),
-      modifier = modifier
-   ) {
-      tileOverlayOptions { TileOverlay(tileProvider = WMSTileProvider(url = wmsUrl)) }
+      GoogleMap(
+         cameraPositionState = cameraPositionState,
+         properties = MapProperties(mapType = MapType.NORMAL),
+         uiSettings = MapUiSettings(compassEnabled = false),
+         modifier = Modifier.weight(1f)
+      ) {
+         tileOverlayOptions { TileOverlay(tileProvider = WMSTileProvider(url = wmsUrl)) }
+      }
    }
 }

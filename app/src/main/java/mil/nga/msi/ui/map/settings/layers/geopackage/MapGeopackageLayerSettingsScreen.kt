@@ -187,11 +187,12 @@ private fun GeoPackageLayer(
             }
          }
 
-         Map(
-            geoPackageState = geoPackageState,
-            latLngBounds = latLngBounds,
-            modifier = Modifier.weight(1f)
-         )
+         Box(modifier = Modifier.weight(1f)) {
+            Map(
+               geoPackageState = geoPackageState,
+               latLngBounds = latLngBounds
+            )
+         }
 
          Button(
             onClick = { onDone() },
@@ -246,8 +247,7 @@ private fun Table(
 @Composable
 private fun Map(
    geoPackageState: GeoPackageState,
-   latLngBounds: LatLngBounds?,
-   modifier: Modifier = Modifier
+   latLngBounds: LatLngBounds?
 ) {
    val scope = rememberCoroutineScope()
    val cameraPositionState = rememberCameraPositionState()
@@ -260,23 +260,25 @@ private fun Map(
       }
    }
 
-   CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-      Text(
-         text = "MAP",
-         style = MaterialTheme.typography.bodyMedium,
-         modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 16.dp)
-      )
-   }
+   Column(Modifier.fillMaxSize()) {
+      CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+         Text(
+            text = "MAP",
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 16.dp)
+         )
+      }
 
-   GoogleMap(
-      cameraPositionState = cameraPositionState,
-      properties = MapProperties(mapType = MapType.NORMAL),
-      uiSettings = MapUiSettings(compassEnabled = false),
-      modifier = modifier
-   ) {
-      geoPackageState.selectedLayers.forEach { table ->
-         geoPackageState.overlays.find { it.table == table }?.let { overlay ->
-            TileOverlay(tileProvider = overlay.tileProvider)
+      GoogleMap(
+         cameraPositionState = cameraPositionState,
+         properties = MapProperties(mapType = MapType.NORMAL),
+         uiSettings = MapUiSettings(compassEnabled = false),
+         modifier = Modifier.weight(1f)
+      ) {
+         geoPackageState.selectedLayers.forEach { table ->
+            geoPackageState.overlays.find { it.table == table }?.let { overlay ->
+               TileOverlay(tileProvider = overlay.tileProvider)
+            }
          }
       }
    }
