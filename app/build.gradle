@@ -12,7 +12,7 @@ plugins {
 }
 
 group 'mil.nga.msi'
-version '1.0.2'
+version '1.1.0'
 
 def googleMapsApiReleaseKey = hasProperty('MSI_RELEASE_MAPS_API_KEY') ? MSI_RELEASE_MAPS_API_KEY : ''
 def googleMapsApiDebugKey = hasProperty('MSI_DEBUG_MAPS_API_KEY') ? MSI_DEBUG_MAPS_API_KEY : ''
@@ -137,11 +137,11 @@ dependencies {
 
     implementation "androidx.compose.material3:material3:1.1.0-beta02"
 
-    implementation 'androidx.core:core-ktx:1.9.0'
+    implementation 'androidx.core:core-ktx:1.10.0'
     implementation "androidx.compose.ui:ui:$compose_version"
-    implementation 'androidx.compose.material:material:1.4.0'
+    implementation 'androidx.compose.material:material:1.4.1'
     implementation "androidx.compose.ui:ui-tooling-preview:$compose_version"
-    implementation "androidx.compose.material:material-icons-extended:1.4.0"
+    implementation "androidx.compose.material:material-icons-extended:1.4.1"
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.1'
     implementation 'androidx.lifecycle:lifecycle-runtime-compose:2.6.1'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1'
