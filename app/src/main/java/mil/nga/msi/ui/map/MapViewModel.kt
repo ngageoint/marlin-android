@@ -1,16 +1,17 @@
 package mil.nga.msi.ui.map
 
 import android.app.Application
-import android.net.Uri
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.*
+import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.TileProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import mil.nga.geopackage.BoundingBox
 import mil.nga.geopackage.GeoPackageManager
+import mil.nga.geopackage.features.index.FeatureIndexManager
 import mil.nga.geopackage.map.tiles.overlay.FeatureOverlay
 import mil.nga.geopackage.map.tiles.overlay.XYZGeoPackageOverlay
 import mil.nga.msi.datasource.DataSource
@@ -26,6 +27,7 @@ import mil.nga.msi.repository.asam.AsamRepository
 import mil.nga.msi.repository.dgpsstation.DgpsStationKey
 import mil.nga.msi.repository.dgpsstation.DgpsStationRepository
 import mil.nga.msi.repository.geocoder.GeocoderRemoteDataSource
+import mil.nga.msi.repository.geopackage.GeoPackageFeatureKey
 import mil.nga.msi.repository.layer.LayerRepository
 import mil.nga.msi.repository.light.LightKey
 import mil.nga.msi.repository.light.LightRepository
@@ -58,7 +60,7 @@ enum class TileProviderType {
 class MapViewModel @Inject constructor(
    private val application: Application,
    private val filterRepository: FilterRepository,
-   layerRepository: LayerRepository,
+   private val layerRepository: LayerRepository,
    private val geoPackageManager: GeoPackageManager,
    private val asamRepository: AsamRepository,
    private val asamTileRepository: AsamTileRepository,
@@ -290,12 +292,12 @@ class MapViewModel @Inject constructor(
       }
    }
 
-   // TODO need to filter on min/max box, that is surounding click
    suspend fun getMapAnnotations(
       minLongitude: Double,
       maxLongitude: Double,
       minLatitude: Double,
-      maxLatitude: Double
+      maxLatitude: Double,
+      point: LatLng
    ) = withContext(Dispatchers.IO) {
       val dataSources = mapped.value ?: emptyMap()
       val boundsFilters = MapBoundsFilter.filtersForBounds(
@@ -391,6 +393,36 @@ class MapViewModel @Inject constructor(
             }
       } else emptyList()
 
-     asams + modus + lights + ports + beacons + dgps
+      val boundingBox = BoundingBox(
+         minLongitude,
+         minLatitude,
+         maxLongitude,
+         maxLatitude
+      )
+      val features = layerRepository.observeVisibleLayers()
+         .first()
+         .filter { it.type == LayerType.GEOPACKAGE }
+         .flatMap { layer ->
+         try {
+            val geoPackage = geoPackageManager.openExternal(layer.filePath)
+            val annotations = mutableListOf<MapAnnotation>()
+
+            layer.url.split(",").filter { it.isNotEmpty() }.forEach { table ->
+               if (geoPackage.featureTables.contains(table)) {
+                  val featureDao = geoPackage.getFeatureDao(table)
+                  val indexer = FeatureIndexManager(application, geoPackage, featureDao)
+                  indexer.query(boundingBox).forEach { result ->
+                     val key = MapAnnotation.Key(GeoPackageFeatureKey(layer.id, table, result.id).id(), MapAnnotation.Type.GEOPACKAGE)
+                     val annotation = MapAnnotation(key, point.latitude, point.longitude)
+                     annotations.add(annotation)
+                  }
+               }
+            }
+
+            annotations
+         } catch (_: Exception) { emptyList() }
+      }
+
+     asams + modus + lights + ports + beacons + dgps + features
    }
 }

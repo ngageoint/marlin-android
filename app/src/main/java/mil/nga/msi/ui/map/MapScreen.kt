@@ -219,7 +219,8 @@ fun MapScreen(
                      minLongitude = latLng.longitude - tolerance,
                      maxLongitude = latLng.longitude + tolerance,
                      minLatitude = latLng.latitude - tolerance,
-                     maxLatitude = latLng.latitude + tolerance
+                     maxLatitude = latLng.latitude + tolerance,
+                     point = latLng
                   )
 
                   if (mapAnnotations.isNotEmpty()) {

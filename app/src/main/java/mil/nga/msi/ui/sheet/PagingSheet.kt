@@ -19,10 +19,13 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.launch
 import mil.nga.msi.repository.dgpsstation.DgpsStationKey
+import mil.nga.msi.repository.geopackage.GeoPackageFeatureKey
 import mil.nga.msi.repository.light.LightKey
 import mil.nga.msi.repository.radiobeacon.RadioBeaconKey
 import mil.nga.msi.ui.asam.sheet.AsamSheetScreen
 import mil.nga.msi.ui.dgpsstation.sheet.DgpsStationSheetScreen
+import mil.nga.msi.ui.geopackage.GeoPackageRoute
+import mil.nga.msi.ui.geopackage.sheet.GeoPackageFeatureSheetScreen
 import mil.nga.msi.ui.light.sheet.LightSheetScreen
 import mil.nga.msi.ui.map.cluster.MapAnnotation
 import mil.nga.msi.ui.modu.sheet.ModuSheetScreen
@@ -68,6 +71,7 @@ fun PagingSheet(
                   MapAnnotation.Type.PORT -> PortPage(annotation.key.id) { onDetails(annotation) }
                   MapAnnotation.Type.RADIO_BEACON -> RadioBeaconPage(annotation.key.id) { onDetails(annotation) }
                   MapAnnotation.Type.DGPS_STATION -> DgpsStationPage(annotation.key.id) { onDetails(annotation) }
+                  MapAnnotation.Type.GEOPACKAGE -> GeoPackageFeaturePage(annotation.key.id) { onDetails(annotation) }
                }
             }
          }
@@ -189,6 +193,19 @@ private fun DgpsStationPage(
 ) {
    val key = DgpsStationKey.fromId(id)
    DgpsStationSheetScreen(
+      key,
+      onDetails = { onDetails() },
+      modifier = Modifier.fillMaxHeight()
+   )
+}
+
+@Composable
+private fun GeoPackageFeaturePage(
+   id: String,
+   onDetails: () -> Unit,
+) {
+   val key = GeoPackageFeatureKey.fromId(id)
+   GeoPackageFeatureSheetScreen(
       key,
       onDetails = { onDetails() },
       modifier = Modifier.fillMaxHeight()

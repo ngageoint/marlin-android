@@ -18,7 +18,8 @@ enum class DataSource(
    RADIO_BEACON(true, Color(0xFF007BFF), R.drawable.ic_baseline_settings_input_antenna_24, label = "Radio Beacon"),
    DGPS_STATION(true, Color(0xFF00E676), R.drawable.ic_dgps_icon_24, label = "Differential GPS Station"),
    ELECTRONIC_PUBLICATION(false, Color(0xFF30B0C7), R.drawable.ic_description_24dp, label = "Electronic Publication"),
-   NOTICE_TO_MARINERS(false, Color(0xFFFF0000), R.drawable.ic_baseline_campaign_24, label = "Notice To Mariners");
+   NOTICE_TO_MARINERS(false, Color(0xFFFF0000), R.drawable.ic_baseline_campaign_24, label = "Notice To Mariners"),
+   GEOPACKAGE(false, Color(0xFFA2855E), R.drawable.ic_round_place_24, label = "GeoPackage Feature"), ;
 
    fun labelForCount(count: Int) = if (count == 1) label else labelPlural
 }

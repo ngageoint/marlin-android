@@ -4,6 +4,7 @@ import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.ui.asam.AsamRoute
 import mil.nga.msi.ui.dgpsstation.DgpsStationRoute
 import mil.nga.msi.ui.electronicpublication.ElectronicPublicationRoute
+import mil.nga.msi.ui.geopackage.GeoPackageRoute
 import mil.nga.msi.ui.light.LightRoute
 import mil.nga.msi.ui.modu.ModuRoute
 import mil.nga.msi.ui.navigationalwarning.NavigationWarningRoute
@@ -22,6 +23,7 @@ private val mainRoutes: Map<DataSource, Route> = DataSource.values().fold(mapOf(
         DataSource.DGPS_STATION -> DgpsStationRoute.Main
         DataSource.ELECTRONIC_PUBLICATION -> ElectronicPublicationRoute.Main
         DataSource.NOTICE_TO_MARINERS -> NoticeToMarinersRoute.Main
+        DataSource.GEOPACKAGE -> GeoPackageRoute.Sheet
     }
     dataSourceToRoute + (dataSource to route)
 }

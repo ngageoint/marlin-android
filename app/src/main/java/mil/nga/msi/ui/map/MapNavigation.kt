@@ -14,10 +14,12 @@ import com.google.accompanist.navigation.material.bottomSheet
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import mil.nga.msi.repository.dgpsstation.DgpsStationKey
+import mil.nga.msi.repository.geopackage.GeoPackageFeatureKey
 import mil.nga.msi.repository.light.LightKey
 import mil.nga.msi.repository.radiobeacon.RadioBeaconKey
 import mil.nga.msi.ui.asam.AsamRoute
 import mil.nga.msi.ui.dgpsstation.DgpsStationRoute
+import mil.nga.msi.ui.geopackage.GeoPackageRoute
 import mil.nga.msi.ui.light.LightRoute
 import mil.nga.msi.ui.map.cluster.MapAnnotation
 import mil.nga.msi.ui.map.filter.MapFilterScreen
@@ -83,7 +85,8 @@ fun NavGraphBuilder.mapGraph(
          route?.startsWith(LightRoute.Sheet.name) != true &&
          route?.startsWith(PortRoute.Sheet.name) != true &&
          route?.startsWith(RadioBeaconRoute.Sheet.name) != true &&
-         route?.startsWith(DgpsStationRoute.Sheet.name) != true
+         route?.startsWith(DgpsStationRoute.Sheet.name) != true &&
+         route?.startsWith(GeoPackageRoute.Sheet.name) != true
       ) {
          annotationProvider.setMapAnnotation(null)
       }
@@ -115,6 +118,11 @@ fun NavGraphBuilder.mapGraph(
                   val dgpsStationKey = DgpsStationKey.fromId(annotation.key.id)
                   val encoded = Uri.encode(Json.encodeToString(dgpsStationKey))
                   navController.navigate(DgpsStationRoute.Sheet.name + "?key=${encoded}")
+               }
+               MapAnnotation.Type.GEOPACKAGE -> {
+                  val featureKey = GeoPackageFeatureKey.fromId(annotation.key.id)
+                  val encoded = Uri.encode(Json.encodeToString(featureKey))
+                  navController.navigate(GeoPackageRoute.Sheet.name + "?key=${encoded}")
                }
             }
          },
@@ -189,6 +197,11 @@ fun NavGraphBuilder.mapGraph(
                      val key = DgpsStationKey.fromId(annotation.key.id)
                      val encoded = Uri.encode(Json.encodeToString(key))
                      navController.navigate(DgpsStationRoute.Detail.name + "?key=${encoded}")
+                  }
+                  MapAnnotation.Type.GEOPACKAGE -> {
+                     val key = GeoPackageFeatureKey.fromId(annotation.key.id)
+                     val encoded = Uri.encode(Json.encodeToString(key))
+                     navController.navigate(GeoPackageRoute.Detail.name + "?key=${encoded}")
                   }
                }
             }

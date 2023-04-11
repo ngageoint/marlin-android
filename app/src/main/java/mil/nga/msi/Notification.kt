@@ -33,7 +33,7 @@ class MarlinNotificationChannel {
 
       const val Id = "mil.nga.msi.Marlin"
       const val Name = "Marlin"
-      const val Importance = NotificationManager.IMPORTANCE_HIGH
+      private const val Importance = NotificationManager.IMPORTANCE_HIGH
 
       fun create(): NotificationChannel {
          return NotificationChannel(Id, Name, Importance)
@@ -170,6 +170,7 @@ class MarlinNotification @Inject constructor(
          DataSource.DGPS_STATION -> DgpsStationsFetchNotificationId
          DataSource.ELECTRONIC_PUBLICATION -> ElectronicPublicationFetchNotificationId
          DataSource.NOTICE_TO_MARINERS -> NoticeToMarinersFetchNotificationId
+         DataSource.GEOPACKAGE -> -1
       }
    }
 

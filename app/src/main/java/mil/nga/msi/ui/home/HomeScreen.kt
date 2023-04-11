@@ -14,6 +14,7 @@ import mil.nga.msi.ui.dgpsstation.dgpsStationGraph
 import mil.nga.msi.ui.electronicpublication.electronicPublicationGraph
 import mil.nga.msi.ui.embark.EmbarkRoute
 import mil.nga.msi.ui.embark.embarkGraph
+import mil.nga.msi.ui.geopackage.geopackageGraph
 import mil.nga.msi.ui.light.lightGraph
 import mil.nga.msi.ui.main.SnackbarState
 import mil.nga.msi.ui.map.AnnotationProvider
@@ -166,6 +167,10 @@ fun NavGraphBuilder.homeGraph(
    reportGraph(
       navController = navController,
       bottomBarVisibility = { bottomBarVisibility(false) }
+   )
+   geopackageGraph(
+      navController = navController,
+      showSnackbar = { showSnackbar(SnackbarState(message = it)) },
    )
    noticeToMarinersGraph(
       navController = navController,
