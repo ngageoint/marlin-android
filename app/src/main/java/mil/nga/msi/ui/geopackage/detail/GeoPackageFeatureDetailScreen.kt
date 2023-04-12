@@ -5,8 +5,6 @@ import android.graphics.BitmapFactory
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.ContentAlpha
-import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -207,10 +205,10 @@ fun FeatureDetails(
    if (feature != null) {
       Column {
          if (feature.properties.isNotEmpty()) {
-            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-               androidx.compose.material.Text(
+            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+              Text(
                   text = "DETAILS",
-                  style = androidx.compose.material.MaterialTheme.typography.caption,
+                  style = MaterialTheme.typography.bodySmall,
                   fontWeight = FontWeight.SemiBold,
                   modifier = Modifier.padding(8.dp)
                )
@@ -223,15 +221,15 @@ fun FeatureDetails(
          }
 
          if (feature.attributes.isNotEmpty()) {
-            androidx.compose.material.Divider(
-               color = androidx.compose.material.MaterialTheme.colors.onSurface.copy(alpha = 0.08f),
+            Divider(
+               color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f),
                modifier = Modifier.height(8.dp)
             )
 
-            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-               androidx.compose.material.Text(
+            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+               Text(
                   text = "ATTRIBUTES",
-                  style = androidx.compose.material.MaterialTheme.typography.caption,
+                  style = MaterialTheme.typography.bodySmall,
                   fontWeight = FontWeight.SemiBold,
                   modifier = Modifier.padding(8.dp)
                )
@@ -257,11 +255,11 @@ fun GeoPackageProperties(
             .sortedBy { property -> property.key }
             .forEach { property ->
                Column(Modifier.padding(bottom = 16.dp)) {
-                  CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                  CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                      Text(
                         modifier = Modifier.padding(bottom = 4.dp),
                         text = property.key,
-                        style = androidx.compose.material.MaterialTheme.typography.overline,
+                        style = MaterialTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold
                      )
                   }
@@ -308,10 +306,10 @@ private fun GeoPackageAttributes(
 
 @Composable
 private fun GeoPackageAttributeText(value: String) {
-   CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
-      androidx.compose.material.Text(
+   CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
+      Text(
          text = value,
-         style = androidx.compose.material.MaterialTheme.typography.subtitle1
+         style = MaterialTheme.typography.titleMedium
       )
    }
 }
@@ -347,8 +345,8 @@ private fun GeoPackageImage(
       Modifier
          .fillMaxWidth()
          .height(200.dp)
-         .clip(androidx.compose.material.MaterialTheme.shapes.medium)
-         .background(androidx.compose.material.MaterialTheme.colors.onSurface.copy(alpha = 0.08f))
+         .clip(MaterialTheme.shapes.medium)
+         .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f))
          .background(Color(0x19FFFFFF))
          .clickable { onClick?.invoke() }
    ) {
@@ -370,8 +368,8 @@ private fun GeoPackageMediaIcon(
       modifier = Modifier
          .fillMaxWidth()
          .height(200.dp)
-         .clip(androidx.compose.material.MaterialTheme.shapes.medium)
-         .background(androidx.compose.material.MaterialTheme.colors.onSurface.copy(alpha = 0.08f))
+         .clip(MaterialTheme.shapes.medium)
+         .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f))
          .clickable { onClick?.invoke() }
    ) {
 
@@ -383,7 +381,7 @@ private fun GeoPackageMediaIcon(
             .clip(CircleShape)
             .background(Color(0x54000000))
       ) {
-         androidx.compose.material.Icon(
+         Icon(
             imageVector = icon,
             contentDescription = "Media Icon",
             tint = Color(0xDEFFFFFF),
