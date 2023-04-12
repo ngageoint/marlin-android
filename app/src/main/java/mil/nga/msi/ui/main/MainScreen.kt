@@ -155,9 +155,6 @@ fun MainScreen(
                         onClick = {
                            if (currentDestination?.route?.substringBefore("?") != MapRoute.Map.name) {
                               navController.navigate(MapRoute.Map.name) {
-                                 popUpTo(navController.graph.findStartDestination().id) {
-                                    saveState = true
-                                 }
                                  launchSingleTop = true
                                  restoreState = true
                               }
@@ -187,9 +184,6 @@ fun MainScreen(
                            onClick = {
                               if (currentDestination?.route?.substringBefore("?") != tabRoute.name) {
                                  navController.navigate(tabRoute.name) {
-                                    popUpTo(navController.graph.findStartDestination().id) {
-                                       saveState = true
-                                    }
                                     launchSingleTop = true
                                     restoreState = true
                                  }
