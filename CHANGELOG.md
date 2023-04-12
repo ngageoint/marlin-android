@@ -5,6 +5,11 @@ Marlin adheres to [Semantic Versioning](http://semver.org/).
 ---
 ## Pending on [`develop`](https://github.com/ngageoint/mage-server/tree/develop)
 
+## 1.1.0
+
+##### Features
+* Addition of WMS, XYX/TMS and GeoPackage layer import.
+
 ## 1.0.1
 
 ##### Features
