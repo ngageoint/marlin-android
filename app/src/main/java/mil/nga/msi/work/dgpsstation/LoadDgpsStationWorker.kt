@@ -21,7 +21,7 @@ class LoadDgpsStationWorker @AssistedInject constructor(
       if (dataSource.isEmpty()) {
          context.assets.open("dgps.json").use { input ->
             val reader = JsonReader(InputStreamReader(input))
-            val stations = DgpsStationsTypeAdapter().read(reader)
+            val stations = DgpsStationsTypeAdapter().read(reader).dgpsStations
             dataSource.insert(stations)
          }
       }

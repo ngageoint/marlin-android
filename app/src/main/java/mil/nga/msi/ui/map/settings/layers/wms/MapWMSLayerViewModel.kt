@@ -1,6 +1,7 @@
 package mil.nga.msi.ui.map.settings.layers.wms
 
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -29,23 +30,25 @@ data class WmsState(
    private fun mapUrl(): String {
       val format = wmsCapabilities.capability?.request?.map?.getImageFormat() ?: "image/png"
       val version = wmsCapabilities.version
+      val transparent = format == "image/png"
       val epsg = if (version == "1.3" || version == "1.3.0") "CRS" else "SRS"
 
       return Uri.parse(baseUrl).buildUpon()
          .appendQueryParameter("REQUEST", "GetMap")
          .appendQueryParameter("SERVICE", "WMS")
+         .appendQueryParameter("VERSION", version ?: "1.3.0")
          .appendQueryParameter(epsg, "EPSG:3857")
          .appendQueryParameter("WIDTH", "256")
          .appendQueryParameter("HEIGHT", "256")
          .appendQueryParameter("FORMAT", format)
-         .appendQueryParameter("TRANSPARENT", "false")
+         .appendQueryParameter("TRANSPARENT", transparent.toString())
          .appendQueryParameter("LAYERS", layers.joinToString(","))
+         .appendQueryParameter("STYLES", "")
          .build()
          .toString()
    }
 }
 
-// TODO should I just inject 2 view models, should I put all this in one view model?
 @HiltViewModel
 class MapWMSLayerViewModel @Inject constructor(
  private val layerRepository: LayerRepository
@@ -149,9 +152,7 @@ class MapWMSLayerViewModel @Inject constructor(
          layer.layers.first {
             getLayer(name, it) != null
          }
-      } else {
-         null
-      }
+      } else null
    }
 
    companion object {

@@ -1,6 +1,7 @@
 package mil.nga.msi.repository.layer
 
 import android.net.Uri
+import android.util.Log
 import mil.nga.msi.network.layer.wms.WMSCapabilities
 import mil.nga.msi.network.layer.LayerService
 import javax.inject.Inject
@@ -18,7 +19,7 @@ class LayerRemoteDataSource @Inject constructor(
 
          try {
             val response = service.getTile(tileUri.toString())
-            response.isSuccessful
+            response.isSuccessful && response.body()?.contentType()?.type == "image"
          } catch (e: Exception) { false }
       } ?: false
    }

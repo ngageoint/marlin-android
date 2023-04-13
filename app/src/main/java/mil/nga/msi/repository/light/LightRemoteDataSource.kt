@@ -35,13 +35,13 @@ class LightRemoteDataSource @Inject constructor(
       )
 
       if (filteredResponse.isSuccessful) {
-         val body = filteredResponse.body()
+         val body = filteredResponse.body()?.lights
          if (latestLight != null && body?.isNotEmpty() == true) {
             // Pull all lights again and save to ensure regions are set correctly
             val response = service.getLights(volume = publicationVolume.volumeQuery)
             if (response.isSuccessful) {
                // TODO do we need to remove lights that don't come back that we have locally?
-               response.body()?.let { lights.addAll(it) }
+               response.body()?.let { lights.addAll(it.lights) }
             }
          } else {
             body?.let { lights.addAll(it) }

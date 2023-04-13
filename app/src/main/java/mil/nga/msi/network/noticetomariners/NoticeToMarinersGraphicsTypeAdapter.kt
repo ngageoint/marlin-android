@@ -8,17 +8,19 @@ import mil.nga.msi.datasource.noticetomariners.NoticeToMarinersGraphics
 import mil.nga.msi.network.nextIntOrNull
 import mil.nga.msi.network.nextStringOrNull
 
-class NoticeToMarinersGraphicsTypeAdapter: TypeAdapter<List<NoticeToMarinersGraphics>>() {
-   override fun read(`in`: JsonReader): List<NoticeToMarinersGraphics> {
+data class NoticeToMarinersGraphicsResponse(val graphics: List<NoticeToMarinersGraphics> = emptyList())
+
+class NoticeToMarinersGraphicsTypeAdapter: TypeAdapter<NoticeToMarinersGraphicsResponse>() {
+   override fun read(`in`: JsonReader): NoticeToMarinersGraphicsResponse {
       val graphics = mutableListOf<NoticeToMarinersGraphics>()
       if (`in`.peek() == JsonToken.NULL) {
          `in`.nextNull()
-         return graphics
+         return NoticeToMarinersGraphicsResponse()
       }
 
       if (`in`.peek() != JsonToken.BEGIN_OBJECT) {
          `in`.skipValue()
-         return graphics
+         return NoticeToMarinersGraphicsResponse()
       }
 
       `in`.beginObject()
@@ -32,7 +34,7 @@ class NoticeToMarinersGraphicsTypeAdapter: TypeAdapter<List<NoticeToMarinersGrap
       }
       `in`.endObject()
 
-      return graphics
+      return NoticeToMarinersGraphicsResponse(graphics)
    }
 
 
@@ -127,7 +129,7 @@ class NoticeToMarinersGraphicsTypeAdapter: TypeAdapter<List<NoticeToMarinersGrap
       } else { null }
    }
 
-   override fun write(out: JsonWriter, value: List<NoticeToMarinersGraphics>) {
+   override fun write(out: JsonWriter, value: NoticeToMarinersGraphicsResponse) {
       throw UnsupportedOperationException()
    }
 }

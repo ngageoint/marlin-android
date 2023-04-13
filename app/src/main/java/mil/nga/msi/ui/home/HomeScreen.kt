@@ -3,6 +3,7 @@ package mil.nga.msi.ui.home
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.runtime.LaunchedEffect
+import androidx.core.os.BundleCompat
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -65,7 +66,9 @@ fun NavGraphBuilder.homeGraph(
    ) { backstackEntry ->
       bottomBarVisibility(false)
 
-      val intent = backstackEntry.arguments?.getParcelable<Intent?>(NavController.KEY_DEEP_LINK_INTENT)
+      val intent = backstackEntry.arguments?.let { bundle ->
+         BundleCompat.getParcelable(bundle, NavController.KEY_DEEP_LINK_INTENT, Intent::class.java)
+      }
 
       MapGeoPackageLayerSettingsScreen(
          uri = intent?.data,

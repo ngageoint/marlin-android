@@ -9,17 +9,19 @@ import mil.nga.msi.datasource.light.Light
 import mil.nga.msi.network.nextIntOrNull
 import mil.nga.msi.network.nextStringOrNull
 
-class LightsTypeAdapter: TypeAdapter<List<Light>>() {
-   override fun read(`in`: JsonReader): List<Light> {
+data class LightResponse(val lights: List<Light> = emptyList())
+
+class LightsTypeAdapter: TypeAdapter<LightResponse>() {
+   override fun read(`in`: JsonReader): LightResponse {
       val lights = mutableListOf<Light>()
       if (`in`.peek() == JsonToken.NULL) {
          `in`.nextNull()
-         return lights
+         return LightResponse()
       }
 
       if (`in`.peek() != JsonToken.BEGIN_OBJECT) {
          `in`.skipValue()
-         return lights
+         return LightResponse()
       }
 
       `in`.beginObject()
@@ -33,7 +35,7 @@ class LightsTypeAdapter: TypeAdapter<List<Light>>() {
       }
       `in`.endObject()
 
-      return lights
+      return LightResponse(lights)
    }
 
    private fun readLights(`in`: JsonReader): List<Light> {
@@ -231,7 +233,7 @@ class LightsTypeAdapter: TypeAdapter<List<Light>>() {
       } else null
    }
 
-   override fun write(out: JsonWriter, value: List<Light>) {
+   override fun write(out: JsonWriter, value: LightResponse) {
       throw UnsupportedOperationException()
    }
 }

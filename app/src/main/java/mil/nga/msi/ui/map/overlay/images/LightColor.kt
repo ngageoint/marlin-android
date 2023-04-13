@@ -178,11 +178,11 @@ private fun coordinates(center: LatLng, radiusInMeters: Double): List<LatLng> {
    coordinates.add(LatLng(latitudeRadians.toDegrees(), longitudeRadians.toDegrees()))
 
    for (i in 0..360) {
-      val radial = toRadians(i.toDouble())
-      val latitudeRadians = asin(sin(centerLatitudeRadians) * cos(dRadians) + cos(centerLatitudeRadians) * sin(dRadians) * cos(radial))
-      val dLongitudeRadians = atan2(sin(radial) * sin(dRadians) * cos(centerLatitudeRadians), cos(dRadians) - sin(centerLatitudeRadians) * sin(latitudeRadians))
-      val longitudeRadians = ((centerLongitudeRadians + dLongitudeRadians + PI) % (2.0 * PI)) - PI
-      coordinates.add(LatLng(latitudeRadians.toDegrees(), longitudeRadians.toDegrees()))
+      val stepRadial = toRadians(i.toDouble())
+      val stepLatitudeRadians = asin(sin(centerLatitudeRadians) * cos(dRadians) + cos(centerLatitudeRadians) * sin(dRadians) * cos(stepRadial))
+      val stepDLongitudeRadians = atan2(sin(stepRadial) * sin(dRadians) * cos(centerLatitudeRadians), cos(dRadians) - sin(centerLatitudeRadians) * sin(stepLatitudeRadians))
+      val stepLongitudeRadians = ((centerLongitudeRadians + stepDLongitudeRadians + PI) % (2.0 * PI)) - PI
+      coordinates.add(LatLng(stepLatitudeRadians.toDegrees(), stepLongitudeRadians.toDegrees()))
    }
 
    val endRadial = toRadians(360.0)

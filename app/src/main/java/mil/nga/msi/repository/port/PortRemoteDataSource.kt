@@ -13,7 +13,7 @@ class PortRemoteDataSource @Inject constructor(
       val response = service.getPorts()
       if (response.isSuccessful) {
          response.body()?.let {
-            ports.addAll(it)
+            ports.addAll(it.ports)
          }
       }
 

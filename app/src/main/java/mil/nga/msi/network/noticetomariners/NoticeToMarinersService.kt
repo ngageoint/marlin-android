@@ -1,8 +1,6 @@
 package mil.nga.msi.network.noticetomariners
 
 import mil.nga.msi.datasource.noticetomariners.ChartCorrection
-import mil.nga.msi.datasource.noticetomariners.NoticeToMariners
-import mil.nga.msi.datasource.noticetomariners.NoticeToMarinersGraphics
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.GET
@@ -15,14 +13,14 @@ interface NoticeToMarinersService {
       @Query("output") output: String = "json",
       @Query("minNoticeNumber") minNoticeNumber: String? = null,
       @Query("maxNoticeNumber") maxNoticeNumber: String? = null,
-   ): Response<List<NoticeToMariners>>
+   ): Response<NoticeToMarinersResponse>
 
    @GET("/api/publications/ntm/ntm-graphics")
    suspend fun getNoticeToMarinersGraphics(
       @Query("noticeNumber") noticeNumber: Int,
       @Query("graphicType") graphicType: String = "All",
       @Query("output") output: String = "json"
-   ): Response<List<NoticeToMarinersGraphics>>
+   ): Response<NoticeToMarinersGraphicsResponse>
 
    @GET("/api/publications/download/")
    @Streaming
@@ -47,5 +45,5 @@ interface NoticeToMarinersService {
       @Query("longitudeRight") maxLongitude: Double,
       @Query("noticeNumber") noticeNumber: Int? = null,
       @Query("output") output: String = "json"
-   ): Response<List<ChartCorrection>>
+   ): Response<ChartCorrectionResponse>
 }

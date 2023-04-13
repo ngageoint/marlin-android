@@ -10,17 +10,19 @@ import mil.nga.msi.network.nextDoubleOrNull
 import mil.nga.msi.network.nextIntOrNull
 import mil.nga.msi.network.nextStringOrNull
 
-class PortsTypeAdapter: TypeAdapter<List<Port>>() {
-   override fun read(`in`: JsonReader): List<Port> {
+data class PortResponse(val ports: List<Port> = emptyList())
+
+class PortsTypeAdapter: TypeAdapter<PortResponse>() {
+   override fun read(`in`: JsonReader): PortResponse {
       val ports = mutableListOf<Port>()
       if (`in`.peek() == JsonToken.NULL) {
          `in`.nextNull()
-         return ports
+         return PortResponse()
       }
 
       if (`in`.peek() != JsonToken.BEGIN_OBJECT) {
          `in`.skipValue()
-         return ports
+         return PortResponse()
       }
 
       `in`.beginObject()
@@ -34,7 +36,7 @@ class PortsTypeAdapter: TypeAdapter<List<Port>>() {
       }
       `in`.endObject()
 
-      return ports
+      return PortResponse(ports)
    }
 
    private fun readPorts(`in`: JsonReader): List<Port> {
@@ -779,7 +781,7 @@ class PortsTypeAdapter: TypeAdapter<List<Port>>() {
       } else { null }
    }
 
-   override fun write(out: JsonWriter, value: List<Port>) {
+   override fun write(out: JsonWriter, value: PortResponse) {
       throw UnsupportedOperationException()
    }
 }

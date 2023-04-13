@@ -2,6 +2,7 @@ package mil.nga.msi.ui.geopackage
 
 import android.net.Uri
 import androidx.compose.ui.graphics.Color
+import androidx.core.os.BundleCompat
 import androidx.navigation.*
 import androidx.navigation.compose.composable
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
@@ -42,7 +43,9 @@ fun NavGraphBuilder.geopackageGraph(
       route = "${GeoPackageRoute.Detail.name}?key={key}",
       arguments = listOf(navArgument("key") { type = NavType.GeoPackageFeature })
    ) { backstackEntry ->
-      backstackEntry.arguments?.getParcelable<GeoPackageFeatureKey>("key")?.let { key ->
+      backstackEntry.arguments?.let { bundle ->
+         BundleCompat.getParcelable(bundle, "key", GeoPackageFeatureKey::class.java)
+      }?.let { key ->
          GeoPackageFeatureDetailScreen(
             key = key,
             close = {
@@ -70,7 +73,9 @@ fun NavGraphBuilder.geopackageGraph(
       route = "${GeoPackageRoute.Media.name}?key={key}",
       arguments = listOf(navArgument("key") { type = NavType.GeoPackageMedia })
    ) { backstackEntry ->
-      backstackEntry.arguments?.getParcelable<GeoPackageMediaKey>("key")?.let { key ->
+      backstackEntry.arguments?.let { bundle ->
+         BundleCompat.getParcelable(bundle, "key", GeoPackageMediaKey::class.java)
+      }?.let { key ->
          GeoPackageMediaScreen(
             key = key,
             close = {
@@ -84,7 +89,9 @@ fun NavGraphBuilder.geopackageGraph(
       route = "${GeoPackageRoute.Sheet.name}?key={key}",
       arguments = listOf(navArgument("key") { type = NavType.GeoPackageFeature })
    ) { backstackEntry ->
-      backstackEntry.arguments?.getParcelable<GeoPackageFeatureKey>("key")?.let { key ->
+      backstackEntry.arguments?.let { bundle ->
+         BundleCompat.getParcelable(bundle, "key", GeoPackageFeatureKey::class.java)
+      }?.let { key ->
          GeoPackageFeatureSheetScreen(
             key = key,
             onDetails = {

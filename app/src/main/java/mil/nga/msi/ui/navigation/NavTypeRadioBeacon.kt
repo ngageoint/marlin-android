@@ -1,6 +1,7 @@
 package mil.nga.msi.ui.navigation
 
 import android.os.Bundle
+import androidx.core.os.BundleCompat
 import androidx.navigation.NavType
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
@@ -15,7 +16,7 @@ val NavType.Companion.RadioBeacon: NavType<RadioBeaconKey?>
       }
 
       override fun get(bundle: Bundle, key: String): RadioBeaconKey? {
-         return bundle.getParcelable(key)
+         return BundleCompat.getParcelable(bundle, key, RadioBeaconKey::class.java)
       }
 
       override fun parseValue(value: String): RadioBeaconKey? {

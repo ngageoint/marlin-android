@@ -1,13 +1,14 @@
 package mil.nga.msi.network.layer.wms
 
-import org.simpleframework.xml.*
+import com.tickaroo.tikxml.annotation.*
 
-@Root(name = "WMS_Capabilities", strict = false)
+
+@Xml(name = "WMS_Capabilities")
 data class WMSCapabilities(
-   @field:Attribute(name = "version", required = false)
+   @field:Attribute(name = "version")
    var version: String? = null,
 
-   @field:Element(name = "Service", required = false)
+   @field:Element(name = "Service")
    var service: Service? = null,
 
    @field:Element(name = "Capability")
@@ -18,61 +19,61 @@ data class WMSCapabilities(
    }
 }
 
-@Root(name = "Service", strict = false)
+@Xml(name = "Service")
 data class Service(
-   @field:Element(name = "Name", required = false)
+   @field:PropertyElement(name = "Name")
    var name: String? = null,
 
-   @field:Element(name = "Title", required = false)
+   @field:PropertyElement(name = "Title")
    var title: String? = null,
 
-   @field:Element(name = "Abstract", required = false)
+   @field:PropertyElement(name = "Abstract")
    var abstract: String? = null,
 
-   @field:Element(name = "ContactInformation", required = false)
+   @field:Element(name = "ContactInformation")
    var contactInformation: ContactInformation? = null
 )
 
-@Root(name = "ContactInformation", strict = false)
+@Xml(name = "ContactInformation")
 data class ContactInformation(
-   @field:Element(name = "ContactPersonPrimary", required = false)
+   @field:Element(name = "ContactPersonPrimary")
    var person: ContactPersonPrimary? = null,
 
-   @field:Element(name = "ContactVoiceTelephone", required = false)
+   @field:PropertyElement(name = "ContactVoiceTelephone")
    var phone: String? = null,
 
-   @field:Element(name = "ContactElectronicMailAddress", required = false)
+   @field:PropertyElement(name = "ContactElectronicMailAddress")
    var email: String? = null
 )
 
-@Root(name = "ContactPersonPrimary", strict = false)
+@Xml(name = "ContactPersonPrimary")
 data class ContactPersonPrimary(
-   @field:Element(name = "ContactPerson", required = false)
+   @field:PropertyElement(name = "ContactPerson")
    var name: String? = null,
 
-   @field:Element(name = "ContactOrganization", required = false)
+   @field:PropertyElement(name = "ContactOrganization")
    var organization: String? = null
 )
 
-@Root(name = "Capability", strict = false)
+@Xml(name = "Capability")
 data class Capability(
-   @field:Element(name = "Request", required = false)
+   @field:Element(name = "Request")
    var request: Request? = null,
 
-   @field:ElementList(name = "Layer", inline = true, required = false)
+   @field:Element(name = "Layer")
    var layers: List<Layer> = mutableListOf()
 )
 
-@Root(name = "Request", strict = false)
+@Xml(name = "Request")
 data class Request(
-   @field:Element(name = "GetMap", required = false)
+   @field:Element(name = "GetMap")
    var map: GetMap? = null
 )
 
-@Root(name = "GetMap", strict = false)
+@Xml(name = "GetMap")
 data class GetMap(
-   @field:ElementList(name="Format", entry="Format", inline = true, required = false, type = String::class)
-   var formats: List<String> = mutableListOf()
+   @field:Element(name="Format")
+   var formats: List<StringWrapper> = mutableListOf()
 ) {
    fun hasImageFormat(): Boolean {
       return getImageFormat() != null
@@ -80,30 +81,30 @@ data class GetMap(
 
    fun getImageFormat(): String? {
       return formats.firstOrNull {
-         it.equals("image/png", ignoreCase = true) ||
-         it.equals("image/jpeg", ignoreCase = true)
-      }
+         it.value.equals("image/png", ignoreCase = true) ||
+                 it.value.equals("image/jpeg", ignoreCase = true)
+      }?.value
    }
 }
 
-@Root(name = "Layer", strict = false)
+@Xml(name = "Layer")
 data class Layer(
-   @field:Element(name = "Title")
+   @field:PropertyElement(name = "Title")
    var title: String? = null,
 
-   @field:Element(name = "Abstract")
+   @field:PropertyElement(name = "Abstract")
    var abstract: String? = null,
 
-   @field:Element(name = "Name", required = false)
+   @field:PropertyElement(name = "Name")
    var name: String? = null,
 
-   @field:ElementList(name="CRS", entry="CRS", inline = true, required = false, type = String::class)
-   var crs: List<String> = mutableListOf(),
+   @field:Element(name="CRS")
+   var crs: List<StringWrapper> = mutableListOf(),
 
-   @field:ElementList(name = "BoundingBox", inline = true, required = false)
+   @field:Element(name = "BoundingBox")
    var boundingBoxes: List<BoundingBox> = mutableListOf(),
 
-   @field:ElementList(name = "Layer", inline = true, required = false)
+   @field:Element(name = "Layer")
    var layers: List<Layer> = mutableListOf()
 ) {
    fun hasTiles(): Boolean {
@@ -112,8 +113,8 @@ data class Layer(
 
    fun isWebMercator(): Boolean {
       return if (crs.any {
-            it.equals("EPSG:3857", ignoreCase = true) ||
-            it.equals("EPSG:900913", ignoreCase = true)
+            it.value.equals("EPSG:3857", ignoreCase = true) ||
+                    it.value.equals("EPSG:900913", ignoreCase = true)
          }) {
          true
       } else {
@@ -122,20 +123,26 @@ data class Layer(
    }
 }
 
-@Root(name = "BoundingBox", strict = false)
+@Xml(name = "BoundingBox")
 class BoundingBox {
-   @field:Attribute(name = "CRS", required = false)
+   @field:Attribute(name = "CRS")
    lateinit var crs: String
 
-   @field:Attribute(name = "minx", required = false)
+   @field:Attribute(name = "minx")
    var minX: Double = 0.0
 
-   @field:Attribute(name = "miny", required = false)
+   @field:Attribute(name = "miny")
    var minY: Double = 0.0
 
-   @field:Attribute(name = "maxx", required = false)
+   @field:Attribute(name = "maxx")
    var maxX: Double = 0.0
 
-   @field:Attribute(name = "maxy", required = false)
+   @field:Attribute(name = "maxy")
    var maxY: Double = 0.0
+}
+
+@Xml
+class StringWrapper {
+   @TextContent
+   var value: String? = null
 }

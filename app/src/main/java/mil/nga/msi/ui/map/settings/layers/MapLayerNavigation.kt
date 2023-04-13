@@ -2,6 +2,7 @@ package mil.nga.msi.ui.map.settings.layers
 
 import android.net.Uri
 import androidx.compose.ui.graphics.Color
+import androidx.core.os.BundleCompat
 import androidx.navigation.*
 import androidx.navigation.compose.composable
 import kotlinx.serialization.encodeToString
@@ -125,11 +126,13 @@ fun NavGraphBuilder.mapLayerGraph(
 
    composable(
       route = "${MapLayerRoute.CreateGridLayer.name}?layer={layer}",
-      arguments = listOf(navArgument("layer") { type = NavType.Layer })
+      arguments = listOf(navArgument("layer") { type = NavType.NavTypeLayer })
    ) { backstackEntry ->
       bottomBarVisibility(false)
 
-      val layer = backstackEntry.arguments?.getParcelable<Layer>("layer")
+      val layer = backstackEntry.arguments?.let { bundle ->
+         BundleCompat.getParcelable(bundle, "layer", Layer::class.java)
+      }
       requireNotNull(layer) { "'layer' argument is required" }
 
       MapGridLayerScreen(
@@ -156,11 +159,13 @@ fun NavGraphBuilder.mapLayerGraph(
 
    composable(
       route = "${MapLayerRoute.WMSLayerCreateSettings.name}?layer={layer}",
-      arguments = listOf(navArgument("layer") { type = NavType.Layer })
+      arguments = listOf(navArgument("layer") { type = NavType.NavTypeLayer })
    ) { backstackEntry ->
       bottomBarVisibility(false)
 
-      val layer = backstackEntry.arguments?.getParcelable<Layer>("layer")
+      val layer = backstackEntry.arguments?.let { bundle ->
+         BundleCompat.getParcelable(bundle, "layer", Layer::class.java)
+      }
       requireNotNull(layer) { "'layer' argument is required" }
 
       MapWMSLayerSettingsScreen(
@@ -201,11 +206,13 @@ fun NavGraphBuilder.mapLayerGraph(
 
    composable(
       route = "${MapLayerRoute.WMSLayer.name}?layer={layer}",
-      arguments = listOf(navArgument("layer") { type = NavType.Layer })
+      arguments = listOf(navArgument("layer") { type = NavType.NavTypeLayer })
    ) { backstackEntry ->
       bottomBarVisibility(false)
 
-      val layer = backstackEntry.arguments?.getParcelable<Layer>("layer")
+      val layer = backstackEntry.arguments?.let { bundle ->
+         BundleCompat.getParcelable(bundle, "layer", Layer::class.java)
+      }
       requireNotNull(layer) { "'layer' argument is required" }
 
       MapWMSLayerScreen(
@@ -218,11 +225,13 @@ fun NavGraphBuilder.mapLayerGraph(
 
    composable(
       route = "${MapLayerRoute.GeoPackageLayerCreateSettings.name}?layer={layer}&import={import}",
-      arguments = listOf(navArgument("layer") { type = NavType.Layer })
+      arguments = listOf(navArgument("layer") { type = NavType.NavTypeLayer })
    ) { backstackEntry ->
       bottomBarVisibility(false)
 
-      val layer = backstackEntry.arguments?.getParcelable<Layer>("layer")
+      val layer = backstackEntry.arguments?.let { bundle ->
+         BundleCompat.getParcelable(bundle, "layer", Layer::class.java)
+      }
       requireNotNull(layer) { "'layer' argument is required" }
 
       val import = backstackEntry.arguments?.getString("import")?.toBoolean() ?: false
@@ -265,11 +274,13 @@ fun NavGraphBuilder.mapLayerGraph(
 
    composable(
       route = "${MapLayerRoute.GeoPackageLayer.name}?layer={layer}&import={import}&embark={embark}",
-      arguments = listOf(navArgument("layer") { type = NavType.Layer })
+      arguments = listOf(navArgument("layer") { type = NavType.NavTypeLayer })
    ) { backstackEntry ->
       bottomBarVisibility(false)
 
-      val layer = backstackEntry.arguments?.getParcelable<Layer>("layer")
+      val layer = backstackEntry.arguments?.let { bundle ->
+         BundleCompat.getParcelable(bundle, "layer", Layer::class.java)
+      }
       requireNotNull(layer) { "'layer' argument is required" }
 
       val import = backstackEntry.arguments?.getString("import")?.toBoolean() ?: false

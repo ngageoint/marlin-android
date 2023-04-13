@@ -35,13 +35,13 @@ class RadioBeaconRemoteDataSource @Inject constructor(
       )
 
       if (filteredResponse.isSuccessful) {
-         val body = filteredResponse.body()
+         val body = filteredResponse.body()?.radioBeacons
          if (latestBeacon != null && body?.isNotEmpty() == true) {
             // Pull all radio beacons again and save to ensure regions are set correctly
             val response = service.getRadioBeacons(volume = publicationVolume.volumeQuery)
             if (response.isSuccessful) {
                // TODO do we need to remove lights that don't come back that we have locally?
-               response.body()?.let { beacons.addAll(it) }
+               response.body()?.let { beacons.addAll(it.radioBeacons) }
             }
          } else {
             body?.let { beacons.addAll(it) }

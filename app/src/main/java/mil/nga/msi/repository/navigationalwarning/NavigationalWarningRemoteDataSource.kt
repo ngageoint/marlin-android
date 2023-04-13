@@ -13,7 +13,7 @@ class NavigationalWarningRemoteDataSource @Inject constructor(
       val response = service.getNavigationalWarnings()
       if (response.isSuccessful) {
          response.body()?.let {
-            warnings.addAll(it)
+            warnings.addAll(it.warnings)
          }
       }
 

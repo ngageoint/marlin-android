@@ -2,6 +2,7 @@ package mil.nga.msi.ui.noticetomariners
 
 import android.net.Uri
 import androidx.compose.ui.graphics.Color
+import androidx.core.os.BundleCompat
 import androidx.navigation.*
 import androidx.navigation.compose.composable
 import kotlinx.serialization.encodeToString
@@ -117,8 +118,9 @@ fun NavGraphBuilder.noticeToMarinersGraph(
          arguments = listOf(navArgument("graphic") { type = NavType.NavTypeNoticeToMarinersGraphic })
       ) { backstackEntry ->
          bottomBarVisibility(false)
-
-         backstackEntry.arguments?.getParcelable<NoticeToMarinersGraphic>("graphic")?.let { graphic ->
+         backstackEntry.arguments?.let { bundle ->
+            BundleCompat.getParcelable(bundle, "graphic", NoticeToMarinersGraphic::class.java)
+         }?.let { graphic ->
             NoticeToMarinersGraphicScreen(
                graphic = graphic,
                close = { navController.popBackStack() }

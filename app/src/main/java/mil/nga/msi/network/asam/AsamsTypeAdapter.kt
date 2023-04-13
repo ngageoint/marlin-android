@@ -1,5 +1,6 @@
 package mil.nga.msi.network.asam
 
+import android.util.Log
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
@@ -10,17 +11,20 @@ import mil.nga.msi.network.nextStringOrNull
 import java.text.SimpleDateFormat
 import java.util.*
 
-class AsamsTypeAdapter: TypeAdapter<List<Asam>>() {
-   override fun read(`in`: JsonReader): List<Asam> {
+data class AsamResponse(val asams: List<Asam> = emptyList())
+
+class AsamsTypeAdapter: TypeAdapter<AsamResponse>() {
+
+   override fun read(`in`: JsonReader): AsamResponse {
       val asams = mutableListOf<Asam>()
       if (`in`.peek() == JsonToken.NULL) {
          `in`.nextNull()
-         return asams
+         return AsamResponse()
       }
 
       if (`in`.peek() != JsonToken.BEGIN_OBJECT) {
          `in`.skipValue()
-         return asams
+         return AsamResponse()
       }
 
       `in`.beginObject()
@@ -34,7 +38,7 @@ class AsamsTypeAdapter: TypeAdapter<List<Asam>>() {
       }
       `in`.endObject()
 
-      return asams
+      return AsamResponse(asams)
    }
 
    private fun readAsams(`in`: JsonReader): List<Asam> {
@@ -132,7 +136,7 @@ class AsamsTypeAdapter: TypeAdapter<List<Asam>>() {
       } else null
    }
 
-   override fun write(out: JsonWriter, value: List<Asam>) {
+   override fun write(out: JsonWriter, value: AsamResponse) {
       throw UnsupportedOperationException()
    }
 }

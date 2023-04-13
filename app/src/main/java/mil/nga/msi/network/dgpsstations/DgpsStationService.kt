@@ -1,6 +1,5 @@
 package mil.nga.msi.network.dgpsstations
 
-import mil.nga.msi.datasource.dgpsstation.DgpsStation
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -13,5 +12,5 @@ interface DgpsStationService {
       @Query("minNoticeNumber") minNoticeNumber: String? = null,
       @Query("maxNoticeNumber") maxNoticeNumber: String? = null,
       @Query("includeRemovals") includeRemovals: String = "false"
-   ): Response<List<DgpsStation>>
+   ): Response<DgpsStationResponse>
 }

@@ -2,6 +2,7 @@ package mil.nga.msi.ui.dgpsstation
 
 import android.net.Uri
 import androidx.compose.ui.graphics.Color
+import androidx.core.os.BundleCompat
 import androidx.navigation.*
 import androidx.navigation.compose.composable
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
@@ -89,7 +90,9 @@ fun NavGraphBuilder.dgpsStationGraph(
       ) { backstackEntry ->
          bottomBarVisibility(false)
 
-         backstackEntry.arguments?.getParcelable<DgpsStationKey>("key")?.let { key ->
+         backstackEntry.arguments?.let { bundle ->
+            BundleCompat.getParcelable(bundle, "key", DgpsStationKey::class.java)
+         }?.let { key ->
             DgpsStationDetailScreen(
                key,
                close = { navController.popBackStack() },
@@ -108,7 +111,10 @@ fun NavGraphBuilder.dgpsStationGraph(
          route = "${DgpsStationRoute.Sheet.name}?key={key}",
          arguments = listOf(navArgument("key") { type = NavType.DgpsStation })
       ) { backstackEntry ->
-         backstackEntry.arguments?.getParcelable<DgpsStationKey>("key")?.let { key ->
+
+         backstackEntry.arguments?.let { bundle ->
+            BundleCompat.getParcelable(bundle, "key", DgpsStationKey::class.java)
+         }?.let { key ->
             DgpsStationSheetScreen(key, onDetails = {
                val encoded = Uri.encode(Json.encodeToString(key))
                navController.navigate( "${DgpsStationRoute.Detail.name}?key=$encoded")

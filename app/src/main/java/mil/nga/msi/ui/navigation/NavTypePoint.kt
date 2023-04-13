@@ -2,6 +2,7 @@ package mil.nga.msi.ui.navigation
 
 import android.os.Bundle
 import android.os.Parcelable
+import androidx.core.os.BundleCompat
 import androidx.navigation.NavType
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
@@ -21,7 +22,7 @@ data class Point(val latitude: Double, val longitude: Double): Parcelable {
    }
 }
 
-val NavType.Companion.Point: NavType<Point?>
+val NavType.Companion.NavTypePoint: NavType<Point?>
    get() = pointType
 
    private val pointType = object : NavType<Point?>(true) {
@@ -30,7 +31,7 @@ val NavType.Companion.Point: NavType<Point?>
       }
 
       override fun get(bundle: Bundle, key: String): Point? {
-         return bundle.getParcelable(key)
+         return BundleCompat.getParcelable(bundle, key, Point::class.java)
       }
 
       override fun parseValue(value: String): Point? {

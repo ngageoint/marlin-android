@@ -10,17 +10,19 @@ import mil.nga.msi.network.nextDoubleOrNull
 import mil.nga.msi.network.nextIntOrNull
 import mil.nga.msi.network.nextStringOrNull
 
-class DgpsStationsTypeAdapter: TypeAdapter<List<DgpsStation>>() {
-   override fun read(`in`: JsonReader): List<DgpsStation> {
+data class DgpsStationResponse(val dgpsStations: List<DgpsStation> = emptyList())
+
+class DgpsStationsTypeAdapter: TypeAdapter<DgpsStationResponse>() {
+   override fun read(`in`: JsonReader): DgpsStationResponse {
       val dgpsStations = mutableListOf<DgpsStation>()
       if (`in`.peek() == JsonToken.NULL) {
          `in`.nextNull()
-         return dgpsStations
+         return DgpsStationResponse()
       }
 
       if (`in`.peek() != JsonToken.BEGIN_OBJECT) {
          `in`.skipValue()
-         return dgpsStations
+         return DgpsStationResponse()
       }
 
       `in`.beginObject()
@@ -34,7 +36,7 @@ class DgpsStationsTypeAdapter: TypeAdapter<List<DgpsStation>>() {
       }
       `in`.endObject()
 
-      return dgpsStations
+      return DgpsStationResponse(dgpsStations)
    }
 
    private fun readDgpsStations(`in`: JsonReader): List<DgpsStation> {
@@ -191,7 +193,7 @@ class DgpsStationsTypeAdapter: TypeAdapter<List<DgpsStation>>() {
       } else null
    }
 
-   override fun write(out: JsonWriter, value: List<DgpsStation>) {
+   override fun write(out: JsonWriter, value: DgpsStationResponse) {
       throw UnsupportedOperationException()
    }
 }

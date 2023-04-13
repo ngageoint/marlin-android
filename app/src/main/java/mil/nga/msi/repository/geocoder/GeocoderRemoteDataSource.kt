@@ -1,19 +1,32 @@
 package mil.nga.msi.repository.geocoder
 
+import android.location.Address
 import android.location.Geocoder
 import com.google.android.gms.maps.model.LatLng
 import mil.nga.gars.GARS
 import mil.nga.mgrs.MGRS
 import mil.nga.msi.coordinate.DMS
 import mil.nga.msi.coordinate.WGS84
+import mil.nga.msi.geocoder.getFromLocationName
 import mil.nga.msi.ui.map.TileProviderType
 import javax.inject.Inject
+import kotlin.coroutines.suspendCoroutine
 
 data class GeocoderState(
    val name: String,
    val address: String? = null,
    val location: LatLng
-)
+) {
+   companion object {
+      fun fromAddress(address: Address): GeocoderState {
+         return GeocoderState(
+            name = address.featureName,
+            address = address.getAddressLine(0)?.toString(),
+            location = LatLng(address.latitude, address.longitude)
+         )
+      }
+   }
+}
 
 class GeocoderRemoteDataSource @Inject constructor(
    private val geocoder: Geocoder
@@ -58,19 +71,9 @@ class GeocoderRemoteDataSource @Inject constructor(
       }
    }
 
-   private suspend fun fetchAddresses(text: String): List<GeocoderState> {
-      val results = geocoder.getFromLocationName(text, 10) ?: emptyList()
-
-      return results.mapNotNull {
-         if (it.featureName != null) {
-            it
-         } else null
-      }.map {
-         GeocoderState(
-            name = it.featureName,
-            address = it.getAddressLine(0)?.toString(),
-            location = LatLng(it.latitude, it.longitude)
-         )
+   private suspend fun fetchAddresses(text: String) = suspendCoroutine { continuation ->
+      geocoder.getFromLocationName(text) {
+         continuation.resumeWith(Result.success(it))
       }
    }
 }

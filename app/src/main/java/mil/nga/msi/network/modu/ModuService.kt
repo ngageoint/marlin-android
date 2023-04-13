@@ -1,6 +1,5 @@
 package mil.nga.msi.network.modu
 
-import mil.nga.msi.datasource.modu.Modu
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -12,5 +11,5 @@ interface ModuService {
       @Query("output") output: String = "json",
       @Query("minSourceDate") minDate: String? = null,
       @Query("maxSourceDate") maxDate: String? = null,
-   ): Response<List<Modu>>
+   ): Response<ModuResponse>
 }

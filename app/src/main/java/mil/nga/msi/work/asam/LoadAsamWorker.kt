@@ -21,7 +21,7 @@ class LoadAsamWorker @AssistedInject constructor(
       if (dataSource.isEmpty()) {
          context.assets.open("asam.json").use { input ->
             val reader = JsonReader(InputStreamReader(input))
-            val asams = AsamsTypeAdapter().read(reader)
+            val asams = AsamsTypeAdapter().read(reader).asams
             dataSource.insert(asams)
          }
       }

@@ -8,17 +8,19 @@ import mil.nga.msi.coordinate.DMS
 import mil.nga.msi.datasource.radiobeacon.RadioBeacon
 import mil.nga.msi.network.nextStringOrNull
 
-class RadioBeaconsTypeAdapter: TypeAdapter<List<RadioBeacon>>() {
-   override fun read(`in`: JsonReader): List<RadioBeacon> {
+data class RadioBeaconResponse(val radioBeacons: List<RadioBeacon> = emptyList())
+
+class RadioBeaconsTypeAdapter: TypeAdapter<RadioBeaconResponse>() {
+   override fun read(`in`: JsonReader): RadioBeaconResponse {
       val beacons = mutableListOf<RadioBeacon>()
       if (`in`.peek() == JsonToken.NULL) {
          `in`.nextNull()
-         return beacons
+         return RadioBeaconResponse()
       }
 
       if (`in`.peek() != JsonToken.BEGIN_OBJECT) {
          `in`.skipValue()
-         return beacons
+         return RadioBeaconResponse()
       }
 
       `in`.beginObject()
@@ -32,7 +34,7 @@ class RadioBeaconsTypeAdapter: TypeAdapter<List<RadioBeacon>>() {
       }
       `in`.endObject()
 
-      return beacons
+      return RadioBeaconResponse(beacons)
    }
 
    private fun readRadioBeacons(`in`: JsonReader): List<RadioBeacon> {
@@ -189,7 +191,7 @@ class RadioBeaconsTypeAdapter: TypeAdapter<List<RadioBeacon>>() {
       } else null
    }
 
-   override fun write(out: JsonWriter, value: List<RadioBeacon>) {
+   override fun write(out: JsonWriter, value: RadioBeaconResponse) {
       throw UnsupportedOperationException()
    }
 }

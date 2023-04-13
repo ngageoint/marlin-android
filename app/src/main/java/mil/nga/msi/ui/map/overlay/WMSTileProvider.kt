@@ -1,6 +1,7 @@
 package mil.nga.msi.ui.map.overlay
 
 import android.net.Uri
+import android.util.Log
 import java.net.MalformedURLException
 import java.net.URL
 import kotlin.math.*
@@ -20,6 +21,7 @@ class WMSTileProvider(
          .appendQueryParameter("BBOX", bbox(x, y, z))
 
       val url = builder.build().toString()
+
       return try {
          URL(url)
       } catch (e: MalformedURLException) { null }

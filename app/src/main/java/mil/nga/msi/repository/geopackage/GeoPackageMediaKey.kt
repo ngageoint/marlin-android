@@ -15,11 +15,4 @@ data class GeoPackageMediaKey(
    fun id(): String {
       return "${layerId}--${table}--${mediaId}"
    }
-
-   companion object {
-      fun fromId(id: String): GeoPackageMediaKey {
-         val (layerId, table, featureId, mediaId) = id.split("--")
-         return GeoPackageMediaKey(layerId.toLong(), table, mediaId.toLong())
-      }
-   }
 }

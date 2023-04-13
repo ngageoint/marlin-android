@@ -22,7 +22,7 @@ class ModuRemoteDataSource @Inject constructor(
       val response = service.getModus(minDate = minDate, maxDate = maxDate)
       if (response.isSuccessful) {
          response.body()?.let {
-            modus.addAll(it)
+            modus.addAll(it.modus)
          }
       }
 

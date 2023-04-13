@@ -61,15 +61,15 @@ class AsamRepository @Inject constructor(
 
    suspend fun fetchAsams(refresh: Boolean = false): List<Asam> {
       if (refresh) {
-         val asams = remoteDataSource.fetchAsams()
+         val msiAsam = remoteDataSource.fetchAsams()
 
          val fetched = userPreferencesRepository.fetched(DataSource.ASAM)
          if (fetched != null) {
-            val newAsams = asams.subtract(localDataSource.existingAsams(asams.map { it.reference }).toSet()).toList()
+            val newAsams = msiAsam.asams.subtract(localDataSource.existingAsams(msiAsam.asams.map { it.reference }).toSet()).toList()
             notification.asam(newAsams)
          }
 
-         localDataSource.insert(asams)
+         localDataSource.insert(msiAsam.asams)
       }
 
       return localDataSource.getAsams()

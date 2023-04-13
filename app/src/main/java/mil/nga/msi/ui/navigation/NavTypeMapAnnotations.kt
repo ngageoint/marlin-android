@@ -1,6 +1,7 @@
 package mil.nga.msi.ui.navigation
 
 import android.os.Bundle
+import androidx.core.os.BundleCompat
 import androidx.navigation.NavType
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
@@ -15,7 +16,7 @@ val NavType.Companion.MapAnnotationsType: NavType<List<MapAnnotation>?>
       }
 
       override fun get(bundle: Bundle, key: String): List<MapAnnotation>? {
-         return bundle.getParcelableArray(key)?.toList() as? List<MapAnnotation>?
+         return BundleCompat.getParcelable(bundle, key, List::class.java)?.map { it as MapAnnotation}?.toList()
       }
 
       override fun parseValue(value: String): List<MapAnnotation>? {

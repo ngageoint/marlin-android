@@ -2,6 +2,7 @@ package mil.nga.msi.ui.light
 
 import android.net.Uri
 import androidx.compose.ui.graphics.Color
+import androidx.core.os.BundleCompat
 import androidx.navigation.*
 import androidx.navigation.compose.composable
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
@@ -15,7 +16,7 @@ import mil.nga.msi.ui.light.detail.LightDetailScreen
 import mil.nga.msi.ui.light.list.LightsScreen
 import mil.nga.msi.ui.light.sheet.LightSheetScreen
 import mil.nga.msi.ui.map.MapRoute
-import mil.nga.msi.ui.navigation.LightKey
+import mil.nga.msi.ui.navigation.NavTypeLightKey
 import mil.nga.msi.ui.navigation.Point
 import mil.nga.msi.ui.navigation.Route
 import mil.nga.msi.ui.sort.SortScreen
@@ -85,11 +86,13 @@ fun NavGraphBuilder.lightGraph(
 
       composable(
          route = "${LightRoute.Detail.name}?key={key}",
-         arguments = listOf(navArgument("key") { type = NavType.LightKey })
+         arguments = listOf(navArgument("key") { type = NavType.NavTypeLightKey })
       ) { backstackEntry ->
          bottomBarVisibility(false)
 
-         backstackEntry.arguments?.getParcelable<LightKey>("key")?.let { key ->
+         backstackEntry.arguments?.let { bundle ->
+            BundleCompat.getParcelable(bundle, "key", LightKey::class.java)
+         }?.let { key ->
             LightDetailScreen(
                key,
                close = { navController.popBackStack() },
@@ -106,9 +109,11 @@ fun NavGraphBuilder.lightGraph(
 
       bottomSheet(
          route = "${LightRoute.Sheet.name}?key={key}",
-         arguments = listOf(navArgument("key") { type = NavType.LightKey })
+         arguments = listOf(navArgument("key") { type = NavType.NavTypeLightKey })
       ) { backstackEntry ->
-         backstackEntry.arguments?.getParcelable<LightKey>("key")?.let { key ->
+         backstackEntry.arguments?.let { bundle ->
+            BundleCompat.getParcelable(bundle, "key", LightKey::class.java)
+         }?.let { key ->
             LightSheetScreen(key, onDetails = {
                val encoded = Uri.encode(Json.encodeToString(key))
                navController.navigate( "${LightRoute.Detail.name}?key=$encoded")

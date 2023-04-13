@@ -20,8 +20,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.drawable.toBitmap
+import androidx.core.os.BundleCompat
 import mil.nga.msi.R
+import mil.nga.msi.packagemanager.getPackageInfoCompat
 import mil.nga.msi.ui.main.TopBar
+import mil.nga.msi.ui.navigation.Point
 
 @Composable
 fun AboutScreen(
@@ -140,7 +143,7 @@ private fun Contact(
 @Composable
 private fun Version() {
    val context =  LocalContext.current
-   val packageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
+   val packageInfo = context.packageManager.getPackageInfoCompat(context.packageName, 0)
 
    Surface {
       Column(

@@ -35,13 +35,13 @@ class DgpsStationRemoteDataSource @Inject constructor(
       )
 
       if (filteredResponse.isSuccessful) {
-         val body = filteredResponse.body()
+         val body = filteredResponse.body()?.dgpsStations
          if (latestDgpsStation != null && body?.isNotEmpty() == true) {
             // Pull all radio beacons again and save to ensure regions are set correctly
             val response = service.getDgpsStations(volume = publicationVolume.volumeQuery)
             if (response.isSuccessful) {
                // TODO do we need to remove lights that don't come back that we have locally?
-               response.body()?.let { dgpsStations.addAll(it) }
+               response.body()?.let { dgpsStations.addAll(it.dgpsStations) }
             }
          } else {
             body?.let { dgpsStations.addAll(it) }

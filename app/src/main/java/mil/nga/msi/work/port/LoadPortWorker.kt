@@ -21,7 +21,7 @@ class LoadPortWorker @AssistedInject constructor(
       if (dataSource.isEmpty()) {
          context.assets.open("port.json").use { input ->
             val reader = JsonReader(InputStreamReader(input))
-            val ports = PortsTypeAdapter().read(reader)
+            val ports = PortsTypeAdapter().read(reader).ports
             dataSource.insert(ports)
          }
       }

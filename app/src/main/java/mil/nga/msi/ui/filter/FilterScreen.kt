@@ -636,7 +636,7 @@ private fun DateValue(
             value = dateFormat.format(date),
             onValueChange = { },
             enabled = false,
-            colors = TextFieldDefaults.textFieldColors(
+            colors = TextFieldDefaults.colors(
                disabledTrailingIconColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
                disabledTextColor = LocalContentColor.current.copy(LocalContentAlpha.current)
             ),

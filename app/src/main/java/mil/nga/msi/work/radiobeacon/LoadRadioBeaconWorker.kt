@@ -21,7 +21,7 @@ class LoadRadioBeaconWorker @AssistedInject constructor(
       if (dataSource.isEmpty()) {
          context.assets.open("radio_beacon.json").use { input ->
             val reader = JsonReader(InputStreamReader(input))
-            val beacons = RadioBeaconsTypeAdapter().read(reader)
+            val beacons = RadioBeaconsTypeAdapter().read(reader).radioBeacons
             dataSource.insert(beacons)
          }
       }

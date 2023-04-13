@@ -86,7 +86,7 @@ class ElectronicPublicationTypeBrowseViewModel @Inject constructor(
         }
     }
 
-    fun uriToSharePublication(ePub: ElectronicPublication): Uri = ePubRepo.getContentUriToSharePublication(ePub)
+    fun uriToSharePublication(ePub: ElectronicPublication) = ePubRepo.getContentUriToSharePublication(ePub)
 }
 
 fun linksForNode(node: PublicationBrowsingNode, ePubs: List<ElectronicPublication>): PublicationBrowsingLinksArrangement {

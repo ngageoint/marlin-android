@@ -21,7 +21,7 @@ class LoadModuWorker @AssistedInject constructor(
       if (dataSource.isEmpty()) {
          context.assets.open("modu.json").use { input ->
             val reader = JsonReader(InputStreamReader(input))
-            val modus = ModusTypeAdapter().read(reader)
+            val modus = ModusTypeAdapter().read(reader).modus
             dataSource.insert(modus)
          }
       }

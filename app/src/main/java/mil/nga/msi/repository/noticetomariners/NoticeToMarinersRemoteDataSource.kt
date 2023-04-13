@@ -48,7 +48,7 @@ class NoticeToMarinersRemoteDataSource @Inject constructor(
 
       if (response.isSuccessful) {
          val body = response.body()
-         body?.let { noticeToMariners.addAll(it) }
+         body?.let { noticeToMariners.addAll(it.noticeToMariners) }
       }
 
       return noticeToMariners
@@ -63,7 +63,7 @@ class NoticeToMarinersRemoteDataSource @Inject constructor(
 
       if (response.isSuccessful) {
          val body = response.body()
-         body?.let { graphics.addAll(it) }
+         body?.let { graphics.addAll(it.graphics) }
       }
 
       return graphics
@@ -138,7 +138,7 @@ class NoticeToMarinersRemoteDataSource @Inject constructor(
          )
 
          if (response.isSuccessful) {
-            response.body()?.let { corrections.addAll(it) }
+            response.body()?.let { corrections.addAll(it.chartCorrections) }
          }
       }
 

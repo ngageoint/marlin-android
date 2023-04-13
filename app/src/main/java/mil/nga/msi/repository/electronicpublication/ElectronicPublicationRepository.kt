@@ -121,10 +121,11 @@ class ElectronicPublicationRepository @Inject constructor(
         }
     }
 
-    fun getContentUriToSharePublication(ePub: ElectronicPublication): Uri {
+    fun getContentUriToSharePublication(ePub: ElectronicPublication): Uri? {
         val extDirPath = context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)
-        val ePubFile = File(extDirPath, ePub.localDownloadRelPath)
-        return FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", ePubFile)
+        return ePub.localDownloadRelPath?.let { path ->
+            FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", File(extDirPath, path))
+        }
     }
 
     val fetching: LiveData<Boolean> = MutableLiveData(false)

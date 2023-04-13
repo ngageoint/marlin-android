@@ -21,7 +21,7 @@ class LoadNoticeToMarinersWorker @AssistedInject constructor(
       if (dataSource.isEmpty()) {
          context.assets.open("ntm.json").use { input ->
             val reader = JsonReader(InputStreamReader(input))
-            val noticeToMariners = NoticeToMarinersTypeAdapter().read(reader)
+            val noticeToMariners = NoticeToMarinersTypeAdapter().read(reader).noticeToMariners
             dataSource.insert(noticeToMariners)
          }
       }

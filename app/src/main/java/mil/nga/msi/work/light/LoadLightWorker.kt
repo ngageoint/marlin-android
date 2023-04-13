@@ -30,7 +30,7 @@ class LoadLightWorker @AssistedInject constructor(
          ).forEach { file ->
             context.assets.open(file).use { input ->
                val reader = JsonReader(InputStreamReader(input))
-               val lights = LightsTypeAdapter().read(reader)
+               val lights = LightsTypeAdapter().read(reader).lights
                dataSource.insert(lights)
             }
          }

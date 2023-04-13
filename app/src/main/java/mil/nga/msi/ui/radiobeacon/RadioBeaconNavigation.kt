@@ -2,6 +2,7 @@ package mil.nga.msi.ui.radiobeacon
 
 import android.net.Uri
 import androidx.compose.ui.graphics.Color
+import androidx.core.os.BundleCompat
 import androidx.navigation.*
 import androidx.navigation.compose.composable
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
@@ -89,7 +90,9 @@ fun NavGraphBuilder.radioBeaconGraph(
       ) { backstackEntry ->
          bottomBarVisibility(false)
 
-         backstackEntry.arguments?.getParcelable<RadioBeaconKey>("key")?.let { key ->
+         backstackEntry.arguments?.let { bundle ->
+            BundleCompat.getParcelable(bundle, "key", RadioBeaconKey::class.java)
+         }?.let { key ->
             RadioBeaconDetailScreen(
                key,
                close = { navController.popBackStack() },
@@ -108,7 +111,9 @@ fun NavGraphBuilder.radioBeaconGraph(
          route = "${RadioBeaconRoute.Sheet.name}?key={key}",
          arguments = listOf(navArgument("key") { type = NavType.RadioBeacon })
       ) { backstackEntry ->
-         backstackEntry.arguments?.getParcelable<RadioBeaconKey>("key")?.let { key ->
+         backstackEntry.arguments?.let { bundle ->
+            BundleCompat.getParcelable(bundle, "point", RadioBeaconKey::class.java)
+         }?.let { key ->
             RadioBeaconSheetScreen(key, onDetails = {
                val encoded = Uri.encode(Json.encodeToString(key))
                navController.navigate( "${RadioBeaconRoute.Detail.name}?key=$encoded")

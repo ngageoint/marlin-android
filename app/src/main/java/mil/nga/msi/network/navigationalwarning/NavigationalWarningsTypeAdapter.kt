@@ -11,17 +11,19 @@ import mil.nga.msi.network.nextStringOrNull
 import java.text.SimpleDateFormat
 import java.util.*
 
-class NavigationalWarningsTypeAdapter: TypeAdapter<List<NavigationalWarning>>() {
-   override fun read(`in`: JsonReader): List<NavigationalWarning> {
+data class NavigationalWarningResponse(val warnings: List<NavigationalWarning> = emptyList())
+
+class NavigationalWarningsTypeAdapter: TypeAdapter<NavigationalWarningResponse>() {
+   override fun read(`in`: JsonReader): NavigationalWarningResponse {
       val warnings = mutableListOf<NavigationalWarning>()
       if (`in`.peek() == JsonToken.NULL) {
          `in`.nextNull()
-         return warnings
+         return NavigationalWarningResponse()
       }
 
       if (`in`.peek() != JsonToken.BEGIN_OBJECT) {
          `in`.skipValue()
-         return warnings
+         return NavigationalWarningResponse()
       }
 
       `in`.beginObject()
@@ -35,7 +37,7 @@ class NavigationalWarningsTypeAdapter: TypeAdapter<List<NavigationalWarning>>() 
       }
       `in`.endObject()
 
-      return warnings
+      return NavigationalWarningResponse(warnings)
    }
 
    private fun readNavigationalWarnings(`in`: JsonReader): List<NavigationalWarning> {
@@ -152,7 +154,7 @@ class NavigationalWarningsTypeAdapter: TypeAdapter<List<NavigationalWarning>>() 
       } else { null }
    }
 
-   override fun write(out: JsonWriter, value: List<NavigationalWarning>) {
+   override fun write(out: JsonWriter, value: NavigationalWarningResponse) {
       throw UnsupportedOperationException()
    }
 }

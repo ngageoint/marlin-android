@@ -11,17 +11,19 @@ import mil.nga.msi.network.nextIntOrNull
 import mil.nga.msi.network.nextStringOrNull
 import java.time.Instant
 
-class ChartCorrectionsTypeAdapter: TypeAdapter<List<ChartCorrection>>() {
-   override fun read(`in`: JsonReader): List<ChartCorrection> {
+data class ChartCorrectionResponse(val chartCorrections: List<ChartCorrection> = emptyList())
+
+class ChartCorrectionsTypeAdapter: TypeAdapter<ChartCorrectionResponse>() {
+   override fun read(`in`: JsonReader): ChartCorrectionResponse {
       val corrections = mutableListOf<ChartCorrection>()
       if (`in`.peek() == JsonToken.NULL) {
          `in`.nextNull()
-         return corrections
+         return ChartCorrectionResponse()
       }
 
       if (`in`.peek() != JsonToken.BEGIN_OBJECT) {
          `in`.skipValue()
-         return corrections
+         return ChartCorrectionResponse()
       }
 
       `in`.beginObject()
@@ -35,7 +37,7 @@ class ChartCorrectionsTypeAdapter: TypeAdapter<List<ChartCorrection>>() {
       }
       `in`.endObject()
 
-      return corrections
+      return ChartCorrectionResponse(corrections)
    }
 
    private fun readChartCorrections(`in`: JsonReader): List<ChartCorrection> {
@@ -77,7 +79,7 @@ class ChartCorrectionsTypeAdapter: TypeAdapter<List<ChartCorrection>>() {
       var portCode: Int? = null
       var classification: String? = null
       var priceCategory: String? = null
-      var date: Instant? = null
+      val date: Instant? = null
       var location: String? = null
       val corrections = mutableListOf<Correction>()
 
@@ -247,7 +249,7 @@ class ChartCorrectionsTypeAdapter: TypeAdapter<List<ChartCorrection>>() {
       )
    }
 
-   override fun write(out: JsonWriter, value: List<ChartCorrection>) {
+   override fun write(out: JsonWriter, value: ChartCorrectionResponse) {
       throw UnsupportedOperationException()
    }
 }

@@ -4,6 +4,7 @@ import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
+import mil.nga.msi.datasource.asam.Asam
 import mil.nga.msi.datasource.noticetomariners.NoticeToMariners
 import mil.nga.msi.network.nextBooleanOrNull
 import mil.nga.msi.network.nextIntOrNull
@@ -11,17 +12,19 @@ import mil.nga.msi.network.nextStringOrNull
 import mil.nga.msi.parseAsInstant
 import java.time.Instant
 
-class NoticeToMarinersTypeAdapter: TypeAdapter<List<NoticeToMariners>>() {
-   override fun read(`in`: JsonReader): List<NoticeToMariners> {
+data class NoticeToMarinersResponse(val noticeToMariners: List<NoticeToMariners> = emptyList())
+
+class NoticeToMarinersTypeAdapter: TypeAdapter<NoticeToMarinersResponse>() {
+   override fun read(`in`: JsonReader): NoticeToMarinersResponse {
       val noticeToMariners = mutableListOf<NoticeToMariners>()
       if (`in`.peek() == JsonToken.NULL) {
          `in`.nextNull()
-         return noticeToMariners
+         return NoticeToMarinersResponse()
       }
 
       if (`in`.peek() != JsonToken.BEGIN_OBJECT) {
          `in`.skipValue()
-         return noticeToMariners
+         return NoticeToMarinersResponse()
       }
 
       `in`.beginObject()
@@ -35,7 +38,7 @@ class NoticeToMarinersTypeAdapter: TypeAdapter<List<NoticeToMariners>>() {
       }
       `in`.endObject()
 
-      return noticeToMariners
+      return NoticeToMarinersResponse(noticeToMariners)
    }
 
    private fun readNoticeToMariners(`in`: JsonReader): List<NoticeToMariners> {
@@ -153,7 +156,7 @@ class NoticeToMarinersTypeAdapter: TypeAdapter<List<NoticeToMariners>>() {
       } else { null }
    }
 
-   override fun write(out: JsonWriter, value: List<NoticeToMariners>) {
+   override fun write(out: JsonWriter, value: NoticeToMarinersResponse) {
       throw UnsupportedOperationException()
    }
 }

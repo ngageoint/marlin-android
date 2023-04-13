@@ -3,6 +3,7 @@ package mil.nga.msi.ui.map
 import android.net.Uri
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
+import androidx.core.os.BundleCompat
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
@@ -59,19 +60,23 @@ fun NavGraphBuilder.mapGraph(
       arguments = listOf(
          navArgument("point") {
             defaultValue = null
-            type = NavType.Point
+            type = NavType.NavTypePoint
             nullable = true
          },
          navArgument("bounds") {
             defaultValue = null
-            type = NavType.Bounds
+            type = NavType.NavTypeBounds
             nullable = true
          }
       )
    ) { backstackEntry ->
       bottomBarVisibility(true)
-      val location = backstackEntry.arguments?.getParcelable<Point?>("point")?.asMapLocation(16f)
-      val latLngBounds = backstackEntry.arguments?.getParcelable<Bounds?>("bounds")?.asLatLngBounds()
+      val location = backstackEntry.arguments?.let { bundle ->
+         BundleCompat.getParcelable(bundle, "point", Point::class.java)?.asMapLocation(16f)
+      }
+      val latLngBounds = backstackEntry.arguments?.let { bundle ->
+         BundleCompat.getParcelable(bundle, "bounds", Bounds::class.java)?.asLatLngBounds()
+      }
       val destination = if (location != null) {
          MapPosition(location = location)
       } else if (latLngBounds != null) {
@@ -167,9 +172,9 @@ fun NavGraphBuilder.mapGraph(
       route = "${MapRoute.PagerSheet.name}?annotations={annotations}",
       arguments = listOf(navArgument("annotations") { type = NavType.MapAnnotationsType })
    ) { backstackEntry ->
-      backstackEntry.arguments?.getParcelableArray("annotations")?.let {
-         it.toList() as? List<MapAnnotation>
-      }?.let {  annotations ->
+      backstackEntry.arguments?.let { bundle ->
+         BundleCompat.getParcelableArray(bundle, "annotations", MapAnnotation::class.java)?.map { it as MapAnnotation }?.toList()
+      }?.let { annotations ->
          PagingSheet(
             annotations,
             onDetails =  {annotation ->

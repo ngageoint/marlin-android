@@ -12,17 +12,19 @@ import mil.nga.msi.network.nextStringOrNull
 import java.text.SimpleDateFormat
 import java.util.*
 
-class ModusTypeAdapter: TypeAdapter<List<Modu>>() {
-   override fun read(`in`: JsonReader): List<Modu> {
+data class ModuResponse(val modus: List<Modu> = emptyList())
+
+class ModusTypeAdapter: TypeAdapter<ModuResponse>() {
+   override fun read(`in`: JsonReader): ModuResponse {
       val modus = mutableListOf<Modu>()
       if (`in`.peek() == JsonToken.NULL) {
          `in`.nextNull()
-         return modus
+         return ModuResponse()
       }
 
       if (`in`.peek() != JsonToken.BEGIN_OBJECT) {
          `in`.skipValue()
-         return modus
+         return ModuResponse()
       }
 
       `in`.beginObject()
@@ -36,7 +38,7 @@ class ModusTypeAdapter: TypeAdapter<List<Modu>>() {
       }
       `in`.endObject()
 
-      return modus
+      return ModuResponse(modus)
    }
 
    private fun readModus(`in`: JsonReader): List<Modu> {
@@ -144,7 +146,7 @@ class ModusTypeAdapter: TypeAdapter<List<Modu>>() {
       } else { null }
    }
 
-   override fun write(out: JsonWriter, value: List<Modu>) {
+   override fun write(out: JsonWriter, value: ModuResponse) {
       throw UnsupportedOperationException()
    }
 }

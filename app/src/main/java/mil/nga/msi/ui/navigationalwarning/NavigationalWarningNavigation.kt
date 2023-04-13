@@ -2,6 +2,7 @@ package mil.nga.msi.ui.navigationalwarning
 
 import android.net.Uri
 import androidx.compose.ui.graphics.Color
+import androidx.core.os.BundleCompat
 import androidx.navigation.*
 import androidx.navigation.compose.composable
 import kotlinx.serialization.encodeToString
@@ -9,7 +10,7 @@ import kotlinx.serialization.json.Json
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.navigationwarning.NavigationArea
 import mil.nga.msi.repository.navigationalwarning.NavigationalWarningKey
-import mil.nga.msi.ui.navigation.NavigationalWarningKey
+import mil.nga.msi.ui.navigation.NavTypeNavigationalWarningKey
 import mil.nga.msi.ui.navigation.Route
 import mil.nga.msi.ui.navigationalwarning.detail.NavigationalWarningDetailScreen
 import mil.nga.msi.ui.navigationalwarning.list.NavigationalWarningsScreen
@@ -80,11 +81,13 @@ fun NavGraphBuilder.navigationalWarningGraph(
       }
       composable(
          route = "${NavigationWarningRoute.Detail.name}?key={key}",
-         arguments = listOf(navArgument("key") { type = NavType.NavigationalWarningKey })
+         arguments = listOf(navArgument("key") { type = NavType.NavTypeNavigationalWarningKey })
       ) { backstackEntry ->
          bottomBarVisibility(false)
 
-         backstackEntry.arguments?.getParcelable<NavigationalWarningKey>("key")?.let { key ->
+         backstackEntry.arguments?.let { bundle ->
+            BundleCompat.getParcelable(bundle, "key", NavigationalWarningKey::class.java)
+         }?.let { key ->
             NavigationalWarningDetailScreen(
                key = key,
                close = { navController.popBackStack() },
