@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface LayerDao {
    @Insert(onConflict = OnConflictStrategy.REPLACE)
-   suspend fun insert(layer: Layer)
+   suspend fun insert(layer: Layer): Long
 
    @Update(onConflict = OnConflictStrategy.REPLACE)
    suspend fun update(layer: Layer)

@@ -11,6 +11,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.maps.android.compose.*
 import kotlinx.coroutines.launch
 import mil.nga.msi.datasource.layer.Layer
+import mil.nga.msi.repository.preferences.Credentials
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.MapRoute
 import java.net.URLDecoder
@@ -18,6 +19,7 @@ import java.net.URLDecoder
 @Composable
 fun MapWMSLayerScreen(
    layer: Layer,
+   credentials: Credentials?,
    onClose: () -> Unit,
    viewModel: MapWMSLayerViewModel = hiltViewModel()
 ) {
@@ -45,10 +47,13 @@ fun MapWMSLayerScreen(
                enabled = name.isNotEmpty(),
                onClick = {
                   scope.launch {
-                     viewModel.saveLayer(layer.copy(
-                        name = name,
-                        url = layer.url
-                     ))
+                     viewModel.saveLayer(
+                        layer = layer.copy(
+                           name = name,
+                           url = layer.url
+                        ),
+                        credentials = credentials
+                     )
                      onClose()
                   }
                },

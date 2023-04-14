@@ -12,12 +12,17 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import mil.nga.msi.datasource.layer.Layer
 import mil.nga.msi.datasource.layer.LayerType
+import mil.nga.msi.network.layer.LayerService
 import mil.nga.msi.repository.layer.LayerRepository
+import mil.nga.msi.repository.preferences.Credentials
+import mil.nga.msi.repository.preferences.SharedPreferencesRepository
 import javax.inject.Inject
 
 @HiltViewModel
 class MapGridLayerViewModel @Inject constructor(
- private val layerRepository: LayerRepository
+   val layerService: LayerService,
+   private val layerRepository: LayerRepository,
+   private val preferencesRepository: SharedPreferencesRepository
 ): ViewModel() {
    private val _layer = MutableLiveData<Layer>()
    val layer: LiveData<Layer> = _layer
@@ -29,11 +34,11 @@ class MapGridLayerViewModel @Inject constructor(
    private val _tileUrl = MutableLiveData<Uri?>()
    val tileUrl: LiveData<Uri?> = _tileUrl
 
-   fun setUrl(url: String) {
+   fun setUrl(url: String, credentials: Credentials? = null) {
       tileUrlJob?.cancel()
       tileUrlJob = viewModelScope.launch {
          delay(DEBOUNCE_TIMEOUT_MILLIS)
-         if (layerRepository.getTile(url)) {
+         if (layerRepository.getTile(url, credentials)) {
             _tileUrl.value = Uri.parse(url)
             _fetchError.value = false
          } else {
@@ -54,7 +59,8 @@ class MapGridLayerViewModel @Inject constructor(
       type: LayerType,
       url: String,
       minZoom: Int?,
-      maxZoom: Int?
+      maxZoom: Int?,
+      credentials: Credentials?
    ) {
       val layer = Layer(
          name = name,
@@ -65,7 +71,10 @@ class MapGridLayerViewModel @Inject constructor(
          maxZoom = maxZoom
       )
 
-      layerRepository.createLayer(layer)
+      val layerId = layerRepository.createLayer(layer)
+      credentials?.let {
+         preferencesRepository.setLayerCredentials(layerId, it)
+      }
    }
 
    suspend fun updateLayer(

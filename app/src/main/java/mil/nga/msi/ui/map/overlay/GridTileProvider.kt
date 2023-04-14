@@ -4,20 +4,26 @@ import android.net.Uri
 import mil.nga.geopackage.tiles.TileBoundingBoxUtils
 import mil.nga.msi.datasource.layer.Layer
 import mil.nga.msi.datasource.layer.LayerType
+import mil.nga.msi.network.layer.LayerService
+import mil.nga.msi.repository.preferences.Credentials
 import java.net.MalformedURLException
 import java.net.URL
 
 open class GridTileProvider(
    private val baseUrl: Uri,
+   service: LayerService,
+   credentials: Credentials? = null,
    width: Int = 256,
    height: Int = 256,
    private val minZoom: Int? = null,
    private val maxZoom: Int? = null,
    private val invertYAxis: Boolean = false
-) : MarlinTileProvider(width, height) {
+) : MarlinTileProvider(service, credentials, width, height) {
 
-   constructor(layer: Layer): this(
+   constructor(service: LayerService, layer: Layer, credentials: Credentials? = null): this(
+      service = service,
       baseUrl = Uri.parse(layer.url),
+      credentials = credentials,
       minZoom = layer.minZoom,
       maxZoom = layer.maxZoom,
       invertYAxis = layer.type == LayerType.TMS

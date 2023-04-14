@@ -1,7 +1,6 @@
 package mil.nga.msi.ui.map.settings.layers.wms
 
 import android.net.Uri
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -14,8 +13,11 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import mil.nga.msi.datasource.layer.BoundingBox
 import mil.nga.msi.datasource.layer.Layer
+import mil.nga.msi.network.layer.LayerService
 import mil.nga.msi.network.layer.wms.WMSCapabilities
 import mil.nga.msi.repository.layer.LayerRepository
+import mil.nga.msi.repository.preferences.Credentials
+import mil.nga.msi.repository.preferences.SharedPreferencesRepository
 import javax.inject.Inject
 
 data class WmsState(
@@ -23,7 +25,8 @@ data class WmsState(
    val baseUrl: String,
    val layers: List<String>,
    val boundingBox: BoundingBox? = null,
-   val wmsCapabilities: WMSCapabilities
+   val wmsCapabilities: WMSCapabilities,
+   val credentials: Credentials? = null
 ) {
    val mapUrl = mapUrl()
 
@@ -51,7 +54,9 @@ data class WmsState(
 
 @HiltViewModel
 class MapWMSLayerViewModel @Inject constructor(
- private val layerRepository: LayerRepository
+   val layerService: LayerService,
+   private val layerRepository: LayerRepository,
+   private val preferencesRepository: SharedPreferencesRepository
 ): ViewModel() {
    private var wmsUrlJob: Job? = null
    private val _wmsState = MutableLiveData<WmsState?>()
@@ -59,6 +64,9 @@ class MapWMSLayerViewModel @Inject constructor(
 
    private val _fetchError = MutableLiveData(false)
    val fetchError: LiveData<Boolean> = _fetchError
+
+   private val _credentials = MutableLiveData<Credentials>()
+   val credentials: LiveData<Credentials> = _credentials
 
    fun setLayerId(id: Long) {
       wmsUrlJob?.cancel()
@@ -77,22 +85,24 @@ class MapWMSLayerViewModel @Inject constructor(
                   layer = layer,
                   baseUrl = baseUrl,
                   layers = layers,
-                  wmsCapabilities = wmsCapabilities
+                  wmsCapabilities = wmsCapabilities,
+                  credentials = credentials.value
                )
             )
          }
       }
    }
 
-   fun setUrl(url: String) {
+   fun setUrl(url: String, credentials: Credentials? = null) {
       viewModelScope.launch {
-         val wmsCapabilities = layerRepository.getWMSCapabilities(url)
+         val wmsCapabilities = layerRepository.getWMSCapabilities(url, credentials)
          if (wmsCapabilities != null) {
             _wmsState.postValue(
                WmsState(
                   baseUrl = url,
                   layers = emptyList(),
-                  wmsCapabilities = wmsCapabilities
+                  wmsCapabilities = wmsCapabilities,
+                  credentials = credentials
                )
             )
             _fetchError.postValue(false)
@@ -134,9 +144,29 @@ class MapWMSLayerViewModel @Inject constructor(
       }
    }
 
-   suspend fun saveLayer(layer: Layer) {
+   fun setUsername(username: String) {
+      _credentials.value = Credentials(
+         username = username,
+         password = _credentials.value?.password ?: ""
+      )
+   }
+
+   fun setPassword(password: String) {
+      _credentials.value = Credentials(
+         username  =_credentials.value?.username ?: "",
+         password
+      )
+   }
+
+   suspend fun saveLayer(
+      layer: Layer,
+      credentials: Credentials?
+   ) {
       if (layer.id == 0L) {
-         layerRepository.createLayer(layer)
+         val layerId = layerRepository.createLayer(layer)
+         credentials?.let {
+            preferencesRepository.setLayerCredentials(layerId, it)
+         }
       } else {
          layerRepository.updateLayer(layer)
       }

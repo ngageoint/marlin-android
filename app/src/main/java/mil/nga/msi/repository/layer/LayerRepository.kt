@@ -8,6 +8,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import mil.nga.msi.datasource.layer.Layer
 import mil.nga.msi.datasource.layer.LayerType
+import mil.nga.msi.repository.preferences.Credentials
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -27,8 +28,8 @@ class LayerRepository @Inject constructor(
    fun observeLayers() = localDataSource.observeLayers()
    fun observeVisibleLayers() = localDataSource.observeVisibleLayers()
 
-   suspend fun getTile(url: String) = remoteDataSource.getTile(url)
-   suspend fun getWMSCapabilities(url: String) = remoteDataSource.getWMSCapabilities(url)
+   suspend fun getTile(url: String, credentials: Credentials? = null) = remoteDataSource.getTile(url, credentials)
+   suspend fun getWMSCapabilities(url: String, credentials: Credentials? = null) = remoteDataSource.getWMSCapabilities(url, credentials)
 
    suspend fun getLayer(id: Long) = localDataSource.getLayer(id)
    suspend fun insertLayer(layer: Layer) = localDataSource.insertLayer(layer)
@@ -50,15 +51,17 @@ class LayerRepository @Inject constructor(
       path.toFile()
    }
 
-   suspend fun createLayer(layer: Layer) = withContext(Dispatchers.IO) {
+   suspend fun createLayer(layer: Layer): Long = withContext(Dispatchers.IO) {
       if (layer.type == LayerType.GEOPACKAGE) {
          layer.filePath?.let {
             val file = saveGeoPackageFile(it)
             val geoPackageLayer = layer.copy(filePath = file.absolutePath)
             localDataSource.insertLayer(geoPackageLayer)
          }
+         layer.id
       } else {
-         localDataSource.insertLayer(layer)
+         val layerId = localDataSource.insertLayer(layer)
+         layerId
       }
    }
 

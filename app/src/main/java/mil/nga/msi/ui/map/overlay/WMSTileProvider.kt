@@ -1,18 +1,21 @@
 package mil.nga.msi.ui.map.overlay
 
 import android.net.Uri
-import android.util.Log
+import mil.nga.msi.network.layer.LayerService
+import mil.nga.msi.repository.preferences.Credentials
 import java.net.MalformedURLException
 import java.net.URL
 import kotlin.math.*
 
 class WMSTileProvider(
+   service: LayerService,
+   credentials: Credentials? = null,
    width: Int = 256,
    height: Int = 256,
    private val url: String,
    private val minZoom: Int? = null,
    private val maxZoom: Int? = null
-) : MarlinTileProvider(width, height) {
+) : MarlinTileProvider(service, credentials, width, height) {
 
    override fun getTileUrl(x: Int, y: Int, z: Int): URL? {
       if (!withinZoom(z, minZoom, maxZoom)) return null

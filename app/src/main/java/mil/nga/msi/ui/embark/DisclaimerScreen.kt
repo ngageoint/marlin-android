@@ -50,7 +50,12 @@ private fun Disclaimer(
    var height by remember { mutableStateOf(0) }
    val scrollState = rememberScrollState()
 
-   Surface {
+   Surface(
+      color = MaterialTheme.colorScheme.primary,
+      modifier = Modifier.onGloballyPositioned { coordinates ->
+         height = coordinates.size.height
+      }
+   ) {
       Column(
          Modifier
             .fillMaxSize()
@@ -65,9 +70,7 @@ private fun Disclaimer(
             )
             .verticalScroll(scrollState)
             .padding(vertical = 48.dp, horizontal = 32.dp)
-            .onGloballyPositioned { coordinates ->
-               height = coordinates.size.height
-            }
+
       ) {
          Text(
             text = "Welcome to Marlin",

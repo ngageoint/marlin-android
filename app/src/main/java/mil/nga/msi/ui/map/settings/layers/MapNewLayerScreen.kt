@@ -6,6 +6,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -18,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
@@ -27,7 +29,9 @@ import com.google.maps.android.ktx.model.tileOverlayOptions
 import kotlinx.coroutines.launch
 import mil.nga.msi.datasource.layer.Layer
 import mil.nga.msi.datasource.layer.LayerType
+import mil.nga.msi.network.layer.LayerService
 import mil.nga.msi.network.layer.wms.WMSCapabilities
+import mil.nga.msi.repository.preferences.Credentials
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.overlay.GridTileProvider
 import mil.nga.msi.ui.map.settings.layers.geopackage.GeopackageLayerViewModel
@@ -37,7 +41,7 @@ import mil.nga.msi.ui.map.settings.layers.wms.MapWMSLayerViewModel
 @Composable
 fun MapNewLayerScreen(
    onClose: () -> Unit,
-   onLayer: (Layer) -> Unit,
+   onLayer: (Layer, Credentials?) -> Unit,
    wmsViewModel: MapWMSLayerViewModel = hiltViewModel(),
    gridViewModel: MapGridLayerViewModel = hiltViewModel(),
    geoPackageViewModel: GeopackageLayerViewModel = hiltViewModel()
@@ -50,6 +54,7 @@ fun MapNewLayerScreen(
    val tileError by gridViewModel.fetchError.observeAsState(false)
    val wmsState by wmsViewModel.wmsState.observeAsState()
    val wmsError by wmsViewModel.fetchError.observeAsState(false)
+   val credentials by wmsViewModel.credentials.observeAsState()
 
    LaunchedEffect(tileUrl) {
       if (tileUrl != null && type == null) {
@@ -58,7 +63,7 @@ fun MapNewLayerScreen(
    }
 
    LaunchedEffect(wmsState?.wmsCapabilities) {
-      if (wmsState?.wmsCapabilities != null && type == null) {
+      if (wmsState?.wmsCapabilities?.isValid() == true && type == null) {
          type = LayerType.WMS
       }
    }
@@ -83,19 +88,22 @@ fun MapNewLayerScreen(
                serverError = tileError && wmsError,
                onUrlChanged = {
                   url = it
-                  wmsViewModel.setUrl(it)
-                  gridViewModel.setUrl(it)
+                  wmsViewModel.setUrl(it, credentials)
+                  gridViewModel.setUrl(it, credentials)
                },
                onTypeChanged = { type = it },
                onGeoPackageUri = { uri ->
                   scope.launch {
                      val geopackageFile = geoPackageViewModel.getGeoPackage(uri)
-                     onLayer(Layer(
-                        name = "",
-                        type = LayerType.GEOPACKAGE,
-                        url = Uri.fromFile(geopackageFile).toString(),
-                        filePath = geopackageFile?.absolutePath
-                     ))
+                     onLayer(
+                        Layer(
+                           name = "",
+                           type = LayerType.GEOPACKAGE,
+                           url = Uri.fromFile(geopackageFile).toString(),
+                           filePath = geopackageFile?.absolutePath
+                        ),
+                        credentials
+                     )
                   }
                }
             )
@@ -104,6 +112,7 @@ fun MapNewLayerScreen(
                MapLayer(
                   url = uri,
                   type = type,
+                  service = wmsViewModel.layerService,
                   modifier = Modifier
                      .fillMaxWidth()
                      .weight(1f)
@@ -113,6 +122,13 @@ fun MapNewLayerScreen(
             wmsState?.wmsCapabilities?.let { wmsCapabilities ->
                WMSCapabilities(wmsCapabilities)
             }
+
+            Credentials(
+               username = credentials?.username ?: "",
+               password = credentials?.password ?: "",
+               onUsernameChange = { wmsViewModel.setUsername(it) },
+               onPasswordChange = { wmsViewModel.setPassword(it) }
+            )
 
             if (tileUrl != null || wmsState?.wmsCapabilities?.isValid() == true) {
                Button(
@@ -125,7 +141,7 @@ fun MapNewLayerScreen(
                                  type = it,
                                  url = tileUrl.toString()
                               )
-                              onLayer(layer)
+                              onLayer(layer, credentials)
                            }
                         }
 
@@ -136,7 +152,7 @@ fun MapNewLayerScreen(
                               url = url
                            )
 
-                           onLayer(layer)
+                           onLayer(layer, credentials)
                         }
                      }
                   },
@@ -304,6 +320,7 @@ private fun Layer(
 private fun MapLayer(
    url: Uri,
    type: LayerType?,
+   service: LayerService,
    modifier: Modifier = Modifier
 ) {
    GoogleMap(
@@ -313,7 +330,11 @@ private fun MapLayer(
    ) {
       tileOverlayOptions {
          TileOverlay(
-            tileProvider = GridTileProvider(url, invertYAxis = type == LayerType.TMS)
+            tileProvider = GridTileProvider(
+               service = service,
+               baseUrl = url,
+               invertYAxis = type == LayerType.TMS
+            )
          )
       }
    }
@@ -427,6 +448,45 @@ private fun WMSServiceProperty(
          Text(
             text = value,
             style = MaterialTheme.typography.bodyLarge
+         )
+      }
+   }
+}
+
+@Composable
+private fun Credentials(
+   username: String,
+   password: String,
+   onUsernameChange: (String) -> Unit,
+   onPasswordChange: (String) -> Unit
+) {
+   var showCredentials by remember { mutableStateOf(false) }
+
+   Column {
+      TextButton(
+         onClick = { showCredentials = !showCredentials }
+      ) {
+         Text("Add Credentials")
+      }
+
+      if (showCredentials) {
+         TextField(
+            value = username,
+            label = { Text("Username") },
+            onValueChange = { onUsernameChange(it) },
+            modifier = Modifier
+               .fillMaxWidth()
+               .padding(vertical = 8.dp)
+         )
+
+         TextField(
+            value = password,
+            label = { Text("Password") },
+            onValueChange = { onPasswordChange(it) },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            modifier = Modifier
+               .fillMaxWidth()
+               .padding(vertical = 8.dp)
          )
       }
    }

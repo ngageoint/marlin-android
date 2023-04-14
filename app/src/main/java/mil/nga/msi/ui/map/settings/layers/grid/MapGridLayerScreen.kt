@@ -20,6 +20,8 @@ import com.google.maps.android.ktx.model.tileOverlayOptions
 import kotlinx.coroutines.launch
 import mil.nga.msi.datasource.layer.Layer
 import mil.nga.msi.datasource.layer.LayerType
+import mil.nga.msi.network.layer.LayerService
+import mil.nga.msi.repository.preferences.Credentials
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.overlay.GridTileProvider
 import mil.nga.msi.ui.map.settings.layers.MapLayerRoute
@@ -27,6 +29,7 @@ import mil.nga.msi.ui.map.settings.layers.MapLayerRoute
 @Composable
 fun MapGridLayerScreen(
    layer: Layer,
+   credentials: Credentials?,
    onClose: () -> Unit,
    viewModel: MapGridLayerViewModel = hiltViewModel()
 ) {
@@ -45,6 +48,7 @@ fun MapGridLayerScreen(
       MapGridLayerScreen(
          type = layer.type,
          url = layer.url,
+         layerService = viewModel.layerService,
          name = name,
          onNameChanged = { name = it },
          minZoom = minZoom,
@@ -58,7 +62,8 @@ fun MapGridLayerScreen(
                   type = layer.type,
                   url = layer.url,
                   minZoom = minZoom,
-                  maxZoom = maxZoom
+                  maxZoom = maxZoom,
+                  credentials = credentials
                )
                onClose()
             }
@@ -100,6 +105,7 @@ fun MapGridLayerScreen(
             name = name,
             type = layer.type,
             url = layer.url,
+            layerService = viewModel.layerService,
             onNameChanged = { name = it },
             minZoom = minZoom,
             onMinZoomChanged = { minZoom = it },
@@ -127,6 +133,7 @@ fun MapGridLayerScreen(
 @Composable
 private fun MapGridLayerScreen(
    type: LayerType,
+   layerService: LayerService,
    url: String,
    name: String,
    onNameChanged: (String) -> Unit,
@@ -147,13 +154,16 @@ private fun MapGridLayerScreen(
             onMaxZoomChanged = onMaxZoomChanged
          )
 
-         Map(
-            url = Uri.parse(url),
-            type = type,
-            modifier = Modifier
+         Box(
+            Modifier
                .fillMaxWidth()
-               .weight(1f)
-         )
+               .weight(1f)) {
+            Map(
+               url = Uri.parse(url),
+               type = type,
+               service = layerService
+            )
+         }
 
          Button(
             enabled = name.isNotEmpty(),
@@ -168,7 +178,6 @@ private fun MapGridLayerScreen(
    }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun GridLayer(
    name: String,
@@ -229,29 +238,34 @@ private fun GridLayer(
 private fun Map(
    url: Uri,
    type: LayerType,
-   modifier: Modifier = Modifier
+   service: LayerService
 ) {
-   CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-      Text(
-         text = "MAP",
-         style = MaterialTheme.typography.titleMedium,
-         modifier = Modifier.padding(start = 16.dp, top = 0.dp, bottom = 16.dp)
-      )
-   }
-
-   GoogleMap(
-      properties = MapProperties(
-         mapType = MapType.NORMAL
-      ),
-      uiSettings = MapUiSettings(
-         compassEnabled = false
-      ),
-      modifier = modifier
-   ) {
-      tileOverlayOptions {
-         TileOverlay(
-            tileProvider = GridTileProvider(url, invertYAxis = type == LayerType.TMS)
+   Column(Modifier.fillMaxSize()) {
+      CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+         Text(
+            text = "MAP",
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(start = 16.dp, top = 0.dp, bottom = 16.dp)
          )
+      }
+
+      GoogleMap(
+         properties = MapProperties(
+            mapType = MapType.NORMAL
+         ),
+         uiSettings = MapUiSettings(
+            compassEnabled = false
+         ),
+         modifier = Modifier.weight(1f)
+      ) {
+         tileOverlayOptions {
+            TileOverlay(
+               tileProvider = GridTileProvider(
+                  service = service,
+                  baseUrl = url,
+                  invertYAxis = type == LayerType.TMS)
+            )
+         }
       }
    }
 }

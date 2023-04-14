@@ -1,6 +1,5 @@
 package mil.nga.msi.ui.map.settings.layers.wms
 
-import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -25,6 +24,7 @@ import com.google.maps.android.ktx.model.tileOverlayOptions
 import kotlinx.coroutines.launch
 import mil.nga.msi.datasource.layer.Layer
 import mil.nga.msi.datasource.layer.LayerType
+import mil.nga.msi.network.layer.LayerService
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.MapRoute
 import mil.nga.msi.ui.map.overlay.WMSTileProvider
@@ -53,6 +53,7 @@ fun MapWMSLayerSettingsScreen(
          Column(Modifier.fillMaxHeight()) {
             WMSLayer(
                wmsState = wmsState,
+               layerService = viewModel.layerService,
                onDone = {
                   val layer = Layer(
                      id = wmsState.layer?.id ?: 0,
@@ -99,6 +100,7 @@ fun MapWMSLayerSettingsScreen(
          Column(Modifier.fillMaxHeight()) {
             WMSLayer(
                wmsState = wmsState,
+               layerService = viewModel.layerService,
                onDone = {
                   done(Layer(
                      id = layer.id,
@@ -123,6 +125,7 @@ fun MapWMSLayerSettingsScreen(
 @Composable
 private fun WMSLayer(
    wmsState: WmsState,
+   layerService: LayerService,
    onDone: () -> Unit,
    onLayerChecked: (mil.nga.msi.network.layer.wms.Layer, String, Boolean) -> Unit,
    modifier: Modifier = Modifier
@@ -169,6 +172,7 @@ private fun WMSLayer(
          Box(Modifier.weight(1f)){
             Map(
                wmsUrl = wmsState.mapUrl,
+               service = layerService,
                latLngBounds = latLngBounds
             )
          }
@@ -281,6 +285,7 @@ private fun WMSCapabilitiesLayer(
 @Composable
 private fun Map(
    wmsUrl: String,
+   service: LayerService,
    latLngBounds: LatLngBounds?
 ) {
    val scope = rememberCoroutineScope()
@@ -309,7 +314,7 @@ private fun Map(
          uiSettings = MapUiSettings(compassEnabled = false),
          modifier = Modifier.weight(1f)
       ) {
-         tileOverlayOptions { TileOverlay(tileProvider = WMSTileProvider(url = wmsUrl)) }
+         tileOverlayOptions { TileOverlay(tileProvider = WMSTileProvider(service = service, url = wmsUrl)) }
       }
    }
 }

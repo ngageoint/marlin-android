@@ -1,6 +1,7 @@
 package mil.nga.msi.ui.map.settings.layers
 
 import android.net.Uri
+import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.core.os.BundleCompat
 import androidx.navigation.*
@@ -9,6 +10,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import mil.nga.msi.datasource.layer.Layer
 import mil.nga.msi.datasource.layer.LayerType
+import mil.nga.msi.repository.preferences.Credentials
 import mil.nga.msi.ui.embark.EmbarkRoute
 import mil.nga.msi.ui.main.SnackbarState
 import mil.nga.msi.ui.map.MapRoute
@@ -94,24 +96,27 @@ fun NavGraphBuilder.mapLayerGraph(
       bottomBarVisibility(false)
 
       MapNewLayerScreen(
-         onLayer = { layer ->
-            val encoded = Uri.encode(Json.encodeToString(layer))
+         onLayer = { layer, credentials ->
+            val encodedLayer = Uri.encode(Json.encodeToString(layer))
+            val encodedCredentials = credentials?.let {
+               Uri.encode(Json.encodeToString(credentials))
+            }
 
             when (layer.type) {
                LayerType.WMS -> {
-                  val route = "${MapLayerRoute.WMSLayerCreateSettings.name}?layer=${encoded}"
+                  val route = "${MapLayerRoute.WMSLayerCreateSettings.name}?layer=${encodedLayer}&credentials=${encodedCredentials}"
                   navController.navigate(route) {
                      popUpTo(route) { inclusive = true }
                   }
                }
                LayerType.TMS, LayerType.XYZ -> {
-                  val route = "${MapLayerRoute.CreateGridLayer.name}?layer=${encoded}"
+                  val route = "${MapLayerRoute.CreateGridLayer.name}?layer=${encodedLayer}&credentials=${encodedCredentials}"
                   navController.navigate(route) {
                      popUpTo(route) { inclusive = true }
                   }
                }
                LayerType.GEOPACKAGE -> {
-                  val route = "${MapLayerRoute.GeoPackageLayerCreateSettings.name}?layer=${encoded}"
+                  val route = "${MapLayerRoute.GeoPackageLayerCreateSettings.name}?layer=${encodedLayer}"
                   navController.navigate(route) {
                      popUpTo(route) { inclusive = true }
                   }
@@ -125,8 +130,11 @@ fun NavGraphBuilder.mapLayerGraph(
    }
 
    composable(
-      route = "${MapLayerRoute.CreateGridLayer.name}?layer={layer}",
-      arguments = listOf(navArgument("layer") { type = NavType.NavTypeLayer })
+      route = "${MapLayerRoute.CreateGridLayer.name}?layer={layer}&credentials={credentials}",
+      arguments = listOf(
+         navArgument("layer") { type = NavType.NavTypeLayer },
+         navArgument("credentials") { nullable = true; type = NavType.NavTypeCredentials }
+      )
    ) { backstackEntry ->
       bottomBarVisibility(false)
 
@@ -135,8 +143,13 @@ fun NavGraphBuilder.mapLayerGraph(
       }
       requireNotNull(layer) { "'layer' argument is required" }
 
+      val credentials: Credentials? = backstackEntry.arguments?.let { bundle ->
+         BundleCompat.getParcelable(bundle, "credentials", Credentials::class.java)
+      }
+
       MapGridLayerScreen(
          layer = layer,
+         credentials = credentials,
          onClose = {
             navController.popBackStack(MapLayerRoute.Layers.name, false)
          }
@@ -158,8 +171,11 @@ fun NavGraphBuilder.mapLayerGraph(
    }
 
    composable(
-      route = "${MapLayerRoute.WMSLayerCreateSettings.name}?layer={layer}",
-      arguments = listOf(navArgument("layer") { type = NavType.NavTypeLayer })
+      route = "${MapLayerRoute.WMSLayerCreateSettings.name}?layer={layer}&credentials={credentials}",
+      arguments = listOf(
+         navArgument("layer") { type = NavType.NavTypeLayer },
+         navArgument("credentials") { nullable = true; type = NavType.NavTypeCredentials }
+      )
    ) { backstackEntry ->
       bottomBarVisibility(false)
 
@@ -168,11 +184,16 @@ fun NavGraphBuilder.mapLayerGraph(
       }
       requireNotNull(layer) { "'layer' argument is required" }
 
+      val credentials = backstackEntry.arguments?.let { bundle ->
+         BundleCompat.getParcelable(bundle, "credentials", Credentials::class.java)
+      }
+
       MapWMSLayerSettingsScreen(
          layer = layer,
          done = {
-            val encoded = Uri.encode(Json.encodeToString(it))
-            val route = "${MapLayerRoute.WMSLayer.name}?layer=${encoded}"
+            val encodedLayer = Uri.encode(Json.encodeToString(it))
+            val encodedCredentials = Uri.encode(Json.encodeToString(credentials))
+            val route = "${MapLayerRoute.WMSLayer.name}?layer=${encodedLayer}&credentials=${encodedCredentials}"
             navController.navigate(route) {
                popUpTo(route) { inclusive = true }
             }
@@ -205,8 +226,11 @@ fun NavGraphBuilder.mapLayerGraph(
    }
 
    composable(
-      route = "${MapLayerRoute.WMSLayer.name}?layer={layer}",
-      arguments = listOf(navArgument("layer") { type = NavType.NavTypeLayer })
+      route = "${MapLayerRoute.WMSLayer.name}?layer={layer}&credentials={credentials}",
+      arguments = listOf(
+         navArgument("layer") { type = NavType.NavTypeLayer },
+         navArgument("credentials") { nullable = true; type = NavType.NavTypeCredentials }
+      )
    ) { backstackEntry ->
       bottomBarVisibility(false)
 
@@ -215,8 +239,13 @@ fun NavGraphBuilder.mapLayerGraph(
       }
       requireNotNull(layer) { "'layer' argument is required" }
 
+      val credentials = backstackEntry.arguments?.let { bundle ->
+         BundleCompat.getParcelable(bundle, "credentials", Credentials::class.java)
+      }
+
       MapWMSLayerScreen(
          layer = layer,
+         credentials,
          onClose = {
             navController.popBackStack(MapLayerRoute.Layers.name, false)
          }

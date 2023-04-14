@@ -4,12 +4,13 @@ import android.net.Uri
 import android.util.Log
 import mil.nga.msi.network.layer.wms.WMSCapabilities
 import mil.nga.msi.network.layer.LayerService
+import mil.nga.msi.repository.preferences.Credentials
 import javax.inject.Inject
 
 class LayerRemoteDataSource @Inject constructor(
-   private val service: LayerService,
+   private val service: LayerService
 ) {
-   suspend fun getTile(url: String): Boolean {
+   suspend fun getTile(url: String, credentials: Credentials? = null): Boolean {
       return url.toUri()?.let { uri ->
          val tileUri = uri.buildUpon()
             .appendPath("1")
@@ -17,14 +18,21 @@ class LayerRemoteDataSource @Inject constructor(
             .appendPath("1.png")
             .build()
 
+         val credentialsHeader = credentials?.let {
+            okhttp3.Credentials.basic(it.username, it.password)
+         }
+
          try {
-            val response = service.getTile(tileUri.toString())
+            val response = service.getTile(
+               url = tileUri.toString(),
+               credentials = credentialsHeader
+            )
             response.isSuccessful && response.body()?.contentType()?.type == "image"
          } catch (e: Exception) { false }
       } ?: false
    }
 
-   suspend fun getWMSCapabilities(url: String): WMSCapabilities? {
+   suspend fun getWMSCapabilities(url: String, credentials: Credentials? = null): WMSCapabilities? {
       return url.toUri()?.let { uri ->
          val wmsUri = uri.buildUpon()
             .appendQueryParameter("service", "WMS")
@@ -32,8 +40,12 @@ class LayerRemoteDataSource @Inject constructor(
             .appendQueryParameter("request", "GetCapabilities")
             .build()
 
+         val credentialsHeader = credentials?.let {
+            okhttp3.Credentials.basic(it.username, it.password)
+         }
+
          try {
-            val response = service.getWMSCapabilities(wmsUri.toString())
+            val response = service.getWMSCapabilities(wmsUri.toString(), credentialsHeader)
             if (response.isSuccessful) {
                response.body()
             } else null

@@ -22,6 +22,7 @@ import mil.nga.msi.filter.Filter
 import mil.nga.msi.filter.FilterParameter
 import mil.nga.msi.filter.FilterParameterType
 import mil.nga.msi.location.LocationPolicy
+import mil.nga.msi.network.layer.LayerService
 import mil.nga.msi.repository.DataSourceRepository
 import mil.nga.msi.repository.asam.AsamRepository
 import mil.nga.msi.repository.dgpsstation.DgpsStationKey
@@ -35,6 +36,7 @@ import mil.nga.msi.repository.map.*
 import mil.nga.msi.repository.modu.ModuRepository
 import mil.nga.msi.repository.port.PortRepository
 import mil.nga.msi.repository.preferences.FilterRepository
+import mil.nga.msi.repository.preferences.SharedPreferencesRepository
 import mil.nga.msi.repository.preferences.UserPreferencesRepository
 import mil.nga.msi.repository.radiobeacon.RadioBeaconKey
 import mil.nga.msi.repository.radiobeacon.RadioBeaconRepository
@@ -59,6 +61,7 @@ enum class TileProviderType {
 @HiltViewModel
 class MapViewModel @Inject constructor(
    private val application: Application,
+   private val layerService: LayerService,
    private val filterRepository: FilterRepository,
    private val layerRepository: LayerRepository,
    private val geoPackageManager: GeoPackageManager,
@@ -76,6 +79,7 @@ class MapViewModel @Inject constructor(
    private val dgpsStationTileRepository: DgpsStationTileRepository,
    dataSourceRepository: DataSourceRepository,
    val locationPolicy: LocationPolicy,
+   private val preferencesRepository: SharedPreferencesRepository,
    val userPreferencesRepository: UserPreferencesRepository,
    val annotationProvider: AnnotationProvider,
    private val geocoderRemoteDataSource: GeocoderRemoteDataSource,
@@ -132,12 +136,14 @@ class MapViewModel @Inject constructor(
       layers.sortedBy { orderById[it.id.toInt()] }
    }.transform { layers ->
       val tileProviders = layers.flatMap {  layer ->
+         val credentials = preferencesRepository.getLayerCredentials(layer.id)
+
          when (layer.type) {
             LayerType.WMS -> {
-               listOf(WMSTileProvider(url = layer.url))
+               listOf(WMSTileProvider(url = layer.url, service = layerService, credentials = credentials))
             }
             LayerType.XYZ, LayerType.TMS -> {
-               listOf(GridTileProvider(layer = layer))
+               listOf(GridTileProvider(layer = layer, service = layerService, credentials = credentials))
             }
             LayerType.GEOPACKAGE -> {
                val geoPackage = geoPackageManager.openExternal(layer.filePath)

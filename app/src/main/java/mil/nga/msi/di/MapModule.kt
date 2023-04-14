@@ -8,6 +8,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mil.nga.gars.tile.GARSTileProvider
 import mil.nga.mgrs.tile.MGRSTileProvider
+import mil.nga.msi.network.layer.LayerService
 import mil.nga.msi.repository.asam.AsamLocalDataSource
 import mil.nga.msi.repository.dgpsstation.DgpsStationLocalDataSource
 import mil.nga.msi.repository.light.LightLocalDataSource
@@ -27,8 +28,10 @@ class MapModule {
    @Singleton
    @Provides
    @Named("osmTileProvider")
-   fun provideOSMTileProvider(): TileProvider {
-      return OsmTileProvider()
+   fun provideOSMTileProvider(
+      layerService: LayerService
+   ): TileProvider {
+      return OsmTileProvider(layerService)
    }
 
    @Singleton
