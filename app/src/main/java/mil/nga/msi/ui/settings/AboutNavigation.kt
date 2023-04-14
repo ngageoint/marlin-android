@@ -19,8 +19,8 @@ sealed class AboutRoute(
 ): Route {
    object Main: AboutRoute("about", "About")
    object List: AboutRoute("about/list", "Settings")
+   object Licenses: AboutRoute("about/licenses", "Open Source Licenses")
    object Disclaimer: AboutRoute("about/disclaimer", "Disclaimer")
-   object Version: AboutRoute("about/version", "Marlin <version>")
 }
 
 fun NavGraphBuilder.settingsGraph(

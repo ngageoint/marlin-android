@@ -2,4 +2,9 @@
     <style name="Theme.Msi" parent="android:Theme.Material.Light.NoActionBar">
         <item name="android:statusBarColor">@color/sea_green</item>
     </style>
+
+    <style name="Theme.OSS" parent="@style/Theme.AppCompat.Light.DarkActionBar">
+        <item name="android:statusBarColor">@color/sea_green</item>
+        <item name="colorPrimary">@color/sea_green</item>
+    </style>
 </resources>

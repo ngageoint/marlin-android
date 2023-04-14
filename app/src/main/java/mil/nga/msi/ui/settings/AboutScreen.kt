@@ -1,7 +1,7 @@
 package mil.nga.msi.ui.settings
 
+import android.content.Intent
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -10,6 +10,7 @@ import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Mail
+import androidx.compose.material.icons.filled.Policy
 import androidx.compose.material.icons.filled.PrivacyTip
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -20,11 +21,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.drawable.toBitmap
-import androidx.core.os.BundleCompat
+import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import mil.nga.msi.R
 import mil.nga.msi.packagemanager.getPackageInfoCompat
 import mil.nga.msi.ui.main.TopBar
-import mil.nga.msi.ui.navigation.Point
 
 @Composable
 fun AboutScreen(
@@ -51,6 +51,7 @@ private fun About(
    onDisclaimer: () -> Unit,
    onContact: () -> Unit
 ) {
+   val context = LocalContext.current
    val scrollState = rememberScrollState()
 
    Surface(
@@ -63,9 +64,13 @@ private fun About(
             .padding(top = 32.dp)
             .verticalScroll(scrollState)
       ) {
-         Disclaimer() { onDisclaimer() }
+         Disclaimer { onDisclaimer() }
          Divider(Modifier.padding(start = 16.dp))
-         Contact() { onContact() }
+         Licenses {
+            context.startActivity(Intent(context, OssLicensesMenuActivity::class.java))
+         }
+         Divider(Modifier.padding(start = 16.dp))
+         Contact { onContact() }
          Divider(Modifier.padding(start = 16.dp))
          Version()
       }
@@ -98,6 +103,40 @@ private fun Disclaimer(
 
             Text(
                text = AboutRoute.Disclaimer.title,
+               style = MaterialTheme.typography.bodyMedium,
+               fontWeight = FontWeight.Medium
+            )
+         }
+      }
+   }
+}
+
+@Composable
+private fun Licenses(
+   onTap: () -> Unit
+) {
+   Surface {
+      Column(
+         verticalArrangement = Arrangement.Center,
+         modifier = Modifier
+            .height(48.dp)
+            .fillMaxWidth()
+            .clickable { onTap() }
+            .padding(horizontal = 16.dp)
+      ) {
+         Row(
+            verticalAlignment = Alignment.CenterVertically
+         ) {
+            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+               Icon(
+                  Icons.Default.Policy,
+                  modifier = Modifier.padding(end = 16.dp),
+                  contentDescription = "Licenses"
+               )
+            }
+
+            Text(
+               text = AboutRoute.Licenses.title,
                style = MaterialTheme.typography.bodyMedium,
                fontWeight = FontWeight.Medium
             )

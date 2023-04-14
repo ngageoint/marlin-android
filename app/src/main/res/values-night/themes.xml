@@ -3,4 +3,9 @@
         <item name="android:statusBarColor">@color/nga_blue</item>
         <item name="android:windowBackground">@android:color/black</item>
     </style>
+
+    <style name="Theme.OSS" parent="@style/Theme.AppCompat">
+        <item name="android:statusBarColor">@color/nga_blue</item>
+        <item name="colorPrimary">@color/nga_blue</item>
+    </style>
 </resources>
