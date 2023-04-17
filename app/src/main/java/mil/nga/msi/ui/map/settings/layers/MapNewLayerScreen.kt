@@ -266,7 +266,7 @@ private fun Layer(
             .padding(bottom = 16.dp)
       )
 
-      if (serverError) {
+      if (serverError && type != null) {
          NoServer()
       }
 

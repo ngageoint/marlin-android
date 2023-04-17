@@ -2,8 +2,8 @@ package mil.nga.msi.repository.layer
 
 import android.net.Uri
 import android.util.Log
-import mil.nga.msi.network.layer.wms.WMSCapabilities
 import mil.nga.msi.network.layer.LayerService
+import mil.nga.msi.network.layer.wms.WMSCapabilities
 import mil.nga.msi.repository.preferences.Credentials
 import javax.inject.Inject
 
@@ -33,8 +33,9 @@ class LayerRemoteDataSource @Inject constructor(
    }
 
    suspend fun getWMSCapabilities(url: String, credentials: Credentials? = null): WMSCapabilities? {
-      return url.toUri()?.let { uri ->
+      return url.toUri()?.let { uri: Uri ->
          val wmsUri = uri.buildUpon()
+            .clearQuery()
             .appendQueryParameter("service", "WMS")
             .appendQueryParameter("version", "1.3.0")
             .appendQueryParameter("request", "GetCapabilities")
