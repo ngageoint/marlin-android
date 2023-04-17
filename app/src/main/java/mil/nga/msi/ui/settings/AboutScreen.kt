@@ -9,8 +9,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Handshake
 import androidx.compose.material.icons.filled.Mail
-import androidx.compose.material.icons.filled.Policy
 import androidx.compose.material.icons.filled.PrivacyTip
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -66,7 +66,7 @@ private fun About(
       ) {
          Disclaimer { onDisclaimer() }
          Divider(Modifier.padding(start = 16.dp))
-         Licenses {
+         Acknowledgements {
             context.startActivity(Intent(context, OssLicensesMenuActivity::class.java))
          }
          Divider(Modifier.padding(start = 16.dp))
@@ -112,7 +112,7 @@ private fun Disclaimer(
 }
 
 @Composable
-private fun Licenses(
+private fun Acknowledgements(
    onTap: () -> Unit
 ) {
    Surface {
@@ -129,9 +129,9 @@ private fun Licenses(
          ) {
             CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                Icon(
-                  Icons.Default.Policy,
+                  Icons.Default.Handshake,
                   modifier = Modifier.padding(end = 16.dp),
-                  contentDescription = "Licenses"
+                  contentDescription = "Acknowledgements"
                )
             }
 
