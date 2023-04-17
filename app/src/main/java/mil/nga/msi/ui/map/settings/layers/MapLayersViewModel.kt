@@ -1,6 +1,7 @@
 package mil.nga.msi.ui.map.settings.layers
 
 import androidx.lifecycle.*
+import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.combine
@@ -26,8 +27,18 @@ class MapLayersViewModel @Inject constructor(
       val orderById = order.withIndex().associate { (index, it) -> it to index }
       layers
          .sortedBy { orderById[it.id.toInt()] }
-         .map {
-            LayerState(layer = it)
+         .map { layer ->
+            val bounds = layer.boundingBox?.let { bounds ->
+               LatLngBounds(
+                  LatLng(bounds.minLatitude, bounds.minLongitude),
+                  LatLng(bounds.maxLatitude, bounds.maxLongitude)
+               )
+            }
+
+            LayerState(
+               layer = layer,
+               latLngBounds = bounds
+            )
          }
    }.asLiveData()
 

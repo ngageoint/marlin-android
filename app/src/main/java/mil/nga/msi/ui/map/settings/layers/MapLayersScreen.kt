@@ -30,7 +30,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
+import mil.nga.msi.coordinate.DMS
 import mil.nga.msi.datasource.layer.Layer
 import mil.nga.msi.datasource.layer.LayerType
 import mil.nga.msi.ui.drag.DraggableItem
@@ -267,11 +269,22 @@ private fun Layer(
             else -> state.layer.url
          }
 
-         Text(
-            text = text,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-         )
+         Column {
+            Text(
+               text = text,
+               maxLines = 1,
+               overflow = TextOverflow.Ellipsis
+            )
+            state.latLngBounds?.let { bounds ->
+               val southwest = DMS.from(LatLng(bounds.southwest.latitude, bounds.southwest.longitude)).format()
+               val northeast = DMS.from(LatLng(bounds.southwest.latitude, bounds.southwest.longitude)).format()
+
+               Text(
+                  text = "($southwest) - ($northeast)",
+                  modifier = Modifier.padding(top = 4.dp)
+               )
+            }
+         }
       },
       leadingContent = {
          Icon(
