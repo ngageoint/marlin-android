@@ -19,7 +19,7 @@ sealed class AboutRoute(
 ): Route {
    object Main: AboutRoute("about", "About")
    object List: AboutRoute("about/list", "Settings")
-   object Licenses: AboutRoute("about/licenses", "Open Source Licenses")
+   object Licenses: AboutRoute("about/acknowledgements", "Acknowledgements")
    object Disclaimer: AboutRoute("about/disclaimer", "Disclaimer")
 }
 

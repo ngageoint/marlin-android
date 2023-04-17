@@ -8,6 +8,7 @@ import android.content.pm.PackageManager
 import androidx.core.content.ContextCompat
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
+import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import dagger.hilt.android.HiltAndroidApp
 import mil.nga.msi.location.LocationFilterService
 import mil.nga.msi.location.LocationPolicy
@@ -30,6 +31,8 @@ class MsiApplication: Application(), Configuration.Provider {
       requestLocationUpdates()
       startFilterService()
       createNotificationChannel()
+
+      OssLicensesMenuActivity.setActivityTitle(getString(R.string.custom_license_title))
    }
 
    private fun requestLocationUpdates() {
