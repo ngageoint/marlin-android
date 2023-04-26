@@ -41,10 +41,9 @@ class LayerEntityTest {
     @Throws(Exception::class)
     fun insertAndRead() = runTest {
         val layer = Layer(
-            type = "XYZ",
+            type = LayerType.XYZ,
             url = "",
-            name = "Test Layer",
-            displayName = "Test Layer"
+            name = "Test Layer"
         )
         dao.insert(layer)
         val layers = dao.observeLayers().first()
@@ -57,10 +56,9 @@ class LayerEntityTest {
     @Throws(Exception::class)
     fun updateAndRead() = runTest {
         val layer = Layer(
-            type = "XYZ",
+            type = LayerType.XYZ,
             url = "",
-            name = "Test Layer",
-            displayName = "Test Layer"
+            name = "Test Layer"
         )
         layer.visible = false
 

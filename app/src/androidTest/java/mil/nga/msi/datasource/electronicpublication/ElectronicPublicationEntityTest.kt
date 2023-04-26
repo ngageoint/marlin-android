@@ -39,7 +39,7 @@ class ElectronicPublicationEntityTest {
 
     @Test
     @Throws(Exception::class)
-    fun insert_and_read() = runTest {
+    fun insertAndRead() = runTest {
         val epub = ElectronicPublication("test.epub.1")
         dao.insert(epub)
         val epubs = dao.readElectronicPublications()
@@ -49,7 +49,7 @@ class ElectronicPublicationEntityTest {
     }
 
     @Test
-    fun insert_and_read_multiple() = runTest {
+    fun insertAndReadMultiple() = runTest {
         val inserted = listOf(
             ElectronicPublication("test.epub.1", fileSize = 10000),
             ElectronicPublication("test.epub.2", fileSize = 20000),
@@ -63,7 +63,7 @@ class ElectronicPublicationEntityTest {
     }
 
     @Test
-    fun read_file_counts_by_type() = runTest {
+    fun readFileCountsByType() = runTest {
         dao.insert(listOf(
             ElectronicPublication("epub.1", pubTypeId = ElectronicPublicationType.AmericanPracticalNavigator.typeId),
             ElectronicPublication("epub.2", pubTypeId = ElectronicPublicationType.AtlasOfPilotCharts.typeId),
