@@ -59,19 +59,19 @@ class GeopackageLayerViewModel @Inject constructor(
 
    fun setLayerId(id: Long) {
       viewModelScope.launch {
-         val layer = layerRepository.getLayer(id)
-
-         try {
-            val geoPackage = geoPackageManager.openExternal(layer.filePath)
-            _geopackageState.postValue(
-               GeoPackageState(
-                  layer = layer,
-                  geoPackage = geoPackage,
-                  overlays = geoPackage.getOverlays(),
-                  selectedLayers = layer.url.split(",")
+         layerRepository.getLayer(id)?.let { layer ->
+            try {
+               val geoPackage = geoPackageManager.openExternal(layer.filePath)
+               _geopackageState.postValue(
+                  GeoPackageState(
+                     layer = layer,
+                     geoPackage = geoPackage,
+                     overlays = geoPackage.getOverlays(),
+                     selectedLayers = layer.url.split(",")
+                  )
                )
-            )
-         } catch (_: Exception) { }
+            } catch (_: Exception) { }
+         }
       }
    }
 

@@ -77,31 +77,32 @@ class GeoPackageViewModel @Inject constructor(
 
    fun setFeature(layerId: Long, table: String, featureId: Long) {
       viewModelScope.launch(Dispatchers.IO) {
-         val layer = repository.getLayer(layerId)
-         try {
-            val geoPackage = geoPackageManager.openExternal(layer.filePath)
-            getFeature(geoPackage, layer.id, layer.name, table, featureId)?.let {
-               _feature.postValue(it)
-            }
+         repository.getLayer(layerId)?.let { layer ->
+            try {
+               val geoPackage = geoPackageManager.openExternal(layer.filePath)
+               getFeature(geoPackage, layer.id, layer.name, table, featureId)?.let {
+                  _feature.postValue(it)
+               }
 
-            val featureDao = geoPackage.getFeatureDao(table)
-            val featureTiles = mil.nga.geopackage.tiles.features.DefaultFeatureTiles(
-               application,
-               geoPackage,
-               featureDao
-            )
-            _tileProvider.postValue(FeatureOverlay(featureTiles))
+               val featureDao = geoPackage.getFeatureDao(table)
+               val featureTiles = mil.nga.geopackage.tiles.features.DefaultFeatureTiles(
+                  application,
+                  geoPackage,
+                  featureDao
+               )
+               _tileProvider.postValue(FeatureOverlay(featureTiles))
 
-         } catch (_: Exception) { }
+            } catch (_: Exception) { }
+         }
       }
    }
 
    fun setMedia(key: GeoPackageMediaKey) {
       viewModelScope.launch(Dispatchers.IO) {
-         val layer = repository.getLayer(key.layerId)
-         val geoPackage = geoPackageManager.openExternal(layer.filePath)
-         _media.postValue(getMedia(geoPackage, key.table, key.mediaId))
-
+         repository.getLayer(key.layerId)?.let { layer ->
+            val geoPackage = geoPackageManager.openExternal(layer.filePath)
+            _media.postValue(getMedia(geoPackage, key.table, key.mediaId))
+         }
       }
    }
 

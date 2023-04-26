@@ -73,22 +73,22 @@ class MapWMSLayerViewModel @Inject constructor(
       wmsUrlJob = viewModelScope.launch {
          delay(DEBOUNCE_TIMEOUT_MILLIS)
 
-         val layer = layerRepository.getLayer(id)
+         layerRepository.getLayer(id)?.let { layer ->
+            val uri = Uri.parse(layer.url)
+            val baseUrl = "${uri.scheme}://${uri.host}/${uri.path}"
+            val layers = uri.getQueryParameters("LAYERS")
 
-         val uri = Uri.parse(layer.url)
-         val baseUrl = "${uri.scheme}://${uri.host}/${uri.path}"
-         val layers = uri.getQueryParameters("LAYERS")
-
-         layerRepository.getWMSCapabilities(baseUrl)?.let { wmsCapabilities ->
-            _wmsState.postValue(
-               WmsState(
-                  layer = layer,
-                  baseUrl = baseUrl,
-                  layers = layers,
-                  wmsCapabilities = wmsCapabilities,
-                  credentials = credentials.value
+            layerRepository.getWMSCapabilities(baseUrl)?.let { wmsCapabilities ->
+               _wmsState.postValue(
+                  WmsState(
+                     layer = layer,
+                     baseUrl = baseUrl,
+                     layers = layers,
+                     wmsCapabilities = wmsCapabilities,
+                     credentials = credentials.value
+                  )
                )
-            )
+            }
          }
       }
    }
