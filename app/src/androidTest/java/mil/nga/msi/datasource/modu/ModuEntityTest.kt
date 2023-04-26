@@ -1,10 +1,10 @@
-package mil.nga.msi.datasource.asam
+package mil.nga.msi.datasource.modu
 
 import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import assertAsamsEqual
+import assertModusEqual
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mil.nga.msi.datasource.MsiDatabase
@@ -19,16 +19,16 @@ import java.util.Date
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
-class AsamEntityTest {
+class ModuEntityTest {
 
-    private lateinit var dao: AsamDao
+    private lateinit var dao: ModuDao
     private lateinit var db: MsiDatabase
 
     @Before
     fun createDb() {
         val context = ApplicationProvider.getApplicationContext<Context>()
         db = Room.inMemoryDatabaseBuilder(context, MsiDatabase::class.java).build()
-        dao = db.asamDao()
+        dao = db.moduDao()
     }
 
     @After
@@ -40,51 +40,50 @@ class AsamEntityTest {
     @Test
     @Throws(Exception::class)
     fun insert() = runTest {
-        val asam = Asam("1", Date(), 0.0, 0.0)
-        dao.insert(asam)
-        val asams = dao.getAsams()
+        val modu = Modu("1", Date(), 0.0, 0.0)
+        dao.insert(modu)
+        val modus = dao.getModus()
 
-        assertEquals(asams.size, 1)
-        assertAsamsEqual(asams.first(), asam)
+        assertEquals(modus.size, 1)
+        assertModusEqual(modus.first(), modu)
     }
 
     @Test
     @Throws(Exception::class)
     fun readByReference() = runTest {
-        val insert = Asam("1", Date(), 0.0, 0.0)
+        val insert = Modu("1", Date(), 0.0, 0.0)
         dao.insert(insert)
-        val read = dao.getAsam(insert.reference)
+        val read = dao.getModu(insert.name)
 
         assertNotNull(read)
-        assertAsamsEqual(insert, read!!)
+        assertModusEqual(insert, read!!)
     }
 
     @Test
     fun readMultiple() = runTest {
         val insert = listOf(
-            Asam("1", Date(), 1.0, 1.0),
-            Asam("2", Date(), 2.0, 2.0),
-            Asam("3", Date(), 3.0, 3.0),
-            Asam("4", Date(), 4.0, 4.0)
+            Modu("1", Date(), 1.0, 1.0),
+            Modu("2", Date(), 2.0, 2.0),
+            Modu("3", Date(), 3.0, 3.0),
+            Modu("4", Date(), 4.0, 4.0)
         )
 
         dao.insert(insert)
-        val read = dao.getAsams()
+        val read = dao.getModus()
 
         assertEquals(read.size, 4)
-        insert.forEachIndexed { index, _ -> assertAsamsEqual(read[index], insert[index]) }
+        insert.forEachIndexed { index, _ -> assertModusEqual(read[index], insert[index]) }
     }
 
     @Test
     fun update() = runTest {
-        val insert = Asam("1", Date(), 0.0, 0.0).apply {
+        val insert = Modu("1", Date(), 0.0, 0.0).apply {
             position = "1"
         }
         dao.insert(insert)
 
         insert.position = "2"
-
-        val read = dao.getAsam(insert.reference)
+        val read = dao.getModu(insert.name)
 
         assertNotNull(read)
         assertEquals("2", insert.position)
@@ -93,10 +92,10 @@ class AsamEntityTest {
     @Test
     fun count() = runTest {
         val insert = listOf(
-            Asam("1", Date(), 1.0, 1.0),
-            Asam("2", Date(), 2.0, 2.0),
-            Asam("3", Date(), 3.0, 3.0),
-            Asam("4", Date(), 4.0, 4.0)
+            Modu("1", Date(), 1.0, 1.0),
+            Modu("2", Date(), 2.0, 2.0),
+            Modu("3", Date(), 3.0, 3.0),
+            Modu("4", Date(), 4.0, 4.0)
         )
 
         dao.insert(insert)
@@ -108,17 +107,17 @@ class AsamEntityTest {
     @Test
     fun readMultipleByReference() = runTest {
         val insert = listOf(
-            Asam("1", Date(), 1.0, 1.0),
-            Asam("2", Date(), 2.0, 2.0),
-            Asam("3", Date(), 3.0, 3.0),
-            Asam("4", Date(), 4.0, 4.0)
+            Modu("1", Date(), 1.0, 1.0),
+            Modu("2", Date(), 2.0, 2.0),
+            Modu("3", Date(), 3.0, 3.0),
+            Modu("4", Date(), 4.0, 4.0)
         )
 
         dao.insert(insert)
-        val read = dao.getAsams(listOf("1", "2"))
+        val read = dao.getModus(listOf("1", "2"))
 
         assertEquals(read.size, 2)
-        assertAsamsEqual(insert[0], read[0])
-        assertAsamsEqual(insert[1], read[1])
+        assertModusEqual(insert[0], read[0])
+        assertModusEqual(insert[1], read[1])
     }
 }

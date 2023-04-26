@@ -33,6 +33,9 @@ interface ModuDao {
    @Query("SELECT * FROM modus")
    suspend fun getModus(): List<Modu>
 
+   @Query("SELECT * FROM modus WHERE name IN (:names)")
+   suspend fun getModus(names: List<String>): List<Modu>
+
    @Query("SELECT * FROM modus WHERE name = :name")
    suspend fun getModu(name: String): Modu?
 
@@ -53,8 +56,5 @@ interface ModuDao {
       minLongitude: Double,
       maxLongitude: Double
    ): List<Modu>
-
-   @Query("SELECT * FROM modus WHERE name IN (:names)")
-   suspend fun existingModus(names: List<String>): List<Modu>
 }
 

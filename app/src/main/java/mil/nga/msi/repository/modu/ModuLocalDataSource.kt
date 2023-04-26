@@ -19,7 +19,7 @@ class ModuLocalDataSource @Inject constructor(
    suspend fun getModus() = dao.getModus()
    suspend fun getLatestModu() = dao.getLatestModu()
 
-   suspend fun existingModus(names: List<String>) = dao.existingModus(names)
+   suspend fun existingModus(names: List<String>) = dao.getModus(names)
 
    fun getModus(query: SimpleSQLiteQuery) = dao.getModus(query)
 
