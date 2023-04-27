@@ -83,10 +83,11 @@ class ModuEntityTest {
         dao.insert(insert)
 
         insert.position = "2"
+        dao.update(insert)
         val read = dao.getModu(insert.name)
 
         assertNotNull(read)
-        assertEquals("2", insert.position)
+        assertEquals("2", read?.position)
     }
 
     @Test

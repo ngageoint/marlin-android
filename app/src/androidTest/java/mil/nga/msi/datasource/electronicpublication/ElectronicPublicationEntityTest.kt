@@ -59,7 +59,7 @@ class ElectronicPublicationEntityTest {
         val read = dao.readElectronicPublications()
 
         assertEquals(read.size, 3)
-        inserted.forEachIndexed { pos, epub -> assertEPubsEqual(read[pos], inserted[pos]) }
+        inserted.forEachIndexed { pos, _ -> assertEPubsEqual(read[pos], inserted[pos]) }
     }
 
     @Test

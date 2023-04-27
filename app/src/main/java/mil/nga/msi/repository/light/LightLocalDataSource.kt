@@ -14,7 +14,7 @@ class LightLocalDataSource @Inject constructor(
    fun getLights(query: SimpleSQLiteQuery) = dao.getLights(query)
 
    fun isEmpty() = dao.count() == 0
-   suspend fun existingLights(ids: List<String>) = dao.existingLights(ids)
+   suspend fun existingLights(ids: List<String>) = dao.getLights(ids)
 
    fun observeLight(
       volumeNumber: String,

@@ -22,6 +22,9 @@ interface LightDao {
    @Query("SELECT * FROM lights")
    suspend fun getLights(): List<Light>
 
+   @Query("SELECT * FROM lights WHERE id IN (:ids)")
+   suspend fun getLights(ids: List<String>): List<Light>
+
    @RawQuery(observedEntities = [Light::class])
    @RewriteQueriesToDropUnusedColumns
    fun getLights(query: SupportSQLiteQuery): List<Light>
@@ -58,7 +61,4 @@ interface LightDao {
    @RawQuery(observedEntities = [Light::class])
    @RewriteQueriesToDropUnusedColumns
    fun observeLightMapItems(query: SupportSQLiteQuery): Flow<List<LightMapItem>>
-
-   @Query("SELECT * FROM lights WHERE id IN (:ids)")
-   suspend fun existingLights(ids: List<String>): List<Light>
 }

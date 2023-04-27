@@ -59,7 +59,11 @@ android {
 
     buildTypes {
         debug {
+            minifyEnabled false
+            applicationIdSuffix ".debug"
+            versionNameSuffix "-debug"
             resValue "string", "GOOGLE_MAPS_ANDROID_API_KEY", googleMapsApiDebugKey
+            resValue "string", "applicationId", defaultConfig.applicationId + applicationIdSuffix
         }
         release {
             minifyEnabled false

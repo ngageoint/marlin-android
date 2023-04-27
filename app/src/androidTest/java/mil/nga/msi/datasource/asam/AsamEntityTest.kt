@@ -83,11 +83,12 @@ class AsamEntityTest {
         dao.insert(insert)
 
         insert.position = "2"
+        dao.update(insert)
 
         val read = dao.getAsam(insert.reference)
 
         assertNotNull(read)
-        assertEquals("2", insert.position)
+        assertEquals("2", read?.position)
     }
 
     @Test
