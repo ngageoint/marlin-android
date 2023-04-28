@@ -4,7 +4,7 @@ import androidx.room.TypeConverter
 
 class StringListTypeConverter {
    @TypeConverter
-   fun fromTimestamp(value: String?): List<String>? {
+   fun fromTimestamp(value: String?): List<String> {
       return if (value.isNullOrEmpty()) {
          emptyList()
       } else {

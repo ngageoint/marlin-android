@@ -3,7 +3,6 @@ package mil.nga.msi.datasource.noticetomariners
 import androidx.paging.PagingSource
 import androidx.room.*
 import kotlinx.coroutines.flow.Flow
-import mil.nga.msi.datasource.light.Light
 
 @Dao
 interface NoticeToMarinersDao {
@@ -29,12 +28,12 @@ interface NoticeToMarinersDao {
    @Query("SELECT * FROM notice_to_mariners")
    suspend fun getNoticeToMariners(): List<NoticeToMariners>
 
+   @Query("SELECT * FROM notice_to_mariners WHERE ods_entry_id IN (:odsEntryIds)")
+   suspend fun getNoticeToMariners(odsEntryIds: List<Int>): List<NoticeToMariners>
+
    @Query("SELECT * FROM notice_to_mariners WHERE notice_number = :noticeNumber")
    suspend fun getNoticeToMariners(noticeNumber: Int): List<NoticeToMariners>
 
    @Query("SELECT * FROM notice_to_mariners ORDER BY notice_number DESC")
    fun getNoticeToMarinersListItems(): Flow<List<NoticeToMariners>>
-
-   @Query("SELECT * FROM notice_to_mariners WHERE ods_entry_id IN (:odsEntryIds)")
-   suspend fun existingNoticeToMariners(odsEntryIds: List<Int>): List<NoticeToMariners>
 }

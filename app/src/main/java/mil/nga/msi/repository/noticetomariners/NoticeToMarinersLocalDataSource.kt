@@ -6,7 +6,6 @@ import kotlinx.coroutines.withContext
 import mil.nga.msi.datasource.noticetomariners.NoticeToMariners
 import mil.nga.msi.datasource.noticetomariners.NoticeToMarinersDao
 import java.nio.file.Files
-import java.nio.file.Paths
 import javax.inject.Inject
 
 class NoticeToMarinersLocalDataSource @Inject constructor(
@@ -21,7 +20,7 @@ class NoticeToMarinersLocalDataSource @Inject constructor(
 
    suspend fun getNoticeToMariners(noticeNumber: Int) = dao.getNoticeToMariners(noticeNumber)
 
-   suspend fun existingNoticeToMariners(odsEntryIds: List<Int>) = dao.existingNoticeToMariners(odsEntryIds)
+   suspend fun existingNoticeToMariners(odsEntryIds: List<Int>) = dao.getNoticeToMariners(odsEntryIds)
 
    suspend fun insert(noticeToMariners: List<NoticeToMariners>) = dao.insert(noticeToMariners)
 
