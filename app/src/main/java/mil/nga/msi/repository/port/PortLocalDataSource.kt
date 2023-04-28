@@ -18,7 +18,7 @@ class PortLocalDataSource @Inject constructor(
 
    suspend fun getPort(portNumber: Int) = dao.getPort(portNumber)
    suspend fun getPorts(): List<Port> = dao.getPorts()
-   suspend fun existingPorts(portNumbers: List<Int>) = dao.existingPorts(portNumbers)
+   suspend fun existingPorts(portNumbers: List<Int>) = dao.getPorts(portNumbers)
 
    fun getPorts(
       minLatitude: Double,

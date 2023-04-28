@@ -29,6 +29,9 @@ interface PortDao {
    @RewriteQueriesToDropUnusedColumns
    fun getPorts(query: SupportSQLiteQuery): List<Port>
 
+   @Query("SELECT * FROM ports WHERE port_number IN (:portNumbers)")
+   suspend fun getPorts(portNumbers: List<Int>): List<Port>
+
    @Query("SELECT * FROM ports WHERE port_number = :portNumber")
    suspend fun getPort(portNumber: Int): Port?
 
@@ -46,7 +49,4 @@ interface PortDao {
    @RawQuery(observedEntities = [Port::class])
    @RewriteQueriesToDropUnusedColumns
    fun observePortMapItems(query: SupportSQLiteQuery): Flow<List<PortMapItem>>
-
-   @Query("SELECT * FROM ports WHERE port_number IN (:portNumbers)")
-   suspend fun existingPorts(portNumbers: List<Int>): List<Port>
 }
