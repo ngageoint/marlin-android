@@ -27,6 +27,9 @@ interface NavigationalWarningDao {
    @Query("SELECT * FROM navigational_warnings")
    suspend fun getNavigationalWarnings(): List<NavigationalWarning>
 
+   @Query("SELECT * FROM navigational_warnings WHERE id IN (:ids)")
+   suspend fun getNavigationalWarnings(ids: List<String>): List<NavigationalWarning>
+
    @Query("SELECT * FROM navigational_warnings WHERE navigation_area = :navigationArea ORDER BY issue_date DESC")
    @RewriteQueriesToDropUnusedColumns
    fun getNavigationalWarningsByArea(navigationArea: NavigationArea?): Flow<List<NavigationalWarningListItem>>
@@ -53,7 +56,4 @@ interface NavigationalWarningDao {
 
    @Query("DELETE FROM navigational_warnings WHERE number IN (:numbers)")
    suspend fun deleteNavigationalWarnings(numbers: List<Int>)
-
-   @Query("SELECT * FROM navigational_warnings WHERE id IN (:ids)")
-   suspend fun existingNavigationalWarnings(ids: List<String>): List<NavigationalWarning>
 }

@@ -46,7 +46,7 @@ import mil.nga.msi.datasource.radiobeacon.RadioBeaconDao
 abstract class MsiDatabase : RoomDatabase() {
 
    companion object {
-      const val VERSION = 3
+      const val VERSION = 4
    }
 
    abstract fun asamDao(): AsamDao
@@ -56,7 +56,7 @@ abstract class MsiDatabase : RoomDatabase() {
    abstract fun lightDao(): LightDao
    abstract fun noticeToMarinersDao(): NoticeToMarinersDao
    abstract fun moduDao(): ModuDao
-   abstract fun navigationalWarning(): NavigationalWarningDao
+   abstract fun navigationalWarningDao(): NavigationalWarningDao
    abstract fun portDao(): PortDao
    abstract fun radioBeaconDao(): RadioBeaconDao
 }
