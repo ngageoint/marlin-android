@@ -18,6 +18,6 @@ class AsamRemoteDataSource @Inject constructor(
          }
       }
 
-      return AsamResponse()
+      return AsamResponse(asams)
    }
 }

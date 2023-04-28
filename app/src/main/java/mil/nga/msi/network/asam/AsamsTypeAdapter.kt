@@ -1,6 +1,5 @@
 package mil.nga.msi.network.asam
 
-import android.util.Log
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
@@ -16,6 +15,7 @@ data class AsamResponse(val asams: List<Asam> = emptyList())
 class AsamsTypeAdapter: TypeAdapter<AsamResponse>() {
 
    override fun read(`in`: JsonReader): AsamResponse {
+
       val asams = mutableListOf<Asam>()
       if (`in`.peek() == JsonToken.NULL) {
          `in`.nextNull()
