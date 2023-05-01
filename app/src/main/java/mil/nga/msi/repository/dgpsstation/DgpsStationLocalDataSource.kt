@@ -12,7 +12,7 @@ class DgpsStationLocalDataSource @Inject constructor(
    fun observeDgpsStationMapItems(query: SimpleSQLiteQuery) = dao.observeDgpsStationMapItems(query)
 
    fun isEmpty() = dao.count() == 0
-   suspend fun existingDgpsStations(ids: List<String>) = dao.existingDgpsStations(ids)
+   suspend fun existingDgpsStations(ids: List<String>) = dao.getDgpsStations(ids)
 
    fun observeDgpsStation(
       volumeNumber: String,
