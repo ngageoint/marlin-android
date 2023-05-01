@@ -14,7 +14,6 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.ArgumentMatcher
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.MockitoAnnotations

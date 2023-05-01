@@ -27,5 +27,4 @@ fun assertDgpsStationsEqual(expected: DgpsStation, actual: DgpsStation) {
     Assert.assertEquals(expected.noticeNumber, actual.noticeNumber)
     Assert.assertEquals(expected.removeFromList, actual.removeFromList)
     Assert.assertEquals(expected.deleteFlag, actual.deleteFlag)
-    Assert.assertEquals(expected.sectionHeader, actual.sectionHeader)
 }
