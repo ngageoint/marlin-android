@@ -48,7 +48,7 @@ class AsamServiceTest {
         }
 
         val repository = AsamRemoteDataSource(mockService)
-        val asams = repository.fetchAsams().asams
+        val asams = repository.fetchAsams()
         assertEquals(2, asams.size)
     }
 

@@ -8,7 +8,7 @@ import javax.inject.Inject
 class AsamRemoteDataSource @Inject constructor(
    private val service: AsamService
 ) {
-   suspend fun fetchAsams(): AsamResponse {
+   suspend fun fetchAsams(): List<Asam> {
       val asams = mutableListOf<Asam>()
 
       val response = service.getAsams()
@@ -18,6 +18,6 @@ class AsamRemoteDataSource @Inject constructor(
          }
       }
 
-      return AsamResponse(asams)
+      return asams
    }
 }
