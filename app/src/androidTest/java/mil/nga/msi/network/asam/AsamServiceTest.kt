@@ -1,4 +1,4 @@
-package mil.nga.msi.repository.asam
+package mil.nga.msi.network.asam
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import assertAsamsEqual
@@ -7,9 +7,7 @@ import com.google.gson.stream.JsonToken
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mil.nga.msi.datasource.asam.Asam
-import mil.nga.msi.network.asam.AsamResponse
-import mil.nga.msi.network.asam.AsamService
-import mil.nga.msi.network.asam.AsamsTypeAdapter
+import mil.nga.msi.repository.asam.AsamRemoteDataSource
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -26,7 +24,7 @@ import java.util.Date
 @RunWith(AndroidJUnit4::class)
 class AsamServiceTest {
 
-    lateinit var typeAdapter: AsamsTypeAdapter
+    private lateinit var typeAdapter: AsamsTypeAdapter
 
     @Before
     fun setup() {
