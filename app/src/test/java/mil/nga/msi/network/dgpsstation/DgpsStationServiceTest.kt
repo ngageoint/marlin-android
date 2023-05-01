@@ -1,6 +1,5 @@
 package mil.nga.msi.network.dgpsstation
 
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import assertDgpsStationsEqual
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
@@ -16,9 +15,7 @@ import mil.nga.msi.repository.dgpsstation.DgpsStationRemoteDataSource
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers
-import org.mockito.ArgumentMatchers.any
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
@@ -28,7 +25,6 @@ import org.mockito.ArgumentMatchers.anyString
 
 
 @OptIn(ExperimentalCoroutinesApi::class)
-@RunWith(AndroidJUnit4::class)
 class DgpsStationServiceTest {
 
     private lateinit var typeAdapter: DgpsStationsTypeAdapter

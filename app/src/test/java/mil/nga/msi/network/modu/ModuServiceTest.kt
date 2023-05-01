@@ -1,6 +1,5 @@
 package mil.nga.msi.network.modu
 
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import assertModusEqual
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
@@ -13,7 +12,6 @@ import mil.nga.msi.repository.modu.ModuRemoteDataSource
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.MockitoAnnotations
@@ -26,7 +24,6 @@ import java.text.SimpleDateFormat
 import java.util.Date
 
 @OptIn(ExperimentalCoroutinesApi::class)
-@RunWith(AndroidJUnit4::class)
 class ModuServiceTest {
 
     private lateinit var typeAdapter: ModusTypeAdapter
