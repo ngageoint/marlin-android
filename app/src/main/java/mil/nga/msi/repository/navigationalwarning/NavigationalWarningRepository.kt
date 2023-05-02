@@ -13,7 +13,7 @@ import java.util.*
 import javax.inject.Inject
 
 class NavigationalWarningRepository @Inject constructor(
-   private val workManager: WorkManager,
+   workManager: WorkManager,
    private val localDataSource: NavigationalWarningLocalDataSource,
    private val remoteDataSource: NavigationalWarningRemoteDataSource,
    private val notification: MarlinNotification,
