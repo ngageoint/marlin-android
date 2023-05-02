@@ -56,7 +56,7 @@ class NoticeToMarinersTypeAdapterTest {
             }"""
 
         val notice = NoticeToMariners(
-            odsEntryId = 301323,
+            odsEntryId = 30133,
             odsKey = "16694429/SFH00000/UNTM/202318/Front_Cover.pdf",
             noticeNumber = 202318,
             filename = "Front_Cover.pdf"

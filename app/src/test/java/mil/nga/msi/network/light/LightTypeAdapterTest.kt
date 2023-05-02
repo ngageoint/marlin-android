@@ -38,7 +38,7 @@ class LightTypeAdapterTest {
                         "volumeNumber": "PUB 110",
                         "aidType": "Lighted Aids",
                         "geopoliticalHeading": "GREENLAND",
-                        "regionHeading": "region heading:",
+                        "regionHeading": "region heading",
                         "subregionHeading": "subregion heading",
                         "localHeading": "local heading",
                         "precedingNote": "preceding note",
@@ -74,7 +74,7 @@ class LightTypeAdapterTest {
             internationalFeature = "L5000"
             aidType = "Lighted Aids"
             geopoliticalHeading = "GREENLAND"
-            regionHeading = "region heading:"
+            regionHeading = "region heading"
             subregionHeading = "subregion heading"
             localHeading = "local heading"
             precedingNote = "preceding note"
@@ -90,6 +90,7 @@ class LightTypeAdapterTest {
             noticeNumber = 201507
             removeFromList = "N"
             deleteFlag = "Y"
+            sectionHeader = "GREENLANDregion heading"
         }
     }
 }

@@ -51,7 +51,7 @@ class RadioBeaconsTypeAdapter: TypeAdapter<RadioBeaconResponse>() {
       while (`in`.hasNext()) {
          readRadioBeacon(`in`)?.let {
             it.regionHeading = it.regionHeading ?: previousRegionHeading
-            it.sectionHeader = "${it.geopoliticalHeading ?: ""}${it.regionHeading ?: ""})"
+            it.sectionHeader = "${it.geopoliticalHeading ?: ""}${it.regionHeading ?: ""}"
 
             if (previousRegionHeading != it.regionHeading) {
                previousRegionHeading = it.regionHeading

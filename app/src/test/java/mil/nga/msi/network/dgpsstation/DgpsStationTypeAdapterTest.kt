@@ -47,7 +47,7 @@ class DgpsStationTypeAdapterTest {
                     "aidType":"Differential GPS Stations",
                     "position":"38°33'09\"N \n128°23'53.99\"E",
                     "geopoliticalHeading": "KOREA",
-                    "regionHeading": "regionalHeading",
+                    "regionHeading": "regional heading",
                     "precedingNote": "precedingNote",
                     "stationId":"T670\nR740\nR741\n",
                     "range":100,
@@ -74,7 +74,7 @@ class DgpsStationTypeAdapterTest {
             aidType = "Differential GPS Stations"
             position = "38°33'09\"N \n128°23'53.99\"E"
             geopoliticalHeading = "KOREA"
-            regionHeading = "regionalHeading"
+            regionHeading = "regional heading"
             precedingNote = "precedingNote"
             stationId = "T670\nR740\nR741\n"
             range = 100
@@ -84,7 +84,7 @@ class DgpsStationTypeAdapterTest {
             postNote = "post note"
             removeFromList = "N"
             deleteFlag = "N"
-
+            sectionHeader = "KOREAregional heading"
         }
     }
 }
