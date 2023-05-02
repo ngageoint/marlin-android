@@ -5,6 +5,11 @@ Marlin adheres to [Semantic Versioning](http://semver.org/).
 ---
 ## Pending on [`develop`](https://github.com/ngageoint/mage-server/tree/develop)
 
+## 1.1.1
+
+##### Bug Fixes
+* Fix pulling new ASAMs
+
 ## 1.1.0
 
 ##### Features
