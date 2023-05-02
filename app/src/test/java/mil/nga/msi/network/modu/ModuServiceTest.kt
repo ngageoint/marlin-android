@@ -8,8 +8,6 @@ import mil.nga.msi.repository.modu.ModuRemoteDataSource
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
-import org.mockito.ArgumentMatchers
-import org.mockito.ArgumentMatchers.anyString
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
@@ -42,10 +40,8 @@ class ModuServiceTest {
         val mockService = mock<ModuService> {
             onBlocking {
                 getModus(
-                    sort = anyString(),
-                    output = anyString(),
-                    minDate = ArgumentMatchers.matches(""),
-                    maxDate = ArgumentMatchers.matches("")
+                    minDate = "2021-04-16",
+                    maxDate = dateFormat.format(Date())
                 )
             } doReturn Response.success(mockResponse)
         }
@@ -61,10 +57,10 @@ class ModuServiceTest {
         assertEquals(2, modus.size)
 
         verify(mockService).getModus(
-            sort = ArgumentMatchers.matches("date"),
-            output = ArgumentMatchers.matches("json"),
-            minDate = ArgumentMatchers.matches("2021-04-16"),
-            maxDate = ArgumentMatchers.matches("2023-05-01")
+            sort = "date",
+            output = "json",
+            minDate = "2021-04-16",
+            maxDate = dateFormat.format(Date())
         )
     }
 }

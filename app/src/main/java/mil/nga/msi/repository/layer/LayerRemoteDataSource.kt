@@ -1,7 +1,6 @@
 package mil.nga.msi.repository.layer
 
 import android.net.Uri
-import android.util.Log
 import mil.nga.msi.network.layer.LayerService
 import mil.nga.msi.network.layer.wms.WMSCapabilities
 import mil.nga.msi.repository.preferences.Credentials
