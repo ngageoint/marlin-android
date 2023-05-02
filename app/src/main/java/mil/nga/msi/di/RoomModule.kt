@@ -46,7 +46,7 @@ class RoomModule {
    @Provides
    @Singleton
    fun provideNavigationalWarningDao(database: MsiDatabase): NavigationalWarningDao {
-      return database.navigationalWarning()
+      return database.navigationalWarningDao()
    }
 
    @Provides

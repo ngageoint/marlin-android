@@ -12,7 +12,7 @@ class RadioBeaconLocalDataSource @Inject constructor(
    fun observeRadioBeaconListItems(query: SimpleSQLiteQuery) = dao.observeRadioBeaconListItems(query)
 
    fun isEmpty() = dao.count() == 0
-   suspend fun existingRadioBeacons(ids: List<String>) = dao.existingRadioBeacons(ids)
+   suspend fun existingRadioBeacons(ids: List<String>) = dao.getRadioBeacons(ids)
 
    fun observeRadioBeacon(
       volumeNumber: String,

@@ -23,6 +23,6 @@ class DateTypeConverter {
 
    @TypeConverter
    fun timestampFromInstant(x: Instant?): Long? {
-      return x?.let { it.toEpochMilli() }
+      return x?.toEpochMilli()
    }
 }

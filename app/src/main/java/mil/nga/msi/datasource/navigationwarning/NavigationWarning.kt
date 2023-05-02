@@ -43,7 +43,7 @@ data class NavigationalWarning(
    var issueDate: Date
 ) {
    @ColumnInfo(name = "subregions")
-   var subregions: List<String>? = emptyList()
+   var subregions: List<String>? = mutableListOf()
 
    @ColumnInfo(name = "text")
    var text: String? = null

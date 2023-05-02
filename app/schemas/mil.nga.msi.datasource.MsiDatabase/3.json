@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 3,
-    "identityHash": "74dbb3f22b55d635e6a95fdb256332ac",
+    "identityHash": "51e0586b2399df35d4c7107317bbbf2f",
     "entities": [
       {
         "tableName": "asams",
@@ -70,10 +70,10 @@
           }
         ],
         "primaryKey": {
+          "autoGenerate": false,
           "columnNames": [
             "reference"
-          ],
-          "autoGenerate": false
+          ]
         },
         "indices": [],
         "foreignKeys": []
@@ -222,11 +222,11 @@
           }
         ],
         "primaryKey": {
+          "autoGenerate": false,
           "columnNames": [
             "volume_number",
             "feature_number"
-          ],
-          "autoGenerate": false
+          ]
         },
         "indices": [
           {
@@ -403,17 +403,17 @@
           }
         ],
         "primaryKey": {
+          "autoGenerate": false,
           "columnNames": [
             "s3_key"
-          ],
-          "autoGenerate": false
+          ]
         },
         "indices": [],
         "foreignKeys": []
       },
       {
         "tableName": "layers",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `type` TEXT NOT NULL, `url` TEXT NOT NULL, `name` TEXT NOT NULL, `visible` INTEGER NOT NULL, `min_zoom` INTEGER, `max_zoom` INTEGER, `file_path` TEXT, `tables` TEXT NOT NULL, `refresh_rate` INTEGER, `minLatitude` REAL, `minLongitude` REAL, `maxLatitude` REAL, `maxLongitude` REAL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `type` TEXT NOT NULL, `url` TEXT NOT NULL, `name` TEXT NOT NULL, `visible` INTEGER NOT NULL, `min_zoom` INTEGER, `max_zoom` INTEGER, `file_path` TEXT, `tables` TEXT, `refresh_rate` INTEGER, `minLatitude` REAL, `minLongitude` REAL, `maxLatitude` REAL, `maxLongitude` REAL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -467,7 +467,7 @@
             "fieldPath": "tables",
             "columnName": "tables",
             "affinity": "TEXT",
-            "notNull": true
+            "notNull": false
           },
           {
             "fieldPath": "refreshRate",
@@ -501,10 +501,10 @@
           }
         ],
         "primaryKey": {
+          "autoGenerate": true,
           "columnNames": [
             "id"
-          ],
-          "autoGenerate": true
+          ]
         },
         "indices": [],
         "foreignKeys": []
@@ -683,12 +683,12 @@
           }
         ],
         "primaryKey": {
+          "autoGenerate": false,
           "columnNames": [
             "volume_number",
             "feature_number",
             "characteristic_number"
-          ],
-          "autoGenerate": false
+          ]
         },
         "indices": [
           {
@@ -793,10 +793,10 @@
           }
         ],
         "primaryKey": {
+          "autoGenerate": false,
           "columnNames": [
             "ods_entry_id"
-          ],
-          "autoGenerate": false
+          ]
         },
         "indices": [],
         "foreignKeys": []
@@ -873,10 +873,10 @@
           }
         ],
         "primaryKey": {
+          "autoGenerate": false,
           "columnNames": [
             "name"
-          ],
-          "autoGenerate": false
+          ]
         },
         "indices": [],
         "foreignKeys": []
@@ -965,12 +965,12 @@
           }
         ],
         "primaryKey": {
+          "autoGenerate": false,
           "columnNames": [
             "number",
             "year",
             "navigation_area"
-          ],
-          "autoGenerate": false
+          ]
         },
         "indices": [
           {
@@ -1651,10 +1651,10 @@
           }
         ],
         "primaryKey": {
+          "autoGenerate": false,
           "columnNames": [
             "port_number"
-          ],
-          "autoGenerate": false
+          ]
         },
         "indices": [],
         "foreignKeys": []
@@ -1803,11 +1803,11 @@
           }
         ],
         "primaryKey": {
+          "autoGenerate": false,
           "columnNames": [
             "volume_number",
             "feature_number"
-          ],
-          "autoGenerate": false
+          ]
         },
         "indices": [],
         "foreignKeys": []
@@ -1816,7 +1816,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '74dbb3f22b55d635e6a95fdb256332ac')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '51e0586b2399df35d4c7107317bbbf2f')"
     ]
   }
 }

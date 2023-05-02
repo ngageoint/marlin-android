@@ -56,7 +56,7 @@ class LightsTypeAdapter: TypeAdapter<LightResponse>() {
             it.regionHeading = it.regionHeading ?: previousRegionHeading
             it.subregionHeading = it.subregionHeading ?: previousSubregionHeading
             it.localHeading = it.localHeading ?: previousLocalHeading
-            it.sectionHeader = "${it.geopoliticalHeading ?: ""}${it.regionHeading ?: ""})"
+            it.sectionHeader = "${it.geopoliticalHeading ?: ""}${it.regionHeading ?: ""}"
 
             if (previousRegionHeading != it.regionHeading) {
                previousRegionHeading = it.regionHeading

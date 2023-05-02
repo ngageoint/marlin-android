@@ -30,6 +30,9 @@ interface AsamDao {
    @Query("SELECT * FROM asams")
    suspend fun getAsams(): List<Asam>
 
+   @Query("SELECT * FROM asams WHERE reference IN (:references)")
+   suspend fun getAsams(references: List<String>): List<Asam>
+
    @RawQuery(observedEntities = [Asam::class])
    @RewriteQueriesToDropUnusedColumns
    fun getAsams(query: SupportSQLiteQuery): List<Asam>
@@ -43,7 +46,4 @@ interface AsamDao {
    @RawQuery(observedEntities = [Asam::class])
    @RewriteQueriesToDropUnusedColumns
    fun observeAsamMapItems(query: SupportSQLiteQuery): Flow<List<AsamMapItem>>
-
-   @Query("SELECT * FROM asams WHERE reference IN (:references)")
-   suspend fun existingAsams(references: List<String>): List<Asam>
 }

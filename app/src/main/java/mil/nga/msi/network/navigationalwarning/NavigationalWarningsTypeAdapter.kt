@@ -66,7 +66,7 @@ class NavigationalWarningsTypeAdapter: TypeAdapter<NavigationalWarningResponse>(
       var year: Int? = null
       var issueDate: Date? = null
       var navigationArea: NavigationArea? = null
-      var subregions: List<String>? = null
+      var subregions: List<String> = emptyList()
       var text: String? = null
       var status: String? = null
       var authority: String? = null

@@ -53,7 +53,7 @@ class DgpsStationsTypeAdapter: TypeAdapter<DgpsStationResponse>() {
       while (`in`.hasNext()) {
          readDgpsStation(`in`)?.let {
             it.regionHeading = it.regionHeading ?: previousRegionHeading
-            it.sectionHeader = "${it.geopoliticalHeading ?: ""}${it.regionHeading ?: ""})"
+            it.sectionHeader = "${it.geopoliticalHeading ?: ""}${it.regionHeading ?: ""}"
 
             if (previousRegionHeading != it.regionHeading) {
                previousRegionHeading = it.regionHeading

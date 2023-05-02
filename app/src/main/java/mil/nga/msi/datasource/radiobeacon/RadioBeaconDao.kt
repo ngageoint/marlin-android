@@ -22,6 +22,9 @@ interface RadioBeaconDao {
    @Query("SELECT * FROM radio_beacons")
    suspend fun getRadioBeacons(): List<RadioBeacon>
 
+   @Query("SELECT * FROM radio_beacons WHERE id IN (:ids)")
+   suspend fun getRadioBeacons(ids: List<String>): List<RadioBeacon>
+
    @RawQuery(observedEntities = [RadioBeacon::class])
    @RewriteQueriesToDropUnusedColumns
    fun getRadioBeacons(query: SupportSQLiteQuery): List<RadioBeacon>
@@ -41,7 +44,4 @@ interface RadioBeaconDao {
    @RawQuery(observedEntities = [RadioBeacon::class])
    @RewriteQueriesToDropUnusedColumns
    fun observeRadioBeaconMapItems(query: SupportSQLiteQuery): Flow<List<RadioBeaconMapItem>>
-
-   @Query("SELECT * FROM radio_beacons WHERE id IN (:ids)")
-   suspend fun existingRadioBeacons(ids: List<String>): List<RadioBeacon>
 }

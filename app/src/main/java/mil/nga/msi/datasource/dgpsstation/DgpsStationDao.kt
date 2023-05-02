@@ -26,6 +26,9 @@ interface DgpsStationDao {
    @RewriteQueriesToDropUnusedColumns
    fun getDgpsStations(query: SupportSQLiteQuery): List<DgpsStation>
 
+   @Query("SELECT * FROM dgps_stations WHERE id IN (:ids)")
+   suspend fun getDgpsStations(ids: List<String>): List<DgpsStation>
+
    @Query("SELECT * FROM dgps_stations WHERE volume_number = :volumeNumber ORDER BY notice_number DESC LIMIT 1")
    suspend fun getLatestDgpsStation(volumeNumber: String): DgpsStation?
 
@@ -41,7 +44,4 @@ interface DgpsStationDao {
    @RawQuery(observedEntities = [DgpsStation::class])
    @RewriteQueriesToDropUnusedColumns
    fun observeDgpsStationMapItems(query: SupportSQLiteQuery): Flow<List<DgpsStationMapItem>>
-
-   @Query("SELECT * FROM dgps_stations WHERE id IN (:ids)")
-   suspend fun existingDgpsStations(ids: List<String>): List<DgpsStation>
 }
