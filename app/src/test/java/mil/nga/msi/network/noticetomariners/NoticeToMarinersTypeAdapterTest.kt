@@ -1,10 +1,8 @@
 package mil.nga.msi.network.noticetomariners
 
-import assertLightsEqual
 import assertNoticeToMarinersEqual
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
-import mil.nga.msi.datasource.light.Light
 import mil.nga.msi.datasource.noticetomariners.NoticeToMariners
 import mil.nga.msi.parseAsInstant
 import org.junit.Assert.assertEquals
