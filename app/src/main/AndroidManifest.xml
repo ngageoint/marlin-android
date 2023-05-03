@@ -70,7 +70,7 @@
         
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="${applicationId}.fileprovider"
+            android:authorities="mil.nga.msi.fileprovider"
             android:grantUriPermissions="true"
             android:exported="false">
 
