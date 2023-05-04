@@ -1,6 +1,7 @@
 package mil.nga.msi.repository.layer
 
 import android.net.Uri
+import android.util.Log
 import mil.nga.msi.network.layer.LayerService
 import mil.nga.msi.network.layer.wms.WMSCapabilities
 import mil.nga.msi.repository.preferences.Credentials
@@ -21,6 +22,8 @@ class LayerRemoteDataSource @Inject constructor(
             okhttp3.Credentials.basic(it.username, it.password)
          }
 
+         Log.i("billy", "tile uri is $tileUri")
+
          try {
             val response = service.getTile(
                url = tileUri.toString(),
@@ -33,19 +36,29 @@ class LayerRemoteDataSource @Inject constructor(
 
    suspend fun getWMSCapabilities(url: String, credentials: Credentials? = null): WMSCapabilities? {
       return url.toUri()?.let { uri: Uri ->
-         val wmsUri = uri.buildUpon()
-            .clearQuery()
-            .appendQueryParameter("service", "WMS")
-            .appendQueryParameter("version", "1.3.0")
-            .appendQueryParameter("request", "GetCapabilities")
-            .build()
-
-         val credentialsHeader = credentials?.let {
-            okhttp3.Credentials.basic(it.username, it.password)
-         }
-
          try {
-            val response = service.getWMSCapabilities(wmsUri.toString(), credentialsHeader)
+            val extraParameters = mutableListOf<Pair<String, String>>()
+            uri.queryParameterNames.forEach { parameter ->
+               if (!GET_CAPABILITIES_PARAMETERS.contains(parameter)) {
+                  uri.getQueryParameter(parameter)?.let { value ->
+                     extraParameters.add(Pair(parameter, value))
+                  }
+               }
+            }
+
+            val builder = uri.buildUpon()
+               .clearQuery()
+               .appendQueryParameter("service", "WMS")
+               .appendQueryParameter("version", "1.3.0")
+               .appendQueryParameter("request", "GetCapabilities")
+
+            extraParameters.forEach { builder.appendQueryParameter(it.first, it.second) }
+
+            val credentialsHeader = credentials?.let {
+               okhttp3.Credentials.basic(it.username, it.password)
+            }
+
+            val response = service.getWMSCapabilities(builder.build().toString(), credentialsHeader)
             if (response.isSuccessful) {
                response.body()
             } else null
@@ -57,5 +70,9 @@ class LayerRemoteDataSource @Inject constructor(
       return try {
          Uri.parse(this)
       } catch(e: Exception) { null }
+   }
+
+   companion object {
+      val GET_CAPABILITIES_PARAMETERS = listOf("service", "version", "request")
    }
 }
