@@ -35,7 +35,6 @@ android {
         targetSdk 33
         versionName project.version
         versionCode ext.repo.log().size() as int
-        compileSdkPreview = "UpsideDownCake"
 
         kapt {
             arguments {
