@@ -20,7 +20,7 @@ def googleMapsApiDebugKey = hasProperty('MSI_DEBUG_MAPS_API_KEY') ? MSI_DEBUG_MA
 
 def room_version = '2.5.1'
 def work_version = '2.8.1'
-def compose_version = '1.4.1'
+def compose_version = '1.4.2'
 def retrofit_version = '2.9.0'
 def accompanist_version = '0.30.1'
 
@@ -72,11 +72,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_11
-        targetCompatibility JavaVersion.VERSION_11
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "17"
     }
     buildFeatures {
         compose true
@@ -144,18 +144,18 @@ dependencies {
 
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.3"
 
-    implementation "androidx.compose.material3:material3:1.1.0-beta02"
+    implementation "androidx.compose.material3:material3:1.1.0-rc01"
 
     implementation 'androidx.core:core-ktx:1.10.0'
     implementation "androidx.compose.ui:ui:$compose_version"
-    implementation 'androidx.compose.material:material:1.4.1'
+    implementation 'androidx.compose.material:material:1.4.2'
     implementation "androidx.compose.ui:ui-tooling-preview:$compose_version"
-    implementation "androidx.compose.material:material-icons-extended:1.4.1"
+    implementation "androidx.compose.material:material-icons-extended:1.4.2"
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.1'
     implementation 'androidx.lifecycle:lifecycle-runtime-compose:2.6.1'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1'
     implementation "androidx.lifecycle:lifecycle-service:2.6.1"
-    implementation 'androidx.activity:activity-compose:1.7.0'
+    implementation 'androidx.activity:activity-compose:1.7.1'
     implementation 'androidx.navigation:navigation-compose:2.5.3'
     implementation('androidx.paging:paging-runtime-ktx:3.1.1')
     implementation("androidx.paging:paging-compose:1.0.0-alpha18")
@@ -169,7 +169,7 @@ dependencies {
 
     implementation 'com.google.protobuf:protobuf-javalite:3.18.0'
     implementation 'androidx.datastore:datastore-preferences:1.0.0'
-    implementation "androidx.security:security-crypto:1.1.0-alpha05"
+    implementation "androidx.security:security-crypto:1.1.0-alpha06"
 
     implementation 'com.google.maps.android:maps-compose:2.8.0'
     implementation 'com.google.maps.android:maps-ktx:3.2.1'
@@ -192,7 +192,7 @@ dependencies {
     implementation "com.google.accompanist:accompanist-permissions:$accompanist_version"
     implementation "com.google.accompanist:accompanist-webview:$accompanist_version"
 
-    implementation("com.google.android.gms:play-services-oss-licenses:17.0.0")
+    implementation("com.google.android.gms:play-services-oss-licenses:17.0.1")
 
     testImplementation libs.junit4
     testImplementation project(':testing')

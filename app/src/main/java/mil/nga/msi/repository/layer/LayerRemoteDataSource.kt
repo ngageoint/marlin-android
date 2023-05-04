@@ -22,8 +22,6 @@ class LayerRemoteDataSource @Inject constructor(
             okhttp3.Credentials.basic(it.username, it.password)
          }
 
-         Log.i("billy", "tile uri is $tileUri")
-
          try {
             val response = service.getTile(
                url = tileUri.toString(),
