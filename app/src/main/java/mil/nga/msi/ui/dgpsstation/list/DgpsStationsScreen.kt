@@ -19,7 +19,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.PagingData
 import androidx.paging.compose.collectAsLazyPagingItems
-import androidx.paging.compose.items
+import androidx.paging.compose.itemContentType
+import androidx.paging.compose.itemKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import mil.nga.msi.coordinate.DMS
@@ -110,9 +111,22 @@ private fun DgpsStations(
          modifier = Modifier.padding(horizontal = 8.dp),
          contentPadding = PaddingValues(top = 16.dp)
       ) {
-
-         items(lazyItems) { item ->
-            when (item) {
+         items(
+            count = lazyItems.itemCount,
+            key = lazyItems.itemKey {
+               when (it) {
+                  is DgpsStationListItem.DgpsStationItem -> it.dgpsStation.id
+                  is DgpsStationListItem.HeaderItem -> it.header
+               }
+            },
+            contentType = lazyItems.itemContentType {
+               when (it) {
+                  is DgpsStationListItem.DgpsStationItem -> "dgpsStation"
+                  is DgpsStationListItem.HeaderItem -> "header"
+               }
+            }
+         ) { index ->
+            when (val item = lazyItems[index]) {
                is DgpsStationListItem.HeaderItem -> {
                   Text(
                      text = item.header,

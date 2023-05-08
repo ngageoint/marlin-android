@@ -5,6 +5,11 @@ Marlin adheres to [Semantic Versioning](http://semver.org/).
 ---
 ## Pending on [`develop`](https://github.com/ngageoint/mage-server/tree/develop)
 
+## 1.1.2
+
+##### Bug Fixes
+* Allow query parameters in WMS get capabilities request
+
 ## 1.1.1
 
 ##### Bug Fixes

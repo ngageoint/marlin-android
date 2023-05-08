@@ -18,7 +18,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.PagingData
 import androidx.paging.compose.collectAsLazyPagingItems
-import androidx.paging.compose.items
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import mil.nga.msi.coordinate.DMS
@@ -31,6 +30,8 @@ import mil.nga.msi.ui.navigation.Point
 import java.text.SimpleDateFormat
 import java.util.*
 import androidx.compose.material3.*
+import androidx.paging.compose.itemContentType
+import androidx.paging.compose.itemKey
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -111,8 +112,22 @@ private fun Asams(
          modifier = Modifier.padding(horizontal = 8.dp),
          contentPadding = PaddingValues(top = 16.dp)
       ) {
-         items(lazyItems) { item ->
-            when (item) {
+         items(
+            count = lazyItems.itemCount,
+            key = lazyItems.itemKey {
+               when (it) {
+                  is AsamListItem.AsamItem -> it.asam.reference
+                  is AsamListItem.HeaderItem -> it.header
+               }
+            },
+            contentType = lazyItems.itemContentType {
+               when (it) {
+                  is AsamListItem.AsamItem -> "asam"
+                  is AsamListItem.HeaderItem -> "header"
+               }
+            }
+         ) { index ->
+            when (val item = lazyItems[index]) {
                is AsamListItem.AsamItem -> {
                   AsamCard(
                      asam = item.asam,

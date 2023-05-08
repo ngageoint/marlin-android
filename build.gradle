@@ -1,10 +1,7 @@
 buildscript {
     ext {
-        hilt_version = '2.46'
-        kotlin_version = '1.8.21'
-    }
-    dependencies {
-        classpath("com.google.android.gms:oss-licenses-plugin:0.10.6")
+        hilt_version = '2.44.2'
+        kotlin_version = '1.8.10'
     }
 }
 plugins {

@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -15,14 +14,14 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.PagingData
 import androidx.paging.compose.collectAsLazyPagingItems
-import androidx.paging.compose.items
+import androidx.paging.compose.itemContentType
+import androidx.paging.compose.itemKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import mil.nga.msi.coordinate.DMS
@@ -114,8 +113,22 @@ private fun RadioBeacons(
          contentPadding = PaddingValues(top = 16.dp)
       ) {
 
-         items(lazyItems) { item ->
-            when (item) {
+         items(
+            count = lazyItems.itemCount,
+            key = lazyItems.itemKey {
+               when (it) {
+                  is RadioBeaconListItem.RadioBeaconItem -> it.radioBeacon.id
+                  is RadioBeaconListItem.HeaderItem -> it.header
+               }
+            },
+            contentType = lazyItems.itemContentType {
+               when (it) {
+                  is RadioBeaconListItem.RadioBeaconItem -> "radioBeacon"
+                  is RadioBeaconListItem.HeaderItem -> "header"
+               }
+            }
+         ) { index ->
+            when (val item = lazyItems[index]) {
                is RadioBeaconListItem.HeaderItem -> {
                   Text(
                      text = item.header,
