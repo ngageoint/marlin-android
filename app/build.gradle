@@ -9,18 +9,17 @@ plugins {
     id 'kotlinx-serialization'
     id 'com.google.protobuf'
     id 'org.ajoberstar.grgit' version '4.1.0'
-    id 'com.google.android.gms.oss-licenses-plugin'
 }
 
 group 'mil.nga.msi'
-version '1.1.1'
+version '1.0.1'
 
 def googleMapsApiReleaseKey = hasProperty('MSI_RELEASE_MAPS_API_KEY') ? MSI_RELEASE_MAPS_API_KEY : ''
 def googleMapsApiDebugKey = hasProperty('MSI_DEBUG_MAPS_API_KEY') ? MSI_DEBUG_MAPS_API_KEY : ''
 
 def room_version = '2.5.1'
 def work_version = '2.8.1'
-def compose_version = '1.4.2'
+def compose_version = '1.4.3'
 def retrofit_version = '2.9.0'
 def accompanist_version = '0.30.1'
 
@@ -58,11 +57,7 @@ android {
 
     buildTypes {
         debug {
-            minifyEnabled false
-            applicationIdSuffix ".debug"
-            versionNameSuffix "-debug"
             resValue "string", "GOOGLE_MAPS_ANDROID_API_KEY", googleMapsApiDebugKey
-            resValue "string", "applicationId", defaultConfig.applicationId + applicationIdSuffix
         }
         release {
             minifyEnabled false
@@ -72,42 +67,43 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_11
-        targetCompatibility JavaVersion.VERSION_11
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
-    
-    kotlin {
-        jvmToolchain(11)
-    }
-
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = '1.8'
     }
-
     buildFeatures {
         compose true
         viewBinding true
     }
-
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.4.4"
+        kotlinCompilerExtensionVersion = "1.4.3"
     }
 
     protobuf {
         protoc {
             artifact = 'com.google.protobuf:protoc:3.21.1'
         }
+
+        sourceSets.all {
+            java.srcDir("build/generated/source/proto/$name/java")
+            java.srcDir("build/generated/source/proto/$name/kotlin")
+        }
+
+        // Generates the java Protobuf-lite code for the Protobufs in this project. See
+        // https://github.com/google/protobuf-gradle-plugin#customizing-protobuf-compilation
+        // for more information.
         generateProtoTasks {
-            all().configureEach { task ->
+            all().each { task ->
                 task.builtins {
                     java {
-                        option "lite"
+                        option 'lite'
                     }
                 }
             }
         }
     }
-
     namespace 'mil.nga.msi'
     sourceSets {
         main {
@@ -151,13 +147,12 @@ dependencies {
 
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.3"
 
-    implementation "androidx.compose.material3:material3:1.1.0-rc01"
-
     implementation 'androidx.core:core-ktx:1.10.0'
     implementation "androidx.compose.ui:ui:$compose_version"
-    implementation 'androidx.compose.material:material:1.4.2'
+    implementation "androidx.compose.material3:material3:1.1.0-rc01"
+    implementation 'androidx.compose.material:material:1.4.3'
     implementation "androidx.compose.ui:ui-tooling-preview:$compose_version"
-    implementation "androidx.compose.material:material-icons-extended:1.4.2"
+    implementation "androidx.compose.material:material-icons-extended:1.5.0-alpha03"
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.1'
     implementation 'androidx.lifecycle:lifecycle-runtime-compose:2.6.1'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1'
@@ -165,10 +160,10 @@ dependencies {
     implementation 'androidx.activity:activity-compose:1.7.1'
     implementation 'androidx.navigation:navigation-compose:2.5.3'
     implementation('androidx.paging:paging-runtime-ktx:3.1.1')
-    implementation("androidx.paging:paging-compose:1.0.0-alpha18")
+    implementation("androidx.paging:paging-compose:1.0.0-alpha19")
     implementation "androidx.compose.runtime:runtime-livedata:$compose_version"
     implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'com.google.android.material:material:1.8.0'
+    implementation 'com.google.android.material:material:1.9.0'
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.6.1'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1'
     implementation 'androidx.navigation:navigation-fragment-ktx:2.5.3'
@@ -209,16 +204,4 @@ dependencies {
     androidTestImplementation project(':testing')
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_version"
-
-    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4'
-    testImplementation 'org.mockito:mockito-core:5.3.1'
-    testImplementation 'org.mockito:mockito-inline:5.2.0'
-    testImplementation "org.mockito.kotlin:mockito-kotlin:3.2.0"
-    testImplementation "io.mockk:mockk:1.4.1"
-
-    androidTestImplementation 'org.mockito:mockito-core:5.3.1'
-    androidTestImplementation 'com.linkedin.dexmaker:dexmaker-mockito-inline:2.28.3'
-    androidTestImplementation "org.mockito.kotlin:mockito-kotlin:3.2.0"
-    androidTestImplementation "io.mockk:mockk:1.4.1"
-
 }
