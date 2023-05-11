@@ -1,4 +1,4 @@
-package mil.nga.msi.ui.settings
+package mil.nga.msi.ui.about
 
 import android.content.Intent
 import android.net.Uri

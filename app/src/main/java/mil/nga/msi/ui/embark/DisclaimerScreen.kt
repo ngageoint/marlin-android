@@ -20,10 +20,10 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import mil.nga.msi.ui.settings.EndorsementDisclaimer
-import mil.nga.msi.ui.settings.LegalDisclaimer
-import mil.nga.msi.ui.settings.LiabilityDisclaimer
-import mil.nga.msi.ui.settings.SecurityPolicy
+import mil.nga.msi.ui.about.EndorsementDisclaimer
+import mil.nga.msi.ui.about.LegalDisclaimer
+import mil.nga.msi.ui.about.LiabilityDisclaimer
+import mil.nga.msi.ui.about.SecurityPolicy
 
 @Composable
 fun DisclaimerScreen(

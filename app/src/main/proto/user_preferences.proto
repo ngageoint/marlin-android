@@ -8,6 +8,7 @@ import "map.proto";
 import "sort.proto";
 import "filter.proto";
 import "notice_to_mariners.proto";
+import "developer.proto";
 
 message NavigationalWarningKey {
   int64 number = 1;
@@ -27,4 +28,5 @@ message UserPreferences {
   NoticeToMarinersFilter noticeToMarinersFilter = 10;
   int32 version = 11;
   repeated int32 layers = 12;
+  Developer developer = 13;
 }

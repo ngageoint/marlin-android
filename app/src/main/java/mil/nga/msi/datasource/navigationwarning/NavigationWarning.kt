@@ -1,18 +1,29 @@
 package mil.nga.msi.datasource.navigationwarning
 
+import androidx.compose.ui.graphics.Color
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
+import mil.nga.msi.datasource.Position
+import mil.nga.sf.GeometryType
+import mil.nga.sf.wkt.GeometryReader
 import java.text.SimpleDateFormat
 import java.util.*
 
-enum class NavigationArea(val code: String, val title: String) {
-   HYDROARC("C", "HYDROARC"),
-   HYDROLANT("A", "HYDROLANT"),
-   HYDROPAC("P", "HYDROPAC"),
-   NAVAREA_IV("4", "NAVAREA IV"),
-   NAVAREA_XII("12", "NAVAREA XII"),
-   SPECIAL_WARNING("S", "Special Warning");
+enum class NavigationArea(
+   val code: String,
+   val title: String,
+   val color: Color
+) {
+   HYDROARC("C", "HYDROARC", Color(0xFF77DFFC)),
+   HYDROLANT("A", "HYDROLANT", Color(0xFF7C91F2)),
+   HYDROPAC("P", "HYDROPAC", Color(0xFFF5F481)),
+   NAVAREA_IV("4", "NAVAREA IV", Color(0xFFFDBFBF)),
+   NAVAREA_XII("12", "NAVAREA XII", Color(0xFF8BCC6B)),
+   SPECIAL_WARNING("S", "Special Warning", Color.Unspecified),
+   UNPARSED("NA", "UNPARSED LOCATIONS", Color.Transparent);
 
    companion object {
       fun fromCode(code: String): NavigationArea? {
@@ -42,6 +53,7 @@ data class NavigationalWarning(
    @ColumnInfo(name = "issue_date")
    var issueDate: Date
 ) {
+
    @ColumnInfo(name = "subregions")
    var subregions: List<String>? = mutableListOf()
 
@@ -66,8 +78,34 @@ data class NavigationalWarning(
    @ColumnInfo(name = "cancel_year")
    var cancelYear: Int? = null
 
+   @ColumnInfo(name = "position")
+   var position: Position? = null
+
    fun compositeKey(): String {
       return compositeKey(number, year, navigationArea)
+   }
+
+   fun bounds(): LatLngBounds? {
+      val builder = LatLngBounds.builder()
+      position?.locations?.forEach { location ->
+         val geometry = GeometryReader.readGeometry(location.wkt)
+         when (geometry.geometryType) {
+            GeometryType.POINT -> {
+               val centroid = geometry.centroid
+               builder.include(LatLng(centroid.y, centroid.x))
+            }
+            GeometryType.LINESTRING, GeometryType.POLYGON -> {
+               val envelope = geometry.envelope
+               builder.include(LatLng(envelope.bottomLeft.y, envelope.bottomLeft.x))
+               builder.include(LatLng(envelope.topLeft.y, envelope.topLeft.x))
+               builder.include(LatLng(envelope.topRight.y, envelope.topRight.x))
+               builder.include(LatLng(envelope.bottomRight.y, envelope.bottomRight.x))
+            }
+            else -> {}
+         }
+      }
+
+      return try { builder.build() } catch(e: Exception) { null }
    }
 
    override fun toString(): String {

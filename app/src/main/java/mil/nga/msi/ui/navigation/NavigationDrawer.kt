@@ -34,7 +34,7 @@ import mil.nga.msi.ui.drag.DraggableItem
 import mil.nga.msi.ui.drag.dragContainer
 import mil.nga.msi.ui.drag.rememberDragDropState
 import mil.nga.msi.ui.report.ReportRoute
-import mil.nga.msi.ui.settings.AboutRoute
+import mil.nga.msi.ui.about.AboutRoute
 import mil.nga.msi.ui.theme.screenBackground
 
 private const val MAX_TABS = 4

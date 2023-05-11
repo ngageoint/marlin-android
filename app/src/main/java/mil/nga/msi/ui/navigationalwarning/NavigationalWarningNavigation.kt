@@ -5,15 +5,21 @@ import androidx.compose.ui.graphics.Color
 import androidx.core.os.BundleCompat
 import androidx.navigation.*
 import androidx.navigation.compose.composable
+import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
+import com.google.accompanist.navigation.material.bottomSheet
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.navigationwarning.NavigationArea
 import mil.nga.msi.repository.navigationalwarning.NavigationalWarningKey
+import mil.nga.msi.ui.map.MapPosition
+import mil.nga.msi.ui.navigation.Bounds
+import mil.nga.msi.ui.navigation.NavTypeBounds
 import mil.nga.msi.ui.navigation.NavTypeNavigationalWarningKey
 import mil.nga.msi.ui.navigation.Route
 import mil.nga.msi.ui.navigationalwarning.detail.NavigationalWarningDetailScreen
 import mil.nga.msi.ui.navigationalwarning.list.NavigationalWarningsScreen
+import mil.nga.msi.ui.navigationalwarning.sheet.NavigationalWarningSheetScreen
 
 sealed class NavigationWarningRoute(
    override val name: String,
@@ -25,8 +31,10 @@ sealed class NavigationWarningRoute(
    object Group: NavigationWarningRoute("navigational_warnings/group", "Navigational Warnings", "Navigational Warnings")
    object List: NavigationWarningRoute("navigational_warnings/list", "Navigational Warnings", "Navigational Warnings")
    object Detail: NavigationWarningRoute("navigational_warnings/detail", "Navigational Warning Details", "Navigational Warning Details")
+   object Sheet: NavigationWarningRoute("navigational_warnings/sheet", "Navigational Warning Sheet", "Navigational Warning Sheet")
 }
 
+@OptIn(ExperimentalMaterialNavigationApi::class)
 fun NavGraphBuilder.navigationalWarningGraph(
    navController: NavController,
    bottomBarVisibility: (Boolean) -> Unit,
@@ -39,18 +47,37 @@ fun NavGraphBuilder.navigationalWarningGraph(
 
    navigation(
       route = NavigationWarningRoute.Main.name,
-      startDestination = NavigationWarningRoute.Group.name,
+      startDestination = "${NavigationWarningRoute.Group.name}?bounds={bounds}",
    ) {
       composable(
-         route = NavigationWarningRoute.Group.name,
+         route = "${NavigationWarningRoute.Group.name}?bounds={bounds}",
+         arguments = listOf(
+            navArgument("bounds") {
+               nullable = true
+               defaultValue = null
+               type = NavType.NavTypeBounds
+            }
+         ),
          deepLinks = listOf(navDeepLink { uriPattern = "marlin://${NavigationWarningRoute.Group.name}" })
-      ) {
+      ) { backstackEntry ->
          bottomBarVisibility(true)
 
+         val mapPosition = backstackEntry.arguments?.let { bundle ->
+            BundleCompat.getParcelable(bundle, "bounds", Bounds::class.java)?.asLatLngBounds()?.let {
+               MapPosition(bounds = it)
+            }
+         }
+
          NavigationalWarningGroupScreen(
+            position = mapPosition,
             openDrawer = { openNavigationDrawer() },
             onGroupTap = { navigationArea ->
                navController.navigate( "${NavigationWarningRoute.List.name}?navigationArea=${navigationArea.code}")
+            },
+            onNavigationWarningTap = { warning ->
+               val key = NavigationalWarningKey.fromNavigationWarning(warning)
+               val encoded = Uri.encode(Json.encodeToString(key))
+               navController.navigate(NavigationWarningRoute.Sheet.name + "?key=${encoded}")
             }
          )
       }
@@ -74,6 +101,10 @@ fun NavGraphBuilder.navigationalWarningGraph(
                      is NavigationalWarningAction.Share -> {
                         shareNavigationalWarning(action.text)
                      }
+                     is NavigationalWarningAction.Zoom -> {
+                        val encoded = Uri.encode(Json.encodeToString(Bounds.fromLatLngBounds(action.bounds)))
+                        navController.navigate( "${NavigationWarningRoute.Group.name}?bounds=$encoded")
+                     }
                   }
                }
             )
@@ -96,7 +127,28 @@ fun NavGraphBuilder.navigationalWarningGraph(
                      is NavigationalWarningAction.Share -> {
                         shareNavigationalWarning(action.text)
                      }
+                     is NavigationalWarningAction.Zoom -> {
+                        val encoded = Uri.encode(Json.encodeToString(Bounds.fromLatLngBounds(action.bounds)))
+                        navController.navigate( "${NavigationWarningRoute.Group.name}?bounds=$encoded")
+                     }
                   }
+               }
+            )
+         }
+      }
+
+      bottomSheet(
+         route = "${NavigationWarningRoute.Sheet.name}?key={key}",
+         arguments = listOf(navArgument("key") { type = NavType.NavTypeNavigationalWarningKey })
+      ) { backstackEntry ->
+         backstackEntry.arguments?.let { bundle ->
+            BundleCompat.getParcelable(bundle, "key", NavigationalWarningKey::class.java)
+         }?.let { key ->
+            NavigationalWarningSheetScreen(
+               key = key,
+               onDetails = {
+                  val encoded = Uri.encode(Json.encodeToString(key))
+                  navController.navigate( "${NavigationWarningRoute.Detail.name}?key=$encoded")
                }
             )
          }

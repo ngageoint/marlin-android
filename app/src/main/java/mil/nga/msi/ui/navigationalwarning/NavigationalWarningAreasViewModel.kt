@@ -4,8 +4,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import com.google.android.gms.maps.model.TileProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
 import mil.nga.msi.datasource.navigationwarning.NavigationArea
 import mil.nga.msi.location.LocationPolicy
 import mil.nga.msi.repository.navigationalwarning.NavigationalWarningKey
@@ -32,6 +37,23 @@ class NavigationalWarningAreasViewModel @Inject constructor(
          locationPolicy.requestLocationUpdates()
       }
    }
+
+   val warnings = repository.observeNavigationalWarnings()
+      .mapLatest {
+         it.map { warning ->
+            NavigationalWarningState.fromWarning(warning)
+         }
+      }
+      .flowOn(Dispatchers.IO)
+      .asLiveData()
+
+   val unparsedWarnings = userPreferencesRepository.developer().map { developer ->
+      developer.showNonParsedNavigationWarnings
+   }.flatMapLatest { show ->
+      if (show) {
+         repository.observeUnparsedNavigationalWarnings()
+      } else emptyFlow()
+   }.asLiveData()
 
    val navigationalWarningsByArea = userPreferencesRepository.lastReadNavigationalWarnings.flatMapLatest {
       repository.getNavigationalWarningsByNavigationArea(

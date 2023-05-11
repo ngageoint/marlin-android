@@ -34,17 +34,25 @@ class NavigationalWarningsViewModel @Inject constructor(
 
    val navigationalWarningsByArea = navigationArea.flatMapLatest { navigationArea ->
       navigationArea?.let {
-         repository.getNavigationalWarningsByArea(it)
+         if (navigationArea == NavigationArea.UNPARSED) {
+            repository.observeUnparsedNavigationalWarnings()
+         } else {
+            repository.getNavigationalWarningsByArea(it)
+         }
       } ?: emptyFlow()
    }.asLiveData()
 
    @OptIn(ExperimentalCoroutinesApi::class)
    fun getLastViewedWarning(): LiveData<NavigationalWarning?> {
       return navigationArea.filterNotNull().flatMapLatest { navigationArea ->
-         userPreferencesRepository.lastReadNavigationalWarnings.flatMapLatest { map ->
-            val preferenceKey = map[navigationArea.code]!!
-            val key = NavigationalWarningKey(preferenceKey.number.toInt(), preferenceKey.year, navigationArea)
-            repository.observeNavigationalWarning(key)
+         if (navigationArea == NavigationArea.UNPARSED) {
+            emptyFlow()
+         } else {
+            userPreferencesRepository.lastReadNavigationalWarnings.flatMapLatest { map ->
+               val preferenceKey = map[navigationArea.code]!!
+               val key = NavigationalWarningKey(preferenceKey.number.toInt(), preferenceKey.year, navigationArea)
+               repository.observeNavigationalWarning(key)
+            }
          }
       }.asLiveData()
    }

@@ -1,4 +1,4 @@
-package mil.nga.msi.ui.settings
+package mil.nga.msi.ui.about
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize

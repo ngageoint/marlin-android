@@ -30,7 +30,7 @@ import mil.nga.msi.ui.noticetomariners.noticeToMarinersGraph
 import mil.nga.msi.ui.port.portGraph
 import mil.nga.msi.ui.radiobeacon.radioBeaconGraph
 import mil.nga.msi.ui.report.reportGraph
-import mil.nga.msi.ui.settings.settingsGraph
+import mil.nga.msi.ui.about.settingsGraph
 
 fun NavGraphBuilder.homeGraph(
    navController: NavController,
