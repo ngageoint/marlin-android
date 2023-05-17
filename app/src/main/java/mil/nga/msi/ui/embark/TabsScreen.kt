@@ -112,7 +112,7 @@ private fun Tabs(
                .padding(vertical = 8.dp)
                .weight(1f)
          ) {
-            items(DataSource.values().asList()) { dataSource ->
+            items(DataSource.values().asList().filter{ it.tab }) { dataSource ->
                Box(contentAlignment = Alignment.TopEnd) {
                   Card(
                      colors = CardDefaults.cardColors(
