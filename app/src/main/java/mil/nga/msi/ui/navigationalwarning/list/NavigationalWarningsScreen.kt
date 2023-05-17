@@ -1,5 +1,6 @@
 package mil.nga.msi.ui.navigationalwarning.list
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -12,13 +13,13 @@ import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowUpward
+import androidx.compose.material.icons.filled.GpsFixed
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -67,6 +68,15 @@ fun NavigationalWarningsScreen(
                   }
                }
             },
+            onZoom = { key ->
+               scope.launch {
+                  viewModel.getNavigationalWarning(key)?.let { warning ->
+                     warning.bounds()?.let { bounds ->
+                        onAction(NavigationalWarningAction.Zoom(bounds))
+                     }
+                  }
+               }
+            },
             onItemViewed = { viewModel.setNavigationalWarningViewed(navigationArea, it) }
          )
       }
@@ -79,6 +89,7 @@ private fun NavigationalWarnings(
    lastViewed: NavigationalWarning?,
    onTap: (NavigationalWarningKey) -> Unit,
    onShare: (NavigationalWarningKey) -> Unit,
+   onZoom: (NavigationalWarningKey) -> Unit,
    onItemViewed: (NavigationalWarningListItem) -> Unit
 ) {
    val contentPadding = PaddingValues(vertical = 16.dp, horizontal = 8.dp)
@@ -120,6 +131,7 @@ private fun NavigationalWarnings(
                   item = item,
                   onTap = onTap,
                   onShare = { onShare(it) },
+                  onZoom = onZoom,
                   onItemViewed = {
                      if (i < index) {
                         onItemViewed(it)
@@ -178,6 +190,7 @@ private fun NavigationalWarningCard(
    item: NavigationalWarningListItem,
    onTap: (NavigationalWarningKey) -> Unit,
    onShare: (NavigationalWarningKey) -> Unit,
+   onZoom: ((NavigationalWarningKey) -> Unit)? = null,
    onItemViewed: (NavigationalWarningListItem) -> Unit
 ) {
    val isItemWithKeyInView by remember {
@@ -210,7 +223,10 @@ private fun NavigationalWarningCard(
    ) {
       NavigationalWarningContent(
          item,
-         onShare = { onShare(NavigationalWarningKey.fromNavigationWarning(item)) }
+         onShare = { onShare(NavigationalWarningKey.fromNavigationWarning(item)) },
+         onZoom = if (item.position != null) {
+            { onZoom?.invoke(NavigationalWarningKey.fromNavigationWarning(item)) }
+         } else null
       )
    }
 }
@@ -218,7 +234,8 @@ private fun NavigationalWarningCard(
 @Composable
 private fun NavigationalWarningContent(
    item: NavigationalWarningListItem,
-   onShare: () -> Unit
+   onShare: () -> Unit,
+   onZoom: (() -> Unit)? = null
 ) {
    Column(Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
       CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
@@ -257,13 +274,14 @@ private fun NavigationalWarningContent(
          }
       }
 
-      NavigationalWarningFooter(onShare)
+      NavigationalWarningFooter(onShare, onZoom)
    }
 }
 
 @Composable
 private fun NavigationalWarningFooter(
-   onShare: () -> Unit
+   onShare: () -> Unit,
+   onZoom: (() -> Unit)? = null
 ) {
    Row(
       verticalAlignment = Alignment.CenterVertically,
@@ -272,13 +290,14 @@ private fun NavigationalWarningFooter(
          .fillMaxWidth()
          .padding(top = 8.dp)
    ) {
-      NavigationalWarningActions(onShare)
+      NavigationalWarningActions(onShare, onZoom)
    }
 }
 
 @Composable
 private fun NavigationalWarningActions(
-   onShare: () -> Unit
+   onShare: () -> Unit,
+   onZoom: (() -> Unit)? = null
 ) {
    Row {
       IconButton(
@@ -288,6 +307,15 @@ private fun NavigationalWarningActions(
             tint = MaterialTheme.colorScheme.tertiary,
             contentDescription = "Share Navigational Warning"
          )
+      }
+
+      onZoom?.let { onClick ->
+         IconButton(onClick = onClick) {
+            Icon(Icons.Default.GpsFixed,
+               tint = MaterialTheme.colorScheme.tertiary,
+               contentDescription = "Zoom to Navigational Warning"
+            )
+         }
       }
    }
 }

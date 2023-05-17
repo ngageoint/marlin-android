@@ -1,5 +1,6 @@
 package mil.nga.msi.repository.preferences
 
+import android.util.Log
 import androidx.datastore.core.DataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -8,6 +9,7 @@ import kotlinx.coroutines.flow.map
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.navigationwarning.NavigationArea
 import mil.nga.msi.repository.navigationalwarning.NavigationalWarningKey
+import mil.nga.msi.type.Developer
 import mil.nga.msi.type.MapLocation
 import mil.nga.msi.type.UserPreferences
 import mil.nga.msi.ui.map.BaseMapType
@@ -200,6 +202,35 @@ class UserPreferencesRepository @Inject constructor(
             .clearLayers()
             .addAllLayers(layers)
             .build()
+      }
+   }
+
+   fun developer(): Flow<Developer> {
+      return preferencesDataStore.data.map {
+         it.developer
+      }.distinctUntilChanged()
+   }
+
+   suspend fun setDeveloperMode() {
+      preferencesDataStore.updateData {
+         val builder = it.toBuilder()
+         builder.developer = builder.developer.toBuilder()
+            .setShowDeveloperMode(true)
+            .build()
+
+         builder.build()
+      }
+   }
+
+   suspend fun setShowNoLocationNavigationWarnings(show: Boolean) {
+      Log.i("billy", "show no location nav warnings $show")
+      preferencesDataStore.updateData {
+         val builder = it.toBuilder()
+         builder.developer = builder.developer.toBuilder()
+            .setShowNonParsedNavigationWarnings(show)
+            .build()
+
+         builder.build()
       }
    }
 }

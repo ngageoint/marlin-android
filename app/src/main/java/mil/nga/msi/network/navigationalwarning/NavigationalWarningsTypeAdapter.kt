@@ -6,6 +6,7 @@ import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
 import mil.nga.msi.datasource.navigationwarning.NavigationArea
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarning
+import mil.nga.msi.location.NavTextParser
 import mil.nga.msi.network.nextIntOrNull
 import mil.nga.msi.network.nextStringOrNull
 import java.text.SimpleDateFormat
@@ -150,6 +151,7 @@ class NavigationalWarningsTypeAdapter: TypeAdapter<NavigationalWarningResponse>(
             this.cancelNavigationArea = cancelNavigationArea
             this.cancelYear = cancelYear
             this.cancelNumber = cancelNumber
+            this.position = text?.let { NavTextParser().parseToMappedLocation(it) }?.locations()
          }
       } else { null }
    }

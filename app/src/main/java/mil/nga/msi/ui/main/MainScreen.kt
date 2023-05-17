@@ -177,9 +177,7 @@ fun MainScreen(
                               alpha = ContentAlpha.disabled
                            ),
                            selected = currentDestination?.hierarchy?.any {
-                              it.route?.substringBefore(
-                                 "?"
-                              ) == tabRoute.name
+                              it.route?.substringBefore("?") == tabRoute.name
                            } == true,
                            onClick = {
                               if (currentDestination?.route?.substringBefore("?") != tabRoute.name) {

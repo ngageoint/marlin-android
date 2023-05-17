@@ -27,6 +27,12 @@ interface NavigationalWarningDao {
    @Query("SELECT * FROM navigational_warnings")
    suspend fun getNavigationalWarnings(): List<NavigationalWarning>
 
+   @Query("SELECT * FROM navigational_warnings")
+   fun observeNavigationalWarnings(): Flow<List<NavigationalWarning>>
+
+   @Query("SELECT * FROM navigational_warnings WHERE position IS NULL")
+   fun observeUnparsedNavigationalWarnings(): Flow<List<NavigationalWarningListItem>>
+
    @Query("SELECT * FROM navigational_warnings WHERE id IN (:ids)")
    suspend fun getNavigationalWarnings(ids: List<String>): List<NavigationalWarning>
 
