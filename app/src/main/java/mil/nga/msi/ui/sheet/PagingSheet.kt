@@ -21,14 +21,15 @@ import kotlinx.coroutines.launch
 import mil.nga.msi.repository.dgpsstation.DgpsStationKey
 import mil.nga.msi.repository.geopackage.GeoPackageFeatureKey
 import mil.nga.msi.repository.light.LightKey
+import mil.nga.msi.repository.navigationalwarning.NavigationalWarningKey
 import mil.nga.msi.repository.radiobeacon.RadioBeaconKey
 import mil.nga.msi.ui.asam.sheet.AsamSheetScreen
 import mil.nga.msi.ui.dgpsstation.sheet.DgpsStationSheetScreen
-import mil.nga.msi.ui.geopackage.GeoPackageRoute
 import mil.nga.msi.ui.geopackage.sheet.GeoPackageFeatureSheetScreen
 import mil.nga.msi.ui.light.sheet.LightSheetScreen
 import mil.nga.msi.ui.map.cluster.MapAnnotation
 import mil.nga.msi.ui.modu.sheet.ModuSheetScreen
+import mil.nga.msi.ui.navigationalwarning.sheet.NavigationalWarningSheetScreen
 import mil.nga.msi.ui.port.sheet.PortSheetScreen
 import mil.nga.msi.ui.radiobeacon.sheet.RadioBeaconSheetScreen
 
@@ -40,7 +41,9 @@ fun PagingSheet(
    viewModel: PagingSheetViewModel = hiltViewModel()
 ) {
    val scope = rememberCoroutineScope()
-   val pagerState = androidx.compose.foundation.pager.rememberPagerState()
+   val pagerState = androidx.compose.foundation.pager.rememberPagerState(
+      pageCount = { mapAnnotations.size }
+   )
    var badgeColor = remember(pagerState.currentPage) {
       mapAnnotations[pagerState.currentPage].key.type.route.color
    }
@@ -55,7 +58,6 @@ fun PagingSheet(
 
       Box {
          HorizontalPager(
-            pageCount = mapAnnotations.size,
             state = pagerState,
             modifier = Modifier.fillMaxWidth(),
          ) {
@@ -71,6 +73,7 @@ fun PagingSheet(
                   MapAnnotation.Type.PORT -> PortPage(annotation.key.id) { onDetails(annotation) }
                   MapAnnotation.Type.RADIO_BEACON -> RadioBeaconPage(annotation.key.id) { onDetails(annotation) }
                   MapAnnotation.Type.DGPS_STATION -> DgpsStationPage(annotation.key.id) { onDetails(annotation) }
+                  MapAnnotation.Type.NAVIGATIONAL_WARNING -> NavigationWarningPage(annotation.key.id) { onDetails(annotation) }
                   MapAnnotation.Type.GEOPACKAGE -> GeoPackageFeaturePage(annotation.key.id) { onDetails(annotation) }
                }
             }
@@ -193,6 +196,19 @@ private fun DgpsStationPage(
 ) {
    val key = DgpsStationKey.fromId(id)
    DgpsStationSheetScreen(
+      key,
+      onDetails = { onDetails() },
+      modifier = Modifier.fillMaxHeight()
+   )
+}
+
+@Composable
+private fun NavigationWarningPage(
+   id: String,
+   onDetails: () -> Unit,
+) {
+   val key = NavigationalWarningKey.fromId(id)
+   NavigationalWarningSheetScreen(
       key,
       onDetails = { onDetails() },
       modifier = Modifier.fillMaxHeight()

@@ -14,7 +14,16 @@ data class NavigationalWarningKey(
    val year: Int,
    val navigationArea: NavigationArea
 ): Parcelable {
+   fun id(): String {
+      return "${number}--${year}--${navigationArea.name}"
+   }
+
    companion object {
+      fun fromId(id: String): NavigationalWarningKey {
+         val (number, year, navigationArea) = id.split("--")
+         return NavigationalWarningKey(number.toInt(), year.toInt(), NavigationArea.valueOf(navigationArea))
+      }
+
       fun fromNavigationWarning(warning: NavigationalWarning): NavigationalWarningKey {
          return NavigationalWarningKey(warning.number, warning.year, warning.navigationArea)
       }

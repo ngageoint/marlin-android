@@ -34,7 +34,7 @@ fun NavGraphBuilder.geopackageGraph(
    navController: NavController,
    showSnackbar: (String) -> Unit
 ) {
-   val zoomTo: (Point) -> Unit = { point ->
+   val zoomTo: (NavPoint) -> Unit = { point ->
       val encoded = Uri.encode(Json.encodeToString(point))
       navController.navigate(MapRoute.Map.name + "?point=${encoded}")
    }

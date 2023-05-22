@@ -10,6 +10,7 @@ import mil.nga.msi.ui.geopackage.GeoPackageRoute
 import mil.nga.msi.ui.light.LightRoute
 import mil.nga.msi.ui.modu.ModuRoute
 import mil.nga.msi.ui.navigation.Route
+import mil.nga.msi.ui.navigationalwarning.NavigationWarningRoute
 import mil.nga.msi.ui.port.PortRoute
 import mil.nga.msi.ui.radiobeacon.RadioBeaconRoute
 
@@ -27,6 +28,7 @@ data class MapAnnotation(
       PORT(PortRoute.Main, R.drawable.ic_port_marker_24dp),
       RADIO_BEACON(RadioBeaconRoute.Main, R.drawable.ic_beacon_marker_24dp),
       DGPS_STATION(DgpsStationRoute.Main, R.drawable.ic_dgps_marker_24dp),
+      NAVIGATIONAL_WARNING(NavigationWarningRoute.Main, R.drawable.ic_navigationwarning_marker_24dp),
       GEOPACKAGE(GeoPackageRoute.Sheet, R.drawable.ic_feature_marker_24dp)
    }
 

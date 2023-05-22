@@ -26,7 +26,7 @@ import mil.nga.msi.ui.asam.AsamAction
 import mil.nga.msi.ui.asam.AsamRoute
 import mil.nga.msi.ui.location.LocationTextButton
 import mil.nga.msi.ui.main.TopBar
-import mil.nga.msi.ui.navigation.Point
+import mil.nga.msi.ui.navigation.NavPoint
 import java.text.SimpleDateFormat
 import java.util.*
 import androidx.compose.material3.*
@@ -101,7 +101,7 @@ fun AsamsScreen(
 private fun Asams(
    pagingState: Flow<PagingData<AsamListItem>>,
    onTap: (String) -> Unit,
-   onZoom: (Point) -> Unit,
+   onZoom: (NavPoint) -> Unit,
    onShare: (String) -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
@@ -133,7 +133,7 @@ private fun Asams(
                      asam = item.asam,
                      onTap = onTap,
                      onCopyLocation = { onCopyLocation(it) },
-                     onZoom = { onZoom(Point(item.asam.latitude, item.asam.longitude)) },
+                     onZoom = { onZoom(NavPoint(item.asam.latitude, item.asam.longitude)) },
                      onShare = { onShare(item.asam.reference) }
                   )
                }

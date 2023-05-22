@@ -17,6 +17,7 @@ import kotlinx.serialization.json.Json
 import mil.nga.msi.repository.dgpsstation.DgpsStationKey
 import mil.nga.msi.repository.geopackage.GeoPackageFeatureKey
 import mil.nga.msi.repository.light.LightKey
+import mil.nga.msi.repository.navigationalwarning.NavigationalWarningKey
 import mil.nga.msi.repository.radiobeacon.RadioBeaconKey
 import mil.nga.msi.ui.asam.AsamRoute
 import mil.nga.msi.ui.dgpsstation.DgpsStationRoute
@@ -29,6 +30,7 @@ import mil.nga.msi.ui.map.settings.MapSettingsScreen
 import mil.nga.msi.ui.map.settings.layers.*
 import mil.nga.msi.ui.modu.ModuRoute
 import mil.nga.msi.ui.navigation.*
+import mil.nga.msi.ui.navigationalwarning.NavigationWarningRoute
 import mil.nga.msi.ui.port.PortRoute
 import mil.nga.msi.ui.radiobeacon.RadioBeaconRoute
 import mil.nga.msi.ui.sheet.PagingSheet
@@ -72,7 +74,7 @@ fun NavGraphBuilder.mapGraph(
    ) { backstackEntry ->
       bottomBarVisibility(true)
       val location = backstackEntry.arguments?.let { bundle ->
-         BundleCompat.getParcelable(bundle, "point", Point::class.java)?.asMapLocation(16f)
+         BundleCompat.getParcelable(bundle, "point", NavPoint::class.java)?.asMapLocation(16f)
       }
       val latLngBounds = backstackEntry.arguments?.let { bundle ->
          BundleCompat.getParcelable(bundle, "bounds", Bounds::class.java)?.asLatLngBounds()
@@ -124,6 +126,7 @@ fun NavGraphBuilder.mapGraph(
                   val encoded = Uri.encode(Json.encodeToString(dgpsStationKey))
                   navController.navigate(DgpsStationRoute.Sheet.name + "?key=${encoded}")
                }
+               MapAnnotation.Type.NAVIGATIONAL_WARNING -> {}
                MapAnnotation.Type.GEOPACKAGE -> {
                   val featureKey = GeoPackageFeatureKey.fromId(annotation.key.id)
                   val encoded = Uri.encode(Json.encodeToString(featureKey))
@@ -177,7 +180,7 @@ fun NavGraphBuilder.mapGraph(
       }?.let { annotations ->
          PagingSheet(
             annotations,
-            onDetails =  {annotation ->
+            onDetails =  { annotation ->
                when (annotation.key.type) {
                   MapAnnotation.Type.ASAM -> {
                      navController.navigate(AsamRoute.Detail.name + "?reference=${annotation.key.id}")
@@ -202,6 +205,11 @@ fun NavGraphBuilder.mapGraph(
                      val key = DgpsStationKey.fromId(annotation.key.id)
                      val encoded = Uri.encode(Json.encodeToString(key))
                      navController.navigate(DgpsStationRoute.Detail.name + "?key=${encoded}")
+                  }
+                  MapAnnotation.Type.NAVIGATIONAL_WARNING -> {
+                     val key = NavigationalWarningKey.fromId(annotation.key.id)
+                     val encoded = Uri.encode(Json.encodeToString(key))
+                     navController.navigate(NavigationWarningRoute.Detail.name + "?key=${encoded}")
                   }
                   MapAnnotation.Type.GEOPACKAGE -> {
                      val key = GeoPackageFeatureKey.fromId(annotation.key.id)

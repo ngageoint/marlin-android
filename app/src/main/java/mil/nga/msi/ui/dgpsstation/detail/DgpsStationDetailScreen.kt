@@ -29,7 +29,7 @@ import mil.nga.msi.ui.location.LocationTextButton
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.BaseMapType
 import mil.nga.msi.ui.map.MapClip
-import mil.nga.msi.ui.navigation.Point
+import mil.nga.msi.ui.navigation.NavPoint
 import mil.nga.msi.ui.theme.onSurfaceDisabled
 
 @Composable
@@ -64,7 +64,7 @@ private fun RadioBeaconDetailContent(
    dgpsStation: DgpsStation?,
    baseMap: BaseMapType?,
    tileProvider: TileProvider,
-   onZoom: (Point) -> Unit,
+   onZoom: (NavPoint) -> Unit,
    onShare: (DgpsStation) -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
@@ -89,7 +89,7 @@ private fun DgpsStationHeader(
    dgpsStation: DgpsStation,
    baseMap: BaseMapType?,
    tileProvider: TileProvider,
-   onZoom: (Point) -> Unit,
+   onZoom: (NavPoint) -> Unit,
    onShare: (DgpsStation) -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
@@ -141,7 +141,7 @@ private fun DgpsStationHeader(
 
             DgpsStationFooter(
                dgpsStation,
-               onZoom = { onZoom(Point(dgpsStation.latitude, dgpsStation.longitude))},
+               onZoom = { onZoom(NavPoint(dgpsStation.latitude, dgpsStation.longitude))},
                onShare = { onShare(dgpsStation) },
                onCopyLocation)
          }

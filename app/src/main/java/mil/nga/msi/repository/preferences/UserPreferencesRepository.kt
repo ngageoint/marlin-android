@@ -223,7 +223,6 @@ class UserPreferencesRepository @Inject constructor(
    }
 
    suspend fun setShowNoLocationNavigationWarnings(show: Boolean) {
-      Log.i("billy", "show no location nav warnings $show")
       preferencesDataStore.updateData {
          val builder = it.toBuilder()
          builder.developer = builder.developer.toBuilder()

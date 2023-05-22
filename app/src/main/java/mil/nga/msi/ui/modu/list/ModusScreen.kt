@@ -29,7 +29,7 @@ import mil.nga.msi.ui.location.LocationTextButton
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.modu.ModuAction
 import mil.nga.msi.ui.modu.ModuRoute
-import mil.nga.msi.ui.navigation.Point
+import mil.nga.msi.ui.navigation.NavPoint
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -100,7 +100,7 @@ fun ModusScreen(
 private fun Modus(
    pagingState: Flow<PagingData<ModuListItem>>,
    onTap: (String) -> Unit,
-   onZoom: (Point) -> Unit,
+   onZoom: (NavPoint) -> Unit,
    onShare: (String) -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
@@ -130,7 +130,7 @@ private fun Modus(
                   ModuCard(
                      modu = item.modu,
                      onTap = onTap,
-                     onZoom = { onZoom(Point(item.modu.latitude, item.modu.longitude)) },
+                     onZoom = { onZoom(NavPoint(item.modu.latitude, item.modu.longitude)) },
                      onShare = { item.modu.name.let { onShare(it) } },
                      onCopyLocation = onCopyLocation
                   )

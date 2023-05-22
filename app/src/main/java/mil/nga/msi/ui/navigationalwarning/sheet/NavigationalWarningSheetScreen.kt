@@ -14,7 +14,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import mil.nga.msi.R
 import mil.nga.msi.datasource.DataSource
-import mil.nga.msi.datasource.navigationwarning.NavigationalWarning
 import mil.nga.msi.repository.navigationalwarning.NavigationalWarningKey
 import mil.nga.msi.ui.navigationalwarning.NavigationalWarningState
 import mil.nga.msi.ui.navigationalwarning.NavigationalWarningViewModel
@@ -23,12 +22,13 @@ import mil.nga.msi.ui.navigationalwarning.detail.NavigationalWarningHeader
 @Composable
 fun NavigationalWarningSheetScreen(
    key: NavigationalWarningKey,
+   modifier: Modifier = Modifier,
    onDetails: (() -> Unit)? = null,
    viewModel: NavigationalWarningViewModel = hiltViewModel()
 ) {
    val warning by viewModel.getNavigationalWarning(key).observeAsState()
    warning?.let {
-      Column {
+      Column(modifier = modifier) {
          NavigationalWarningContent(warning = it) {
             onDetails?.invoke()
          }

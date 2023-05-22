@@ -30,7 +30,7 @@ import mil.nga.msi.ui.dgpsstation.DgpsStationAction
 import mil.nga.msi.ui.dgpsstation.DgpsStationRoute
 import mil.nga.msi.ui.location.LocationTextButton
 import mil.nga.msi.ui.main.TopBar
-import mil.nga.msi.ui.navigation.Point
+import mil.nga.msi.ui.navigation.NavPoint
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -100,7 +100,7 @@ fun DgpsStationsScreen(
 private fun DgpsStations(
    pagingState: Flow<PagingData<DgpsStationListItem>>,
    onTap: (DgpsStation) -> Unit,
-   onZoom: (Point) -> Unit,
+   onZoom: (NavPoint) -> Unit,
    onShare: (DgpsStation) -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
@@ -140,7 +140,7 @@ private fun DgpsStations(
                      dgpsStation = item.dgpsStation,
                      onTap = onTap,
                      onCopyLocation = { onCopyLocation(it) },
-                     onZoom = { onZoom(Point(item.dgpsStation.latitude, item.dgpsStation.longitude)) },
+                     onZoom = { onZoom(NavPoint(item.dgpsStation.latitude, item.dgpsStation.longitude)) },
                      onShare = onShare
                   )
                }

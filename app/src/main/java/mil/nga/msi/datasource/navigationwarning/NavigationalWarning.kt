@@ -1,14 +1,17 @@
 package mil.nga.msi.datasource.navigationwarning
 
+import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
-import mil.nga.msi.datasource.Position
-import mil.nga.sf.GeometryType
-import mil.nga.sf.wkt.GeometryReader
+import mil.nga.sf.geojson.Feature
+import mil.nga.sf.geojson.FeatureCollection
+import mil.nga.sf.geojson.LineString
+import mil.nga.sf.geojson.Point
+import mil.nga.sf.geojson.Polygon
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -79,29 +82,22 @@ data class NavigationalWarning(
    var cancelYear: Int? = null
 
    @ColumnInfo(name = "position")
-   var position: Position? = null
-
-   fun compositeKey(): String {
-      return compositeKey(number, year, navigationArea)
-   }
+   var featureCollection: FeatureCollection? = null
 
    fun bounds(): LatLngBounds? {
       val builder = LatLngBounds.builder()
-      position?.locations?.forEach { location ->
-         val geometry = GeometryReader.readGeometry(location.wkt)
-         when (geometry.geometryType) {
-            GeometryType.POINT -> {
-               val centroid = geometry.centroid
-               builder.include(LatLng(centroid.y, centroid.x))
+      featureCollection?.features?.forEach { feature: Feature ->
+         when (val geometry = feature.geometry) {
+            is Point -> {
+               builder.include(LatLng(geometry.point.y, geometry.point.x))
             }
-            GeometryType.LINESTRING, GeometryType.POLYGON -> {
-               val envelope = geometry.envelope
-               builder.include(LatLng(envelope.bottomLeft.y, envelope.bottomLeft.x))
-               builder.include(LatLng(envelope.topLeft.y, envelope.topLeft.x))
-               builder.include(LatLng(envelope.topRight.y, envelope.topRight.x))
-               builder.include(LatLng(envelope.bottomRight.y, envelope.bottomRight.x))
+            is LineString, is Polygon -> {
+               val envelope = geometry.geometry.envelope
+               builder.include(LatLng(envelope.minY, envelope.minX))
+               builder.include(LatLng(envelope.maxY,  envelope.minX))
+               builder.include(LatLng(envelope.maxY,  envelope.maxX))
+               builder.include(LatLng(envelope.minY,  envelope.maxX))
             }
-            else -> {}
          }
       }
 
@@ -124,10 +120,6 @@ data class NavigationalWarning(
    companion object {
       val numberComparator = Comparator<NavigationalWarning> { a, b ->
          a.number.compareTo(b.number)
-      }
-
-      fun compositeKey(number: Int, year: Int, navigationArea: NavigationArea): String {
-         return "$number--$year--${navigationArea.name}"
       }
    }
 }

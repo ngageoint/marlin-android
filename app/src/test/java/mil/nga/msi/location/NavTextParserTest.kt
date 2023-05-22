@@ -1,5 +1,6 @@
 package mil.nga.msi.location
 
+import android.util.Log
 import mil.nga.msi.coordinate.WGS84
 import org.junit.Assert
 import org.junit.Before
@@ -14,6 +15,38 @@ class NavTextParserTest {
    @Before
    fun setup() {
       MockitoAnnotations.openMocks(this)
+   }
+
+   @Test
+   fun testMap() {
+      val things = listOf(
+         listOf("odd" to 1, "even" to 2, "odd" to 3),
+         listOf("even" to 4, "odd" to 5, "even" to 6),
+         listOf("odd" to 7, "even" to 8, "odd" to 9)
+      )
+
+      val all = things.flatten()
+
+      val listOfMaps= things.map { inner ->
+         inner.groupBy { it.first }
+      }
+
+      val flattened = listOfMaps
+         .flatMap { it.asSequence() }
+         .associate { it.key to it.value }
+
+
+      val result = listOfMaps
+         .asSequence()
+         .flatMap { it.asSequence() }
+         .groupBy({ it.key }, { it.value })
+
+      val map = listOfMaps
+         .flatMap { it.entries }
+         .groupBy { it.key }
+         .mapValues { entry -> entry.value.map { it.value } }
+
+
    }
 
    @Test

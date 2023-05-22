@@ -33,7 +33,7 @@ import mil.nga.msi.ui.light.LightAction
 import mil.nga.msi.ui.light.LightRoute
 import mil.nga.msi.ui.location.LocationTextButton
 import mil.nga.msi.ui.main.TopBar
-import mil.nga.msi.ui.navigation.Point
+import mil.nga.msi.ui.navigation.NavPoint
 
 @Composable
 fun LightsScreen(
@@ -103,7 +103,7 @@ fun LightsScreen(
 private fun Lights(
    pagingState: Flow<PagingData<LightListItem>>,
    onTap: (Light) -> Unit,
-   onZoom: (Point) -> Unit,
+   onZoom: (NavPoint) -> Unit,
    onShare: (Light) -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
@@ -143,7 +143,7 @@ private fun Lights(
                      light = item.light,
                      onTap = onTap,
                      onCopyLocation = { onCopyLocation(it) },
-                     onZoom = { onZoom(Point(item.light.latitude, item.light.longitude)) },
+                     onZoom = { onZoom(NavPoint(item.light.latitude, item.light.longitude)) },
                      onShare = onShare
                   )
                }

@@ -17,7 +17,7 @@ import mil.nga.msi.ui.asam.list.AsamsScreen
 import mil.nga.msi.ui.asam.sheet.AsamSheetScreen
 import mil.nga.msi.ui.filter.FilterScreen
 import mil.nga.msi.ui.map.MapRoute
-import mil.nga.msi.ui.navigation.Point
+import mil.nga.msi.ui.navigation.NavPoint
 import mil.nga.msi.ui.navigation.Route
 import mil.nga.msi.ui.sort.SortScreen
 
@@ -47,7 +47,7 @@ fun NavGraphBuilder.asamGraph(
       share(Pair("Share ASAM Information", it))
    }
 
-   val zoomTo: (Point) -> Unit = { point ->
+   val zoomTo: (NavPoint) -> Unit = { point ->
       val encoded = Uri.encode(Json.encodeToString(point))
       navController.navigate(MapRoute.Map.name + "?point=${encoded}")
    }

@@ -29,7 +29,7 @@ import mil.nga.msi.datasource.port.Port
 import mil.nga.msi.ui.location.LocationTextButton
 import mil.nga.msi.ui.location.generalDirection
 import mil.nga.msi.ui.main.TopBar
-import mil.nga.msi.ui.navigation.Point
+import mil.nga.msi.ui.navigation.NavPoint
 import mil.nga.msi.ui.port.PortAction
 import mil.nga.msi.ui.port.PortRoute
 
@@ -104,7 +104,7 @@ private fun Ports(
    pagingState: Flow<PagingData<PortListItem>>,
    location: Location?,
    onTap: (Int) -> Unit,
-   onZoom: (Point) -> Unit,
+   onZoom: (NavPoint) -> Unit,
    onShare: (Int) -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
@@ -136,7 +136,7 @@ private fun Ports(
                      location = location,
                      onTap = onTap,
                      onCopyLocation = { onCopyLocation(it) },
-                     onZoom = { onZoom(Point(item.port.latitude, item.port.longitude)) },
+                     onZoom = { onZoom(NavPoint(item.port.latitude, item.port.longitude)) },
                      onShare = { onShare(item.port.portNumber) }
                   )
                }

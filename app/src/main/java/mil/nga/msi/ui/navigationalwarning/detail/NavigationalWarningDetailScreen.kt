@@ -28,13 +28,17 @@ import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
+import com.google.maps.android.compose.MapsComposeExperimentalApi
+import com.google.maps.android.compose.clustering.Clustering
 import com.google.maps.android.compose.rememberCameraPositionState
 import mil.nga.msi.R
 import mil.nga.msi.repository.navigationalwarning.NavigationalWarningKey
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.BaseMapType
-import mil.nga.msi.ui.navigationalwarning.GeometryState
-import mil.nga.msi.ui.navigationalwarning.NavigationWarningAnnotation
+import mil.nga.msi.ui.map.MapShape
+import mil.nga.msi.ui.map.PointShape
+import mil.nga.msi.ui.map.cluster.ClusterItem
+import mil.nga.msi.ui.navigationalwarning.MapAnnotations
 import mil.nga.msi.ui.navigationalwarning.NavigationalWarningAction
 import mil.nga.msi.ui.navigationalwarning.NavigationalWarningState
 import mil.nga.msi.ui.navigationalwarning.NavigationalWarningViewModel
@@ -97,7 +101,7 @@ private fun NavigationalWarningDetailContent(
                )
                NavigationalWarningFooter(
                   onShare = onShare,
-                  onZoom = if (state.location != null) {
+                  onZoom = if (state.warning.featureCollection != null) {
                      { onZoom(mapBounds) }
                   } else null
                )
@@ -118,11 +122,11 @@ fun NavigationalWarningHeader(
    val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.US)
 
    Column {
-      if (showMap && state.location != null) {
+      if (showMap && state.annotations.isNotEmpty()) {
          Map(
             baseMap = baseMap,
             mapBounds = mapBounds,
-            location = state.location
+            annotations = state.annotations
          )
       }
 
@@ -157,11 +161,12 @@ fun NavigationalWarningHeader(
    }
 }
 
+@OptIn(MapsComposeExperimentalApi::class)
 @Composable
 private fun Map(
    baseMap: BaseMapType?,
    mapBounds: LatLngBounds?,
-   location: List<GeometryState>
+   annotations: List<MapShape>
 ) {
    val cameraPositionState = rememberCameraPositionState()
 
@@ -191,7 +196,6 @@ private fun Map(
       )
    } ?: MapProperties()
 
-
    GoogleMap(
       cameraPositionState = cameraPositionState,
       properties = properties,
@@ -200,12 +204,9 @@ private fun Map(
          .fillMaxWidth()
          .height(200.dp)
    ) {
-      location.forEach { state ->
-         NavigationWarningAnnotation(
-            id = "warning",
-            state = state
-         )
-      }
+      MapAnnotations(
+         annotations = annotations
+      )
    }
 }
 

@@ -33,7 +33,7 @@ import mil.nga.msi.ui.location.LocationTextButton
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.BaseMapType
 import mil.nga.msi.ui.map.MapClip
-import mil.nga.msi.ui.navigation.Point
+import mil.nga.msi.ui.navigation.NavPoint
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -165,7 +165,7 @@ private fun FeatureFooter(
          )
          FeatureActions(
             onZoom = {
-               onAction(GeoPackageFeatureAction.Zoom(Point(it.latitude, it.longitude)))
+               onAction(GeoPackageFeatureAction.Zoom(NavPoint(it.latitude, it.longitude)))
             }
          )
       }

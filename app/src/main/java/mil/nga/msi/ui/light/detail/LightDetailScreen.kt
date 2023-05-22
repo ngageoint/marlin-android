@@ -42,7 +42,7 @@ import mil.nga.msi.ui.location.LocationTextButton
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.BaseMapType
 import mil.nga.msi.ui.map.MapClip
-import mil.nga.msi.ui.navigation.Point
+import mil.nga.msi.ui.navigation.NavPoint
 import mil.nga.msi.ui.theme.onSurfaceDisabled
 
 @Composable
@@ -77,7 +77,7 @@ private fun LightDetailContent(
    lights: List<Light>,
    baseMap: BaseMapType?,
    tileProvider: TileProvider,
-   onZoom: (Point) -> Unit,
+   onZoom: (NavPoint) -> Unit,
    onShare: (Light) -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
@@ -102,7 +102,7 @@ private fun LightHeader(
    light: Light,
    baseMap: BaseMapType?,
    lightTileProvider: TileProvider,
-   onZoom: (Point) -> Unit,
+   onZoom: (NavPoint) -> Unit,
    onShare: (Light) -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
@@ -162,7 +162,7 @@ private fun LightHeader(
 
             LightFooter(
                light,
-               onZoom = { onZoom(Point(light.latitude, light.longitude))},
+               onZoom = { onZoom(NavPoint(light.latitude, light.longitude))},
                onShare = { onShare(light) },
                onCopyLocation)
          }

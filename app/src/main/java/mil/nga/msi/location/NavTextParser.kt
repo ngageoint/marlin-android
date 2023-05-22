@@ -2,13 +2,13 @@ package mil.nga.msi.location
 
 import mil.nga.msi.coordinate.DMS
 import mil.nga.msi.coordinate.WGS84
-import mil.nga.msi.datasource.LocationWithDistance
-import mil.nga.msi.datasource.Position
 import mil.nga.msi.nlp.NumberNormalizer
-import mil.nga.sf.Geometry
-import mil.nga.sf.LineString
-import mil.nga.sf.Polygon
-import mil.nga.sf.wkt.GeometryWriter
+import mil.nga.sf.geojson.Feature
+import mil.nga.sf.geojson.FeatureCollection
+import mil.nga.sf.geojson.LineString
+import mil.nga.sf.geojson.Point
+import mil.nga.sf.geojson.Polygon
+import mil.nga.sf.geojson.Position
 
 private const val METERS_IN_NAUTICAL_MILE = 1852
 
@@ -18,37 +18,44 @@ data class LocationWithType(
    val locationDescription: String? = null,
    val distanceFromLocation: String? = null
 ) {
-   fun wkt(): String? {
-      return geometry()?.let { geometry ->
-         GeometryWriter.writeGeometry(geometry)
-      }
-   }
-
-   fun point(text: String): mil.nga.sf.Point? {
+   private fun asPoint(text: String): Point? {
       val latLng = WGS84.from(text)
       return if (latLng != null) {
-         mil.nga.sf.Point(latLng.longitude, latLng.latitude)
+         Point(Position(latLng.longitude, latLng.latitude))
       } else {
          DMS.from(text)?.toLatLng()?.let {
-            mil.nga.sf.Point(it.longitude, it.latitude)
+            Point(Position(it.longitude, it.latitude))
          }
       }
    }
 
-   fun geometry(): Geometry? {
+   fun asFeature(): Feature? {
       return when (locationType) {
          "Point" -> {
-            location.firstOrNull()?.let { point(it) }
+            location.firstOrNull()?.let { location ->
+               asPoint(location)?.let {
+                  Feature(it)
+               }
+            }
          }
          "Circle" -> {
-            location.firstOrNull()?.let { point(it) }
+            location.firstOrNull()?.let { location ->
+               asPoint(location)?.let {
+                  Feature(it).apply {
+                     properties = mapOf("radius" to metersDistance())
+                  }
+               }
+            }
          }
          "LineString" -> {
-            LineString(location.mapNotNull { point(it) })
+            val points = location.mapNotNull { asPoint(it) }
+            Feature(LineString(points))
          }
          "Polygon" -> {
-            Polygon(LineString(location.mapNotNull { point(it) }))
-         } else -> null
+            val points = location.mapNotNull { asPoint(it) }
+            Feature(Polygon(listOf(LineString(points))))
+         }
+         else -> null
       }
    }
 
@@ -93,22 +100,10 @@ data class MappedLocation(
    val dnc: String? = null,
    val chart: String? = null
 ) {
-   fun locations(): Position? {
-      val locations = mutableListOf<LocationWithDistance>()
-
-      location.forEach { location ->
-         location.wkt()?.let { wkt ->
-            val distance = location.metersDistance()
-            if (distance != null) {
-               locations.add(LocationWithDistance(wkt, distance))
-            } else {
-               locations.add(LocationWithDistance(wkt))
-            }
-         }
-      }
-
-      return if (locations.isNotEmpty()) {
-         Position(locations)
+   fun featureCollection(): FeatureCollection? {
+      val features = location.mapNotNull {  it.asFeature() }
+      return if (features.isNotEmpty()) {
+         FeatureCollection(features)
       } else null
    }
 }
@@ -210,7 +205,7 @@ class NavTextParser {
       }
    }
 
-   fun parseHeading(heading: List<String>) {
+   private fun parseHeading(heading: List<String>) {
       firstDistance = parseDistance(heading.joinToString(" "))
 
       var foundChart: Boolean

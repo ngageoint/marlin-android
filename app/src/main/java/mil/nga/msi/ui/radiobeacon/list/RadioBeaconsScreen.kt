@@ -29,7 +29,7 @@ import mil.nga.msi.datasource.radiobeacon.RadioBeacon
 import mil.nga.msi.repository.radiobeacon.RadioBeaconKey
 import mil.nga.msi.ui.location.LocationTextButton
 import mil.nga.msi.ui.main.TopBar
-import mil.nga.msi.ui.navigation.Point
+import mil.nga.msi.ui.navigation.NavPoint
 import mil.nga.msi.ui.radiobeacon.RadioBeaconAction
 import mil.nga.msi.ui.radiobeacon.RadioBeaconRoute
 
@@ -101,7 +101,7 @@ fun RadioBeaconsScreen(
 private fun RadioBeacons(
    pagingState: Flow<PagingData<RadioBeaconListItem>>,
    onTap: (RadioBeacon) -> Unit,
-   onZoom: (Point) -> Unit,
+   onZoom: (NavPoint) -> Unit,
    onShare: (RadioBeacon) -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
@@ -142,7 +142,7 @@ private fun RadioBeacons(
                      beacon = item.radioBeacon,
                      onTap = onTap,
                      onCopyLocation = { onCopyLocation(it) },
-                     onZoom = { onZoom(Point(item.radioBeacon.latitude, item.radioBeacon.longitude)) },
+                     onZoom = { onZoom(NavPoint(item.radioBeacon.latitude, item.radioBeacon.longitude)) },
                      onShare = onShare
                   )
                }

@@ -17,6 +17,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -27,8 +28,6 @@ import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.LocationSource
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
@@ -38,19 +37,21 @@ import kotlinx.coroutines.launch
 import mil.nga.geopackage.GeoPackageFactory
 import mil.nga.geopackage.extension.rtree.RTreeIndexExtension
 import mil.nga.geopackage.features.user.FeatureDao
-import mil.nga.geopackage.map.geom.GoogleMapShapeConverter
 import mil.nga.msi.R
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.navigationwarning.NavigationArea
-import mil.nga.msi.datasource.navigationwarning.NavigationalWarning
 import mil.nga.msi.type.MapLocation
 import mil.nga.msi.ui.location.LocationPermission
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.MapPosition
-import mil.nga.sf.GeometryType
-import mil.nga.sf.LineString
-import mil.nga.sf.Point
-import mil.nga.sf.Polygon
+import com.google.maps.android.compose.clustering.Clustering
+import mil.nga.msi.repository.navigationalwarning.NavigationalWarningKey
+import mil.nga.msi.ui.map.CircleShape
+import mil.nga.msi.ui.map.MapShape
+import mil.nga.msi.ui.map.PointShape
+import mil.nga.msi.ui.map.PolygonShape
+import mil.nga.msi.ui.map.PolylineShape
+import mil.nga.msi.ui.map.cluster.ClusterItem
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
@@ -58,14 +59,14 @@ fun NavigationalWarningGroupScreen(
    position: MapPosition?,
    openDrawer: () -> Unit,
    onGroupTap: (NavigationArea) -> Unit,
-   onNavigationWarningTap: (NavigationalWarning) -> Unit,
+   onNavigationWarningsTap: (List<NavigationalWarningKey>) -> Unit,
    viewModel: NavigationalWarningAreasViewModel = hiltViewModel()
 ) {
    val scrollState = rememberScrollState()
    val screenHeight = LocalConfiguration.current.screenHeightDp
    var fullScreenMap by remember { mutableStateOf(false) }
    var mapPosition by remember { mutableStateOf(position) }
-   val warnings by viewModel.warnings.observeAsState(emptyList())
+   val annotations by viewModel.annotations.observeAsState(emptyList())
    val unparsedWarnings by viewModel.unparsedWarnings.observeAsState(emptyList())
    val warningsByArea by viewModel.navigationalWarningsByArea.observeAsState(emptyList())
    val location by viewModel.locationProvider.observeAsState()
@@ -97,14 +98,6 @@ fun NavigationalWarningGroupScreen(
                   height = if (fullScreenMap) screenHeight * 1f else screenHeight * .33f,
                   fullScreenMap = fullScreenMap,
                   mapPosition = mapPosition,
-                  onMapLocation = {
-                     mapPosition = MapPosition(
-                        location = MapLocation.newBuilder()
-                           .setLatitude(it.latitude)
-                           .setLongitude(it.longitude)
-                           .build()
-                     )
-                  },
                   onZoom = {
                      location?.let {
                         mapPosition = MapPosition(
@@ -117,9 +110,10 @@ fun NavigationalWarningGroupScreen(
                      }
                   },
                   onMapFullScreen = { fullScreenMap = it },
-                  onNavigationWarningTap = { onNavigationWarningTap(it) },
+                  onNavigationWarningsTap = { keys -> onNavigationWarningsTap(keys) },
+                  onMapPositionChanged = { mapPosition = it },
                   location = location,
-                  warnings = warnings,
+                  annotations = annotations,
                   locationPermissionState = locationPermissionState,
                   naturalEarthTileProvider = viewModel.naturalEarthTileProvider,
                   navigationAreaTileProvider = viewModel.navigationAreaTileProvider
@@ -172,28 +166,28 @@ private fun NavigationAreaMap(
    mapPosition: MapPosition?,
    location: Location?,
    locationPermissionState: PermissionState,
-   warnings: List<NavigationalWarningState>,
+   annotations: List<MapShape>,
    naturalEarthTileProvider: TileProvider,
    navigationAreaTileProvider: TileProvider,
    height: Float,
    fullScreenMap: Boolean,
    onZoom: () -> Unit,
    onMapFullScreen: (Boolean) -> Unit,
-   onMapLocation: (LatLng) -> Unit,
-   onNavigationWarningTap: (NavigationalWarning) -> Unit
+   onMapPositionChanged: (MapPosition) -> Unit,
+   onNavigationWarningsTap: (List<NavigationalWarningKey>) -> Unit
 ) {
    val scope = rememberCoroutineScope()
    val cameraPositionState = rememberCameraPositionState {}
 
-   var currentLocation by remember { mutableStateOf<Location?>(null) }
+   var setLocation by remember { mutableStateOf(false) }
    LaunchedEffect(location) {
-      if (currentLocation == null) {
+      if (!setLocation) {
          location?.let {
             cameraPositionState.position = CameraPosition.fromLatLngZoom(LatLng(it.latitude, it.longitude), 0f)
          }
       }
 
-      currentLocation = location
+      setLocation = true
    }
 
    LaunchedEffect(mapPosition) {
@@ -217,55 +211,21 @@ private fun NavigationAreaMap(
       }
    }
 
-   val locationSource = object : LocationSource {
-      override fun activate(listener: LocationSource.OnLocationChangedListener) {
-         location?.let { listener.onLocationChanged(it) }
-      }
-
-      override fun deactivate() {}
-   }
-
-   val mapStyleOptions = if (isSystemInDarkTheme()) {
-      MapStyleOptions.loadRawResourceStyle(LocalContext.current, R.raw.map_theme_night)
-   } else null
-
    Box(
       Modifier
          .fillMaxWidth()
          .height(height.dp)
    ) {
-      GoogleMap(
-         modifier = Modifier.fillMaxSize(),
-         cameraPositionState = cameraPositionState,
-         properties = MapProperties(
-            mapType = MapType.NORMAL,
-            mapStyleOptions = mapStyleOptions,
-            isMyLocationEnabled = locationPermissionState.status.isGranted
-         ),
-         uiSettings = MapUiSettings(
-            compassEnabled = false,
-            zoomControlsEnabled = false,
-            myLocationButtonEnabled = false,
-            rotationGesturesEnabled = false
-         ),
-         locationSource = locationSource
-      ) {
-         TileOverlay(tileProvider = naturalEarthTileProvider, zIndex = 1f)
-         TileOverlay(tileProvider = navigationAreaTileProvider, zIndex = 0f)
 
-         warnings.forEach { (warning, location) ->
-            location?.forEach { state ->
-               NavigationWarningAnnotation(
-                  id = warning.id,
-                  state = state,
-                  onTap = {
-                     onMapLocation(it)
-                     onNavigationWarningTap(warning)
-                  }
-               )
-            }
-         }
-      }
+      Map(
+         annotations = annotations,
+         naturalEarthTileProvider = naturalEarthTileProvider,
+         navigationAreaTileProvider = navigationAreaTileProvider,
+         cameraPositionState = cameraPositionState,
+         locationPermissionState = locationPermissionState,
+         onMapPositionChanged = onMapPositionChanged,
+         onNavigationWarningsTap = onNavigationWarningsTap
+      )
 
       Column(
          Modifier
@@ -302,71 +262,137 @@ private fun NavigationAreaMap(
    }
 }
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun NavigationWarningAnnotation(
-   id: String,
-   state: GeometryState,
-   onTap: ((LatLng) -> Unit)? = null
+fun Map(
+   annotations: List<MapShape>,
+   naturalEarthTileProvider: TileProvider,
+   navigationAreaTileProvider: TileProvider,
+   cameraPositionState: CameraPositionState,
+   locationPermissionState: PermissionState,
+   onMapPositionChanged: (MapPosition) -> Unit,
+   onNavigationWarningsTap: (List<NavigationalWarningKey>) -> Unit
+) {
+   val mapStyleOptions = if (isSystemInDarkTheme()) {
+      MapStyleOptions.loadRawResourceStyle(LocalContext.current, R.raw.map_theme_night)
+   } else null
+
+   GoogleMap(
+      modifier = Modifier.fillMaxSize(),
+      cameraPositionState = cameraPositionState,
+      properties = MapProperties(
+         mapType = MapType.NORMAL,
+         mapStyleOptions = mapStyleOptions,
+         isMyLocationEnabled = locationPermissionState.status.isGranted
+      ),
+      uiSettings = MapUiSettings(
+         compassEnabled = false,
+         zoomControlsEnabled = false,
+         myLocationButtonEnabled = false,
+         rotationGesturesEnabled = false
+      )
+   ) {
+      TileOverlay(tileProvider = naturalEarthTileProvider, zIndex = 1f)
+      TileOverlay(tileProvider = navigationAreaTileProvider, zIndex = 0f)
+
+      MapAnnotations(
+         annotations = annotations,
+         onMapPositionChanged = onMapPositionChanged,
+         onTap = { annotations ->
+            val keys = annotations.map { NavigationalWarningKey.fromId(it) }
+            onNavigationWarningsTap(keys)
+         }
+      )
+   }
+}
+
+@OptIn(MapsComposeExperimentalApi::class)
+@Composable
+fun MapAnnotations(
+   annotations: List<MapShape>,
+   onTap: ((List<String>) -> Unit)? = null,
+   onMapPositionChanged: ((MapPosition) -> Unit)? = null
 ) {
    val context = LocalContext.current
-   val (geometry, distance) = state
 
-   when (geometry.geometryType) {
-      GeometryType.POINT -> {
-         if (distance == null) {
-            val icon = AppCompatResources.getDrawable(
-               context,
-               R.drawable.ic_navigationwarning_marker_24dp
-            )!!.toBitmap()
-            Marker(
-               state = MarkerState(GoogleMapShapeConverter().toLatLng(geometry.centroid)),
-               icon = BitmapDescriptorFactory.fromBitmap(icon),
-               tag = id,
-               onClick = {
-                  onTap?.invoke(it.position)
-                  true
-               }
+   Clustering(
+      items = annotations.filterIsInstance(PointShape::class.java).map {
+         ClusterItem(it.latLng, it.tag)
+      },
+      onClusterClick = { cluster ->
+         onTap?.invoke(cluster.items.mapNotNull { it.tag })
+         onMapPositionChanged?.invoke(
+            MapPosition(
+               location = MapLocation
+                  .newBuilder()
+                  .setLatitude(cluster.position.latitude)
+                  .setLongitude(cluster.position.longitude)
+                  .build()
             )
-         } else {
-            Circle(
-               center = GoogleMapShapeConverter().toLatLng(geometry.centroid),
-               radius = distance,
-               strokeColor = DataSource.NAVIGATION_WARNING.color,
-               fillColor = DataSource.NAVIGATION_WARNING.color.copy(alpha = .2f),
-               zIndex = 2f
+         )
+
+         true
+      },
+      onClusterItemClick = { item ->
+         item.tag?.let { onTap?.invoke(listOf(it)) }
+         onMapPositionChanged?.invoke(
+            MapPosition(
+               location = MapLocation
+                  .newBuilder()
+                  .setLatitude(item.position.latitude)
+                  .setLongitude(item.position.longitude)
+                  .build()
             )
-         }
-      }
-      GeometryType.LINESTRING -> {
-         val lineString = geometry as LineString
-         Polyline(
-            points = GoogleMapShapeConverter().toPolyline(lineString).points,
-            color = DataSource.NAVIGATION_WARNING.color,
-            tag = id,
-            zIndex = 2f,
-            clickable = true,
-            onClick = {
-               val centroid = lineString.centroid
-               onTap?.invoke(LatLng(centroid.y, centroid.x))
-            }
          )
+         true
+      },
+      clusterContent = null,
+      clusterItemContent = {
+         val icon = AppCompatResources.getDrawable(
+            context,
+            R.drawable.ic_navigationwarning_marker_24dp
+         )!!.toBitmap()
+
+         Image(
+            bitmap = icon.asImageBitmap(),
+            contentDescription = "Navigational Warning")
       }
-      GeometryType.POLYGON -> {
-         val polygon = geometry as Polygon
-         Polygon(
-            points = GoogleMapShapeConverter().toPolygon(polygon).points,
-            strokeColor = DataSource.NAVIGATION_WARNING.color,
-            fillColor = DataSource.NAVIGATION_WARNING.color.copy(alpha = .2f),
-            tag = id,
-            zIndex = 2f,
-            clickable = true,
-            onClick = {
-               val centroid = polygon.centroid
-               onTap?.invoke(LatLng(centroid.y, centroid.x))
-            }
-         )
-      }
-      else -> {}
+   )
+
+   annotations.filterIsInstance<CircleShape>().forEach { circle ->
+      Circle(
+         tag = circle.tag,
+         center = circle.center,
+         radius = circle.radius,
+         strokeColor = DataSource.NAVIGATION_WARNING.color,
+         fillColor = DataSource.NAVIGATION_WARNING.color.copy(alpha = .2f),
+         zIndex = 2f,
+         clickable = true,
+         onClick = { circle.tag?.let { onTap?.invoke(listOf(it)) } }
+      )
+   }
+
+   annotations.filterIsInstance<PolylineShape>().forEach { polyline ->
+      Polyline(
+         tag = polyline.tag,
+         points = polyline.points,
+         color = DataSource.NAVIGATION_WARNING.color,
+         zIndex = 2f,
+         clickable = true,
+         onClick = { polyline.tag?.let { onTap?.invoke(listOf(it)) } }
+      )
+   }
+
+   annotations.filterIsInstance<PolygonShape>().forEach { polygon ->
+      Polygon(
+         tag = polygon.tag,
+         points = polygon.points,
+         strokeColor = DataSource.NAVIGATION_WARNING.color,
+         fillColor = DataSource.NAVIGATION_WARNING.color.copy(alpha = .2f),
+         zIndex = 2f,
+         clickable = true,
+         onClick = { polygon.tag?.let { onTap?.invoke(listOf(it)) } }
+      )
    }
 }
 
@@ -447,7 +473,7 @@ private fun getNavigationArea(
    val featureDao: FeatureDao = geopackage.getFeatureDao(featureTable)
    val rtree = RTreeIndexExtension(geopackage)
    val rtreeDao = rtree.getTableDao(featureDao)
-   val point = Point(location.longitude, location.latitude)
+   val point = mil.nga.sf.Point(location.longitude, location.latitude)
    rtreeDao.queryFeatures(point.envelope).first()?.let { row ->
       val codeColumnIndex = row.getColumnIndex("code")
       val code = row.getValue(codeColumnIndex) as? String

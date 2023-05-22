@@ -16,6 +16,7 @@ import mil.nga.msi.location.LocationPolicy
 import mil.nga.msi.repository.navigationalwarning.NavigationalWarningKey
 import mil.nga.msi.repository.navigationalwarning.NavigationalWarningRepository
 import mil.nga.msi.repository.preferences.UserPreferencesRepository
+import mil.nga.msi.ui.map.MapShape
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Named
@@ -38,10 +39,12 @@ class NavigationalWarningAreasViewModel @Inject constructor(
       }
    }
 
-   val warnings = repository.observeNavigationalWarnings()
-      .mapLatest {
-         it.map { warning ->
-            NavigationalWarningState.fromWarning(warning)
+   val annotations = repository.observeNavigationalWarnings()
+      .mapLatest { warnings ->
+         warnings.flatMap { warning ->
+            warning.featureCollection?.features?.mapNotNull { feature ->
+               MapShape.fromGeometry(feature, warning.id)
+            } ?: emptyList()
          }
       }
       .flowOn(Dispatchers.IO)

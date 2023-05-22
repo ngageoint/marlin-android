@@ -28,7 +28,7 @@ import mil.nga.msi.ui.location.LocationTextButton
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.BaseMapType
 import mil.nga.msi.ui.map.MapClip
-import mil.nga.msi.ui.navigation.Point
+import mil.nga.msi.ui.navigation.NavPoint
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -64,7 +64,7 @@ private fun AsamDetailContent(
    asam: Asam?,
    baseMap: BaseMapType?,
    tileProvider: TileProvider,
-   onZoom: (Point) -> Unit,
+   onZoom: (NavPoint) -> Unit,
    onShare: () -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
@@ -97,7 +97,7 @@ private fun AsamHeader(
    asam: Asam,
    baseMap: BaseMapType?,
    tileProvider: TileProvider,
-   onZoom: (Point) -> Unit,
+   onZoom: (NavPoint) -> Unit,
    onShare: () -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
@@ -134,7 +134,7 @@ private fun AsamHeader(
 
             AsamFooter(
                asam,
-               onZoom = { onZoom(Point(asam.latitude, asam.longitude))},
+               onZoom = { onZoom(NavPoint(asam.latitude, asam.longitude))},
                onShare,
                onCopyLocation)
          }

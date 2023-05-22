@@ -28,7 +28,7 @@ import mil.nga.msi.ui.location.LocationTextButton
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.BaseMapType
 import mil.nga.msi.ui.map.MapClip
-import mil.nga.msi.ui.navigation.Point
+import mil.nga.msi.ui.navigation.NavPoint
 import mil.nga.msi.ui.radiobeacon.RadioBeaconAction
 import mil.nga.msi.ui.radiobeacon.RadioBeaconRoute
 import mil.nga.msi.ui.radiobeacon.RadioBeaconViewModel
@@ -66,7 +66,7 @@ private fun RadioBeaconDetailContent(
    beacon: RadioBeacon?,
    baseMap: BaseMapType?,
    tileProvider: TileProvider,
-   onZoom: (Point) -> Unit,
+   onZoom: (NavPoint) -> Unit,
    onShare: (RadioBeacon) -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
@@ -91,7 +91,7 @@ private fun RadioBeaconHeader(
    beacon: RadioBeacon,
    baseMap: BaseMapType?,
    tileProvider: TileProvider,
-   onZoom: (Point) -> Unit,
+   onZoom: (NavPoint) -> Unit,
    onShare: (RadioBeacon) -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
@@ -164,7 +164,7 @@ private fun RadioBeaconHeader(
 
             RadioBeaconFooter(
                beacon,
-               onZoom = { onZoom(Point(beacon.latitude, beacon.longitude))},
+               onZoom = { onZoom(NavPoint(beacon.latitude, beacon.longitude))},
                onShare = { onShare(beacon) },
                onCopyLocation)
          }

@@ -41,13 +41,13 @@ import mil.nga.msi.datasource.radiobeacon.RadioBeaconDao
 )
 @TypeConverters(
    DateTypeConverter::class,
-   LocationsTypeConverter::class,
-   StringListTypeConverter::class
+   StringListTypeConverter::class,
+   FeatureCollectionTypeConverter::class
 )
 abstract class MsiDatabase : RoomDatabase() {
 
    companion object {
-      const val VERSION = 5
+      const val VERSION = 6
    }
 
    abstract fun asamDao(): AsamDao

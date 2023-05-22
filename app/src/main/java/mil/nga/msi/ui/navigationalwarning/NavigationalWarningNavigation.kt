@@ -1,6 +1,7 @@
 package mil.nga.msi.ui.navigationalwarning
 
 import android.net.Uri
+import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.core.os.BundleCompat
 import androidx.navigation.*
@@ -13,6 +14,8 @@ import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.navigationwarning.NavigationArea
 import mil.nga.msi.repository.navigationalwarning.NavigationalWarningKey
 import mil.nga.msi.ui.map.MapPosition
+import mil.nga.msi.ui.map.MapRoute
+import mil.nga.msi.ui.map.cluster.MapAnnotation
 import mil.nga.msi.ui.navigation.Bounds
 import mil.nga.msi.ui.navigation.NavTypeBounds
 import mil.nga.msi.ui.navigation.NavTypeNavigationalWarningKey
@@ -74,10 +77,17 @@ fun NavGraphBuilder.navigationalWarningGraph(
             onGroupTap = { navigationArea ->
                navController.navigate( "${NavigationWarningRoute.List.name}?navigationArea=${navigationArea.code}")
             },
-            onNavigationWarningTap = { warning ->
-               val key = NavigationalWarningKey.fromNavigationWarning(warning)
-               val encoded = Uri.encode(Json.encodeToString(key))
-               navController.navigate(NavigationWarningRoute.Sheet.name + "?key=${encoded}")
+            onNavigationWarningsTap = { keys ->
+               if (keys.size == 1) {
+                  val encoded = Uri.encode(Json.encodeToString(keys.first()))
+                  navController.navigate(NavigationWarningRoute.Sheet.name + "?key=${encoded}")
+               } else {
+                  val annotations = keys.map { key ->
+                     MapAnnotation(MapAnnotation.Key(key.id(), MapAnnotation.Type.NAVIGATIONAL_WARNING), 0.0, 0.0)
+                  }
+                  val encoded = Uri.encode(Json.encodeToString(annotations))
+                  navController.navigate(MapRoute.PagerSheet.name + "?annotations=${encoded}")
+               }
             }
          )
       }

@@ -4,11 +4,19 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.mapNotNull
+import mil.nga.msi.datasource.navigationwarning.NavigationalWarning
 import mil.nga.msi.repository.navigationalwarning.NavigationalWarningKey
 import mil.nga.msi.repository.navigationalwarning.NavigationalWarningRepository
 import mil.nga.msi.repository.preferences.UserPreferencesRepository
+import mil.nga.msi.ui.map.MapShape
 import javax.inject.Inject
+
+data class NavigationalWarningState(
+   val warning: NavigationalWarning,
+   val annotations: List<MapShape>
+)
 
 @HiltViewModel
 class NavigationalWarningViewModel @Inject constructor(
@@ -17,9 +25,14 @@ class NavigationalWarningViewModel @Inject constructor(
 ): ViewModel() {
    val baseMap = userPreferencesRepository.baseMapType.asLiveData()
 
-   fun getNavigationalWarning(key: NavigationalWarningKey): LiveData<NavigationalWarningState?> {
+   fun getNavigationalWarning(key: NavigationalWarningKey): LiveData<NavigationalWarningState> {
        return repository.observeNavigationalWarning(key).mapNotNull { warning ->
-         warning?.let { NavigationalWarningState.fromWarning(it) }
+         warning?.let {
+            val annotations = warning.featureCollection?.features?.mapNotNull { feature ->
+               MapShape.fromGeometry(feature, warning.id)
+            } ?: emptyList()
+            NavigationalWarningState(warning, annotations)
+         }
        }.asLiveData()
    }
 }

@@ -27,7 +27,7 @@ import mil.nga.msi.ui.location.generalDirection
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.BaseMapType
 import mil.nga.msi.ui.map.MapClip
-import mil.nga.msi.ui.navigation.Point
+import mil.nga.msi.ui.navigation.NavPoint
 import mil.nga.msi.ui.port.PortAction
 import mil.nga.msi.ui.port.PortViewModel
 import mil.nga.msi.ui.theme.onSurfaceDisabled
@@ -74,7 +74,7 @@ private fun PortDetailContent(
    baseMap: BaseMapType?,
    tileProvider: TileProvider,
    location: Location?,
-   onZoom: (Point) -> Unit,
+   onZoom: (NavPoint) -> Unit,
    onShare: () -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
@@ -109,7 +109,7 @@ private fun PortHeader(
    baseMap: BaseMapType?,
    tileProvider: TileProvider,
    location: Location?,
-   onZoom: (Point) -> Unit,
+   onZoom: (NavPoint) -> Unit,
    onShare: () -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
@@ -172,7 +172,7 @@ private fun PortHeader(
             PortFooter(
                port = port,
                onShare = onShare,
-               onZoom = { onZoom(Point(port.latitude, port.longitude)) },
+               onZoom = { onZoom(NavPoint(port.latitude, port.longitude)) },
                onCopyLocation = onCopyLocation
             )
          }

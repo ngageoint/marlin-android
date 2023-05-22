@@ -12,7 +12,7 @@ import mil.nga.msi.type.MapLocation
 
 @Serializable
 @Parcelize
-data class Point(val latitude: Double, val longitude: Double): Parcelable {
+data class NavPoint(val latitude: Double, val longitude: Double): Parcelable {
    fun asMapLocation(zoom: Float): MapLocation {
       return MapLocation.newBuilder()
          .setLatitude(latitude)
@@ -22,19 +22,19 @@ data class Point(val latitude: Double, val longitude: Double): Parcelable {
    }
 }
 
-val NavType.Companion.NavTypePoint: NavType<Point?>
+val NavType.Companion.NavTypePoint: NavType<NavPoint?>
    get() = pointType
 
-   private val pointType = object : NavType<Point?>(true) {
-      override fun put(bundle: Bundle, key: String, value: Point?) {
+   private val pointType = object : NavType<NavPoint?>(true) {
+      override fun put(bundle: Bundle, key: String, value: NavPoint?) {
          bundle.putParcelable(key, value)
       }
 
-      override fun get(bundle: Bundle, key: String): Point? {
-         return BundleCompat.getParcelable(bundle, key, Point::class.java)
+      override fun get(bundle: Bundle, key: String): NavPoint? {
+         return BundleCompat.getParcelable(bundle, key, NavPoint::class.java)
       }
 
-      override fun parseValue(value: String): Point? {
+      override fun parseValue(value: String): NavPoint? {
          return Json.decodeFromString(value)
       }
    }

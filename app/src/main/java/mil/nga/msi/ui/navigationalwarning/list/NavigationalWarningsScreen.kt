@@ -224,7 +224,7 @@ private fun NavigationalWarningCard(
       NavigationalWarningContent(
          item,
          onShare = { onShare(NavigationalWarningKey.fromNavigationWarning(item)) },
-         onZoom = if (item.position != null) {
+         onZoom = if (item.featureCollection != null) {
             { onZoom?.invoke(NavigationalWarningKey.fromNavigationWarning(item)) }
          } else null
       )
