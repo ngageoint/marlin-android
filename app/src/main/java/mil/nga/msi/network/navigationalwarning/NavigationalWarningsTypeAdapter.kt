@@ -10,6 +10,7 @@ import mil.nga.msi.location.NavTextParser
 import mil.nga.msi.network.nextIntOrNull
 import mil.nga.msi.network.nextStringOrNull
 import mil.nga.msi.repository.navigationalwarning.NavigationalWarningKey
+import mil.nga.sf.geojson.FeatureConverter
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -144,6 +145,11 @@ class NavigationalWarningsTypeAdapter: TypeAdapter<NavigationalWarningResponse>(
 
       return if (number != null && year != null && navigationArea != null && issueDate != null) {
          val key = NavigationalWarningKey(number, year, navigationArea)
+         val geoJson = text?.let {
+            NavTextParser().parseToMappedLocation(it)
+         }?.featureCollection()?.let {
+            FeatureConverter.toStringValue(it)
+         }
          NavigationalWarning(key.id(), number, year, navigationArea, issueDate).apply {
             this.subregions = subregions
             this.text = text
@@ -153,7 +159,7 @@ class NavigationalWarningsTypeAdapter: TypeAdapter<NavigationalWarningResponse>(
             this.cancelNavigationArea = cancelNavigationArea
             this.cancelYear = cancelYear
             this.cancelNumber = cancelNumber
-            this.featureCollection = text?.let { NavTextParser().parseToMappedLocation(it) }?.featureCollection()
+            this.geoJson = geoJson
          }
       } else { null }
    }

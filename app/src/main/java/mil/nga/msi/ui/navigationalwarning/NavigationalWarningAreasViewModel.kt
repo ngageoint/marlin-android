@@ -1,5 +1,6 @@
 package mil.nga.msi.ui.navigationalwarning
 
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import com.google.android.gms.maps.model.TileProvider
@@ -12,6 +13,7 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import mil.nga.msi.datasource.navigationwarning.NavigationArea
+import mil.nga.msi.datasource.navigationwarning.NavigationalWarning
 import mil.nga.msi.location.LocationPolicy
 import mil.nga.msi.repository.navigationalwarning.NavigationalWarningKey
 import mil.nga.msi.repository.navigationalwarning.NavigationalWarningRepository
@@ -39,7 +41,7 @@ class NavigationalWarningAreasViewModel @Inject constructor(
       }
    }
 
-   val annotations = repository.observeNavigationalWarnings()
+   val annotations = repository.observeNavigationalWarningMapItems()
       .mapLatest { warnings ->
          warnings.flatMap { warning ->
             warning.featureCollection?.features?.mapNotNull { feature ->

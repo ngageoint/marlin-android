@@ -4,7 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.mapNotNull
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarning
 import mil.nga.msi.repository.navigationalwarning.NavigationalWarningKey
@@ -33,6 +34,8 @@ class NavigationalWarningViewModel @Inject constructor(
             } ?: emptyList()
             NavigationalWarningState(warning, annotations)
          }
-       }.asLiveData()
+       }
+       .flowOn(Dispatchers.IO)
+       .asLiveData()
    }
 }

@@ -29,7 +29,7 @@ class NavigationalWarningRepository @Inject constructor(
       special: Date
    )  = localDataSource.observeNavigationalWarningsByNavigationArea(hydroarc, hydrolant, hydropac, navareaIV, navareaXII, special)
 
-   fun observeNavigationalWarnings() = localDataSource.observeNavigationalWarnings()
+   fun observeNavigationalWarningMapItems() = localDataSource.observeNavigationalWarningMapItems()
    fun observeUnparsedNavigationalWarnings() = localDataSource.observeUnparsedNavigationalWarnings()
    fun observeNavigationalWarning(key: NavigationalWarningKey) = localDataSource.observeNavigationalWarning(key)
    suspend fun getNavigationalWarning(key: NavigationalWarningKey) = localDataSource.getNavigationalWarning(key)

@@ -30,7 +30,10 @@ interface NavigationalWarningDao {
    @Query("SELECT * FROM navigational_warnings")
    fun observeNavigationalWarnings(): Flow<List<NavigationalWarning>>
 
-   @Query("SELECT * FROM navigational_warnings WHERE position IS NULL")
+   @Query("SELECT * FROM navigational_warnings WHERE geoJson IS NOT NULL")
+   fun observeNavigationalWarningMapItems(): Flow<List<NavigationalWarningMapItem>>
+
+   @Query("SELECT * FROM navigational_warnings WHERE geoJson IS NULL")
    fun observeUnparsedNavigationalWarnings(): Flow<List<NavigationalWarningListItem>>
 
    @Query("SELECT * FROM navigational_warnings WHERE id IN (:ids)")

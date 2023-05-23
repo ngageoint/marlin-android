@@ -41,8 +41,7 @@ import mil.nga.msi.datasource.radiobeacon.RadioBeaconDao
 )
 @TypeConverters(
    DateTypeConverter::class,
-   StringListTypeConverter::class,
-   FeatureCollectionTypeConverter::class
+   StringListTypeConverter::class
 )
 abstract class MsiDatabase : RoomDatabase() {
 

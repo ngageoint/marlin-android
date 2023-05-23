@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 6,
-    "identityHash": "f191f6e7e2cb5ff3e6a9220b81a8507e",
+    "identityHash": "e55e879c306772b5cd334df0a2dff759",
     "entities": [
       {
         "tableName": "asams",
@@ -883,7 +883,7 @@
       },
       {
         "tableName": "navigational_warnings",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `number` INTEGER NOT NULL, `year` INTEGER NOT NULL, `navigation_area` TEXT NOT NULL, `issue_date` INTEGER NOT NULL, `subregions` TEXT, `text` TEXT, `status` TEXT, `authority` TEXT, `cancel_number` INTEGER, `cancelDate` INTEGER, `cancel_navigation_area` TEXT, `cancel_year` INTEGER, `position` TEXT, PRIMARY KEY(`number`, `year`, `navigation_area`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `number` INTEGER NOT NULL, `year` INTEGER NOT NULL, `navigation_area` TEXT NOT NULL, `issue_date` INTEGER NOT NULL, `subregions` TEXT, `text` TEXT, `status` TEXT, `authority` TEXT, `cancel_number` INTEGER, `cancelDate` INTEGER, `cancel_navigation_area` TEXT, `cancel_year` INTEGER, `geoJson` TEXT, PRIMARY KEY(`number`, `year`, `navigation_area`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -964,8 +964,8 @@
             "notNull": false
           },
           {
-            "fieldPath": "featureCollection",
-            "columnName": "position",
+            "fieldPath": "geoJson",
+            "columnName": "geoJson",
             "affinity": "TEXT",
             "notNull": false
           }
@@ -1822,7 +1822,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f191f6e7e2cb5ff3e6a9220b81a8507e')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'e55e879c306772b5cd334df0a2dff759')"
     ]
   }
 }

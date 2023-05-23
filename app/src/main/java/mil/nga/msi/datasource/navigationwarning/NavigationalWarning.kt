@@ -1,6 +1,5 @@
 package mil.nga.msi.datasource.navigationwarning
 
-import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.room.ColumnInfo
 import androidx.room.Entity
@@ -9,6 +8,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import mil.nga.sf.geojson.Feature
 import mil.nga.sf.geojson.FeatureCollection
+import mil.nga.sf.geojson.FeatureConverter
 import mil.nga.sf.geojson.LineString
 import mil.nga.sf.geojson.Point
 import mil.nga.sf.geojson.Polygon
@@ -81,10 +81,14 @@ data class NavigationalWarning(
    @ColumnInfo(name = "cancel_year")
    var cancelYear: Int? = null
 
-   @ColumnInfo(name = "position")
-   var featureCollection: FeatureCollection? = null
+   @ColumnInfo(name = "geoJson")
+   var geoJson: String? = null
+
+   @Transient
+   val featureCollection: FeatureCollection? = geoJson?.let { FeatureConverter.toFeatureCollection(it) }
 
    fun bounds(): LatLngBounds? {
+      val featureCollection =  geoJson?.let { FeatureConverter.toFeatureCollection(it) }
       val builder = LatLngBounds.builder()
       featureCollection?.features?.forEach { feature: Feature ->
          when (val geometry = feature.geometry) {
