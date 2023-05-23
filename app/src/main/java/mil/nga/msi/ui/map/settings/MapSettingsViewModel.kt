@@ -41,4 +41,12 @@ class MapSettingsViewModel @Inject constructor(
          repository.setShowLocation(enabled)
       }
    }
+
+   val showScale = repository.showScale.asLiveData()
+
+   fun setShowScale(enabled: Boolean) {
+      viewModelScope.launch {
+         repository.setShowScale(enabled)
+      }
+   }
 }

@@ -39,6 +39,7 @@ fun MapSettingsScreen(
    val gars by viewModel.gars.observeAsState(false)
    val mgrs by viewModel.mgrs.observeAsState(false)
    val showLocation by viewModel.showLocation.observeAsState(false)
+   val showScale by viewModel.showScale.observeAsState(false)
 
    Column {
       TopBar(
@@ -73,7 +74,9 @@ fun MapSettingsScreen(
 
             DisplaySettings(
                showLocation = showLocation,
-               onShowLocationToggled = { viewModel.setShowLocation(it) }
+               showScale = showScale,
+               onShowLocationToggled = { viewModel.setShowLocation(it) },
+               onShowScaleToggled = { viewModel.setShowScale(it) }
             )
          }
       }
@@ -327,7 +330,9 @@ private fun LightSettings(
 @Composable
 private fun DisplaySettings(
    showLocation: Boolean,
+   showScale: Boolean,
    onShowLocationToggled: (Boolean) -> Unit,
+   onShowScaleToggled: (Boolean) -> Unit
 ) {
    val hasLocationPermission =
       ContextCompat.checkSelfPermission(LocalContext.current, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
@@ -368,6 +373,36 @@ private fun DisplaySettings(
 
             Switch(
                checked = showLocation,
+               onCheckedChange = null
+            )
+         }
+
+         Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+               .fillMaxWidth()
+               .clickable { onShowScaleToggled(!showScale) }
+               .padding(vertical = 16.dp, horizontal = 32.dp)
+         ) {
+            Column(
+               Modifier.weight(1f)
+            ) {
+               Text(
+                  text = "Show Map Scale",
+                  style = MaterialTheme.typography.bodyLarge
+               )
+
+               CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+                  Text(
+                     text = "Show a scale bar indicating the current map scale",
+                     style = MaterialTheme.typography.bodyMedium
+                  )
+               }
+            }
+
+            Switch(
+               checked = showScale,
                onCheckedChange = null
             )
          }

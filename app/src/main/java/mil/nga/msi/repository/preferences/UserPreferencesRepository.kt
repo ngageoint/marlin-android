@@ -109,6 +109,21 @@ class UserPreferencesRepository @Inject constructor(
       }
    }
 
+   val showScale: Flow<Boolean> = preferencesDataStore.data.map {
+      it.map.showScale
+   }.distinctUntilChanged()
+
+   suspend fun setShowScale(enabled: Boolean) {
+      preferencesDataStore.updateData {
+         val builder = it.toBuilder()
+         builder.map = builder.map.toBuilder()
+            .setShowScale(enabled)
+            .build()
+
+         builder.build()
+      }
+   }
+
    val mapLocation = preferencesDataStore.data.map { it.map.mapLocation }.distinctUntilChanged()
    suspend fun setMapLocation(mapLocation: MapLocation) {
       preferencesDataStore.updateData {

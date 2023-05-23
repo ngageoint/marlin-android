@@ -47,6 +47,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.LocationSource
 import com.google.android.gms.maps.model.*
 import com.google.maps.android.compose.*
+import com.google.maps.android.compose.widgets.ScaleBar
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import mil.nga.msi.R
@@ -83,6 +84,7 @@ fun MapScreen(
 ) {
    val scope = rememberCoroutineScope()
    val showLocation by viewModel.showLocation.observeAsState(false)
+   val showScale by viewModel.showScale.observeAsState(false)
    var searchExpanded by remember { mutableStateOf(false) }
    val searchResults by viewModel.searchResults.observeAsState(emptyList())
    val filterCount by viewModel.filterCount.observeAsState(0)
@@ -109,6 +111,8 @@ fun MapScreen(
    val locationPermissionState: PermissionState = rememberPermissionState(
       Manifest.permission.ACCESS_FINE_LOCATION
    )
+
+   val cameraPositionState = rememberCameraPositionState()
 
    LocationPermission(locationPermissionState)
 
@@ -187,15 +191,16 @@ fun MapScreen(
 
       Box(Modifier.fillMaxWidth()) {
          Map(
-            origin,
-            destination,
-            baseMap,
-            layers,
-            locationSource,
-            locationPermissionState.status.isGranted,
-            tileProviders,
-            searchResults,
-            annotation,
+            origin = origin,
+            destination = destination,
+            baseMap = baseMap,
+            layers = layers,
+            locationSource = locationSource,
+            locationEnabled = locationPermissionState.status.isGranted,
+            tileProviders = tileProviders,
+            searchResults = searchResults,
+            annotation = annotation,
+            cameraPositionState = cameraPositionState,
             onMapMove = { position, reason ->
                if (reason == com.google.android.gms.maps.GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE) {
                   located = false
@@ -293,26 +298,36 @@ fun MapScreen(
             }
          }
 
-         if (locationPermissionState.status.isGranted) {
-            Box(
-               modifier = Modifier
-                  .align(Alignment.BottomEnd)
-                  .padding(16.dp)
-            ) {
-               Zoom(located) {
-                  located = true
-                  scope.launch {
-                     destination = MapPosition(
-                        location = MapLocation.newBuilder()
-                           .setLatitude(location?.latitude ?: 0.0)
-                           .setLongitude(location?.longitude ?: 0.0)
-                           .setZoom(17.0)
-                           .build()
-                     )
+         Box(
+            modifier = Modifier
+               .align(Alignment.BottomEnd)
+               .padding(16.dp)
+         ) {
+            Row {
+               if (showScale) {
+                  ScaleBar(
+                     modifier = Modifier.padding(end = 16.dp),
+                     cameraPositionState = cameraPositionState
+                  )
+               }
+
+               if (locationPermissionState.status.isGranted) {
+                  Zoom(located) {
+                     located = true
+                     scope.launch {
+                        destination = MapPosition(
+                           location = MapLocation.newBuilder()
+                              .setLatitude(location?.latitude ?: 0.0)
+                              .setLongitude(location?.longitude ?: 0.0)
+                              .setZoom(17.0)
+                              .build()
+                        )
+                     }
                   }
                }
             }
          }
+
 
          Box(
             modifier = Modifier
@@ -369,6 +384,7 @@ private fun Map(
    tileProviders: Map<TileProviderType, TileProvider>,
    searchResults: List<GeocoderState>,
    annotation: MapAnnotation?,
+   cameraPositionState: CameraPositionState,
    onMapMove: (CameraPosition, Int) -> Unit,
    onMapClick: (LatLng, Float, VisibleRegion) -> Unit
 ) {
@@ -376,7 +392,6 @@ private fun Map(
    val context = LocalContext.current
 
    var isMapLoaded by remember { mutableStateOf(false) }
-   val cameraPositionState: CameraPositionState = rememberCameraPositionState {}
    var cameraMoveReason by remember { mutableStateOf(0) }
 
    LaunchedEffect(origin) {
