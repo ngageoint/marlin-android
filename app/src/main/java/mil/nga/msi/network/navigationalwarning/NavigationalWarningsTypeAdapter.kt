@@ -7,10 +7,15 @@ import com.google.gson.stream.JsonWriter
 import mil.nga.msi.datasource.navigationwarning.NavigationArea
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarning
 import mil.nga.msi.location.NavTextParser
+import mil.nga.msi.location.bounds
 import mil.nga.msi.network.nextIntOrNull
 import mil.nga.msi.network.nextStringOrNull
 import mil.nga.msi.repository.navigationalwarning.NavigationalWarningKey
+import mil.nga.sf.geojson.Feature
+import mil.nga.sf.geojson.FeatureCollection
 import mil.nga.sf.geojson.FeatureConverter
+import mil.nga.sf.geojson.Point
+import mil.nga.sf.geojson.Position
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -145,12 +150,16 @@ class NavigationalWarningsTypeAdapter: TypeAdapter<NavigationalWarningResponse>(
 
       return if (number != null && year != null && navigationArea != null && issueDate != null) {
          val key = NavigationalWarningKey(number, year, navigationArea)
-         val geoJson = text?.let {
+         val id = key.id()
+         val featureCollection = text?.let {
             NavTextParser().parseToMappedLocation(it)
-         }?.featureCollection()?.let {
+         }?.featureCollection()
+         val bounds = featureCollection?.bounds()
+
+         val geoJson = featureCollection?.let {
             FeatureConverter.toStringValue(it)
          }
-         NavigationalWarning(key.id(), number, year, navigationArea, issueDate).apply {
+         NavigationalWarning(id, number, year, navigationArea, issueDate).apply {
             this.subregions = subregions
             this.text = text
             this.status = status
@@ -160,6 +169,11 @@ class NavigationalWarningsTypeAdapter: TypeAdapter<NavigationalWarningResponse>(
             this.cancelYear = cancelYear
             this.cancelNumber = cancelNumber
             this.geoJson = geoJson
+            this.minLatitude = bounds?.southwest?.latitude
+            this.minLongitude = bounds?.southwest?.longitude
+            this.maxLatitude = bounds?.northeast?.latitude
+            this.maxLongitude = bounds?.northeast?.longitude
+
          }
       } else { null }
    }

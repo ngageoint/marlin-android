@@ -16,7 +16,7 @@ val NavType.Companion.MapAnnotationsType: NavType<List<MapAnnotation>?>
       }
 
       override fun get(bundle: Bundle, key: String): List<MapAnnotation>? {
-         return BundleCompat.getParcelable(bundle, key, List::class.java)?.map { it as MapAnnotation}?.toList()
+         return BundleCompat.getParcelableArray(bundle, key, MapAnnotation::class.java)?.map { it as MapAnnotation}?.toList()
       }
 
       override fun parseValue(value: String): List<MapAnnotation>? {

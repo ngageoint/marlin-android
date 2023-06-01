@@ -13,7 +13,7 @@ enum class DataSource(
 ) {
    ASAM(true, true, Color(0xFF000000), R.drawable.ic_asam_24dp, label = "ASAM"),
    MODU(true, true, Color(0xFF0042A4), R.drawable.ic_modu_24dp, label = "MODU"),
-   NAVIGATION_WARNING(true, false, Color(0xFFD32F2F), R.drawable.ic_round_warning_24, label = "Navigational Warning"),
+   NAVIGATION_WARNING(true, true, Color(0xFFD32F2F), R.drawable.ic_round_warning_24, label = "Navigational Warning"),
    LIGHT(true, true, Color(0xFFFFC500), R.drawable.ic_baseline_lightbulb_24, label = "Light"),
    PORT(true, true, Color(0xFF5856D6), R.drawable.ic_baseline_anchor_24, label = "World Port"),
    RADIO_BEACON(true, true, Color(0xFF007BFF), R.drawable.ic_baseline_settings_input_antenna_24, label = "Radio Beacon"),

@@ -7,6 +7,10 @@ import com.google.maps.android.geometry.Bounds
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.dgpsstation.DgpsStation
 import mil.nga.msi.repository.map.DgpsStationTileRepository
+import mil.nga.sf.geojson.Feature
+import mil.nga.sf.geojson.Geometry
+import mil.nga.sf.geojson.Point
+import mil.nga.sf.geojson.Position
 import javax.inject.Inject
 
 class DgpsStationTileProvider @Inject constructor(
@@ -17,9 +21,13 @@ class DgpsStationTileProvider @Inject constructor(
 class DgpsStationImage(
    dgpsStation: DgpsStation
 ): DataSourceImage {
-   override val latitude = dgpsStation.latitude
-   override val longitude = dgpsStation.longitude
    override val dataSource = DataSource.DGPS_STATION
+   override val feature: Feature =
+      Feature(
+         Point(
+            Position(dgpsStation.longitude, dgpsStation.latitude)
+         )
+      )
 
    override fun image(
       context: Context,
@@ -27,6 +35,6 @@ class DgpsStationImage(
       tileBounds: Bounds,
       tileSize: Double
    ): List<Bitmap> {
-      return listOf(circleImage(context, zoom))
+      return listOf(pointImage(context, zoom))
    }
 }

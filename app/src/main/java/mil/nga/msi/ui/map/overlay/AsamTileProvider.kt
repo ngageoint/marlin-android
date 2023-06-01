@@ -7,6 +7,10 @@ import com.google.maps.android.geometry.Bounds
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.asam.Asam
 import mil.nga.msi.repository.map.AsamTileRepository
+import mil.nga.sf.geojson.Feature
+import mil.nga.sf.geojson.Geometry
+import mil.nga.sf.geojson.Point
+import mil.nga.sf.geojson.Position
 import javax.inject.Inject
 
 class AsamTileProvider @Inject constructor(
@@ -17,9 +21,13 @@ class AsamTileProvider @Inject constructor(
 class AsamImage(
    asam: Asam
 ): DataSourceImage {
-   override val latitude = asam.latitude
-   override val longitude = asam.longitude
    override val dataSource = DataSource.ASAM
+   override val feature: Feature =
+      Feature(
+         Point(
+            Position(asam.longitude, asam.latitude)
+         )
+      )
 
    override fun image(
       context: Context,
@@ -27,6 +35,6 @@ class AsamImage(
       tileBounds: Bounds,
       tileSize: Double
    ): List<Bitmap> {
-      return listOf(circleImage(context, zoom))
+      return listOf(pointImage(context, zoom))
    }
 }

@@ -1,7 +1,6 @@
 package mil.nga.msi.datasource.asam
 
 import android.content.Context
-import android.icu.number.NumberFormatter
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -17,7 +16,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.IOException
 import java.util.Date
-import java.util.Locale
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)

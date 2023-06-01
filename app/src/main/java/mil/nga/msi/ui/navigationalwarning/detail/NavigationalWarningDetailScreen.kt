@@ -101,7 +101,7 @@ private fun NavigationalWarningDetailContent(
                )
                NavigationalWarningFooter(
                   onShare = onShare,
-                  onZoom = if (state.warning.featureCollection != null) {
+                  onZoom = if (state.warning.geoJson != null) {
                      { onZoom(mapBounds) }
                   } else null
                )

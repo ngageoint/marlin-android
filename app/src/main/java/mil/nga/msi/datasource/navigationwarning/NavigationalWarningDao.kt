@@ -2,6 +2,7 @@ package mil.nga.msi.datasource.navigationwarning
 
 import androidx.room.*
 import kotlinx.coroutines.flow.Flow
+import mil.nga.msi.datasource.modu.Modu
 import java.util.*
 
 @Dao
@@ -27,12 +28,22 @@ interface NavigationalWarningDao {
    @Query("SELECT * FROM navigational_warnings")
    suspend fun getNavigationalWarnings(): List<NavigationalWarning>
 
+   @Query("SELECT * FROM navigational_warnings WHERE min_longitude <= :maxLongitude AND max_longitude >= :minLongitude AND min_latitude <= :maxLatitude AND max_longitude <= :minLatitude")
+   fun getNavigationalWarnings(
+      minLatitude: Double,
+      minLongitude: Double,
+      maxLatitude: Double,
+      maxLongitude: Double
+   ): List<NavigationalWarning>
+
    @Query("SELECT * FROM navigational_warnings")
    fun observeNavigationalWarnings(): Flow<List<NavigationalWarning>>
 
+   @RewriteQueriesToDropUnusedColumns
    @Query("SELECT * FROM navigational_warnings WHERE geoJson IS NOT NULL")
    fun observeNavigationalWarningMapItems(): Flow<List<NavigationalWarningMapItem>>
 
+   @RewriteQueriesToDropUnusedColumns
    @Query("SELECT * FROM navigational_warnings WHERE geoJson IS NULL")
    fun observeUnparsedNavigationalWarnings(): Flow<List<NavigationalWarningListItem>>
 

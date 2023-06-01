@@ -13,6 +13,8 @@ import kotlinx.serialization.json.Json
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.navigationwarning.NavigationArea
 import mil.nga.msi.repository.navigationalwarning.NavigationalWarningKey
+import mil.nga.msi.ui.asam.AsamRoute
+import mil.nga.msi.ui.asam.sheet.AsamSheetScreen
 import mil.nga.msi.ui.map.MapPosition
 import mil.nga.msi.ui.map.MapRoute
 import mil.nga.msi.ui.map.cluster.MapAnnotation
@@ -91,6 +93,7 @@ fun NavGraphBuilder.navigationalWarningGraph(
             }
          )
       }
+
       composable(
          route = "${NavigationWarningRoute.List.name}?navigationArea={navigationAreaCode}",
          arguments = listOf(navArgument("navigationAreaCode") { type = NavType.StringType })
@@ -120,6 +123,7 @@ fun NavGraphBuilder.navigationalWarningGraph(
             )
          }
       }
+
       composable(
          route = "${NavigationWarningRoute.Detail.name}?key={key}",
          arguments = listOf(navArgument("key") { type = NavType.NavTypeNavigationalWarningKey })

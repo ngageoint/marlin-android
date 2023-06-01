@@ -3,9 +3,11 @@ package mil.nga.msi.ui.map.overlay
 import android.app.Application
 import android.content.Context
 import android.graphics.*
+import android.util.Log
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.graphics.drawable.toBitmap
+import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Tile
 import com.google.android.gms.maps.model.TileProvider
 import com.google.maps.android.geometry.Bounds
@@ -14,6 +16,9 @@ import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.ui.location.webMercatorToWgs84
 import mil.nga.msi.ui.location.wgs84ToWebMercator
 import mil.nga.sf.Point
+import mil.nga.sf.geojson.Feature
+import mil.nga.sf.geojson.LineString
+import mil.nga.sf.geojson.Polygon
 import java.io.ByteArrayOutputStream
 import kotlin.math.*
 
@@ -27,8 +32,7 @@ interface TileRepository {
 }
 
 interface DataSourceImage {
-   val latitude: Double
-   val longitude: Double
+   val feature: Feature
    val dataSource: DataSource
 
    fun image(
@@ -38,7 +42,7 @@ interface DataSourceImage {
       tileSize: Double
    ): List<Bitmap>
 
-   fun circleImage(
+   fun pointImage(
       context: Context,
       mapZoom: Int,
    ): Bitmap {
@@ -78,6 +82,136 @@ interface DataSourceImage {
       }
 
       return bitmap
+   }
+
+   fun circleImage(
+      context: Context,
+      mapZoom: Int,
+      radius: Double
+   ): Bitmap {
+      val size = (context.resources.displayMetrics.density * 10).toInt()
+      val stroke = (context.resources.displayMetrics.density * 1)
+      val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
+      val canvas = Canvas(bitmap)
+
+      canvas.drawCircle(
+         size / 2f,
+         size / 2f,
+         (size / 2f) - stroke,
+         Paint().apply {
+            color = dataSource.color.toArgb()
+            style = Paint.Style.STROKE
+            strokeWidth = stroke
+         }
+      )
+
+      canvas.drawCircle(
+         size / 2f,
+         size / 2f,
+         (size / 2f) - stroke,
+         Paint().apply {
+            color = dataSource.color.copy(alpha = .2f).toArgb()
+            style = Paint.Style.FILL
+            strokeWidth = stroke
+         }
+      )
+
+      return bitmap
+   }
+
+   fun lineImage(
+      context: Context,
+      lineString: LineString,
+      mapZoom: Int,
+      tileBounds: Bounds,
+      tileSize: Double
+   ): Bitmap {
+      val stroke = (context.resources.displayMetrics.density * 2)
+      val bitmap = Bitmap.createBitmap(tileSize.toInt(), tileSize.toInt(), Bitmap.Config.ARGB_8888)
+      val canvas = Canvas(bitmap)
+
+      val path = Path()
+      val firstPoint = lineString.lineString.points.first()
+      val firstPixel = toPixel(LatLng(firstPoint.y, firstPoint.x), tileBounds, tileSize)
+      path.moveTo(firstPixel.x.toFloat(), firstPixel.y.toFloat())
+
+      lineString.lineString.points.drop(1).forEach { point ->
+         val pixel = toPixel(LatLng(point.y, point.x), tileBounds, tileSize)
+         path.lineTo(pixel.x.toFloat(), pixel.y.toFloat())
+      }
+
+      val paint = Paint().apply {
+         isAntiAlias = true
+         style = Paint.Style.STROKE
+         strokeWidth = stroke
+         color = dataSource.color.toArgb()
+      }
+
+      canvas.drawPath(path, paint)
+
+      return bitmap
+   }
+
+   fun polygonImage(
+      context: Context,
+      polygon: Polygon,
+      mapZoom: Int,
+      tileBounds: Bounds,
+      tileSize: Double
+   ): Bitmap {
+      val stroke = (context.resources.displayMetrics.density * 2)
+      val bitmap = Bitmap.createBitmap(tileSize.toInt(), tileSize.toInt(), Bitmap.Config.ARGB_8888)
+      val canvas = Canvas(bitmap)
+
+      val path = Path()
+      val lineString = polygon.polygon.exteriorRing
+      val firstPoint = lineString.points.first()
+      val firstPixel = toPixel(LatLng(firstPoint.y, firstPoint.x), tileBounds, tileSize)
+      path.moveTo(firstPixel.x.toFloat(), firstPixel.y.toFloat())
+
+      lineString.points.drop(1).forEach { point ->
+         val pixel = toPixel(LatLng(point.y, point.x), tileBounds, tileSize)
+         path.lineTo(pixel.x.toFloat(), pixel.y.toFloat())
+      }
+
+      canvas.drawPath(
+         path,
+         Paint().apply {
+            isAntiAlias = true
+            style = Paint.Style.STROKE
+            strokeWidth = stroke
+            color = dataSource.color.toArgb()
+         }
+      )
+
+      canvas.drawPath(
+         path,
+         Paint().apply {
+            isAntiAlias = true
+            style = Paint.Style.FILL
+            strokeWidth = stroke
+            color = dataSource.color.copy(alpha = .3f).toArgb()
+         }
+      )
+
+      return bitmap
+   }
+
+   private fun toPixel(latLng: LatLng, tileBounds3857: Bounds, tileSize: Double): Point {
+      val object3857Location = to3857(latLng)
+      val xPosition = (((object3857Location.x - tileBounds3857.minX) / (tileBounds3857.maxX - tileBounds3857.minX)) * tileSize)
+      val yPosition = tileSize - (((object3857Location.y - tileBounds3857.minY) / (tileBounds3857.maxY - tileBounds3857.minY)) * tileSize)
+      return Point(xPosition, yPosition)
+   }
+
+   private fun to3857(latLng: LatLng): Point {
+      val a = 6378137.0
+      val lambda = latLng.longitude / 180 * Math.PI
+      val phi = latLng.latitude / 180 * Math.PI
+      val x = a * lambda
+      val y = a * ln(tan(Math.PI / 4 + phi / 2))
+
+      return Point(x, y)
    }
 }
 
@@ -121,7 +255,7 @@ open class DataSourceTileProvider(
          neCorner3857.y
       )
 
-      val items = runBlocking() {
+      val items = runBlocking {
          repository.getTileableItems(
             minLatitude = minQueryLat,
             maxLatitude = maxQueryLat,
@@ -137,7 +271,8 @@ open class DataSourceTileProvider(
          item.image(application, z, tileBounds, width.toDouble()).forEach { image ->
             val translate = !(image.height == height && image.width == width)
             val destination = if (translate) {
-               val webMercator = Point(item.longitude, item.latitude).wgs84ToWebMercator()
+               val centroid = item.feature.geometry.geometry.centroid
+               val webMercator = Point(centroid.x, centroid.y).wgs84ToWebMercator()
                val xPosition = (((webMercator.x - minTileX) / (maxTileX - minTileX)) * width)
                val yPosition = height - (((webMercator.y - minTileY) / (maxTileY - minTileY)) * height)
                Rect(

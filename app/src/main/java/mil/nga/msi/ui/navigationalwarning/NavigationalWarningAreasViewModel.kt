@@ -44,7 +44,7 @@ class NavigationalWarningAreasViewModel @Inject constructor(
    val annotations = repository.observeNavigationalWarningMapItems()
       .mapLatest { warnings ->
          warnings.flatMap { warning ->
-            warning.featureCollection?.features?.mapNotNull { feature ->
+            warning.featureCollection()?.features?.mapNotNull { feature ->
                MapShape.fromGeometry(feature, warning.id)
             } ?: emptyList()
          }

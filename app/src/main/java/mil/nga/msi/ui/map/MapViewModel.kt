@@ -1,6 +1,7 @@
 package mil.nga.msi.ui.map
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.*
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.TileProvider
@@ -34,6 +35,8 @@ import mil.nga.msi.repository.light.LightKey
 import mil.nga.msi.repository.light.LightRepository
 import mil.nga.msi.repository.map.*
 import mil.nga.msi.repository.modu.ModuRepository
+import mil.nga.msi.repository.navigationalwarning.NavigationalWarningKey
+import mil.nga.msi.repository.navigationalwarning.NavigationalWarningRepository
 import mil.nga.msi.repository.port.PortRepository
 import mil.nga.msi.repository.preferences.FilterRepository
 import mil.nga.msi.repository.preferences.SharedPreferencesRepository
@@ -43,6 +46,7 @@ import mil.nga.msi.repository.radiobeacon.RadioBeaconRepository
 import mil.nga.msi.type.MapLocation
 import mil.nga.msi.ui.map.cluster.MapAnnotation
 import mil.nga.msi.ui.map.overlay.*
+import mil.nga.sf.GeometryEnvelope
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -55,7 +59,8 @@ enum class TileProviderType {
    LIGHT,
    PORT,
    RADIO_BEACON,
-   DGPS_STATION
+   DGPS_STATION,
+   NAVIGATIONAL_WARNING
 }
 
 @HiltViewModel
@@ -77,6 +82,8 @@ class MapViewModel @Inject constructor(
    private val beaconTileRepository: RadioBeaconTileRepository,
    private val dgpsStationRepository: DgpsStationRepository,
    private val dgpsStationTileRepository: DgpsStationTileRepository,
+   private val navigationalWarningRepository: NavigationalWarningRepository,
+   private val navigationalWarningTileRepository: NavigationalWarningTileRepository,
    dataSourceRepository: DataSourceRepository,
    val locationPolicy: LocationPolicy,
    private val preferencesRepository: SharedPreferencesRepository,
@@ -108,6 +115,7 @@ class MapViewModel @Inject constructor(
    private var beaconTileProvider = RadioBeaconTileProvider(application, beaconTileRepository)
    private var lightTileProvider = LightTileProvider(application, lightTileRepository)
    private var dgpsTileProvider = DgpsStationTileProvider(application, dgpsStationTileRepository)
+   private var navigationWarningTileProvider = NavigationalWarningTileProvider(application, navigationalWarningTileRepository)
 
    private val searchText = MutableStateFlow("")
    fun search(text: String) {
@@ -239,6 +247,13 @@ class MapViewModel @Inject constructor(
             providers.remove(TileProviderType.DGPS_STATION)
          }
 
+         if (mapped[DataSource.NAVIGATION_WARNING] == true) {
+            navigationWarningTileProvider = NavigationalWarningTileProvider(application, navigationalWarningTileRepository)
+            providers[TileProviderType.NAVIGATIONAL_WARNING] = navigationWarningTileProvider
+         } else {
+            providers.remove(TileProviderType.NAVIGATIONAL_WARNING)
+         }
+
          value = providers
       }
 
@@ -294,6 +309,15 @@ class MapViewModel @Inject constructor(
             val providers = value?.toMutableMap() ?: mutableMapOf()
             dgpsTileProvider = DgpsStationTileProvider(application, dgpsStationTileRepository)
             providers[TileProviderType.DGPS_STATION] = dgpsTileProvider
+            value = providers
+         }
+      }
+
+      addSource(navigationalWarningRepository.observeNavigationalWarningMapItems().distinctUntilChanged().asLiveData()) {
+         if (mapped.value?.get(DataSource.NAVIGATION_WARNING) == true) {
+            val providers = value?.toMutableMap() ?: mutableMapOf()
+            navigationWarningTileProvider = NavigationalWarningTileProvider(application, navigationalWarningTileRepository)
+            providers[TileProviderType.NAVIGATIONAL_WARNING] = navigationWarningTileProvider
             value = providers
          }
       }
@@ -400,6 +424,27 @@ class MapViewModel @Inject constructor(
             }
       } else emptyList()
 
+      val navigationalWarnings = if (dataSources[DataSource.NAVIGATION_WARNING] == true) {
+         val geometryEnvelope = GeometryEnvelope(minLongitude, minLatitude, maxLongitude, maxLatitude)
+         navigationalWarningRepository
+            .getNavigationalWarnings(
+               minLatitude = minLatitude,
+               minLongitude = minLongitude,
+               maxLatitude = maxLatitude,
+               maxLongitude = maxLongitude
+            )
+            .flatMap { warning ->
+               warning.getFeatures().filter { feature ->
+                  geometryEnvelope.contains(feature.geometry.geometry.envelope) ||
+                  geometryEnvelope.intersects(feature.geometry.geometry.envelope)
+               }.map { feature ->
+                  val key = MapAnnotation.Key(NavigationalWarningKey.fromNavigationWarning(warning).id(), MapAnnotation.Type.NAVIGATIONAL_WARNING)
+                  val center = feature.geometry.geometry.centroid
+                  MapAnnotation(key, center.y, center.x)
+               }
+            }
+      } else emptyList()
+
       val boundingBox = BoundingBox(
          minLongitude,
          minLatitude,
@@ -430,6 +475,6 @@ class MapViewModel @Inject constructor(
          } catch (_: Exception) { emptyList() }
       }
 
-     asams + modus + lights + ports + beacons + dgps + features
+     asams + modus + lights + ports + beacons + dgps + navigationalWarnings + features
    }
 }

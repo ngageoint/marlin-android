@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 6,
-    "identityHash": "e55e879c306772b5cd334df0a2dff759",
+    "identityHash": "69592395c20ac6c98d0e31ddaf4915ee",
     "entities": [
       {
         "tableName": "asams",
@@ -883,7 +883,7 @@
       },
       {
         "tableName": "navigational_warnings",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `number` INTEGER NOT NULL, `year` INTEGER NOT NULL, `navigation_area` TEXT NOT NULL, `issue_date` INTEGER NOT NULL, `subregions` TEXT, `text` TEXT, `status` TEXT, `authority` TEXT, `cancel_number` INTEGER, `cancelDate` INTEGER, `cancel_navigation_area` TEXT, `cancel_year` INTEGER, `geoJson` TEXT, PRIMARY KEY(`number`, `year`, `navigation_area`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `number` INTEGER NOT NULL, `year` INTEGER NOT NULL, `navigation_area` TEXT NOT NULL, `issue_date` INTEGER NOT NULL, `subregions` TEXT, `text` TEXT, `status` TEXT, `authority` TEXT, `cancel_number` INTEGER, `cancelDate` INTEGER, `cancel_navigation_area` TEXT, `cancel_year` INTEGER, `geoJson` TEXT, `min_latitude` REAL, `min_longitude` REAL, `max_latitude` REAL, `max_longitude` REAL, PRIMARY KEY(`number`, `year`, `navigation_area`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -967,6 +967,30 @@
             "fieldPath": "geoJson",
             "columnName": "geoJson",
             "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "minLatitude",
+            "columnName": "min_latitude",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "minLongitude",
+            "columnName": "min_longitude",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "maxLatitude",
+            "columnName": "max_latitude",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "maxLongitude",
+            "columnName": "max_longitude",
+            "affinity": "REAL",
             "notNull": false
           }
         ],
@@ -1822,7 +1846,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'e55e879c306772b5cd334df0a2dff759')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '69592395c20ac6c98d0e31ddaf4915ee')"
     ]
   }
 }

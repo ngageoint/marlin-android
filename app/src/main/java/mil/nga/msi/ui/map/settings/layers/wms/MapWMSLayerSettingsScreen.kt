@@ -197,40 +197,40 @@ private fun WMSCapabilitiesLayer(
    onLayerChecked: (mil.nga.msi.network.layer.wms.Layer, String, Boolean) -> Unit
 ) {
    if (layer.layers.isNotEmpty()) {
-      ListItem(
-         headlineContent = {
-            Text(
-               text = layer.title ?: "Folder",
-               maxLines = 1,
-               overflow = TextOverflow.Ellipsis
-            )
-         },
-         supportingContent = {
-            layer.abstract?.let {
-               Text(
-                  text = it,
-                  maxLines = 1,
-                  overflow = TextOverflow.Ellipsis
-               )
-            }
-         },
-         leadingContent = {
-            Icon(
-               Icons.Outlined.Folder,
-               contentDescription = "Folder"
-            )
-         },
-         trailingContent = {
-            IconButton(
-               onClick = { onZoom(layer) }
-            ) {
-               Icon(
-                  Icons.Default.ExpandMore,
-                  contentDescription = "Expand Folder"
-               )
-            }
-         }
-      )
+//      ListItem(
+//         headlineContent = {
+//            Text(
+//               text = layer.title ?: "Folder",
+//               maxLines = 1,
+//               overflow = TextOverflow.Ellipsis
+//            )
+//         },
+//         supportingContent = {
+//            layer.abstract?.let {
+//               Text(
+//                  text = it,
+//                  maxLines = 1,
+//                  overflow = TextOverflow.Ellipsis
+//               )
+//            }
+//         },
+//         leadingContent = {
+//            Icon(
+//               Icons.Outlined.Folder,
+//               contentDescription = "Folder"
+//            )
+//         },
+//         trailingContent = {
+//            IconButton(
+//               onClick = { onZoom(layer) }
+//            ) {
+//               Icon(
+//                  Icons.Default.ExpandMore,
+//                  contentDescription = "Expand Folder"
+//               )
+//            }
+//         }
+//      )
 
       layer.layers.forEach {
          WMSCapabilitiesLayer(
@@ -241,44 +241,44 @@ private fun WMSCapabilitiesLayer(
          )
       }
    } else if (layer.hasTiles()) {
-      ListItem(
-         headlineContent = {
-            Text(
-               text = layer.title ?: "Layer",
-               maxLines = 1,
-               overflow = TextOverflow.Ellipsis
-            )
-         },
-         supportingContent = {
-            layer.abstract?.let {
-               Text(
-                  text = it,
-                  maxLines = 1,
-                  overflow = TextOverflow.Ellipsis
-               )
-            }
-         },
-         leadingContent = {
-            Icon(
-               Icons.Outlined.Layers,
-               contentDescription = "Layer"
-            )
-         },
-         trailingContent = {
-            Row {
-               IconButton(onClick = { onZoom(layer) }) {
-                  Icon(Icons.Default.MyLocation, contentDescription = "Zoom to GeoPackage Bounds")
-               }
-
-               Checkbox(
-                  checked = wmsLayers.contains(layer.name),
-                  onCheckedChange = { checked ->
-                     layer.name?.let { name -> onLayerChecked(layer, name, checked) }
-                  }
-               )
-            }
-         }
-      )
+//      ListItem(
+//         headlineContent = {
+//            Text(
+//               text = layer.title ?: "Layer",
+//               maxLines = 1,
+//               overflow = TextOverflow.Ellipsis
+//            )
+//         },
+//         supportingContent = {
+//            layer.abstract?.let {
+//               Text(
+//                  text = it,
+//                  maxLines = 1,
+//                  overflow = TextOverflow.Ellipsis
+//               )
+//            }
+//         },
+//         leadingContent = {
+//            Icon(
+//               Icons.Outlined.Layers,
+//               contentDescription = "Layer"
+//            )
+//         },
+//         trailingContent = {
+//            Row {
+//               IconButton(onClick = { onZoom(layer) }) {
+//                  Icon(Icons.Default.MyLocation, contentDescription = "Zoom to GeoPackage Bounds")
+//               }
+//
+//               Checkbox(
+//                  checked = wmsLayers.contains(layer.name),
+//                  onCheckedChange = { checked ->
+//                     layer.name?.let { name -> onLayerChecked(layer, name, checked) }
+//                  }
+//               )
+//            }
+//         }
+//      )
    }
 }
 

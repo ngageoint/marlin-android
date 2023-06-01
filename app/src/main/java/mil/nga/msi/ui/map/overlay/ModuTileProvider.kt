@@ -7,6 +7,10 @@ import com.google.maps.android.geometry.Bounds
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.modu.Modu
 import mil.nga.msi.repository.map.ModuTileRepository
+import mil.nga.sf.geojson.Feature
+import mil.nga.sf.geojson.Geometry
+import mil.nga.sf.geojson.Point
+import mil.nga.sf.geojson.Position
 import javax.inject.Inject
 
 class ModuTileProvider @Inject constructor(
@@ -17,9 +21,13 @@ class ModuTileProvider @Inject constructor(
 class ModuImage(
    modu: Modu
 ): DataSourceImage {
-   override val latitude = modu.latitude
-   override val longitude = modu.longitude
    override val dataSource = DataSource.MODU
+   override val feature: Feature =
+      Feature(
+         Point(
+            Position(modu.longitude, modu.latitude)
+         )
+      )
 
    override fun image(
       context: Context,
@@ -27,6 +35,6 @@ class ModuImage(
       tileBounds: Bounds,
       tileSize: Double
    ): List<Bitmap> {
-      return listOf(circleImage(context, zoom))
+      return listOf(pointImage(context, zoom))
    }
 }

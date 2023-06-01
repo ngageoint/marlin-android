@@ -178,6 +178,7 @@ private fun MapGridLayerScreen(
    }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun GridLayer(
    name: String,

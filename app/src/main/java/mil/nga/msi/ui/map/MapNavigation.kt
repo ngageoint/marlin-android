@@ -93,6 +93,7 @@ fun NavGraphBuilder.mapGraph(
          route?.startsWith(PortRoute.Sheet.name) != true &&
          route?.startsWith(RadioBeaconRoute.Sheet.name) != true &&
          route?.startsWith(DgpsStationRoute.Sheet.name) != true &&
+         route?.startsWith(NavigationWarningRoute.Sheet.name) != true &&
          route?.startsWith(GeoPackageRoute.Sheet.name) != true
       ) {
          annotationProvider.setMapAnnotation(null)
@@ -126,7 +127,11 @@ fun NavGraphBuilder.mapGraph(
                   val encoded = Uri.encode(Json.encodeToString(dgpsStationKey))
                   navController.navigate(DgpsStationRoute.Sheet.name + "?key=${encoded}")
                }
-               MapAnnotation.Type.NAVIGATIONAL_WARNING -> {}
+               MapAnnotation.Type.NAVIGATIONAL_WARNING -> {
+                  val featureKey = NavigationalWarningKey.fromId(annotation.key.id)
+                  val encoded = Uri.encode(Json.encodeToString(featureKey))
+                  navController.navigate(NavigationWarningRoute.Sheet.name + "?key=${encoded}")
+               }
                MapAnnotation.Type.GEOPACKAGE -> {
                   val featureKey = GeoPackageFeatureKey.fromId(annotation.key.id)
                   val encoded = Uri.encode(Json.encodeToString(featureKey))

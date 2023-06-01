@@ -1,7 +1,6 @@
 package mil.nga.msi.ui.about
 
 import android.content.Intent
-import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.foundation.clickable
@@ -280,18 +279,16 @@ private fun DeveloperTools(
 @Composable
 private fun NavigationWarning(
    showNoLocationNavigationWarnings: Boolean,
-   onShowNoLocationNavigationWarnings: (Boolean) -> Unit
+   onShowNoLocationNavigationWarnings: (Boolean) -> Unit,
 ) {
    Surface {
       Column(
          verticalArrangement = Arrangement.Center,
-         modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp)
+         modifier = Modifier.fillMaxWidth()
       ) {
          Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(vertical = 8.dp)
+            modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp)
          ) {
             CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                Icon(

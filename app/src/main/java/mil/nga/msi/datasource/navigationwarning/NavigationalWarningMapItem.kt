@@ -15,6 +15,5 @@ data class NavigationalWarningMapItem(
    @ColumnInfo(name = "text") val text: String?,
    @ColumnInfo(name = "geoJson") val geoJson: String?
 ) {
-   @Transient
-   val featureCollection: FeatureCollection? = geoJson?.let { FeatureConverter.toFeatureCollection(it) }
+   fun featureCollection(): FeatureCollection? = geoJson?.let { FeatureConverter.toFeatureCollection(it) }
 }

@@ -4,8 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.repository.DataSourceRepository
@@ -17,22 +15,6 @@ class NavigationViewModel @Inject constructor(
    dataSourceRepository: DataSourceRepository,
    private val userPreferencesRepository: UserPreferencesRepository
 ): ViewModel() {
-
-//   init {
-//      viewModelScope.launch(Dispatchers.IO) {
-//         val tabs = userPreferencesRepository.tabs.first()
-//         val nonTabs = userPreferencesRepository.nonTabs.first()
-//         val allTabs = tabs + nonTabs
-//         val missing = DataSource.values().filterNot { dataSource ->
-//            allTabs.contains(dataSource)
-//         }
-//
-//         userPreferencesRepository.setNonTabs(nonTabs.toMutableList().apply {
-//            addAll(missing)
-//         })
-//      }
-//   }
-
    val mapped = userPreferencesRepository.mapped.asLiveData()
    val tabs = userPreferencesRepository.tabs.asLiveData()
    val nonTabs = userPreferencesRepository.nonTabs.asLiveData()

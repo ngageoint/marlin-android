@@ -11,6 +11,10 @@ import mil.nga.msi.datasource.light.Light
 import mil.nga.msi.repository.map.LightTileRepository
 import mil.nga.msi.repository.preferences.UserPreferencesRepository
 import mil.nga.msi.ui.map.overlay.images.*
+import mil.nga.sf.geojson.Feature
+import mil.nga.sf.geojson.Geometry
+import mil.nga.sf.geojson.Point
+import mil.nga.sf.geojson.Position
 import javax.inject.Inject
 
 class LightTileProvider @Inject constructor(
@@ -22,9 +26,13 @@ class LightImage(
    private val light: Light,
    private val userPreferencesRepository: UserPreferencesRepository
 ): DataSourceImage {
-   override val latitude = light.latitude
-   override val longitude = light.longitude
    override val dataSource = DataSource.LIGHT
+   override val feature: Feature =
+      Feature(
+         Point(
+            Position(light.longitude, light.latitude)
+         )
+      )
 
    override fun image(
       context: Context,

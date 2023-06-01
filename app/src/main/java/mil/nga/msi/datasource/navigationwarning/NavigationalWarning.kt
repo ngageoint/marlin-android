@@ -9,9 +9,6 @@ import com.google.android.gms.maps.model.LatLngBounds
 import mil.nga.sf.geojson.Feature
 import mil.nga.sf.geojson.FeatureCollection
 import mil.nga.sf.geojson.FeatureConverter
-import mil.nga.sf.geojson.LineString
-import mil.nga.sf.geojson.Point
-import mil.nga.sf.geojson.Polygon
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -84,25 +81,37 @@ data class NavigationalWarning(
    @ColumnInfo(name = "geoJson")
    var geoJson: String? = null
 
-   @Transient
-   val featureCollection: FeatureCollection? = geoJson?.let { FeatureConverter.toFeatureCollection(it) }
+   @ColumnInfo(name = "min_latitude")
+   var minLatitude: Double? = null
+
+   @ColumnInfo(name = "min_longitude")
+   var minLongitude: Double? = null
+
+   @ColumnInfo(name = "max_latitude")
+   var maxLatitude: Double? = null
+
+   @ColumnInfo(name = "max_longitude")
+   var maxLongitude: Double? = null
+
+   fun getFeatures(): List<Feature> {
+      return geoJson?.let {
+         FeatureConverter.toFeatureCollection(it)?.features ?: emptyList()
+      } ?: emptyList()
+   }
 
    fun bounds(): LatLngBounds? {
-      val featureCollection =  geoJson?.let { FeatureConverter.toFeatureCollection(it) }
       val builder = LatLngBounds.builder()
-      featureCollection?.features?.forEach { feature: Feature ->
-         when (val geometry = feature.geometry) {
-            is Point -> {
-               builder.include(LatLng(geometry.point.y, geometry.point.x))
-            }
-            is LineString, is Polygon -> {
-               val envelope = geometry.geometry.envelope
-               builder.include(LatLng(envelope.minY, envelope.minX))
-               builder.include(LatLng(envelope.maxY,  envelope.minX))
-               builder.include(LatLng(envelope.maxY,  envelope.maxX))
-               builder.include(LatLng(envelope.minY,  envelope.maxX))
-            }
-         }
+
+      val minY = minLatitude
+      val minX = minLongitude
+      if (minY != null && minX != null) {
+         builder.include(LatLng(minY, minX))
+      }
+
+      val maxY = maxLatitude
+      val maxX = maxLongitude
+      if (maxY != null && maxX != null) {
+         builder.include(LatLng(maxY, maxX))
       }
 
       return try { builder.build() } catch(e: Exception) { null }

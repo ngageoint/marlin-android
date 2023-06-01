@@ -119,7 +119,7 @@ class NavigationWarningEntityTest {
         )
 
         dao.insert(insert)
-        val read = dao.getNavigationalWarnings(listOf(insert[0].compositeKey(), insert[1].compositeKey()))
+        val read = dao.getNavigationalWarnings(listOf(insert[0].id, insert[1].id))
 
         assertEquals(read.size, 2)
         assertNavigationWarningsEqual(insert[0], read[0])

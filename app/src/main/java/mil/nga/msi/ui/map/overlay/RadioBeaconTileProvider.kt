@@ -9,6 +9,10 @@ import com.google.maps.android.geometry.Bounds
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.radiobeacon.RadioBeacon
 import mil.nga.msi.repository.map.RadioBeaconTileRepository
+import mil.nga.sf.geojson.Feature
+import mil.nga.sf.geojson.Geometry
+import mil.nga.sf.geojson.Point
+import mil.nga.sf.geojson.Position
 import javax.inject.Inject
 
 class RadioBeaconTileProvider @Inject constructor(
@@ -19,9 +23,13 @@ class RadioBeaconTileProvider @Inject constructor(
 class RadioBeaconImage(
    private val beacon: RadioBeacon
 ): DataSourceImage {
-   override val latitude = beacon.latitude
-   override val longitude = beacon.longitude
    override val dataSource = DataSource.RADIO_BEACON
+   override val feature: Feature =
+      Feature(
+         Point(
+            Position(beacon.longitude, beacon.latitude)
+         )
+      )
 
    override fun image(
       context: Context,
@@ -30,7 +38,7 @@ class RadioBeaconImage(
       tileSize: Double
    ): List<Bitmap> {
       val image = if (zoom < 13) {
-         circleImage(context, zoom)
+         pointImage(context, zoom)
       } else {
          sectorImageLarge(context, beacon)
       }

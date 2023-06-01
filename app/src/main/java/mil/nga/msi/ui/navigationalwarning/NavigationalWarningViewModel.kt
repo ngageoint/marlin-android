@@ -29,9 +29,9 @@ class NavigationalWarningViewModel @Inject constructor(
    fun getNavigationalWarning(key: NavigationalWarningKey): LiveData<NavigationalWarningState> {
        return repository.observeNavigationalWarning(key).mapNotNull { warning ->
          warning?.let {
-            val annotations = warning.featureCollection?.features?.mapNotNull { feature ->
+            val annotations = warning.getFeatures().mapNotNull { feature ->
                MapShape.fromGeometry(feature, warning.id)
-            } ?: emptyList()
+            }
             NavigationalWarningState(warning, annotations)
          }
        }

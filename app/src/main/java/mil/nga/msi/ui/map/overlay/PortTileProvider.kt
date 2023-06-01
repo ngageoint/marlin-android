@@ -7,6 +7,10 @@ import com.google.maps.android.geometry.Bounds
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.port.Port
 import mil.nga.msi.repository.map.PortTileRepository
+import mil.nga.sf.geojson.Feature
+import mil.nga.sf.geojson.Geometry
+import mil.nga.sf.geojson.Point
+import mil.nga.sf.geojson.Position
 import javax.inject.Inject
 
 class PortTileProvider @Inject constructor(
@@ -17,9 +21,13 @@ class PortTileProvider @Inject constructor(
 class PortImage(
    port: Port
 ): DataSourceImage {
-   override val latitude = port.latitude
-   override val longitude = port.longitude
    override val dataSource = DataSource.PORT
+   override val feature: Feature =
+      Feature(
+         Point(
+            Position(port.longitude, port.latitude)
+         )
+      )
 
    override fun image(
       context: Context,
@@ -27,6 +35,6 @@ class PortImage(
       tileBounds: Bounds,
       tileSize: Double
    ): List<Bitmap> {
-      return listOf(circleImage(context, zoom))
+      return listOf(pointImage(context, zoom))
    }
 }
