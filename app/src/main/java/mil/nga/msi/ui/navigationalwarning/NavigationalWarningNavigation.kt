@@ -113,7 +113,7 @@ fun NavGraphBuilder.navigationalWarningGraph(
                      }
                      is NavigationalWarningAction.Zoom -> {
                         val encoded = Uri.encode(Json.encodeToString(Bounds.fromLatLngBounds(action.bounds)))
-                        navController.navigate( "${NavigationWarningRoute.Group.name}?bounds=$encoded")
+                        navController.navigate(MapRoute.Map.name + "?bounds=${encoded}")
                      }
                   }
                }
@@ -140,7 +140,7 @@ fun NavGraphBuilder.navigationalWarningGraph(
                      }
                      is NavigationalWarningAction.Zoom -> {
                         val encoded = Uri.encode(Json.encodeToString(Bounds.fromLatLngBounds(action.bounds)))
-                        navController.navigate( "${NavigationWarningRoute.Group.name}?bounds=$encoded")
+                        navController.navigate(MapRoute.Map.name + "?bounds=${encoded}")
                      }
                   }
                }
