@@ -15,7 +15,7 @@ dependencyResolutionManagement {
     versionCatalogs {
         libs {
             version('junit4', '4.13.2')
-            version('androidxTestExt', '1.1.4')
+            version('androidxTestExt', '1.1.5')
 
             library('junit4', 'junit', 'junit').versionRef('junit4')
             library('androidx-test-ext', 'androidx.test.ext', 'junit-ktx').versionRef('androidxTestExt')

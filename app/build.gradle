@@ -203,6 +203,7 @@ dependencies {
 
     implementation('edu.stanford.nlp:stanford-corenlp:4.5.4') {
         exclude group: 'org.hamcrest'
+        exclude group: 'junit'
         exclude group: 'com.sun.xml.bind'
         exclude group: 'com.google.protobuf'
     }
