@@ -62,6 +62,7 @@ fun sectorRangeImage(
          // TODO: figure out what to do with multi colored lights over the same sector
          it.startDegrees >= it.endDegrees
       }
+      .filterNot { sector -> sector.obscured }
       .forEach { sector ->
          val nauticalMiles = sector.range ?: 0.0
          val nauticalMilesMeasurement = nauticalMiles * METERS_IN_NAUTICAL_MILE

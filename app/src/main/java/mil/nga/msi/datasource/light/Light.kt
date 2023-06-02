@@ -193,7 +193,7 @@ data class Light(
       val sectors = mutableListOf<LightSector>()
 
       // Use Java RegEx here instead of Kotlin.  Kotlin 1.7 has native issues that was causing this to be slow and a memory hog
-      val pattern = Pattern.compile("(?<visible>(Visible)?)(?<fullLightObscured>(Partially obscured)?)((?<color>[A-Z]+)?)\\.?(?<unintensified>(\\(unintensified\\))?)(?<obscured>(\\(partially obscured\\))?)( (?<startdeg>(\\d*))°)?((?<startminutes>[0-9]*)[\\`'])?(-(?<enddeg>(\\d*))°)(?<endminutes>[0-9]*)[\\`']?")
+      val pattern = Pattern.compile("(?<visible>(Visible)?)(?<fullLightObscured>(bscured)?)((?<color>[A-Z]+)?)\\.?(?<unintensified>(\\(unintensified\\))?)(?<obscured>(\\(bscured\\))?)( (?<startdeg>(\\d*))°)?((?<startminutes>[0-9]*)[\\`'])?(-(?<enddeg>(\\d*))°)(?<endminutes>[0-9]*)[\\`']?")
       remarks?.let { remarks ->
          var previousEnd = 0.0
          val matcher: Matcher = pattern.matcher(remarks)
