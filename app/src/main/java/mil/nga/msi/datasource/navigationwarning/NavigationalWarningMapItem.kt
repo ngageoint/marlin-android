@@ -3,7 +3,7 @@ package mil.nga.msi.datasource.navigationwarning
 import androidx.room.ColumnInfo
 import mil.nga.sf.geojson.FeatureCollection
 import mil.nga.sf.geojson.FeatureConverter
-import java.util.*
+import java.util.Date
 
 data class NavigationalWarningMapItem(
    @ColumnInfo(name = "id") val id: String,

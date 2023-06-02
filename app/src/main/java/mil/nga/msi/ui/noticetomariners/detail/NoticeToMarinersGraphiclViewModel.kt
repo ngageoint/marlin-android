@@ -1,7 +1,9 @@
 package mil.nga.msi.ui.noticetomariners.detail
 
 import android.net.Uri
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import mil.nga.msi.repository.noticetomariners.NoticeToMarinersGraphic
 import mil.nga.msi.repository.noticetomariners.NoticeToMarinersRepository

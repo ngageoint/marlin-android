@@ -1,7 +1,11 @@
 package mil.nga.msi.ui.geopackage
 
 import android.app.Application
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.TileProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,7 +26,6 @@ import mil.nga.msi.repository.geopackage.GeoPackageMediaKey
 import mil.nga.msi.repository.layer.LayerRepository
 import mil.nga.msi.repository.preferences.UserPreferencesRepository
 import mil.nga.sf.proj.GeometryTransform
-import java.util.ArrayList
 import javax.inject.Inject
 
 class Feature(

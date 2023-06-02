@@ -1,7 +1,6 @@
 package mil.nga.msi.ui.navigationalwarning
 
 import android.net.Uri
-import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.core.os.BundleCompat
 import androidx.navigation.*
@@ -13,8 +12,6 @@ import kotlinx.serialization.json.Json
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.navigationwarning.NavigationArea
 import mil.nga.msi.repository.navigationalwarning.NavigationalWarningKey
-import mil.nga.msi.ui.asam.AsamRoute
-import mil.nga.msi.ui.asam.sheet.AsamSheetScreen
 import mil.nga.msi.ui.map.MapPosition
 import mil.nga.msi.ui.map.MapRoute
 import mil.nga.msi.ui.map.cluster.MapAnnotation

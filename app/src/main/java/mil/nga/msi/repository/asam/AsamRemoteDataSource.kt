@@ -2,7 +2,6 @@ package mil.nga.msi.repository.asam
 
 import mil.nga.msi.datasource.asam.Asam
 import mil.nga.msi.network.asam.AsamService
-import mil.nga.msi.network.asam.AsamResponse
 import javax.inject.Inject
 
 class AsamRemoteDataSource @Inject constructor(

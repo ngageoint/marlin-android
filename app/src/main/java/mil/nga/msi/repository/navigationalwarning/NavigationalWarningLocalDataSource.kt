@@ -4,7 +4,7 @@ import mil.nga.msi.datasource.navigationwarning.NavigationArea
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarning
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarningDao
 import mil.nga.sf.GeometryEnvelope
-import java.util.*
+import java.util.Date
 import javax.inject.Inject
 
 class NavigationalWarningLocalDataSource @Inject constructor(

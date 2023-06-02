@@ -10,9 +10,14 @@ import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.light.Light
 import mil.nga.msi.repository.map.LightTileRepository
 import mil.nga.msi.repository.preferences.UserPreferencesRepository
-import mil.nga.msi.ui.map.overlay.images.*
+import mil.nga.msi.ui.map.overlay.images.buoyImage
+import mil.nga.msi.ui.map.overlay.images.colorImage
+import mil.nga.msi.ui.map.overlay.images.colorRangeImage
+import mil.nga.msi.ui.map.overlay.images.fogSignal
+import mil.nga.msi.ui.map.overlay.images.raconImage
+import mil.nga.msi.ui.map.overlay.images.sectorImage
+import mil.nga.msi.ui.map.overlay.images.sectorRangeImage
 import mil.nga.sf.geojson.Feature
-import mil.nga.sf.geojson.Geometry
 import mil.nga.sf.geojson.Point
 import mil.nga.sf.geojson.Position
 import javax.inject.Inject

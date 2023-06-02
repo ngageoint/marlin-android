@@ -8,7 +8,6 @@ import assertPortsEqual
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mil.nga.msi.datasource.MsiDatabase
-import mil.nga.msi.datasource.light.Light
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull

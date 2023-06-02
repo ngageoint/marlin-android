@@ -3,7 +3,8 @@ package mil.nga.msi.repository.modu
 import mil.nga.msi.datasource.modu.Modu
 import mil.nga.msi.network.modu.ModuService
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
 import javax.inject.Inject
 
 class ModuRemoteDataSource @Inject constructor(

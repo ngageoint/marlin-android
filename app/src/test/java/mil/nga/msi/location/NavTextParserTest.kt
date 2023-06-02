@@ -1,6 +1,5 @@
 package mil.nga.msi.location
 
-import android.util.Log
 import mil.nga.msi.coordinate.WGS84
 import org.junit.Assert
 import org.junit.Before

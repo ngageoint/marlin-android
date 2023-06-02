@@ -1,6 +1,7 @@
 package mil.nga.msi.ui.main
 
-import androidx.lifecycle.*
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.navigation.NavDestination
 import dagger.hilt.android.lifecycle.HiltViewModel
 import mil.nga.msi.repository.preferences.EmbarkRepository

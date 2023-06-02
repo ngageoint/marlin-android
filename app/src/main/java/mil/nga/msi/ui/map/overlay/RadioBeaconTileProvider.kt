@@ -2,7 +2,15 @@ package mil.nga.msi.ui.map.overlay
 
 import android.app.Application
 import android.content.Context
-import android.graphics.*
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.DashPathEffect
+import android.graphics.Matrix
+import android.graphics.Paint
+import android.graphics.Path
+import android.graphics.PointF
+import android.graphics.RectF
+import android.graphics.Typeface
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import com.google.maps.android.geometry.Bounds
@@ -10,7 +18,6 @@ import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.radiobeacon.RadioBeacon
 import mil.nga.msi.repository.map.RadioBeaconTileRepository
 import mil.nga.sf.geojson.Feature
-import mil.nga.sf.geojson.Geometry
 import mil.nga.sf.geojson.Point
 import mil.nga.sf.geojson.Position
 import javax.inject.Inject

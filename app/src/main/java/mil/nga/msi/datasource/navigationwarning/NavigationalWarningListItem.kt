@@ -1,9 +1,7 @@
 package mil.nga.msi.datasource.navigationwarning
 
 import androidx.room.ColumnInfo
-import mil.nga.msi.datasource.Position
-import mil.nga.sf.geojson.FeatureCollection
-import java.util.*
+import java.util.Date
 
 data class NavigationalWarningListItem(
    @ColumnInfo(name = "number") val number: Int,

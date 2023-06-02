@@ -9,7 +9,7 @@ import mil.nga.msi.datasource.navigationwarning.NavigationArea
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarning
 import mil.nga.msi.repository.preferences.UserPreferencesRepository
 import mil.nga.msi.startup.navigationalwarning.NavigationalWarningInitializer.Companion.FETCH_LATEST_NAVIGATIONAL_WARNINGS_TASK
-import java.util.*
+import java.util.Date
 import javax.inject.Inject
 
 class NavigationalWarningRepository @Inject constructor(

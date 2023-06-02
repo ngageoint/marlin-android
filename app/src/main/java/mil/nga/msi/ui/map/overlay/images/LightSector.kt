@@ -1,7 +1,15 @@
 package mil.nga.msi.ui.map.overlay.images
 
 import android.content.Context
-import android.graphics.*
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.DashPathEffect
+import android.graphics.Matrix
+import android.graphics.Paint
+import android.graphics.Path
+import android.graphics.PointF
+import android.graphics.RectF
+import android.graphics.Typeface
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import com.google.android.gms.maps.model.LatLng
@@ -10,7 +18,13 @@ import mil.nga.msi.datasource.light.Light
 import mil.nga.msi.datasource.light.LightSector
 import mil.nga.msi.ui.location.toDegrees
 import mil.nga.sf.Point
-import kotlin.math.*
+import kotlin.math.PI
+import kotlin.math.asin
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.ln
+import kotlin.math.sin
+import kotlin.math.tan
 
 private const val METERS_IN_NAUTICAL_MILE = 1852
 

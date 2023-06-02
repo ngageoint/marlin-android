@@ -1,6 +1,10 @@
 package mil.nga.msi.ui.image
 
-import android.graphics.*
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
 
 fun Bitmap.tint(color: Int): Bitmap {
    val paint = Paint()

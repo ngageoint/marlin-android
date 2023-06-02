@@ -6,7 +6,8 @@ import androidx.room.PrimaryKey
 import com.google.android.gms.maps.model.LatLng
 import mil.nga.msi.coordinate.DMS
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
 
 @Entity(tableName = "asams")
 data class Asam(

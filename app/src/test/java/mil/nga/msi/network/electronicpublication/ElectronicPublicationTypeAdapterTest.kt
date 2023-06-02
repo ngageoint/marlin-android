@@ -7,7 +7,8 @@ import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
 import mil.nga.msi.ISO_OFFSET_DATE_TIME_MOD
 import mil.nga.msi.datasource.electronicpublication.ElectronicPublication
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import java.io.StringReader

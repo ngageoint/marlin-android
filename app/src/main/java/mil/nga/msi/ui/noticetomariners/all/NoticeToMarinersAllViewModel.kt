@@ -1,6 +1,7 @@
 package mil.nga.msi.ui.noticetomariners.all
 
-import androidx.lifecycle.*
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.map
 import mil.nga.msi.repository.noticetomariners.NoticeToMarinersRepository

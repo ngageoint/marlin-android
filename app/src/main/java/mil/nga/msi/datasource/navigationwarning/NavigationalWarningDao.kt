@@ -2,7 +2,6 @@ package mil.nga.msi.datasource.navigationwarning
 
 import androidx.room.*
 import kotlinx.coroutines.flow.Flow
-import mil.nga.msi.datasource.modu.Modu
 import java.util.*
 
 @Dao

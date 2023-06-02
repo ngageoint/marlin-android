@@ -1,6 +1,10 @@
 package mil.nga.msi.network.layer.wms
 
-import com.tickaroo.tikxml.annotation.*
+import com.tickaroo.tikxml.annotation.Attribute
+import com.tickaroo.tikxml.annotation.Element
+import com.tickaroo.tikxml.annotation.PropertyElement
+import com.tickaroo.tikxml.annotation.TextContent
+import com.tickaroo.tikxml.annotation.Xml
 
 
 @Xml(name = "WMS_Capabilities")

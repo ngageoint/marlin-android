@@ -1,11 +1,13 @@
 package mil.nga.msi.ui.map.settings.layers
 
 import android.net.Uri
-import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.core.os.BundleCompat
-import androidx.navigation.*
+import androidx.navigation.NavController
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavType
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import mil.nga.msi.datasource.layer.Layer
@@ -19,7 +21,10 @@ import mil.nga.msi.ui.map.settings.layers.geopackage.MapGeoPackageLayerSettingsS
 import mil.nga.msi.ui.map.settings.layers.grid.MapGridLayerScreen
 import mil.nga.msi.ui.map.settings.layers.wms.MapWMSLayerScreen
 import mil.nga.msi.ui.map.settings.layers.wms.MapWMSLayerSettingsScreen
-import mil.nga.msi.ui.navigation.*
+import mil.nga.msi.ui.navigation.Bounds
+import mil.nga.msi.ui.navigation.NavTypeCredentials
+import mil.nga.msi.ui.navigation.NavTypeLayer
+import mil.nga.msi.ui.navigation.Route
 
 sealed class MapLayerRoute(
    override val name: String,

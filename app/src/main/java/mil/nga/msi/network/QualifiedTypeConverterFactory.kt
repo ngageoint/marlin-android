@@ -1,6 +1,5 @@
 package mil.nga.msi.network
 
-import android.util.Log
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import retrofit2.Converter

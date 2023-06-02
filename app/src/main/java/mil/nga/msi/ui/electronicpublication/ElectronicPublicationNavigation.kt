@@ -1,8 +1,12 @@
 package mil.nga.msi.ui.electronicpublication
 
 import androidx.compose.ui.graphics.Color
-import androidx.navigation.*
+import androidx.navigation.NavController
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavType
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
+import androidx.navigation.navigation
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.electronicpublication.ElectronicPublicationType
 import mil.nga.msi.ui.navigation.Route

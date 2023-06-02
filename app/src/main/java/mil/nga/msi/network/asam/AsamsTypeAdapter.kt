@@ -8,7 +8,8 @@ import mil.nga.msi.datasource.asam.Asam
 import mil.nga.msi.network.nextDoubleOrNull
 import mil.nga.msi.network.nextStringOrNull
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
 
 data class AsamResponse(val asams: List<Asam> = emptyList())
 

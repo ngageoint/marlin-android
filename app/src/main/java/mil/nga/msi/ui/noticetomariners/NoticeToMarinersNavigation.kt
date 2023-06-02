@@ -3,8 +3,13 @@ package mil.nga.msi.ui.noticetomariners
 import android.net.Uri
 import androidx.compose.ui.graphics.Color
 import androidx.core.os.BundleCompat
-import androidx.navigation.*
+import androidx.navigation.NavController
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavType
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
+import androidx.navigation.navigation
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import mil.nga.msi.datasource.DataSource

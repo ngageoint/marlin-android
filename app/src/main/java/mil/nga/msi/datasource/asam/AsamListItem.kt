@@ -3,7 +3,7 @@ package mil.nga.msi.datasource.asam
 import androidx.room.ColumnInfo
 import com.google.android.gms.maps.model.LatLng
 import mil.nga.msi.coordinate.DMS
-import java.util.*
+import java.util.Date
 
 data class AsamListItem(
    @ColumnInfo(name = "reference") val reference: String,

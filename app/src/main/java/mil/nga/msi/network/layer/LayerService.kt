@@ -1,7 +1,7 @@
 package mil.nga.msi.network.layer
 
-import mil.nga.msi.network.layer.wms.WMSCapabilities
 import mil.nga.msi.network.Xml
+import mil.nga.msi.network.layer.wms.WMSCapabilities
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.GET

@@ -1,7 +1,6 @@
 package mil.nga.msi.ui.map
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.*
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.TileProvider

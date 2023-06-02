@@ -14,9 +14,9 @@ import org.junit.Test
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
-import retrofit2.Response
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import retrofit2.Response
 import java.util.Calendar
 
 @OptIn(ExperimentalCoroutinesApi::class)

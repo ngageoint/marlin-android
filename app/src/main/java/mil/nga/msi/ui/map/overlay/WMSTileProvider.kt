@@ -5,7 +5,11 @@ import mil.nga.msi.network.layer.LayerService
 import mil.nga.msi.repository.preferences.Credentials
 import java.net.MalformedURLException
 import java.net.URL
-import kotlin.math.*
+import kotlin.math.atan
+import kotlin.math.exp
+import kotlin.math.ln
+import kotlin.math.pow
+import kotlin.math.tan
 
 class WMSTileProvider(
    service: LayerService,

@@ -3,14 +3,15 @@ package mil.nga.msi.ui.noticetomariners.detail
 import android.app.Application
 import android.net.Uri
 import androidx.core.content.FileProvider
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import mil.nga.msi.datasource.noticetomariners.NoticeToMariners
 import mil.nga.msi.datasource.noticetomariners.NoticeToMarinersGraphics
 import mil.nga.msi.repository.noticetomariners.NoticeToMarinersRepository
-import java.io.File
-import java.nio.file.Paths
 import javax.inject.Inject
 
 data class NoticeToMarinersPublication(

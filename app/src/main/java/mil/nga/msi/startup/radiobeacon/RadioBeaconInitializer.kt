@@ -2,7 +2,15 @@ package mil.nga.msi.startup.radiobeacon
 
 import android.content.Context
 import androidx.startup.Initializer
-import androidx.work.*
+import androidx.work.BackoffPolicy
+import androidx.work.Constraints
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.ExistingWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequest
+import androidx.work.OutOfQuotaPolicy
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import mil.nga.msi.di.AppInitializer
 import mil.nga.msi.startup.WorkManagerInitializer
 import mil.nga.msi.work.radiobeacon.LoadRadioBeaconWorker

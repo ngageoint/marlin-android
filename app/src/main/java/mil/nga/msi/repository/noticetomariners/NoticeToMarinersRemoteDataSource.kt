@@ -15,7 +15,7 @@ import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
-import java.util.*
+import java.util.Calendar
 import javax.inject.Inject
 
 class NoticeToMarinersRemoteDataSource @Inject constructor(

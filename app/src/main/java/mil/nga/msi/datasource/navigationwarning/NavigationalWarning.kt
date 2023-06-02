@@ -7,10 +7,10 @@ import androidx.room.Index
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import mil.nga.sf.geojson.Feature
-import mil.nga.sf.geojson.FeatureCollection
 import mil.nga.sf.geojson.FeatureConverter
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
 
 enum class NavigationArea(
    val code: String,

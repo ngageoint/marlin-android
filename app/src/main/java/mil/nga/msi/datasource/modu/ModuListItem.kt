@@ -3,7 +3,7 @@ package mil.nga.msi.datasource.modu
 import androidx.room.ColumnInfo
 import com.google.android.gms.maps.model.LatLng
 import mil.nga.msi.coordinate.DMS
-import java.util.*
+import java.util.Date
 
 data class ModuListItem(
    @ColumnInfo(name = "name") val name: String,

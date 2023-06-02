@@ -3,7 +3,7 @@ package mil.nga.msi.repository.light
 import mil.nga.msi.datasource.light.Light
 import mil.nga.msi.datasource.light.PublicationVolume
 import mil.nga.msi.network.light.LightService
-import java.util.*
+import java.util.Calendar
 import javax.inject.Inject
 
 class LightRemoteDataSource @Inject constructor(

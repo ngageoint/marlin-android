@@ -1,7 +1,6 @@
 package mil.nga.msi.ui.radiobeacon
 
 import android.net.Uri
-import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.core.os.BundleCompat
 import androidx.navigation.*

@@ -10,6 +10,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navDeepLink
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import mil.nga.msi.ui.about.settingsGraph
 import mil.nga.msi.ui.asam.asamGraph
 import mil.nga.msi.ui.dgpsstation.dgpsStationGraph
 import mil.nga.msi.ui.electronicpublication.electronicPublicationGraph
@@ -30,7 +31,6 @@ import mil.nga.msi.ui.noticetomariners.noticeToMarinersGraph
 import mil.nga.msi.ui.port.portGraph
 import mil.nga.msi.ui.radiobeacon.radioBeaconGraph
 import mil.nga.msi.ui.report.reportGraph
-import mil.nga.msi.ui.about.settingsGraph
 
 fun NavGraphBuilder.homeGraph(
    navController: NavController,

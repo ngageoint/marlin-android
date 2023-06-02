@@ -5,7 +5,13 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.google.android.gms.maps.model.LatLng
 import mil.nga.msi.coordinate.DMS
-import mil.nga.msi.datasource.port.types.*
+import mil.nga.msi.datasource.port.types.Decision
+import mil.nga.msi.datasource.port.types.HarborType
+import mil.nga.msi.datasource.port.types.HarborUse
+import mil.nga.msi.datasource.port.types.RepairCode
+import mil.nga.msi.datasource.port.types.Shelter
+import mil.nga.msi.datasource.port.types.Size
+import mil.nga.msi.datasource.port.types.UnderkeelClearance
 import mil.nga.msi.ui.port.detail.asNonZeroOrNull
 
 @Entity(tableName = "ports")

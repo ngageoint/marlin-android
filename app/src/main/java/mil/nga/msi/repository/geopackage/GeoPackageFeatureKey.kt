@@ -3,8 +3,6 @@ package mil.nga.msi.repository.geopackage
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
-import mil.nga.msi.datasource.dgpsstation.DgpsStation
-import mil.nga.msi.datasource.dgpsstation.DgpsStationListItem
 
 @Serializable
 @Parcelize

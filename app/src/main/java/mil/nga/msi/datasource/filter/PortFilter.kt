@@ -1,6 +1,12 @@
 package mil.nga.msi.datasource.filter
 
-import mil.nga.msi.datasource.port.types.*
+import mil.nga.msi.datasource.port.types.Decision
+import mil.nga.msi.datasource.port.types.HarborType
+import mil.nga.msi.datasource.port.types.HarborUse
+import mil.nga.msi.datasource.port.types.RepairCode
+import mil.nga.msi.datasource.port.types.Shelter
+import mil.nga.msi.datasource.port.types.Size
+import mil.nga.msi.datasource.port.types.UnderkeelClearance
 import mil.nga.msi.filter.FilterParameter
 import mil.nga.msi.filter.FilterParameterType
 

@@ -2,7 +2,7 @@ package mil.nga.msi.datasource
 
 import androidx.room.TypeConverter
 import java.time.Instant
-import java.util.*
+import java.util.Date
 
 class DateTypeConverter {
 

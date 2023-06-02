@@ -1,6 +1,5 @@
 package mil.nga.msi.ui.map
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import mil.nga.msi.location.LocationProvider

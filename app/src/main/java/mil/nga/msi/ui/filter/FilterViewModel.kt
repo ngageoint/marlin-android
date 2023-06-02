@@ -1,11 +1,21 @@
 package mil.nga.msi.ui.filter
 
-import androidx.lifecycle.*
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.map
+import androidx.lifecycle.switchMap
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.launch
 import mil.nga.msi.datasource.DataSource
-import mil.nga.msi.datasource.filter.*
+import mil.nga.msi.datasource.filter.AsamFilter
+import mil.nga.msi.datasource.filter.DgpsStationFilter
+import mil.nga.msi.datasource.filter.LightFilter
+import mil.nga.msi.datasource.filter.ModuFilter
+import mil.nga.msi.datasource.filter.PortFilter
+import mil.nga.msi.datasource.filter.RadioBeaconFilter
 import mil.nga.msi.filter.Filter
 import mil.nga.msi.filter.FilterParameter
 import mil.nga.msi.location.LocationPolicy

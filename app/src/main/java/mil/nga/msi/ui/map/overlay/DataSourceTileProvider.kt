@@ -2,8 +2,12 @@ package mil.nga.msi.ui.map.overlay
 
 import android.app.Application
 import android.content.Context
-import android.graphics.*
-import android.util.Log
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.Path
+import android.graphics.Rect
+import android.graphics.RectF
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.graphics.drawable.toBitmap
@@ -20,7 +24,13 @@ import mil.nga.sf.geojson.Feature
 import mil.nga.sf.geojson.LineString
 import mil.nga.sf.geojson.Polygon
 import java.io.ByteArrayOutputStream
-import kotlin.math.*
+import kotlin.math.PI
+import kotlin.math.atan
+import kotlin.math.exp
+import kotlin.math.ln
+import kotlin.math.max
+import kotlin.math.pow
+import kotlin.math.tan
 
 interface TileRepository {
    suspend fun getTileableItems(

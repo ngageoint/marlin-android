@@ -6,12 +6,12 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Fullscreen
 import androidx.compose.material.icons.filled.FullscreenExit
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.outlined.LocationSearching
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -33,6 +33,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.TileProvider
 import com.google.maps.android.compose.*
+import com.google.maps.android.compose.clustering.Clustering
 import kotlinx.coroutines.launch
 import mil.nga.geopackage.GeoPackageFactory
 import mil.nga.geopackage.extension.rtree.RTreeIndexExtension
@@ -40,13 +41,12 @@ import mil.nga.geopackage.features.user.FeatureDao
 import mil.nga.msi.R
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.navigationwarning.NavigationArea
+import mil.nga.msi.repository.navigationalwarning.NavigationalWarningKey
 import mil.nga.msi.type.MapLocation
 import mil.nga.msi.ui.location.LocationPermission
 import mil.nga.msi.ui.main.TopBar
-import mil.nga.msi.ui.map.MapPosition
-import com.google.maps.android.compose.clustering.Clustering
-import mil.nga.msi.repository.navigationalwarning.NavigationalWarningKey
 import mil.nga.msi.ui.map.CircleShape
+import mil.nga.msi.ui.map.MapPosition
 import mil.nga.msi.ui.map.MapShape
 import mil.nga.msi.ui.map.PointShape
 import mil.nga.msi.ui.map.PolygonShape

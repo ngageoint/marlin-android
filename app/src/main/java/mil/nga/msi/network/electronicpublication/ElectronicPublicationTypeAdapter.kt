@@ -11,7 +11,6 @@ import mil.nga.msi.network.nextIntOrNull
 import mil.nga.msi.network.nextLongOrNull
 import mil.nga.msi.network.nextStringOrNull
 import mil.nga.msi.parseAsInstant
-import java.lang.UnsupportedOperationException
 import java.time.Instant
 
 class ElectronicPublicationTypeAdapter: TypeAdapter<ElectronicPublication>() {

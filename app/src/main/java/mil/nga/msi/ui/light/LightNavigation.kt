@@ -16,8 +16,8 @@ import mil.nga.msi.ui.light.detail.LightDetailScreen
 import mil.nga.msi.ui.light.list.LightsScreen
 import mil.nga.msi.ui.light.sheet.LightSheetScreen
 import mil.nga.msi.ui.map.MapRoute
-import mil.nga.msi.ui.navigation.NavTypeLightKey
 import mil.nga.msi.ui.navigation.NavPoint
+import mil.nga.msi.ui.navigation.NavTypeLightKey
 import mil.nga.msi.ui.navigation.Route
 import mil.nga.msi.ui.sort.SortScreen
 

@@ -4,7 +4,6 @@ import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
-import mil.nga.msi.datasource.asam.Asam
 import mil.nga.msi.datasource.noticetomariners.NoticeToMariners
 import mil.nga.msi.network.nextBooleanOrNull
 import mil.nga.msi.network.nextIntOrNull

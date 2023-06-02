@@ -1,6 +1,5 @@
 package mil.nga.msi.network.noticetomariners
 
-import mil.nga.msi.datasource.noticetomariners.ChartCorrection
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.GET

@@ -11,13 +11,10 @@ import mil.nga.msi.location.bounds
 import mil.nga.msi.network.nextIntOrNull
 import mil.nga.msi.network.nextStringOrNull
 import mil.nga.msi.repository.navigationalwarning.NavigationalWarningKey
-import mil.nga.sf.geojson.Feature
-import mil.nga.sf.geojson.FeatureCollection
 import mil.nga.sf.geojson.FeatureConverter
-import mil.nga.sf.geojson.Point
-import mil.nga.sf.geojson.Position
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
 
 data class NavigationalWarningResponse(val warnings: List<NavigationalWarning> = emptyList())
 
