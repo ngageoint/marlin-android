@@ -100,7 +100,7 @@ fun NavGraphBuilder.portGraph(
          }
       }
       bottomSheet("${PortRoute.Sheet.name}?portNumber={portNumber}") { backstackEntry ->
-         backstackEntry.arguments?.getString("portNumber")?.let { portNumber ->
+         backstackEntry.arguments?.getString("portNumber")?.toIntOrNull()?.let { portNumber ->
             PortSheetScreen(portNumber, onDetails = {
                navController.navigate("${PortRoute.Detail.name}?portNumber=$portNumber")
             })

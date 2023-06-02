@@ -28,18 +28,17 @@ fun LightSheetScreen(
    viewModel: LightViewModel = hiltViewModel()
 ) {
    val light by viewModel.getLight(key.volumeNumber, key.featureNumber).observeAsState()
-   light?.first()?.let {
-      Column(modifier = modifier) {
-         LightContent(light = it) {
-            onDetails?.invoke()
-         }
+
+   Column(modifier = modifier) {
+      LightContent(light = light?.first()) {
+         onDetails?.invoke()
       }
    }
 }
 
 @Composable
 private fun LightContent(
-   light: Light,
+   light: Light?,
    onDetails: () -> Unit,
 ) {
    Column(
@@ -65,7 +64,7 @@ private fun LightContent(
       Column(Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
          CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
             Text(
-               text = "${light.featureNumber} ${light.internationalFeature ?: ""} ${light.volumeNumber}",
+               text = "${light?.featureNumber.orEmpty()} ${light?.internationalFeature.orEmpty()} ${light?.volumeNumber.orEmpty()}",
                fontWeight = FontWeight.SemiBold,
                style = MaterialTheme.typography.labelSmall,
                maxLines = 1,
@@ -73,7 +72,7 @@ private fun LightContent(
             )
          }
 
-         light.name?.let { name ->
+         light?.name?.let { name ->
             Text(
                text = name,
                style = MaterialTheme.typography.titleLarge,
@@ -84,13 +83,15 @@ private fun LightContent(
          }
 
          CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+            light?.sectionHeader?.let { sectionHeader ->
             Text(
-               text = light.sectionHeader,
+               text = sectionHeader,
                style = MaterialTheme.typography.bodyMedium,
                modifier = Modifier.padding(top = 4.dp)
             )
+            }
 
-            light.structure?.let { structure ->
+            light?.structure?.let { structure ->
                Text(
                   text = structure,
                   style = MaterialTheme.typography.bodyMedium,

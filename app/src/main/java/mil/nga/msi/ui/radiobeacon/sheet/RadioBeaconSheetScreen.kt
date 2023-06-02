@@ -1,5 +1,6 @@
 package mil.nga.msi.ui.radiobeacon.sheet
 
+import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -25,23 +26,22 @@ import mil.nga.msi.ui.radiobeacon.RadioBeaconViewModel
 @Composable
 fun RadioBeaconSheetScreen(
    key: RadioBeaconKey,
-   onDetails: (() -> Unit)? = null,
    modifier: Modifier = Modifier,
+   onDetails: (() -> Unit)? = null,
    viewModel: RadioBeaconViewModel = hiltViewModel()
 ) {
    val beacon by viewModel.getRadioBeacon(key.volumeNumber, key.featureNumber).observeAsState()
-   beacon?.let {
-      Column(modifier = modifier) {
-         RadioBeaconContent(beacon = it) {
-            onDetails?.invoke()
-         }
+
+   Column(modifier = modifier) {
+      RadioBeaconContent(beacon = beacon) {
+         onDetails?.invoke()
       }
    }
 }
 
 @Composable
 private fun RadioBeaconContent(
-   beacon: RadioBeacon,
+   beacon: RadioBeacon?,
    onDetails: () -> Unit,
 ) {
    Column(modifier = Modifier.padding(vertical = 8.dp)) {
@@ -65,7 +65,7 @@ private fun RadioBeaconContent(
       Column(Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
          CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
             Text(
-               text = "${beacon.featureNumber} ${beacon.volumeNumber}",
+               text = "${beacon?.featureNumber.orEmpty()} ${beacon?.volumeNumber.orEmpty()}",
                fontWeight = FontWeight.SemiBold,
                style = MaterialTheme.typography.labelSmall,
                maxLines = 1,
@@ -73,7 +73,7 @@ private fun RadioBeaconContent(
             )
          }
 
-         beacon.name?.let { name ->
+         beacon?.name?.let { name ->
             Text(
                text = name,
                style = MaterialTheme.typography.titleLarge,
@@ -83,14 +83,16 @@ private fun RadioBeaconContent(
             )
          }
 
-         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-            Text(
-               text = beacon.sectionHeader,
-               style = MaterialTheme.typography.bodyMedium
-            )
+         beacon?.sectionHeader?.let { sectionHeader ->
+            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+               Text(
+                  text = sectionHeader,
+                  style = MaterialTheme.typography.bodyMedium
+               )
+            }
          }
 
-         beacon.morseCode()?.let { code ->
+         beacon?.morseCode()?.let { code ->
             Text(
                text = beacon.morseLetter(),
                style = MaterialTheme.typography.titleLarge,
@@ -103,7 +105,7 @@ private fun RadioBeaconContent(
             )
          }
 
-         beacon.expandedCharacteristicWithoutCode()?.let {
+         beacon?.expandedCharacteristicWithoutCode()?.let {
             Text(
                text = it,
                style = MaterialTheme.typography.bodyMedium,
@@ -112,7 +114,7 @@ private fun RadioBeaconContent(
          }
 
          CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-            beacon.stationRemark?.let { stationRemark ->
+            beacon?.stationRemark?.let { stationRemark ->
                Text(
                   text = stationRemark,
                   style = MaterialTheme.typography.bodyMedium,

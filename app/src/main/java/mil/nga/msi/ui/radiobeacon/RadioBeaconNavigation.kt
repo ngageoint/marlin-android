@@ -1,6 +1,7 @@
 package mil.nga.msi.ui.radiobeacon
 
 import android.net.Uri
+import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.core.os.BundleCompat
 import androidx.navigation.*
@@ -112,9 +113,9 @@ fun NavGraphBuilder.radioBeaconGraph(
          arguments = listOf(navArgument("key") { type = NavType.RadioBeacon })
       ) { backstackEntry ->
          backstackEntry.arguments?.let { bundle ->
-            BundleCompat.getParcelable(bundle, "point", RadioBeaconKey::class.java)
+            BundleCompat.getParcelable(bundle, "key", RadioBeaconKey::class.java)
          }?.let { key ->
-            RadioBeaconSheetScreen(key, onDetails = {
+            RadioBeaconSheetScreen(key = key, onDetails = {
                val encoded = Uri.encode(Json.encodeToString(key))
                navController.navigate( "${RadioBeaconRoute.Detail.name}?key=$encoded")
             })

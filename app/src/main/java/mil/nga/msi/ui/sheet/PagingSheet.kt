@@ -169,11 +169,13 @@ private fun PortPage(
    id: String,
    onDetails: () -> Unit,
 ) {
-   PortSheetScreen(
-      id,
-      onDetails = { onDetails() },
-      modifier = Modifier.fillMaxHeight()
-   )
+   id.toIntOrNull()?.let { portNumber ->
+      PortSheetScreen(
+         portNumber,
+         onDetails = { onDetails() },
+         modifier = Modifier.fillMaxHeight()
+      )
+   }
 }
 
 @Composable
@@ -183,7 +185,7 @@ private fun RadioBeaconPage(
 ) {
    val key = RadioBeaconKey.fromId(id)
    RadioBeaconSheetScreen(
-      key,
+      key = key,
       onDetails = { onDetails() },
       modifier = Modifier.fillMaxHeight()
    )

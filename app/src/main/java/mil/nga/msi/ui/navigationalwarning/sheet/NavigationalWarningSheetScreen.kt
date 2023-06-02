@@ -27,18 +27,16 @@ fun NavigationalWarningSheetScreen(
    viewModel: NavigationalWarningViewModel = hiltViewModel()
 ) {
    val warning by viewModel.getNavigationalWarning(key).observeAsState()
-   warning?.let {
-      Column(modifier = modifier) {
-         NavigationalWarningContent(warning = it) {
-            onDetails?.invoke()
-         }
+   Column(modifier = modifier) {
+      NavigationalWarningContent(warning = warning) {
+         onDetails?.invoke()
       }
    }
 }
 
 @Composable
 private fun NavigationalWarningContent(
-   warning: NavigationalWarningState,
+   warning: NavigationalWarningState?,
    onDetails: () -> Unit,
 ) {
    Column(modifier = Modifier.padding(vertical = 8.dp)) {
@@ -60,10 +58,12 @@ private fun NavigationalWarningContent(
       }
 
       Column(Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
-         NavigationalWarningHeader(
-            state = warning,
-            showMap = false
-         )
+         warning?.let { state ->
+            NavigationalWarningHeader(
+               state = state,
+               showMap = false
+            )
+         }
       }
 
       TextButton(

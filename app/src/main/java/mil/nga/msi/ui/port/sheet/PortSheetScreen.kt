@@ -23,28 +23,24 @@ import mil.nga.msi.ui.port.PortViewModel
 
 @Composable
 fun PortSheetScreen(
-   id: String,
+   portNumber: Int,
    modifier: Modifier = Modifier,
    onDetails: (() -> Unit)? = null,
    viewModel: PortViewModel = hiltViewModel()
 ) {
    val location by viewModel.locationProvider.observeAsState()
+   val port by viewModel.getPort(portNumber).observeAsState()
 
-   id.toIntOrNull()?.let { portNumber ->
-      val port by viewModel.getPort(portNumber).observeAsState()
-      port?.let {
-         Column(modifier = modifier) {
-            PortContent(port = it, location = location) {
-               onDetails?.invoke()
-            }
-         }
+   Column(modifier = modifier) {
+      PortContent(port = port, location = location) {
+         onDetails?.invoke()
       }
    }
 }
 
 @Composable
 private fun PortContent(
-   port: Port,
+   port: Port?,
    location: Location?,
    onDetails: () -> Unit,
 ) {
@@ -70,16 +66,18 @@ private fun PortContent(
          modifier = Modifier
             .padding(vertical = 8.dp, horizontal = 16.dp)
       ) {
-         Text(
-            text = port.portName,
-            fontWeight = FontWeight.SemiBold,
-            style = MaterialTheme.typography.titleLarge,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-         )
+         port?.portName?.let { portName ->
+            Text(
+               text = portName,
+               fontWeight = FontWeight.SemiBold,
+               style = MaterialTheme.typography.titleLarge,
+               maxLines = 1,
+               overflow = TextOverflow.Ellipsis
+            )
+         }
 
          CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-            port.alternateName?.let {
+            port?.alternateName?.let {
                Text(
                   text = it,
                   style = MaterialTheme.typography.bodyMedium,
@@ -91,8 +89,8 @@ private fun PortContent(
          location?.let { location ->
             Row(Modifier.padding(top = 4.dp)) {
                val portLocation = Location("port").apply {
-                  latitude = port.latitude
-                  longitude = port.longitude
+                  latitude = port?.latitude ?: 0.0
+                  longitude = port?.longitude ?: 0.0
                }
 
                val distance = location.distanceTo(portLocation) / 1000

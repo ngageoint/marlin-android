@@ -30,18 +30,16 @@ fun AsamSheetScreen(
    viewModel: AsamViewModel = hiltViewModel()
 ) {
    val asam by viewModel.getAsam(reference).observeAsState()
-   asam?.let {
-      Column(modifier = modifier) {
-         AsamContent(asam = it) {
-            onDetails?.invoke()
-         }
+   Column(modifier = modifier) {
+      AsamContent(asam = asam) {
+         onDetails?.invoke()
       }
    }
 }
 
 @Composable
 private fun AsamContent(
-   asam: Asam,
+   asam: Asam?,
    onDetails: () -> Unit,
 ) {
    Column(modifier = Modifier.padding(vertical = 8.dp)) {
@@ -64,7 +62,7 @@ private fun AsamContent(
 
       Column(Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
          CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-            asam.date.let { date ->
+            asam?.date?.let { date ->
                val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
                Text(
                   text = dateFormat.format(date),
@@ -76,7 +74,7 @@ private fun AsamContent(
             }
          }
 
-         val header = listOfNotNull(asam.hostility, asam.victim)
+         val header = listOfNotNull(asam?.hostility, asam?.victim)
          if (header.isNotEmpty()) {
             Text(
                text = header.joinToString(": "),
@@ -89,7 +87,7 @@ private fun AsamContent(
 
 
          CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-            asam.description?.let {
+            asam?.description?.let {
                Text(
                   text = it,
                   maxLines = 5,

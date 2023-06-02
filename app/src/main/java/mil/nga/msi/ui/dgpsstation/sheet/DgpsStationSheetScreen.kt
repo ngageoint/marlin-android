@@ -28,18 +28,17 @@ fun DgpsStationSheetScreen(
    viewModel: DgpsStationViewModel = hiltViewModel()
 ) {
    val dgps by viewModel.getDgpsStation(key.volumeNumber, key.featureNumber).observeAsState()
-   dgps?.let {
-      Column(modifier = modifier) {
-         DgpsStationContent(dgps = it) {
-            onDetails?.invoke()
-         }
+
+   Column(modifier = modifier) {
+      DgpsStationContent(dgps = dgps) {
+         onDetails?.invoke()
       }
    }
 }
 
 @Composable
 private fun DgpsStationContent(
-   dgps: DgpsStation,
+   dgps: DgpsStation?,
    onDetails: () -> Unit,
 ) {
 
@@ -64,7 +63,7 @@ private fun DgpsStationContent(
       Column(Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
          CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
             Text(
-               text = "${dgps.featureNumber} ${dgps.volumeNumber}",
+               text = "${dgps?.featureNumber?.toString().orEmpty()} ${dgps?.volumeNumber.orEmpty()}",
                fontWeight = FontWeight.SemiBold,
                style = MaterialTheme.typography.labelSmall,
                maxLines = 1,
@@ -72,7 +71,7 @@ private fun DgpsStationContent(
             )
          }
 
-         dgps.name?.let { name ->
+         dgps?.name?.let { name ->
             Text(
                text = name,
                style = MaterialTheme.typography.titleLarge,
@@ -83,7 +82,7 @@ private fun DgpsStationContent(
          }
 
          CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-            dgps.remarks?.let { remarks ->
+            dgps?.remarks?.let { remarks ->
                Text(
                   text = remarks,
                   style = MaterialTheme.typography.bodyMedium,

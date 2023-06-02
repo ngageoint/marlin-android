@@ -30,18 +30,16 @@ fun ModuSheetScreen(
    viewModel: ModuViewModel = hiltViewModel()
 ) {
    val modu by viewModel.getModu(id).observeAsState()
-   modu?.let {
-      Column(modifier = modifier) {
-         ModuContent(modu = it) {
-            onDetails?.invoke()
-         }
+   Column(modifier = modifier) {
+      ModuContent(modu = modu) {
+         onDetails?.invoke()
       }
    }
 }
 
 @Composable
 private fun ModuContent(
-   modu: Modu,
+   modu: Modu?,
    onDetails: () -> Unit,
 ) {
    Column(modifier = Modifier.padding(vertical = 8.dp)) {
@@ -64,7 +62,7 @@ private fun ModuContent(
 
       Column(Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
          CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-            modu.date.let { date ->
+            modu?.date?.let { date ->
                val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
                Text(
                   text = dateFormat.format(date),
@@ -76,23 +74,25 @@ private fun ModuContent(
             }
          }
 
-         Text(
-            text = modu.name,
-            style = MaterialTheme.typography.titleLarge,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.padding(top = 16.dp)
-         )
+         modu?.name?.let { name ->
+            Text(
+               text = name,
+               style = MaterialTheme.typography.titleLarge,
+               maxLines = 1,
+               overflow = TextOverflow.Ellipsis,
+               modifier = Modifier.padding(top = 16.dp)
+            )
+         }
 
          CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-            modu.rigStatus?.let {
+            modu?.rigStatus?.let {
                Text(
                   text = it.name,
                   style = MaterialTheme.typography.bodyMedium,
                   modifier = Modifier.padding(top = 4.dp)
                )
             }
-            modu.specialStatus?.let {
+            modu?.specialStatus?.let {
                Text(
                   text = it,
                   style = MaterialTheme.typography.bodyMedium
