@@ -475,7 +475,7 @@ private fun LightImage(
                   val paint = Paint().apply {
                      isAntiAlias = true
                      textSize = textSizeInPx
-                     color = android.graphics.Color.BLACK // TODO adjust for filled circle
+                     color = android.graphics.Color.BLACK
                      typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD);
                   }
 

@@ -126,25 +126,26 @@ private fun DgpsStations(
                }
             }
          ) { index ->
-            when (val item = lazyItems[index]) {
-               is DgpsStationListItem.HeaderItem -> {
-                  Text(
-                     text = item.header,
-                     fontWeight = FontWeight.Medium,
-                     style = MaterialTheme.typography.bodySmall,
-                     modifier = Modifier.padding(vertical = 8.dp)
-                  )
+            lazyItems[index]?.let { item ->
+               when (item) {
+                  is DgpsStationListItem.HeaderItem -> {
+                     Text(
+                        text = item.header,
+                        fontWeight = FontWeight.Medium,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(vertical = 8.dp)
+                     )
+                  }
+                  is DgpsStationListItem.DgpsStationItem -> {
+                     DgpsStationCard(
+                        dgpsStation = item.dgpsStation,
+                        onTap = onTap,
+                        onCopyLocation = { onCopyLocation(it) },
+                        onZoom = { onZoom(NavPoint(item.dgpsStation.latitude, item.dgpsStation.longitude)) },
+                        onShare = onShare
+                     )
+                  }
                }
-               is DgpsStationListItem.DgpsStationItem -> {
-                  DgpsStationCard(
-                     dgpsStation = item.dgpsStation,
-                     onTap = onTap,
-                     onCopyLocation = { onCopyLocation(it) },
-                     onZoom = { onZoom(NavPoint(item.dgpsStation.latitude, item.dgpsStation.longitude)) },
-                     onShare = onShare
-                  )
-               }
-               else -> { /* TODO item is null, display placeholder */}
             }
          }
       }

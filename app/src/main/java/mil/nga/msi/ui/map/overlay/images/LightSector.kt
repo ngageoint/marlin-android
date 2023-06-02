@@ -217,7 +217,7 @@ private fun sectorImageLarge(
          canvas.drawText(text, 0f, 0f, Paint().apply {
             isAntiAlias = true
             textSize = (context.resources.displayMetrics.density * 4)
-            color = Color.Black.toArgb() // TODO adjust for filled circle
+            color = Color.Black.toArgb()
             typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
          })
       }

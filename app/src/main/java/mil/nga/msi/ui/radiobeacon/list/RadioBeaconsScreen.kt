@@ -128,25 +128,34 @@ private fun RadioBeacons(
                }
             }
          ) { index ->
-            when (val item = lazyItems[index]) {
-               is RadioBeaconListItem.HeaderItem -> {
-                  Text(
-                     text = item.header,
-                     fontWeight = FontWeight.Medium,
-                     style = MaterialTheme.typography.bodySmall,
-                     modifier = Modifier.padding(vertical = 8.dp)
-                  )
+            lazyItems[index]?.let { item ->
+               when (item) {
+                  is RadioBeaconListItem.HeaderItem -> {
+                     Text(
+                        text = item.header,
+                        fontWeight = FontWeight.Medium,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(vertical = 8.dp)
+                     )
+                  }
+
+                  is RadioBeaconListItem.RadioBeaconItem -> {
+                     RadioBeaconCard(
+                        beacon = item.radioBeacon,
+                        onTap = onTap,
+                        onCopyLocation = { onCopyLocation(it) },
+                        onZoom = {
+                           onZoom(
+                              NavPoint(
+                                 item.radioBeacon.latitude,
+                                 item.radioBeacon.longitude
+                              )
+                           )
+                        },
+                        onShare = onShare
+                     )
+                  }
                }
-               is RadioBeaconListItem.RadioBeaconItem -> {
-                  RadioBeaconCard(
-                     beacon = item.radioBeacon,
-                     onTap = onTap,
-                     onCopyLocation = { onCopyLocation(it) },
-                     onZoom = { onZoom(NavPoint(item.radioBeacon.latitude, item.radioBeacon.longitude)) },
-                     onShare = onShare
-                  )
-               }
-               else -> { /* TODO item is null, display placeholder */}
             }
          }
       }

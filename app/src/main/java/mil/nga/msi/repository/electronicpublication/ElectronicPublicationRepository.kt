@@ -21,15 +21,6 @@ class ElectronicPublicationRepository @Inject constructor(
     private val downloadManager: DownloadManager,
     private val context: Application,
 ) {
-
-    suspend fun syncFromRemote(): Unit {
-        TODO()
-    }
-
-    fun observeElectronicPublications(): Flow<List<ElectronicPublication>> {
-        TODO()
-    }
-
     /**
      * Query for publications of the given type.  The results are in ascending order by
      * [ElectronicPublication.pubDownloadOrder], [ElectronicPublication.sectionOrder],

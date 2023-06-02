@@ -129,25 +129,26 @@ private fun Lights(
                }
             }
          ) { index ->
-            when (val item = lazyItems[index]) {
-               is LightListItem.HeaderItem -> {
-                  Text(
-                     text = item.header,
-                     fontWeight = FontWeight.Medium,
-                     style = MaterialTheme.typography.bodySmall,
-                     modifier = Modifier.padding(vertical = 8.dp)
-                  )
+            lazyItems[index]?.let { item ->
+               when (item) {
+                  is LightListItem.HeaderItem -> {
+                     Text(
+                        text = item.header,
+                        fontWeight = FontWeight.Medium,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(vertical = 8.dp)
+                     )
+                  }
+                  is LightListItem.LightItem -> {
+                     LightCard(
+                        light = item.light,
+                        onTap = onTap,
+                        onCopyLocation = { onCopyLocation(it) },
+                        onZoom = { onZoom(NavPoint(item.light.latitude, item.light.longitude)) },
+                        onShare = onShare
+                     )
+                  }
                }
-               is LightListItem.LightItem -> {
-                  LightCard(
-                     light = item.light,
-                     onTap = onTap,
-                     onCopyLocation = { onCopyLocation(it) },
-                     onZoom = { onZoom(NavPoint(item.light.latitude, item.light.longitude)) },
-                     onShare = onShare
-                  )
-               }
-               else -> { /* TODO item is null */}
             }
          }
       }

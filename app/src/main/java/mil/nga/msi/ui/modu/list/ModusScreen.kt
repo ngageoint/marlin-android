@@ -125,25 +125,26 @@ private fun Modus(
                }
             }
          ) { index ->
-            when (val item = lazyItems[index]) {
-               is ModuListItem.ModuItem -> {
-                  ModuCard(
-                     modu = item.modu,
-                     onTap = onTap,
-                     onZoom = { onZoom(NavPoint(item.modu.latitude, item.modu.longitude)) },
-                     onShare = { item.modu.name.let { onShare(it) } },
-                     onCopyLocation = onCopyLocation
-                  )
+            lazyItems[index]?.let { item ->
+               when (item) {
+                  is ModuListItem.ModuItem -> {
+                     ModuCard(
+                        modu = item.modu,
+                        onTap = onTap,
+                        onZoom = { onZoom(NavPoint(item.modu.latitude, item.modu.longitude)) },
+                        onShare = { item.modu.name.let { onShare(it) } },
+                        onCopyLocation = onCopyLocation
+                     )
+                  }
+                  is ModuListItem.HeaderItem -> {
+                     Text(
+                        text = item.header,
+                        fontWeight = FontWeight.Medium,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(vertical = 8.dp)
+                     )
+                  }
                }
-               is ModuListItem.HeaderItem -> {
-                  Text(
-                     text = item.header,
-                     fontWeight = FontWeight.Medium,
-                     style = MaterialTheme.typography.bodySmall,
-                     modifier = Modifier.padding(vertical = 8.dp)
-                  )
-               }
-               else -> { /* TODO item is null */}
             }
          }
       }

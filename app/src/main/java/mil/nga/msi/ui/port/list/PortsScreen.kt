@@ -129,26 +129,27 @@ private fun Ports(
                }
             }
          ) { index ->
-            when (val item = lazyItems[index]) {
-               is PortListItem.PortItem -> {
-                  PortCard(
-                     port = item.port,
-                     location = location,
-                     onTap = onTap,
-                     onCopyLocation = { onCopyLocation(it) },
-                     onZoom = { onZoom(NavPoint(item.port.latitude, item.port.longitude)) },
-                     onShare = { onShare(item.port.portNumber) }
-                  )
+            lazyItems[index]?.let { item ->
+               when (item) {
+                  is PortListItem.PortItem -> {
+                     PortCard(
+                        port = item.port,
+                        location = location,
+                        onTap = onTap,
+                        onCopyLocation = { onCopyLocation(it) },
+                        onZoom = { onZoom(NavPoint(item.port.latitude, item.port.longitude)) },
+                        onShare = { onShare(item.port.portNumber) }
+                     )
+                  }
+                  is PortListItem.HeaderItem -> {
+                     Text(
+                        text = item.header,
+                        fontWeight = FontWeight.Medium,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(vertical = 8.dp)
+                     )
+                  }
                }
-               is PortListItem.HeaderItem -> {
-                  Text(
-                     text = item.header,
-                     fontWeight = FontWeight.Medium,
-                     style = MaterialTheme.typography.bodySmall,
-                     modifier = Modifier.padding(vertical = 8.dp)
-                  )
-               }
-               else -> { /* TODO item is null */}
             }
          }
       }

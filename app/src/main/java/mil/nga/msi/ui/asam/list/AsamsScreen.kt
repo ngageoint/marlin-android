@@ -127,25 +127,26 @@ private fun Asams(
                }
             }
          ) { index ->
-            when (val item = lazyItems[index]) {
-               is AsamListItem.AsamItem -> {
-                  AsamCard(
-                     asam = item.asam,
-                     onTap = onTap,
-                     onCopyLocation = { onCopyLocation(it) },
-                     onZoom = { onZoom(NavPoint(item.asam.latitude, item.asam.longitude)) },
-                     onShare = { onShare(item.asam.reference) }
-                  )
+            lazyItems[index]?.let { item ->
+               when (item) {
+                  is AsamListItem.AsamItem -> {
+                     AsamCard(
+                        asam = item.asam,
+                        onTap = onTap,
+                        onCopyLocation = { onCopyLocation(it) },
+                        onZoom = { onZoom(NavPoint(item.asam.latitude, item.asam.longitude)) },
+                        onShare = { onShare(item.asam.reference) }
+                     )
+                  }
+                  is AsamListItem.HeaderItem -> {
+                     Text(
+                        text = item.header,
+                        fontWeight = FontWeight.Medium,
+                        style = MaterialTheme.typography.labelSmall,
+                        modifier = Modifier.padding(vertical = 8.dp)
+                     )
+                  }
                }
-               is AsamListItem.HeaderItem -> {
-                  Text(
-                     text = item.header,
-                     fontWeight = FontWeight.Medium,
-                     style = MaterialTheme.typography.labelSmall,
-                     modifier = Modifier.padding(vertical = 8.dp)
-                  )
-               }
-               else -> { /* TODO item is null */}
             }
          }
       }
