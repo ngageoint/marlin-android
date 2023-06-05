@@ -1,6 +1,8 @@
 package mil.nga.msi.ui.asam.detail
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -25,6 +27,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -32,6 +35,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.TileProvider
 import mil.nga.msi.coordinate.DMS
+import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.asam.Asam
 import mil.nga.msi.ui.asam.AsamAction
 import mil.nga.msi.ui.asam.AsamViewModel
@@ -114,6 +118,19 @@ private fun AsamHeader(
 ) {
    Card {
       Column {
+         Surface(
+            color = DataSource.ASAM.color,
+            contentColor = MaterialTheme.colorScheme.onPrimary,
+            modifier = Modifier.fillMaxWidth()
+         ) {
+            val header = listOfNotNull(asam.hostility, asam.victim).joinToString(": ")
+            Text(
+               text = header,
+               style = MaterialTheme.typography.headlineSmall,
+               modifier = Modifier.padding(16.dp)
+            )
+         }
+
          MapClip(
             latLng = LatLng(asam.latitude, asam.longitude),
             tileProvider = tileProvider,
@@ -133,15 +150,6 @@ private fun AsamHeader(
                   )
                }
             }
-
-            val header = listOfNotNull(asam.hostility, asam.victim).joinToString(": ")
-            Text(
-               text = header,
-               style = MaterialTheme.typography.titleLarge,
-               maxLines = 1,
-               overflow = TextOverflow.Ellipsis,
-               modifier = Modifier.padding(top = 16.dp)
-            )
 
             AsamFooter(
                asam,

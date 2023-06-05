@@ -32,6 +32,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.TileProvider
 import mil.nga.msi.coordinate.DMS
+import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.modu.Modu
 import mil.nga.msi.ui.location.LocationTextButton
 import mil.nga.msi.ui.main.TopBar
@@ -110,6 +111,18 @@ private fun ModuHeader(
       modifier = Modifier.padding(bottom = 16.dp)
    ) {
       Column {
+         Surface(
+            color = DataSource.MODU.color,
+            contentColor = MaterialTheme.colorScheme.onPrimary,
+            modifier = Modifier.fillMaxWidth()
+         ) {
+            Text(
+               text = modu.name,
+               style = MaterialTheme.typography.headlineSmall,
+               modifier = Modifier.padding(16.dp)
+            )
+         }
+
          MapClip(
             latLng = LatLng(modu.latitude, modu.longitude),
             tileProvider = tileProvider,
@@ -129,14 +142,6 @@ private fun ModuHeader(
                   )
                }
             }
-
-            Text(
-               text = modu.name,
-               style = MaterialTheme.typography.titleLarge,
-               maxLines = 1,
-               overflow = TextOverflow.Ellipsis,
-               modifier = Modifier.padding(top = 16.dp)
-            )
 
             ModuFooter(modu, onZoom, onShare, onCopyLocation)
          }

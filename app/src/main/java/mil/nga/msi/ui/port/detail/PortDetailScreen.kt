@@ -32,6 +32,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.TileProvider
 import mil.nga.msi.coordinate.DMS
+import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.port.Port
 import mil.nga.msi.ui.location.LocationTextButton
 import mil.nga.msi.ui.location.generalDirection
@@ -126,6 +127,18 @@ private fun PortHeader(
 ) {
    Card {
       Column {
+         Surface(
+            color = DataSource.PORT.color,
+            contentColor = MaterialTheme.colorScheme.onPrimary,
+            modifier = Modifier.fillMaxWidth()
+         ) {
+            Text(
+               text = port.portName,
+               style = MaterialTheme.typography.headlineSmall,
+               modifier = Modifier.padding(16.dp)
+            )
+         }
+
          MapClip(
             latLng = LatLng(port.latitude, port.longitude),
             baseMap = baseMap,
@@ -139,15 +152,6 @@ private fun PortHeader(
                Column(
                   Modifier.weight(1f)
                ) {
-                  CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
-                     Text(
-                        text = port.portName,
-                        style = MaterialTheme.typography.titleLarge,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                     )
-                  }
-
                   CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                      port.alternateName?.let {
                         Text(

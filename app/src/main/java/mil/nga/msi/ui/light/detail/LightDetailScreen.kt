@@ -47,6 +47,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.TileProvider
 import mil.nga.msi.coordinate.DMS
+import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.light.Light
 import mil.nga.msi.datasource.light.LightSector
 import mil.nga.msi.repository.light.LightKey
@@ -123,6 +124,20 @@ private fun LightHeader(
 ) {
    Card {
       Column {
+         light.name?.let { name ->
+            Surface(
+               color = DataSource.LIGHT.color,
+               contentColor = MaterialTheme.colorScheme.onPrimary,
+               modifier = Modifier.fillMaxWidth()
+            ) {
+               Text(
+                  text = name.trim(),
+                  style = MaterialTheme.typography.headlineSmall,
+                  modifier = Modifier.padding(16.dp)
+               )
+            }
+         }
+
          MapClip(
             latLng = LatLng(light.latitude, light.longitude),
             baseMap = baseMap,
@@ -137,16 +152,6 @@ private fun LightHeader(
                   style = MaterialTheme.typography.labelSmall,
                   maxLines = 1,
                   overflow = TextOverflow.Ellipsis
-               )
-            }
-
-            light.name?.let { name ->
-               Text(
-                  text = name,
-                  style = MaterialTheme.typography.titleLarge,
-                  maxLines = 1,
-                  overflow = TextOverflow.Ellipsis,
-                  modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
                )
             }
 

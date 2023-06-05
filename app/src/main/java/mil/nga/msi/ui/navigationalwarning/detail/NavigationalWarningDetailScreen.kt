@@ -28,9 +28,9 @@ import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
-import com.google.maps.android.compose.MapsComposeExperimentalApi
 import com.google.maps.android.compose.rememberCameraPositionState
 import mil.nga.msi.R
+import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.repository.navigationalwarning.NavigationalWarningKey
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.BaseMapType
@@ -110,7 +110,7 @@ private fun NavigationalWarningDetailContent(
 }
 
 @Composable
-fun NavigationalWarningHeader(
+private fun NavigationalWarningHeader(
    state: NavigationalWarningState,
    showMap: Boolean = true,
    mapBounds: LatLngBounds? = null,
@@ -119,6 +119,21 @@ fun NavigationalWarningHeader(
    val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.US)
 
    Column {
+      Surface(
+         color = DataSource.NAVIGATION_WARNING.color,
+         contentColor = MaterialTheme.colorScheme.onPrimary,
+         modifier = Modifier.fillMaxWidth()
+      ) {
+         val identifier = "${state.warning.number}/${state.warning.year}"
+         val subregions = state.warning.subregions?.joinToString(",")?.let { "($it)" }
+         val header = listOfNotNull(state.warning.navigationArea.title, identifier, subregions).joinToString(" ")
+         Text(
+            text = header,
+            style = MaterialTheme.typography.headlineSmall,
+            modifier = Modifier.padding(16.dp)
+         )
+      }
+
       if (showMap && state.annotations.isNotEmpty()) {
          Map(
             baseMap = baseMap,
@@ -138,17 +153,6 @@ fun NavigationalWarningHeader(
             )
          }
 
-         val identifier = "${state.warning.number}/${state.warning.year}"
-         val subregions = state.warning.subregions?.joinToString(",")?.let { "($it)" }
-         val header = listOfNotNull(state.warning.navigationArea.title, identifier, subregions).joinToString(" ")
-         Text(
-            text = header,
-            style = MaterialTheme.typography.titleLarge,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.padding(top = 16.dp)
-         )
-
          NavigationalWarningProperty(title = "Status", value = state.warning.status)
          NavigationalWarningProperty(title = "Authority", value = state.warning.authority)
          state.warning.cancelDate?.let { date ->
@@ -158,7 +162,6 @@ fun NavigationalWarningHeader(
    }
 }
 
-@OptIn(MapsComposeExperimentalApi::class)
 @Composable
 private fun Map(
    baseMap: BaseMapType?,
