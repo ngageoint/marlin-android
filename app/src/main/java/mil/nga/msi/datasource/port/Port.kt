@@ -348,7 +348,7 @@ data class Port(
    var offshoreMaxVesselDraft: Int? = null
 
    @Transient
-   val dms = DMS.from(LatLng(latitude, longitude))
+   val latLng = LatLng(latitude, longitude)
 
    fun nameSection() = mapOf(
       "World Port Index Number" to portNumber.toString(),

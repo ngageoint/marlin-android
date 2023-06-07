@@ -82,9 +82,9 @@ data class RadioBeacon(
    var sectionHeader: String = ""
 
    @Transient
-   val dms = DMS.from(LatLng(latitude, longitude))
+   val latLng = LatLng(latitude, longitude)
 
-   fun expandedCharacteristic(): String? {
+   private fun expandedCharacteristic(): String? {
       var expanded = characteristic
       expanded = expanded?.replace("aero", "aeronautical")
       expanded = expanded?.replace( "si", "silence")
@@ -196,7 +196,7 @@ data class RadioBeacon(
          "geopoliticalHeading: ${geopoliticalHeading.orEmpty()}\n" +
          "regionHeading: ${regionHeading.orEmpty()}\n" +
          "name: ${name.orEmpty()}\n" +
-         "noticeNumber: ${noticeNumber?.toString().orEmpty()}\n" +
+         "noticeNumber: ${noticeNumber.orEmpty()}\n" +
          "noticeWeek: ${noticeWeek}\n" +
          "noticeYear: ${noticeYear}\n" +
          "position: ${position.orEmpty()}\n" +
@@ -207,7 +207,7 @@ data class RadioBeacon(
          "frequency: ${frequency.orEmpty()}\n" +
          "stationRemark: ${stationRemark.orEmpty()}\n" +
          "removeFromList: ${removeFromList.orEmpty()}\n" +
-         "volumeNumber: ${volumeNumber.orEmpty()}"
+         "volumeNumber: $volumeNumber"
    }
 
    companion object {

@@ -35,11 +35,10 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.TileProvider
-import mil.nga.msi.coordinate.DMS
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.radiobeacon.RadioBeacon
 import mil.nga.msi.repository.radiobeacon.RadioBeaconKey
-import mil.nga.msi.ui.location.LocationTextButton
+import mil.nga.msi.ui.coordinate.CoordinateTextButton
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.BaseMapType
 import mil.nga.msi.ui.map.MapClip
@@ -203,18 +202,18 @@ private fun RadioBeaconFooter(
       horizontalArrangement = Arrangement.SpaceBetween,
       modifier = Modifier.fillMaxWidth()
    ) {
-      RadioBeaconLocation(beacon.dms, onCopyLocation)
+      RadioBeaconLocation(beacon.latLng, onCopyLocation)
       RadioBeaconActions(onZoom, onShare)
    }
 }
 
 @Composable
 private fun RadioBeaconLocation(
-   dms: DMS,
+   latLng: LatLng,
    onCopyLocation: (String) -> Unit
 ) {
-   LocationTextButton(
-      dms = dms,
+   CoordinateTextButton(
+      latLng = latLng,
       onCopiedToClipboard = { onCopyLocation(it) }
    )
 }

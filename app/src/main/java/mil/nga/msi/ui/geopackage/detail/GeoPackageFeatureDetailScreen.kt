@@ -49,7 +49,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.TileProvider
-import mil.nga.msi.coordinate.DMS
 import mil.nga.msi.repository.geopackage.GeoPackageFeatureKey
 import mil.nga.msi.repository.geopackage.GeoPackageMediaKey
 import mil.nga.msi.ui.geopackage.Feature
@@ -58,7 +57,7 @@ import mil.nga.msi.ui.geopackage.FeatureProperty
 import mil.nga.msi.ui.geopackage.GeoPackageFeatureAction
 import mil.nga.msi.ui.geopackage.GeoPackageViewModel
 import mil.nga.msi.ui.geopackage.MediaProperty
-import mil.nga.msi.ui.location.LocationTextButton
+import mil.nga.msi.ui.coordinate.CoordinateTextButton
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.BaseMapType
 import mil.nga.msi.ui.map.MapClip
@@ -186,11 +185,10 @@ private fun FeatureFooter(
       modifier = Modifier.fillMaxWidth()
    ) {
       latLng?.let {
-         val dms = DMS.from(latLng)
          FeatureLocation(
-            dms = DMS.from(it),
+            latLng = latLng,
             onCopyLocation = {
-               onAction(GeoPackageFeatureAction.Location(dms.format()))
+               onAction(GeoPackageFeatureAction.Location(it))
             }
          )
          FeatureActions(
@@ -204,11 +202,11 @@ private fun FeatureFooter(
 
 @Composable
 private fun FeatureLocation(
-   dms: DMS,
+   latLng: LatLng,
    onCopyLocation: (String) -> Unit,
 ) {
-   LocationTextButton(
-      dms = dms,
+   CoordinateTextButton(
+      latLng = latLng,
       onCopiedToClipboard = { onCopyLocation(it) }
    )
 }

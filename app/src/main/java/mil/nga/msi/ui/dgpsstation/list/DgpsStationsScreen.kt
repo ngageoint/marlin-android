@@ -21,6 +21,7 @@ import androidx.paging.PagingData
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
+import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import mil.nga.msi.coordinate.DMS
@@ -28,7 +29,7 @@ import mil.nga.msi.datasource.dgpsstation.DgpsStation
 import mil.nga.msi.repository.dgpsstation.DgpsStationKey
 import mil.nga.msi.ui.dgpsstation.DgpsStationAction
 import mil.nga.msi.ui.dgpsstation.DgpsStationRoute
-import mil.nga.msi.ui.location.LocationTextButton
+import mil.nga.msi.ui.coordinate.CoordinateTextButton
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.navigation.NavPoint
 
@@ -236,18 +237,18 @@ private fun DgpsStationFooter(
          .fillMaxWidth()
          .padding(top = 8.dp)
    ) {
-      DgpsStationLocation(dgpsStation.dms, onCopyLocation)
+      DgpsStationLocation(dgpsStation.latLng, onCopyLocation)
       DgpsStationActions(onShare, onZoom)
    }
 }
 
 @Composable
 private fun DgpsStationLocation(
-   dms: DMS,
+   latLng: LatLng,
    onCopyLocation: (String) -> Unit
 ) {
-   LocationTextButton(
-      dms = dms,
+   CoordinateTextButton(
+      latLng = latLng,
       onCopiedToClipboard = { onCopyLocation(it) }
    )
 }

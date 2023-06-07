@@ -21,13 +21,14 @@ import androidx.paging.PagingData
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
+import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import mil.nga.msi.coordinate.DMS
 import mil.nga.msi.datasource.asam.Asam
 import mil.nga.msi.ui.asam.AsamAction
 import mil.nga.msi.ui.asam.AsamRoute
-import mil.nga.msi.ui.location.LocationTextButton
+import mil.nga.msi.ui.coordinate.CoordinateTextButton
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.navigation.NavPoint
 import java.text.SimpleDateFormat
@@ -234,18 +235,18 @@ private fun AsamFooter(
          .fillMaxWidth()
          .padding(top = 8.dp)
    ) {
-      AsamLocation(asam.dms, onCopyLocation)
+      AsamLocation(asam.latLng, onCopyLocation)
       AsamActions(onShare, onZoom)
    }
 }
 
 @Composable
 private fun AsamLocation(
-   dms: DMS,
+   latLng: LatLng,
    onCopyLocation: (String) -> Unit
 ) {
-   LocationTextButton(
-      dms = dms,
+   CoordinateTextButton(
+      latLng = latLng,
       onCopiedToClipboard = { onCopyLocation(it) }
    )
 }

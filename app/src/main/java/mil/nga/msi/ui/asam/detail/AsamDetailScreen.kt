@@ -1,8 +1,6 @@
 package mil.nga.msi.ui.asam.detail
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -27,19 +25,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.TileProvider
-import mil.nga.msi.coordinate.DMS
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.asam.Asam
 import mil.nga.msi.ui.asam.AsamAction
 import mil.nga.msi.ui.asam.AsamViewModel
-import mil.nga.msi.ui.location.LocationTextButton
+import mil.nga.msi.ui.coordinate.CoordinateTextButton
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.BaseMapType
 import mil.nga.msi.ui.map.MapClip
@@ -132,7 +128,7 @@ private fun AsamHeader(
          }
 
          MapClip(
-            latLng = LatLng(asam.latitude, asam.longitude),
+            latLng = asam.latLng,
             tileProvider = tileProvider,
             baseMap = baseMap
          )
@@ -173,18 +169,18 @@ private fun AsamFooter(
       horizontalArrangement = Arrangement.SpaceBetween,
       modifier = Modifier.fillMaxWidth()
    ) {
-      AsamLocation(asam.dms, onCopyLocation)
+      AsamLocation(asam.latLng, onCopyLocation)
       AsamActions(onZoom, onShare)
    }
 }
 
 @Composable
 private fun AsamLocation(
-   dms: DMS,
+   latLng: LatLng,
    onCopyLocation: (String) -> Unit
 ) {
-   LocationTextButton(
-      dms = dms,
+   CoordinateTextButton(
+      latLng = latLng,
       onCopiedToClipboard = { onCopyLocation(it) }
    )
 }

@@ -48,7 +48,7 @@ data class Modu(
    var subregion: String? = null
 
    @Transient
-   val dms = DMS.from(LatLng(latitude, longitude))
+   val latLng = LatLng(latitude, longitude)
 
    override fun toString(): String {
       val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)

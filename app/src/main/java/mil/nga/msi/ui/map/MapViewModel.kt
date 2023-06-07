@@ -38,6 +38,7 @@ import mil.nga.msi.repository.navigationalwarning.NavigationalWarningKey
 import mil.nga.msi.repository.navigationalwarning.NavigationalWarningRepository
 import mil.nga.msi.repository.port.PortRepository
 import mil.nga.msi.repository.preferences.FilterRepository
+import mil.nga.msi.repository.preferences.MapRepository
 import mil.nga.msi.repository.preferences.SharedPreferencesRepository
 import mil.nga.msi.repository.preferences.UserPreferencesRepository
 import mil.nga.msi.repository.radiobeacon.RadioBeaconKey
@@ -66,6 +67,7 @@ enum class TileProviderType {
 class MapViewModel @Inject constructor(
    private val application: Application,
    private val layerService: LayerService,
+   private val mapRepository: MapRepository,
    private val filterRepository: FilterRepository,
    private val layerRepository: LayerRepository,
    private val geoPackageManager: GeoPackageManager,
@@ -100,6 +102,7 @@ class MapViewModel @Inject constructor(
    val showScale = userPreferencesRepository.showScale.asLiveData()
    val fetching = dataSourceRepository.fetching
    val mapped = userPreferencesRepository.mapped.asLiveData()
+   val coordinateSystem = mapRepository.coordinateSystem.asLiveData()
 
    private val _zoom = MutableLiveData<Int>()
 

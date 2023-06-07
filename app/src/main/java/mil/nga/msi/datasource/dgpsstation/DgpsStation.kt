@@ -82,7 +82,7 @@ data class DgpsStation(
    var sectionHeader: String = ""
 
    @Transient
-   val dms = DMS.from(LatLng(latitude, longitude))
+   val latLng = LatLng(latitude, longitude)
 
    fun information() = mapOf(
       "Number" to featureNumber,

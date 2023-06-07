@@ -26,7 +26,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.android.gms.maps.model.LatLng
@@ -34,7 +33,7 @@ import com.google.android.gms.maps.model.TileProvider
 import mil.nga.msi.coordinate.DMS
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.port.Port
-import mil.nga.msi.ui.location.LocationTextButton
+import mil.nga.msi.ui.coordinate.CoordinateTextButton
 import mil.nga.msi.ui.location.generalDirection
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.BaseMapType
@@ -207,18 +206,18 @@ private fun PortFooter(
       horizontalArrangement = Arrangement.SpaceBetween,
       modifier = Modifier.fillMaxWidth()
    ) {
-      PortLocation(port.dms, onCopyLocation)
+      PortLocation(port.latLng, onCopyLocation)
       PortActions(onZoom, onShare)
    }
 }
 
 @Composable
 private fun PortLocation(
-   dms: DMS,
+   latLng: LatLng,
    onCopyLocation: (String) -> Unit
 ) {
-   LocationTextButton(
-      dms = dms,
+   CoordinateTextButton(
+      latLng = latLng,
       onCopiedToClipboard = { onCopyLocation(it) }
    )
 }

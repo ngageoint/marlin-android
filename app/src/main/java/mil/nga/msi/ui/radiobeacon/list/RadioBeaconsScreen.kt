@@ -22,12 +22,13 @@ import androidx.paging.PagingData
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
+import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import mil.nga.msi.coordinate.DMS
 import mil.nga.msi.datasource.radiobeacon.RadioBeacon
 import mil.nga.msi.repository.radiobeacon.RadioBeaconKey
-import mil.nga.msi.ui.location.LocationTextButton
+import mil.nga.msi.ui.coordinate.CoordinateTextButton
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.navigation.NavPoint
 import mil.nga.msi.ui.radiobeacon.RadioBeaconAction
@@ -284,18 +285,18 @@ private fun RadioBeaconFooter(
          .fillMaxWidth()
          .padding(top = 8.dp)
    ) {
-      RadioBeaconLocation(beacon.dms, onCopyLocation)
+      RadioBeaconLocation(beacon.latLng, onCopyLocation)
       RadioBeaconActions(onShare, onZoom)
    }
 }
 
 @Composable
 private fun RadioBeaconLocation(
-   dms: DMS,
+   latLng: LatLng,
    onCopyLocation: (String) -> Unit
 ) {
-   LocationTextButton(
-      dms = dms,
+   CoordinateTextButton(
+      latLng = latLng,
       onCopiedToClipboard = { onCopyLocation(it) }
    )
 }

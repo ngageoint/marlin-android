@@ -24,4 +24,5 @@ message MapPreferences {
   bool showLocation = 8;
   map<string, bool> mapped = 10;
   bool showScale = 11;
+  string coordinateSystem = 12;
 }

@@ -41,6 +41,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import mil.nga.msi.R
+import mil.nga.msi.coordinate.CoordinateSystem
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.BaseMapType
 
@@ -58,6 +59,7 @@ fun MapSettingsScreen(
    val mgrs by viewModel.mgrs.observeAsState(false)
    val showLocation by viewModel.showLocation.observeAsState(false)
    val showScale by viewModel.showScale.observeAsState(false)
+   val coordinateSystem by viewModel.coordinateSystem.observeAsState()
 
    Column {
       TopBar(
@@ -86,15 +88,17 @@ fun MapSettingsScreen(
                onMgrsToggled = { viewModel.setMGRS(it) }
             )
 
-            Layers() { onLayers() }
+            Layers { onLayers() }
 
             DataSourceSettings(onLightSettings)
 
             DisplaySettings(
                showLocation = showLocation,
                showScale = showScale,
+               coordinateSystem = coordinateSystem,
                onShowLocationToggled = { viewModel.setShowLocation(it) },
-               onShowScaleToggled = { viewModel.setShowScale(it) }
+               onShowScaleToggled = { viewModel.setShowScale(it) },
+               onCoordinateSystemToggle = { viewModel.setCoordinateSystem(it) }
             )
          }
       }
@@ -349,9 +353,13 @@ private fun LightSettings(
 private fun DisplaySettings(
    showLocation: Boolean,
    showScale: Boolean,
+   coordinateSystem: CoordinateSystem?,
    onShowLocationToggled: (Boolean) -> Unit,
-   onShowScaleToggled: (Boolean) -> Unit
+   onShowScaleToggled: (Boolean) -> Unit,
+   onCoordinateSystemToggle: (CoordinateSystem) -> Unit
 ) {
+   var openCoordinateSystemDialog by remember { mutableStateOf(false) }
+
    val hasLocationPermission =
       ContextCompat.checkSelfPermission(LocalContext.current, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
       ContextCompat.checkSelfPermission(LocalContext.current, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
@@ -373,7 +381,7 @@ private fun DisplaySettings(
             modifier = Modifier
                .fillMaxWidth()
                .clickable { onShowLocationToggled(!showLocation) }
-               .padding(vertical = 8.dp, horizontal = 32.dp)
+               .padding(vertical = 16.dp, horizontal = 32.dp)
          ) {
             Column {
                Text(
@@ -423,6 +431,87 @@ private fun DisplaySettings(
                checked = showScale,
                onCheckedChange = null
             )
+         }
+
+         Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+               .fillMaxWidth()
+               .clickable { openCoordinateSystemDialog = true }
+               .padding(vertical = 16.dp, horizontal = 32.dp)
+         ) {
+            Column(
+               Modifier.weight(1f)
+            ) {
+               Text(
+                  text = "Coordinate System",
+                  style = MaterialTheme.typography.bodyLarge
+               )
+
+               CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+                  Text(
+                     text = coordinateSystem?.title ?: "",
+                     style = MaterialTheme.typography.bodyMedium
+                  )
+               }
+            }
+         }
+      }
+   }
+
+   if (openCoordinateSystemDialog) {
+      CoordinateSystemDialog(
+         coordinateSystem = coordinateSystem,
+         onCoordinateSystemSelected = {
+            onCoordinateSystemToggle(it)
+            openCoordinateSystemDialog = false
+         }
+      )
+   }
+}
+
+@Composable
+fun CoordinateSystemDialog(
+   coordinateSystem: CoordinateSystem?,
+   onCoordinateSystemSelected: (CoordinateSystem) -> Unit
+) {
+   Dialog(
+      onDismissRequest = {
+         coordinateSystem?.let { onCoordinateSystemSelected(it) }
+      }
+   ) {
+      Surface(
+         shape = RoundedCornerShape(4.dp)
+      ) {
+         Column(Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp)) {
+            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
+               Text(
+                  text = "Coordinate System",
+                  style = MaterialTheme.typography.titleLarge,
+                  modifier = Modifier
+                     .height(64.dp)
+                     .wrapContentHeight(align = Alignment.CenterVertically)
+               )
+            }
+
+            CoordinateSystem.values().forEach { row ->
+               Row(
+                  verticalAlignment = Alignment.CenterVertically,
+                  modifier = Modifier
+                     .fillMaxWidth()
+                     .clickable { onCoordinateSystemSelected(row) }
+               ) {
+                  RadioButton(
+                     selected = row == coordinateSystem,
+                     onClick = { onCoordinateSystemSelected(row) }
+                  )
+                  Text(
+                     text = row.title,
+                     modifier = Modifier.fillMaxWidth()
+                  )
+               }
+            }
          }
       }
    }

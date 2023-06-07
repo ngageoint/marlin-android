@@ -51,12 +51,12 @@ import com.google.maps.android.compose.widgets.ScaleBar
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import mil.nga.msi.R
-import mil.nga.msi.coordinate.DMS
+import mil.nga.msi.coordinate.CoordinateSystem
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.repository.geocoder.GeocoderState
 import mil.nga.msi.type.MapLocation
+import mil.nga.msi.ui.coordinate.CoordinateText
 import mil.nga.msi.ui.location.LocationPermission
-import mil.nga.msi.ui.location.LocationText
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.cluster.MapAnnotation
 import mil.nga.msi.ui.navigation.mainRouteFor
@@ -83,6 +83,7 @@ fun MapScreen(
    viewModel: MapViewModel = hiltViewModel()
 ) {
    val scope = rememberCoroutineScope()
+   val coordinateSystem by viewModel.coordinateSystem.observeAsState(CoordinateSystem.DMS)
    val showLocation by viewModel.showLocation.observeAsState(false)
    val showScale by viewModel.showScale.observeAsState(false)
    var searchExpanded by remember { mutableStateOf(false) }
@@ -165,7 +166,7 @@ fun MapScreen(
 
       if (showLocation && locationPermissionState.status.isGranted) {
          val text = location?.let {
-            "${String.format("%.5f", it.latitude)}, ${String.format("%.5f", it.longitude)}"
+            coordinateSystem.format(LatLng(it.latitude, it.longitude))
          }
          Surface(color = MaterialTheme.colorScheme.primary) {
             Row(
@@ -724,8 +725,8 @@ private fun Search(
                            )
                         }
 
-                        LocationText(
-                           dms = DMS.from(result.location),
+                        CoordinateText(
+                           latLng = LatLng(result.location.latitude, result.location.longitude),
                            onCopiedToClipboard = { onLocationCopy(it) }
                         )
                      }

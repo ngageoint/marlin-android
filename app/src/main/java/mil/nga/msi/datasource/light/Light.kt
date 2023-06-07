@@ -112,7 +112,7 @@ data class Light(
    var sectionHeader: String = ""
 
    @Transient
-   val dms = DMS.from(LatLng(latitude, longitude))
+   val latLng = LatLng(latitude, longitude)
 
    @Transient
    val isFogSignal = {

@@ -42,14 +42,14 @@ import androidx.paging.PagingData
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
+import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
-import mil.nga.msi.coordinate.DMS
 import mil.nga.msi.datasource.light.Light
 import mil.nga.msi.repository.light.LightKey
 import mil.nga.msi.ui.light.LightAction
 import mil.nga.msi.ui.light.LightRoute
-import mil.nga.msi.ui.location.LocationTextButton
+import mil.nga.msi.ui.coordinate.CoordinateTextButton
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.navigation.NavPoint
 
@@ -257,18 +257,18 @@ private fun LightFooter(
          .fillMaxWidth()
          .padding(top = 8.dp)
    ) {
-      LightLocation(light.dms, onCopyLocation)
+      LightLocation(light.latLng, onCopyLocation)
       LightActions(onShare, onZoom)
    }
 }
 
 @Composable
 private fun LightLocation(
-   dms: DMS,
+   latLng: LatLng,
    onCopyLocation: (String) -> Unit
 ) {
-   LocationTextButton(
-      dms = dms,
+   CoordinateTextButton(
+      latLng = latLng,
       onCopiedToClipboard = { onCopyLocation(it) }
    )
 }

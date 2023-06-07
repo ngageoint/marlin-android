@@ -46,7 +46,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.TileProvider
-import mil.nga.msi.coordinate.DMS
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.light.Light
 import mil.nga.msi.datasource.light.LightSector
@@ -54,7 +53,7 @@ import mil.nga.msi.repository.light.LightKey
 import mil.nga.msi.ui.light.LightAction
 import mil.nga.msi.ui.light.LightRoute
 import mil.nga.msi.ui.light.LightViewModel
-import mil.nga.msi.ui.location.LocationTextButton
+import mil.nga.msi.ui.coordinate.CoordinateTextButton
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.BaseMapType
 import mil.nga.msi.ui.map.MapClip
@@ -202,18 +201,18 @@ private fun LightFooter(
       horizontalArrangement = Arrangement.SpaceBetween,
       modifier = Modifier.fillMaxWidth()
    ) {
-      LightLocation(light.dms, onCopyLocation)
+      LightLocation(light.latLng, onCopyLocation)
       LightActions(onZoom, onShare)
    }
 }
 
 @Composable
 private fun LightLocation(
-   dms: DMS,
+   latLng: LatLng,
    onCopyLocation: (String) -> Unit
 ) {
-   LocationTextButton(
-      dms = dms,
+   CoordinateTextButton(
+      latLng = latLng,
       onCopiedToClipboard = { onCopyLocation(it) }
    )
 }
@@ -394,10 +393,7 @@ private fun LightDetail(
 
             val lightSectors = light.lightSectors
             if (lightSectors.isNotEmpty()) {
-               LightImage(
-                  lightSectors,
-                  arcWidth = 3.0
-               )
+               LightImage(lightSectors)
             }
          }
 
@@ -444,7 +440,6 @@ private fun LightDetail(
 @Composable
 private fun LightImage(
    sectors: List<LightSector>,
-   arcWidth: Double? = null
 ) {
    val strokeWidth = 6
    val sizeInPx = with(LocalDensity.current) { 100.dp.toPx() }
@@ -456,14 +451,12 @@ private fun LightImage(
          .width(100.dp)
          .height(100.dp)
    ) {
-      if (arcWidth != null) {
-         Canvas(modifier = Modifier.fillMaxSize()) {
-            drawCircle(
-               color = Color.LightGray,
-               radius = sizeInPx / 2,
-               style = Stroke(strokeWidth.toFloat())
-            )
-         }
+      Canvas(modifier = Modifier.fillMaxSize()) {
+         drawCircle(
+            color = Color.LightGray,
+            radius = sizeInPx / 2,
+            style = Stroke(strokeWidth.toFloat())
+         )
       }
 
       sectors.forEach { sector ->
@@ -486,7 +479,6 @@ private fun LightImage(
             )
          }
 
-
          sector.text?.let { text ->
             Canvas(modifier = Modifier.fillMaxSize()) {
                drawIntoCanvas {
@@ -496,7 +488,7 @@ private fun LightImage(
                      isAntiAlias = true
                      textSize = textSizeInPx
                      color = android.graphics.Color.BLACK
-                     typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD);
+                     typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
                   }
 
                   it.translate(

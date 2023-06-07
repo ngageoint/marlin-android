@@ -34,7 +34,7 @@ import com.google.android.gms.maps.model.TileProvider
 import mil.nga.msi.coordinate.DMS
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.modu.Modu
-import mil.nga.msi.ui.location.LocationTextButton
+import mil.nga.msi.ui.coordinate.CoordinateTextButton
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.BaseMapType
 import mil.nga.msi.ui.map.MapClip
@@ -161,18 +161,18 @@ private fun ModuFooter(
       horizontalArrangement = Arrangement.SpaceBetween,
       modifier = Modifier.fillMaxWidth()
    ) {
-      ModuLocation(modu.dms, onCopyLocation)
+      ModuLocation(modu.latLng, onCopyLocation)
       ModuActions(onZoom, onShare)
    }
 }
 
 @Composable
 private fun ModuLocation(
-   dms: DMS,
+   latLng: LatLng,
    onCopyLocation: (String) -> Unit,
 ) {
-   LocationTextButton(
-      dms = dms,
+   CoordinateTextButton(
+      latLng = latLng,
       onCopiedToClipboard = { onCopyLocation(it) }
    )
 }
