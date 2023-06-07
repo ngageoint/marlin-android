@@ -30,13 +30,11 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.TileProvider
-import mil.nga.msi.coordinate.DMS
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.port.Port
 import mil.nga.msi.ui.coordinate.CoordinateTextButton
 import mil.nga.msi.ui.location.generalDirection
 import mil.nga.msi.ui.main.TopBar
-import mil.nga.msi.ui.map.BaseMapType
 import mil.nga.msi.ui.map.MapClip
 import mil.nga.msi.ui.navigation.NavPoint
 import mil.nga.msi.ui.port.PortAction
@@ -56,7 +54,6 @@ fun PortDetailScreen(
    onAction: (PortAction) -> Unit,
    viewModel: PortViewModel = hiltViewModel()
 ) {
-   val baseMap by viewModel.baseMap.observeAsState()
    val location by viewModel.locationProvider.observeAsState()
    val port by viewModel.getPort(portNumber).observeAsState()
 
@@ -69,7 +66,6 @@ fun PortDetailScreen(
 
       PortDetailContent(
          port = port,
-         baseMap = baseMap,
          tileProvider = viewModel.tileProvider,
          location = location,
          onZoom = { onAction(PortAction.Zoom(it)) },
@@ -82,7 +78,6 @@ fun PortDetailScreen(
 @Composable
 private fun PortDetailContent(
    port: Port?,
-   baseMap: BaseMapType?,
    tileProvider: TileProvider,
    location: Location?,
    onZoom: (NavPoint) -> Unit,
@@ -101,7 +96,6 @@ private fun PortDetailContent(
          ) {
             PortHeader(
                port = port,
-               baseMap = baseMap,
                tileProvider = tileProvider,
                location = location,
                onZoom = onZoom,
@@ -117,7 +111,6 @@ private fun PortDetailContent(
 @Composable
 private fun PortHeader(
    port: Port,
-   baseMap: BaseMapType?,
    tileProvider: TileProvider,
    location: Location?,
    onZoom: (NavPoint) -> Unit,
@@ -140,7 +133,6 @@ private fun PortHeader(
 
          MapClip(
             latLng = LatLng(port.latitude, port.longitude),
-            baseMap = baseMap,
             tileProvider = tileProvider
          )
 

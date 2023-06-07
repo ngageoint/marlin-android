@@ -67,7 +67,6 @@ enum class TileProviderType {
 class MapViewModel @Inject constructor(
    private val application: Application,
    private val layerService: LayerService,
-   private val mapRepository: MapRepository,
    private val filterRepository: FilterRepository,
    private val layerRepository: LayerRepository,
    private val geoPackageManager: GeoPackageManager,
@@ -88,6 +87,7 @@ class MapViewModel @Inject constructor(
    dataSourceRepository: DataSourceRepository,
    val locationPolicy: LocationPolicy,
    private val preferencesRepository: SharedPreferencesRepository,
+   val mapRepository: MapRepository,
    val userPreferencesRepository: UserPreferencesRepository,
    val annotationProvider: AnnotationProvider,
    private val geocoderRemoteDataSource: GeocoderRemoteDataSource,
@@ -96,10 +96,10 @@ class MapViewModel @Inject constructor(
    @Named("garsTileProvider") private val garsTileProvider: TileProvider
 ): ViewModel() {
 
-   val baseMap = userPreferencesRepository.baseMapType.asLiveData()
-   val mapLocation = userPreferencesRepository.mapLocation.asLiveData()
-   val showLocation = userPreferencesRepository.showLocation.asLiveData()
-   val showScale = userPreferencesRepository.showScale.asLiveData()
+   val baseMap = mapRepository.baseMapType.asLiveData()
+   val mapLocation = mapRepository.mapLocation.asLiveData()
+   val showLocation = mapRepository.showLocation.asLiveData()
+   val showScale = mapRepository.showScale.asLiveData()
    val fetching = dataSourceRepository.fetching
    val mapped = userPreferencesRepository.mapped.asLiveData()
    val coordinateSystem = mapRepository.coordinateSystem.asLiveData()
@@ -108,7 +108,7 @@ class MapViewModel @Inject constructor(
 
    suspend fun setMapLocation(mapLocation: MapLocation, zoom: Int) {
       _zoom.value = zoom
-      userPreferencesRepository.setMapLocation(mapLocation)
+      mapRepository.setMapLocation(mapLocation)
    }
 
    private var asamTileProvider = AsamTileProvider(application, asamTileRepository)
@@ -142,7 +142,7 @@ class MapViewModel @Inject constructor(
       entry.values.fold(0) { count, filters -> count + filters.size }
    }.asLiveData()
 
-   val layers = combine(userPreferencesRepository.layers, layerRepository.observeVisibleLayers()) { order, layers ->
+   val layers = combine(mapRepository.layers, layerRepository.observeVisibleLayers()) { order, layers ->
       val orderById = order.withIndex().associate { (index, it) -> it to index }
       layers.sortedBy { orderById[it.id.toInt()] }
    }.transform { layers ->
@@ -180,13 +180,13 @@ class MapViewModel @Inject constructor(
    }.asLiveData()
 
    val tileProviders: LiveData<Map<TileProviderType, TileProvider>> = MediatorLiveData<Map<TileProviderType, TileProvider>>().apply {
-      addSource(userPreferencesRepository.mgrs.asLiveData()) { enabled ->
+      addSource(mapRepository.mgrs.asLiveData()) { enabled ->
          val providers = value?.toMutableMap() ?: mutableMapOf()
          if (enabled) providers[TileProviderType.MGRS] = mgrsTileProvider else providers.remove(TileProviderType.MGRS)
          value = providers
       }
 
-      addSource(userPreferencesRepository.gars.asLiveData()) { enabled ->
+      addSource(mapRepository.gars.asLiveData()) { enabled ->
          val providers = value?.toMutableMap() ?: mutableMapOf()
          if (enabled) providers[TileProviderType.GARS] = garsTileProvider else providers.remove(TileProviderType.GARS)
          value = providers

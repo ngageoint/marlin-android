@@ -31,12 +31,10 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.TileProvider
-import mil.nga.msi.coordinate.DMS
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.modu.Modu
 import mil.nga.msi.ui.coordinate.CoordinateTextButton
 import mil.nga.msi.ui.main.TopBar
-import mil.nga.msi.ui.map.BaseMapType
 import mil.nga.msi.ui.map.MapClip
 import mil.nga.msi.ui.modu.ModuAction
 import mil.nga.msi.ui.modu.ModuViewModel
@@ -53,7 +51,6 @@ fun ModuDetailScreen(
    viewModel: ModuViewModel = hiltViewModel()
 ) {
    val modu by viewModel.getModu(name).observeAsState()
-   val baseMap by viewModel.baseMap.observeAsState()
 
    Column {
       TopBar(
@@ -64,7 +61,6 @@ fun ModuDetailScreen(
 
       ModuDetailContent(
          modu = modu,
-         baseMap = baseMap,
          tileProvider = viewModel.tileProvider,
          onZoom = { modu?.let { onAction(ModuAction.Zoom(NavPoint(it.latitude, it.latitude))) } },
          onShare = { onAction(ModuAction.Share(modu.toString())) },
@@ -76,7 +72,6 @@ fun ModuDetailScreen(
 @Composable
 private fun ModuDetailContent(
    modu: Modu?,
-   baseMap: BaseMapType?,
    tileProvider: TileProvider,
    onZoom: () -> Unit,
    onShare: () -> Unit,
@@ -91,7 +86,7 @@ private fun ModuDetailContent(
                .padding(all = 8.dp)
                .verticalScroll(rememberScrollState())
          ) {
-            ModuHeader(modu, baseMap, tileProvider, onZoom, onShare, onCopyLocation)
+            ModuHeader(modu, tileProvider, onZoom, onShare, onCopyLocation)
             ModuInformation(modu)
          }
       }
@@ -101,7 +96,6 @@ private fun ModuDetailContent(
 @Composable
 private fun ModuHeader(
    modu: Modu,
-   baseMap: BaseMapType?,
    tileProvider: TileProvider,
    onZoom: () -> Unit,
    onShare: () -> Unit,
@@ -125,8 +119,7 @@ private fun ModuHeader(
 
          MapClip(
             latLng = LatLng(modu.latitude, modu.longitude),
-            tileProvider = tileProvider,
-            baseMap = baseMap
+            tileProvider = tileProvider
          )
 
          Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {

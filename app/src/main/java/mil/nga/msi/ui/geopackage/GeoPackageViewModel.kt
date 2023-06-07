@@ -4,7 +4,6 @@ import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.TileProvider
@@ -24,7 +23,6 @@ import mil.nga.geopackage.map.tiles.overlay.FeatureOverlay
 import mil.nga.msi.datasource.layer.Layer
 import mil.nga.msi.repository.geopackage.GeoPackageMediaKey
 import mil.nga.msi.repository.layer.LayerRepository
-import mil.nga.msi.repository.preferences.UserPreferencesRepository
 import mil.nga.sf.proj.GeometryTransform
 import javax.inject.Inject
 
@@ -58,11 +56,8 @@ class MediaProperty(
 class GeoPackageViewModel @Inject constructor(
    private val application: Application,
    private val repository: LayerRepository,
-   private val geoPackageManager: GeoPackageManager,
-   userPreferencesRepository: UserPreferencesRepository
+   private val geoPackageManager: GeoPackageManager
 ): ViewModel() {
-   val baseMap = userPreferencesRepository.baseMapType.asLiveData()
-
    private val _layer = MutableLiveData<Layer>()
    val layer: LiveData<Layer> = _layer
 

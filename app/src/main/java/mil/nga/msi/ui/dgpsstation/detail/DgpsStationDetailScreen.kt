@@ -38,7 +38,6 @@ import mil.nga.msi.ui.dgpsstation.DgpsStationAction
 import mil.nga.msi.ui.dgpsstation.DgpsStationViewModel
 import mil.nga.msi.ui.coordinate.CoordinateTextButton
 import mil.nga.msi.ui.main.TopBar
-import mil.nga.msi.ui.map.BaseMapType
 import mil.nga.msi.ui.map.MapClip
 import mil.nga.msi.ui.navigation.NavPoint
 import mil.nga.msi.ui.theme.onSurfaceDisabled
@@ -50,8 +49,8 @@ fun DgpsStationDetailScreen(
    onAction: (DgpsStationAction) -> Unit,
    viewModel: DgpsStationViewModel = hiltViewModel()
 ) {
-   val baseMap by viewModel.baseMap.observeAsState()
    val dgpsStation by viewModel.getDgpsStation(key.volumeNumber, key.featureNumber).observeAsState()
+
    Column {
       TopBar(
          title = dgpsStation?.name ?: "",
@@ -61,7 +60,6 @@ fun DgpsStationDetailScreen(
 
       RadioBeaconDetailContent(
          dgpsStation = dgpsStation,
-         baseMap = baseMap,
          tileProvider = viewModel.tileProvider,
          onZoom = { onAction(DgpsStationAction.Zoom(it)) },
          onShare = { onAction(DgpsStationAction.Share(it.toString())) },
@@ -73,7 +71,6 @@ fun DgpsStationDetailScreen(
 @Composable
 private fun RadioBeaconDetailContent(
    dgpsStation: DgpsStation?,
-   baseMap: BaseMapType?,
    tileProvider: TileProvider,
    onZoom: (NavPoint) -> Unit,
    onShare: (DgpsStation) -> Unit,
@@ -88,7 +85,7 @@ private fun RadioBeaconDetailContent(
                .padding(all = 8.dp)
                .verticalScroll(rememberScrollState())
          ) {
-            DgpsStationHeader(dgpsStation, baseMap, tileProvider, onZoom, onShare, onCopyLocation)
+            DgpsStationHeader(dgpsStation, tileProvider, onZoom, onShare, onCopyLocation)
             DgpsStationInformation(dgpsStation)
          }
       }
@@ -98,7 +95,6 @@ private fun RadioBeaconDetailContent(
 @Composable
 private fun DgpsStationHeader(
    dgpsStation: DgpsStation,
-   baseMap: BaseMapType?,
    tileProvider: TileProvider,
    onZoom: (NavPoint) -> Unit,
    onShare: (DgpsStation) -> Unit,
@@ -122,8 +118,7 @@ private fun DgpsStationHeader(
 
          MapClip(
             latLng = LatLng(dgpsStation.latitude, dgpsStation.longitude),
-            tileProvider = tileProvider,
-            baseMap = baseMap
+            tileProvider = tileProvider
          )
 
          Column(Modifier.padding(horizontal = 8.dp, vertical = 8.dp)) {

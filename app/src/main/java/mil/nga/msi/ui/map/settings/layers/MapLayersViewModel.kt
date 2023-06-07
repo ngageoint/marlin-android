@@ -10,8 +10,8 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import mil.nga.msi.datasource.layer.Layer
 import mil.nga.msi.repository.layer.LayerRepository
+import mil.nga.msi.repository.preferences.MapRepository
 import mil.nga.msi.repository.preferences.SharedPreferencesRepository
-import mil.nga.msi.repository.preferences.UserPreferencesRepository
 import javax.inject.Inject
 
 data class LayerState(
@@ -22,10 +22,10 @@ data class LayerState(
 @HiltViewModel
 class MapLayersViewModel @Inject constructor(
    private val layerRepository: LayerRepository,
-   private val userPreferencesRepository: UserPreferencesRepository,
+   private val mapRepository: MapRepository,
    private val sharedPreferencesRepository: SharedPreferencesRepository
 ): ViewModel() {
-   val layers = combine(userPreferencesRepository.layers, layerRepository.observeLayers()) { order, layers ->
+   val layers = combine(mapRepository.layers, layerRepository.observeLayers()) { order, layers ->
       val orderById = order.withIndex().associate { (index, it) -> it to index }
       layers
          .sortedBy { orderById[it.id.toInt()] }
@@ -46,7 +46,7 @@ class MapLayersViewModel @Inject constructor(
 
    fun setLayerOrder(layers: List<Int>) {
       viewModelScope.launch {
-         userPreferencesRepository.setLayers(layers)
+         mapRepository.setLayers(layers)
       }
    }
 

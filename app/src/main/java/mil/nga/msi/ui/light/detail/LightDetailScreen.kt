@@ -55,7 +55,6 @@ import mil.nga.msi.ui.light.LightRoute
 import mil.nga.msi.ui.light.LightViewModel
 import mil.nga.msi.ui.coordinate.CoordinateTextButton
 import mil.nga.msi.ui.main.TopBar
-import mil.nga.msi.ui.map.BaseMapType
 import mil.nga.msi.ui.map.MapClip
 import mil.nga.msi.ui.navigation.NavPoint
 import mil.nga.msi.ui.theme.onSurfaceDisabled
@@ -67,8 +66,8 @@ fun LightDetailScreen(
    onAction: (LightAction) -> Unit,
    viewModel: LightViewModel = hiltViewModel()
 ) {
-   val baseMap by viewModel.baseMap.observeAsState()
    val lights by viewModel.getLight(key.volumeNumber, key.featureNumber).observeAsState(emptyList())
+
    Column {
       TopBar(
          title = LightRoute.Detail.title,
@@ -78,7 +77,6 @@ fun LightDetailScreen(
 
       LightDetailContent(
          lights = lights,
-         baseMap = baseMap,
          tileProvider = viewModel.tileProvider,
          onZoom = { onAction(LightAction.Zoom(it)) },
          onShare = { onAction(LightAction.Share(it.toString())) },
@@ -90,7 +88,6 @@ fun LightDetailScreen(
 @Composable
 private fun LightDetailContent(
    lights: List<Light>,
-   baseMap: BaseMapType?,
    tileProvider: TileProvider,
    onZoom: (NavPoint) -> Unit,
    onShare: (Light) -> Unit,
@@ -105,7 +102,7 @@ private fun LightDetailContent(
                .padding(all = 8.dp)
                .verticalScroll(rememberScrollState())
          ) {
-            LightHeader(lights.first(), baseMap, tileProvider, onZoom, onShare, onCopyLocation)
+            LightHeader(lights.first(), tileProvider, onZoom, onShare, onCopyLocation)
             LightCharacteristics(lights.drop(0))
          }
       }
@@ -115,7 +112,6 @@ private fun LightDetailContent(
 @Composable
 private fun LightHeader(
    light: Light,
-   baseMap: BaseMapType?,
    lightTileProvider: TileProvider,
    onZoom: (NavPoint) -> Unit,
    onShare: (Light) -> Unit,
@@ -139,7 +135,6 @@ private fun LightHeader(
 
          MapClip(
             latLng = LatLng(light.latitude, light.longitude),
-            baseMap = baseMap,
             tileProvider = lightTileProvider
          )
 

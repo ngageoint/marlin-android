@@ -40,7 +40,6 @@ import mil.nga.msi.datasource.radiobeacon.RadioBeacon
 import mil.nga.msi.repository.radiobeacon.RadioBeaconKey
 import mil.nga.msi.ui.coordinate.CoordinateTextButton
 import mil.nga.msi.ui.main.TopBar
-import mil.nga.msi.ui.map.BaseMapType
 import mil.nga.msi.ui.map.MapClip
 import mil.nga.msi.ui.navigation.NavPoint
 import mil.nga.msi.ui.radiobeacon.RadioBeaconAction
@@ -55,8 +54,8 @@ fun RadioBeaconDetailScreen(
    onAction: (RadioBeaconAction) -> Unit,
    viewModel: RadioBeaconViewModel = hiltViewModel()
 ) {
-   val baseMap by viewModel.baseMap.observeAsState()
    val beacon by viewModel.getRadioBeacon(key.volumeNumber, key.featureNumber).observeAsState()
+
    Column {
       TopBar(
          title = RadioBeaconRoute.Detail.title,
@@ -66,7 +65,6 @@ fun RadioBeaconDetailScreen(
 
       RadioBeaconDetailContent(
          beacon = beacon,
-         baseMap = baseMap,
          tileProvider = viewModel.tileProvider,
          onZoom = { onAction(RadioBeaconAction.Zoom(it)) },
          onShare = { onAction(RadioBeaconAction.Share(it.toString())) },
@@ -78,7 +76,6 @@ fun RadioBeaconDetailScreen(
 @Composable
 private fun RadioBeaconDetailContent(
    beacon: RadioBeacon?,
-   baseMap: BaseMapType?,
    tileProvider: TileProvider,
    onZoom: (NavPoint) -> Unit,
    onShare: (RadioBeacon) -> Unit,
@@ -93,7 +90,7 @@ private fun RadioBeaconDetailContent(
                .padding(all = 8.dp)
                .verticalScroll(rememberScrollState())
          ) {
-            RadioBeaconHeader(beacon, baseMap, tileProvider, onZoom, onShare, onCopyLocation)
+            RadioBeaconHeader(beacon, tileProvider, onZoom, onShare, onCopyLocation)
             RadioBeaconInformation(beacon)
          }
       }
@@ -103,7 +100,6 @@ private fun RadioBeaconDetailContent(
 @Composable
 private fun RadioBeaconHeader(
    beacon: RadioBeacon,
-   baseMap: BaseMapType?,
    tileProvider: TileProvider,
    onZoom: (NavPoint) -> Unit,
    onShare: (RadioBeacon) -> Unit,
@@ -127,8 +123,7 @@ private fun RadioBeaconHeader(
 
          MapClip(
             latLng = LatLng(beacon.latitude, beacon.longitude),
-            baseMap = baseMap,
-             tileProvider = tileProvider
+            tileProvider = tileProvider
          )
 
          Column(Modifier.padding(horizontal = 8.dp, vertical = 8.dp)) {

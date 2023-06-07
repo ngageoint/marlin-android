@@ -7,14 +7,12 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import mil.nga.msi.coordinate.CoordinateSystem
 import mil.nga.msi.repository.preferences.MapRepository
-import mil.nga.msi.repository.preferences.UserPreferencesRepository
 import mil.nga.msi.ui.map.BaseMapType
 import javax.inject.Inject
 
 @HiltViewModel
 class MapSettingsViewModel @Inject constructor(
-   private val repository: UserPreferencesRepository,
-   private val mapRepository: MapRepository
+   private val repository: MapRepository
 ): ViewModel() {
    val baseMap = repository.baseMapType.asLiveData()
    fun setBaseLayer(baseMapType: BaseMapType) {
@@ -51,10 +49,10 @@ class MapSettingsViewModel @Inject constructor(
       }
    }
 
-   val coordinateSystem = mapRepository.coordinateSystem.asLiveData()
+   val coordinateSystem = repository.coordinateSystem.asLiveData()
    fun setCoordinateSystem(coordinateSystem: CoordinateSystem) {
       viewModelScope.launch {
-         mapRepository.setCoordinateSystem(coordinateSystem)
+         repository.setCoordinateSystem(coordinateSystem)
       }
    }
 }

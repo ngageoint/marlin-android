@@ -59,7 +59,6 @@ import mil.nga.msi.ui.geopackage.GeoPackageViewModel
 import mil.nga.msi.ui.geopackage.MediaProperty
 import mil.nga.msi.ui.coordinate.CoordinateTextButton
 import mil.nga.msi.ui.main.TopBar
-import mil.nga.msi.ui.map.BaseMapType
 import mil.nga.msi.ui.map.MapClip
 import mil.nga.msi.ui.navigation.NavPoint
 import java.text.SimpleDateFormat
@@ -73,7 +72,6 @@ fun GeoPackageFeatureDetailScreen(
    onAction: (GeoPackageFeatureAction) -> Unit,
    viewModel: GeoPackageViewModel = hiltViewModel()
 ) {
-   val baseMap by viewModel.baseMap.observeAsState()
    val tileProvider by viewModel.tileProvider.observeAsState()
    val featureState by viewModel.feature.observeAsState()
 
@@ -90,7 +88,6 @@ fun GeoPackageFeatureDetailScreen(
 
       FeatureDetailContent(
          feature = featureState,
-         baseMap = baseMap,
          tileProvider = tileProvider,
          onAction = onAction
       )
@@ -100,7 +97,6 @@ fun GeoPackageFeatureDetailScreen(
 @Composable
 private fun FeatureDetailContent(
    feature: Feature?,
-   baseMap: BaseMapType?,
    tileProvider: TileProvider?,
    onAction: (GeoPackageFeatureAction) -> Unit
 ) {
@@ -115,7 +111,6 @@ private fun FeatureDetailContent(
          ) {
             FeatureHeader(
                feature = feature,
-               baseMap = baseMap,
                tileProvider = tileProvider,
                onAction = onAction
             )
@@ -132,7 +127,6 @@ private fun FeatureDetailContent(
 @Composable
 private fun FeatureHeader(
    feature: Feature,
-   baseMap: BaseMapType?,
    tileProvider: TileProvider?,
    onAction: (GeoPackageFeatureAction) -> Unit
 ) {
@@ -142,8 +136,7 @@ private fun FeatureHeader(
       feature.latLng?.let { latLng ->
          MapClip(
             latLng = latLng,
-            tileProvider = tileProvider,
-            baseMap = baseMap
+            tileProvider = tileProvider
          )
       }
 

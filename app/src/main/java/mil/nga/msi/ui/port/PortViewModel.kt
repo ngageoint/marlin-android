@@ -8,7 +8,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import mil.nga.msi.datasource.port.Port
 import mil.nga.msi.location.LocationPolicy
 import mil.nga.msi.repository.port.PortRepository
-import mil.nga.msi.repository.preferences.UserPreferencesRepository
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -16,11 +15,9 @@ import javax.inject.Named
 class PortViewModel @Inject constructor(
    private val repository: PortRepository,
    locationPolicy: LocationPolicy,
-   @Named("portTileProvider") val tileProvider: TileProvider,
-   userPreferencesRepository: UserPreferencesRepository
+   @Named("portTileProvider") val tileProvider: TileProvider
 ): ViewModel() {
    val locationProvider = locationPolicy.bestLocationProvider
-   val baseMap = userPreferencesRepository.baseMapType.asLiveData()
 
    fun getPort(portNumber: Int): LiveData<Port> {
       return repository.observePort(portNumber).asLiveData()

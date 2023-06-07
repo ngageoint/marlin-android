@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.mapNotNull
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarning
 import mil.nga.msi.repository.navigationalwarning.NavigationalWarningKey
 import mil.nga.msi.repository.navigationalwarning.NavigationalWarningRepository
-import mil.nga.msi.repository.preferences.UserPreferencesRepository
+import mil.nga.msi.repository.preferences.MapRepository
 import mil.nga.msi.ui.map.MapShape
 import javax.inject.Inject
 
@@ -22,9 +22,9 @@ data class NavigationalWarningState(
 @HiltViewModel
 class NavigationalWarningViewModel @Inject constructor(
    private val repository: NavigationalWarningRepository,
-   userPreferencesRepository: UserPreferencesRepository
+   mapRepository: MapRepository
 ): ViewModel() {
-   val baseMap = userPreferencesRepository.baseMapType.asLiveData()
+   val baseMap = mapRepository.baseMapType.asLiveData()
 
    fun getNavigationalWarning(key: NavigationalWarningKey): LiveData<NavigationalWarningState> {
        return repository.observeNavigationalWarning(key).mapNotNull { warning ->

@@ -9,7 +9,7 @@ import kotlinx.coroutines.runBlocking
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.light.Light
 import mil.nga.msi.repository.map.LightTileRepository
-import mil.nga.msi.repository.preferences.UserPreferencesRepository
+import mil.nga.msi.repository.preferences.MapRepository
 import mil.nga.msi.ui.map.overlay.images.buoyImage
 import mil.nga.msi.ui.map.overlay.images.colorImage
 import mil.nga.msi.ui.map.overlay.images.colorRangeImage
@@ -29,7 +29,7 @@ class LightTileProvider @Inject constructor(
 
 class LightImage(
    private val light: Light,
-   private val userPreferencesRepository: UserPreferencesRepository
+   private val mapRepository: MapRepository
 ): DataSourceImage {
    override val dataSource = DataSource.LIGHT
    override val feature: Feature =
@@ -46,11 +46,11 @@ class LightImage(
       tileSize: Double
    ): List<Bitmap> {
       val showLightRanges = runBlocking {
-         userPreferencesRepository.showLightRanges.first()
+         mapRepository.showLightRanges.first()
       }
 
       val showSectorLightRanges = runBlocking {
-         userPreferencesRepository.showSectorLightRanges.first()
+         mapRepository.showSectorLightRanges.first()
       }
 
       val images = mutableListOf<Bitmap>()

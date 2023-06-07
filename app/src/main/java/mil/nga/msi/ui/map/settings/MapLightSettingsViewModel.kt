@@ -9,7 +9,7 @@ import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import mil.nga.msi.datasource.light.Light
-import mil.nga.msi.repository.preferences.UserPreferencesRepository
+import mil.nga.msi.repository.preferences.MapRepository
 import mil.nga.msi.ui.map.overlay.DataSourceImage
 import mil.nga.msi.ui.map.overlay.DataSourceTileProvider
 import mil.nga.msi.ui.map.overlay.LightImage
@@ -17,7 +17,7 @@ import mil.nga.msi.ui.map.overlay.TileRepository
 import javax.inject.Inject
 
 class LightTileRepository(
-   private val userPreferencesRepository: UserPreferencesRepository
+   private val mapRepository: MapRepository
 ): TileRepository {
    val lights = mutableListOf<Light>().apply {
       add(
@@ -64,7 +64,7 @@ class LightTileRepository(
          it.latitude in minLatitude..maxLatitude &&
          it.longitude in minLongitude..maxLongitude
       }.map {
-         LightImage(it, userPreferencesRepository)
+         LightImage(it, mapRepository)
       }
    }
 }
@@ -77,37 +77,37 @@ class LightTileProvider(
 @HiltViewModel
 class MapLightSettingsViewModel @Inject constructor(
    val application: Application,
-   val userPreferencesRepository: UserPreferencesRepository
+   val mapRepository: MapRepository
 ): ViewModel() {
 
-   private val lightTileRepository = LightTileRepository(userPreferencesRepository)
+   private val lightTileRepository = LightTileRepository(mapRepository)
 
-   val baseMap = userPreferencesRepository.baseMapType.asLiveData()
+   val baseMap = mapRepository.baseMapType.asLiveData()
    val center = lightTileRepository.lights.first().run { LatLng(latitude, longitude)  }
-   val showLightRanges = userPreferencesRepository.showLightRanges.asLiveData()
-   val showSectorLightRanges = userPreferencesRepository.showSectorLightRanges.asLiveData()
+   val showLightRanges = mapRepository.showLightRanges.asLiveData()
+   val showSectorLightRanges = mapRepository.showSectorLightRanges.asLiveData()
 
    val lightTileProvider = MediatorLiveData<LightTileProvider>().apply {
       value = LightTileProvider(application, lightTileRepository)
 
-      addSource(userPreferencesRepository.showLightRanges.asLiveData()) {
+      addSource(mapRepository.showLightRanges.asLiveData()) {
          value = LightTileProvider(application, lightTileRepository)
       }
 
-      addSource(userPreferencesRepository.showSectorLightRanges.asLiveData()) {
+      addSource(mapRepository.showSectorLightRanges.asLiveData()) {
          value = LightTileProvider(application, lightTileRepository)
       }
    }
 
    fun setShowLightRanges(enabled: Boolean) {
       viewModelScope.launch {
-         userPreferencesRepository.setShowLightRanges(enabled)
+         mapRepository.setShowLightRanges(enabled)
       }
    }
 
    fun setShowSectorLightRanges(enabled: Boolean) {
       viewModelScope.launch {
-         userPreferencesRepository.setShowSectorLightRanges(enabled)
+         mapRepository.setShowSectorLightRanges(enabled)
       }
    }
 }

@@ -24,11 +24,11 @@ import mil.nga.msi.R
 @Composable
 fun MapClip(
    latLng: LatLng,
-   baseMap: BaseMapType?,
    tileProvider: TileProvider? = null,
    viewModel: MapViewModel = hiltViewModel()
 ) {
 
+   val baseMap by viewModel.baseMap.observeAsState()
    val layers by viewModel.layers.observeAsState()
    val tileProviders by viewModel.tileProviders.observeAsState()
    val mgrsTileProvider = tileProviders?.get(TileProviderType.MGRS)

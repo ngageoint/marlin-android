@@ -37,7 +37,6 @@ import mil.nga.msi.ui.asam.AsamAction
 import mil.nga.msi.ui.asam.AsamViewModel
 import mil.nga.msi.ui.coordinate.CoordinateTextButton
 import mil.nga.msi.ui.main.TopBar
-import mil.nga.msi.ui.map.BaseMapType
 import mil.nga.msi.ui.map.MapClip
 import mil.nga.msi.ui.navigation.NavPoint
 import java.text.SimpleDateFormat
@@ -50,8 +49,8 @@ fun AsamDetailScreen(
    onAction: (AsamAction) -> Unit,
    viewModel: AsamViewModel = hiltViewModel()
 ) {
-   val baseMap by viewModel.baseMap.observeAsState()
    val asam by viewModel.getAsam(reference).observeAsState()
+
    Column {
       TopBar(
          title = "ASAM",
@@ -61,7 +60,6 @@ fun AsamDetailScreen(
 
       AsamDetailContent(
          asam = asam,
-         baseMap = baseMap,
          tileProvider = viewModel.tileProvider,
          onZoom = { onAction(AsamAction.Zoom(it)) },
          onShare = { onAction(AsamAction.Share(asam.toString())) },
@@ -73,7 +71,6 @@ fun AsamDetailScreen(
 @Composable
 private fun AsamDetailContent(
    asam: Asam?,
-   baseMap: BaseMapType?,
    tileProvider: TileProvider,
    onZoom: (NavPoint) -> Unit,
    onShare: () -> Unit,
@@ -90,7 +87,6 @@ private fun AsamDetailContent(
          ) {
             AsamHeader(
                asam = asam,
-               baseMap = baseMap,
                tileProvider = tileProvider,
                onZoom = onZoom,
                onShare = onShare,
@@ -106,7 +102,6 @@ private fun AsamDetailContent(
 @Composable
 private fun AsamHeader(
    asam: Asam,
-   baseMap: BaseMapType?,
    tileProvider: TileProvider,
    onZoom: (NavPoint) -> Unit,
    onShare: () -> Unit,
@@ -129,8 +124,7 @@ private fun AsamHeader(
 
          MapClip(
             latLng = asam.latLng,
-            tileProvider = tileProvider,
-            baseMap = baseMap
+            tileProvider = tileProvider
          )
 
          Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
