@@ -1,5 +1,6 @@
 package mil.nga.msi.ui.asam.list
 
+import android.util.Log
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
@@ -51,24 +52,36 @@ class AsamsViewModel @Inject constructor(
       }
    }
 
-   val asams = queryParameters.switchMap { pair ->
-      val filters = pair.first
-      val sort = pair.second
-      Pager(PagingConfig(pageSize = 20), null) {
-         asamRepository.observeAsamListItems(filters, sort?.parameters ?: emptyList())
-      }.liveData
-   }.asFlow().map { pagingData ->
-      pagingData
-         .map { AsamListItem.AsamItem(it) }
-         .insertSeparators { item1: AsamListItem.AsamItem?, item2: AsamListItem.AsamItem? ->
-            val section = queryParameters.value?.second?.section ?: false
-            val primarySortParameter = queryParameters.value?.second?.parameters?.firstOrNull()
+val asams = queryParameters.switchMap { (filters, sort) ->
+   Log.i("billy", "queryParameters filters $filters")
+   Log.i("billy", "queryParameters sort $sort")
 
-            if (section && primarySortParameter != null) {
-               header(primarySortParameter, item1, item2)
-            } else null
-         }
-   }.cachedIn(viewModelScope)
+   Pager(
+      config = PagingConfig(pageSize = 20),
+      initialKey = null,
+      pagingSourceFactory = {
+         asamRepository.observeAsamListItems(filters, sort?.parameters ?: emptyList())
+      }
+   ).liveData
+}.asFlow().map { pagingData ->
+   Log.i("billy", "got paging data $pagingData")
+   pagingData
+      .map {
+         Log.i("billy", "map the asam to an item")
+         AsamListItem.AsamItem(it)
+      }
+      .insertSeparators { item1: AsamListItem.AsamItem?, item2: AsamListItem.AsamItem? ->
+         Log.i("billy", "insertSeparators item1 $item1")
+         Log.i("billy", "insertSeparators item2 $item2")
+
+         val section = queryParameters.value?.second?.section ?: false
+         val primarySortParameter = queryParameters.value?.second?.parameters?.firstOrNull()
+
+         if (section && primarySortParameter != null) {
+            header(primarySortParameter, item1, item2)
+         } else null
+      }
+}.cachedIn(viewModelScope)
 
    val asamFilters = filterRepository.filters.map { entry ->
       entry[DataSource.ASAM] ?: emptyList()

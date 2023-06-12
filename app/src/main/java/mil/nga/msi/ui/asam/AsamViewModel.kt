@@ -13,7 +13,6 @@ import javax.inject.Named
 class AsamViewModel @Inject constructor(
    private val repository: AsamRepository,
    @Named("asamTileProvider") val tileProvider: TileProvider
-
 ): ViewModel() {
    fun getAsam(id: String): LiveData<Asam> {
       return repository.observeAsam(id)

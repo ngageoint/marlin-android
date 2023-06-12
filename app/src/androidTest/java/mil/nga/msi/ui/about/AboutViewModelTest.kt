@@ -1,7 +1,5 @@
 package mil.nga.msi.ui.about
 
-import io.mockk.coEvery
-import io.mockk.every
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.test.runTest
@@ -30,5 +28,18 @@ class AboutViewModelTest {
       viewModel.setDeveloperMode()
 
       verify(mockRepository).setDeveloperMode()
+   }
+
+   @Test
+   fun testSetShowNoLocationWarnings() = runTest {
+      val mockRepository = mock<UserPreferencesRepository>()
+      Mockito.`when`(mockRepository.developer()).thenReturn(emptyFlow())
+
+      val viewModel = AboutViewModel(mockRepository)
+      viewModel.setShowNoLocationNavigationWarnings(true)
+      viewModel.setShowNoLocationNavigationWarnings(false)
+
+      verify(mockRepository).setShowNoLocationNavigationWarnings(true)
+      verify(mockRepository).setShowNoLocationNavigationWarnings(false)
    }
 }
