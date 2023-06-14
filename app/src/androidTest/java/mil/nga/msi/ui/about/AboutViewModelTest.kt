@@ -1,7 +1,5 @@
 package mil.nga.msi.ui.about
 
-import io.mockk.coEvery
-import io.mockk.every
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.test.runTest

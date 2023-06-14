@@ -45,7 +45,7 @@ class NavigationalWarningRepository @Inject constructor(
          val remoteWarnings = remoteDataSource.fetchNavigationalWarnings()
 
          val fetched = userPreferencesRepository.fetched(DataSource.NAVIGATION_WARNING)
-         if (fetched == null) {
+         if (fetched != null) {
             val newWarnings = remoteWarnings.subtract(localDataSource.existingNavigationalWarnings(remoteWarnings.map { it.id }).toSet()).toList()
             notification.navigationWarning(newWarnings)
          }
