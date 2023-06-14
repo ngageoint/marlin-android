@@ -93,7 +93,6 @@ android {
 
     buildFeatures {
         compose true
-        viewBinding true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.4.3"
@@ -218,6 +217,8 @@ dependencies {
 
     implementation("com.google.android.gms:play-services-oss-licenses:17.0.1")
 
+    implementation "androidx.tracing:tracing:1.1.0"
+
     testImplementation libs.junit4
     testImplementation project(':testing')
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
@@ -237,4 +238,9 @@ dependencies {
     androidTestImplementation 'com.linkedin.dexmaker:dexmaker-mockito-inline:2.28.3'
     androidTestImplementation "org.mockito.kotlin:mockito-kotlin:3.2.0"
     androidTestImplementation "io.mockk:mockk:1.4.1"
+    androidTestImplementation 'androidx.paging:paging-testing:3.2.0-beta01'
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4:$compose_version")
+    androidTestImplementation 'com.google.dagger:hilt-android-testing:2.44'
+    kaptAndroidTest 'com.google.dagger:hilt-android-compiler:2.44'
+    androidTestAnnotationProcessor 'com.google.dagger:hilt-android-compiler:2.44'
 }

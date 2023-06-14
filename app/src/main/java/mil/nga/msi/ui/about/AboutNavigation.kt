@@ -37,7 +37,7 @@ fun NavGraphBuilder.settingsGraph(
          val context = LocalContext.current
 
          AboutScreen(
-            close = { navController.popBackStack() },
+            onClose = { navController.popBackStack() },
             onDisclaimer = {
                navController.navigate(AboutRoute.Disclaimer.name)
             },

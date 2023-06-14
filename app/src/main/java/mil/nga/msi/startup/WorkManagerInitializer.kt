@@ -1,6 +1,7 @@
 package mil.nga.msi.startup
 
 import android.content.Context
+import android.util.Log
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.startup.Initializer
 import androidx.work.Configuration
@@ -14,7 +15,10 @@ class WorkManagerInitializer : Initializer<WorkManager> {
 
    override fun create(context: Context): WorkManager {
       // Inject Hilt dependencies
-      AppInitializer.resolve(context).inject(this)
+      Log.i("Billy", "work manager factory create")
+      val initializer = AppInitializer.resolve(context)
+      Log.i("Billy", "work manager initializer $initializer")
+      initializer.inject(this)
 
       val configuration = Configuration.Builder()
          .setWorkerFactory(workerFactory)

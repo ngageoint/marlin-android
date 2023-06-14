@@ -39,6 +39,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.drawable.toBitmap
@@ -51,7 +53,7 @@ import mil.nga.msi.ui.main.TopBar
 
 @Composable
 fun AboutScreen(
-   close: () -> Unit,
+   onClose: () -> Unit,
    onDisclaimer: () -> Unit,
    onContact: () -> Unit,
    viewModel: AboutViewModel = hiltViewModel()
@@ -62,7 +64,7 @@ fun AboutScreen(
       TopBar(
          title = AboutRoute.Main.title,
          navigationIcon = Icons.Filled.Close,
-         onNavigationClicked = { close() }
+         onNavigationClicked = { onClose() }
       )
 
       About(
@@ -139,6 +141,7 @@ private fun Disclaimer(
             .fillMaxWidth()
             .clickable { onTap() }
             .padding(horizontal = 16.dp)
+            .semantics { testTag = "disclaimer_column" }
       ) {
          Row(
             verticalAlignment = Alignment.CenterVertically
@@ -207,6 +210,7 @@ private fun Contact(
             .fillMaxWidth()
             .clickable { onTap() }
             .padding(horizontal = 16.dp)
+            .semantics { testTag = "contact_column" }
       ) {
          Row(
             verticalAlignment = Alignment.CenterVertically
@@ -252,6 +256,7 @@ private fun Version(
                }
             }
             .padding(horizontal = 16.dp)
+            .semantics { testTag = "version_column" }
       ) {
          Row(
             verticalAlignment = Alignment.CenterVertically
@@ -295,7 +300,9 @@ private fun NavigationWarning(
    showNoLocationNavigationWarnings: Boolean,
    onShowNoLocationNavigationWarnings: (Boolean) -> Unit,
 ) {
-   Surface {
+   Surface(
+      Modifier.semantics { testTag = "navigation_warning_surface" }
+   ) {
       Column(
          verticalArrangement = Arrangement.Center,
          modifier = Modifier.fillMaxWidth()
