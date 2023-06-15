@@ -70,7 +70,7 @@ class RadioBeaconRepository @Inject constructor(
          PublicationVolume.values().forEach { volume ->
             val beacons = remoteDataSource.fetchRadioBeacons(volume)
 
-            if (fetched == null) {
+            if (fetched != null) {
                newBeacons.addAll(beacons.subtract(localDataSource.existingRadioBeacons(beacons.map { it.compositeKey() }).toSet()).toList())
             }
 

@@ -71,7 +71,7 @@ class DgpsStationRepository @Inject constructor(
          PublicationVolume.values().forEach { volume ->
             val stations = remoteDataSource.fetchDgpsStations(volume)
 
-            if (fetched == null) {
+            if (fetched != null) {
                newStations.addAll(stations.subtract(localDataSource.existingDgpsStations(stations.map { it.compositeKey() }).toSet()).toList())
             }
 

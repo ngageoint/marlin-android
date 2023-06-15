@@ -60,7 +60,7 @@ class PortRepository @Inject constructor(
          val ports = remoteDataSource.fetchPorts()
 
          val fetched = userPreferencesRepository.fetched(DataSource.PORT)
-         if (fetched == null) {
+         if (fetched != null) {
             val newPorts = ports.subtract(localDataSource.existingPorts(ports.map { it.portNumber }).toSet()).toList()
             notification.port(newPorts)
          }

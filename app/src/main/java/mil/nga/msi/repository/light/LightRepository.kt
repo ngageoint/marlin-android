@@ -80,7 +80,7 @@ class LightRepository @Inject constructor(
          PublicationVolume.values().forEach { volume ->
             val lights = remoteDataSource.fetchLights(volume)
 
-            if (fetched == null) {
+            if (fetched != null) {
                newLights.addAll(lights.subtract(localDataSource.existingLights(lights.map { it.compositeKey() }).toSet()).toList())
             }
 
