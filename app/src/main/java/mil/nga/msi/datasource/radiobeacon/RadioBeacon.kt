@@ -188,7 +188,7 @@ data class RadioBeacon(
    }
 
    override fun toString(): String {
-      return "LIGHT\n\n" +
+      return "Radio Beacon\n\n" +
          "aidType: ${aidType.orEmpty()}\n" +
          "characteristic: ${characteristic.orEmpty()}\n" +
          "deleteFlag: ${deleteFlag.orEmpty()}\n" +

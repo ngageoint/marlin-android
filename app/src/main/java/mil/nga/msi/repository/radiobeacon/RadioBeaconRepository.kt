@@ -65,7 +65,7 @@ class RadioBeaconRepository @Inject constructor(
    suspend fun fetchRadioBeacons(refresh: Boolean = false): List<RadioBeacon> {
       if (refresh) {
          val newBeacons = mutableListOf<RadioBeacon>()
-         val fetched = userPreferencesRepository.fetched(DataSource.ASAM)
+         val fetched = userPreferencesRepository.fetched(DataSource.RADIO_BEACON)
 
          PublicationVolume.values().forEach { volume ->
             val beacons = remoteDataSource.fetchRadioBeacons(volume)
