@@ -22,6 +22,5 @@ class AsamLocalDataSource @Inject constructor(
 
    suspend fun existingAsams(references: List<String>) = dao.getAsams(references)
 
-
    suspend fun insert(asams: List<Asam>) = dao.insert(asams)
 }

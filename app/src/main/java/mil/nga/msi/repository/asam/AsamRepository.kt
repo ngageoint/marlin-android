@@ -1,6 +1,5 @@
 package mil.nga.msi.repository.asam
 
-import android.util.Log
 import androidx.lifecycle.map
 import androidx.paging.PagingSource
 import androidx.work.WorkInfo
@@ -65,7 +64,7 @@ class AsamRepository @Inject constructor(
          val asams = remoteDataSource.fetchAsams()
 
          val fetched = userPreferencesRepository.fetched(DataSource.ASAM)
-         if (fetched == null) {
+         if (fetched != null) {
             val newAsams = asams.subtract(localDataSource.existingAsams(asams.map { it.reference }).toSet()).toList()
             notification.asam(newAsams)
          }
