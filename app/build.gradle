@@ -169,17 +169,17 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-runtime-compose:2.6.1'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1'
     implementation "androidx.lifecycle:lifecycle-service:2.6.1"
-    implementation 'androidx.activity:activity-compose:1.7.1'
-    implementation 'androidx.navigation:navigation-compose:2.5.3'
-    implementation('androidx.paging:paging-runtime-ktx:3.1.1')
-    implementation("androidx.paging:paging-compose:1.0.0-alpha20")
+    implementation 'androidx.activity:activity-compose:1.7.2'
+    implementation 'androidx.navigation:navigation-compose:2.6.0'
+    implementation 'androidx.paging:paging-runtime-ktx:3.1.1'
+    implementation "androidx.paging:paging-compose:3.2.0-beta01"
     implementation "androidx.compose.runtime:runtime-livedata:$compose_version"
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.9.0'
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.6.1'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1'
-    implementation 'androidx.navigation:navigation-fragment-ktx:2.5.3'
-    implementation 'androidx.navigation:navigation-ui-ktx:2.5.3'
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.6.0'
+    implementation 'androidx.navigation:navigation-ui-ktx:2.6.0'
 
     implementation 'com.google.protobuf:protobuf-javalite:3.23.0'
     implementation 'androidx.datastore:datastore-preferences:1.0.0'
@@ -193,7 +193,7 @@ dependencies {
     implementation 'mil.nga.gars:gars-android:1.2.2'
     implementation 'mil.nga.mgrs:mgrs-android:2.2.2'
 
-    implementation("io.coil-kt:coil-compose:2.2.2")
+    implementation "io.coil-kt:coil-compose:2.2.2"
 
     implementation 'com.google.android.gms:play-services-location:21.0.1'
 
@@ -215,7 +215,7 @@ dependencies {
     implementation "com.google.accompanist:accompanist-permissions:$accompanist_version"
     implementation "com.google.accompanist:accompanist-webview:$accompanist_version"
 
-    implementation("com.google.android.gms:play-services-oss-licenses:17.0.1")
+    implementation "com.google.android.gms:play-services-oss-licenses:17.0.1"
 
     implementation "androidx.tracing:tracing:1.1.0"
 
@@ -228,7 +228,6 @@ dependencies {
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_version"
 
-
     testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4'
     testImplementation 'org.mockito:mockito-core:5.3.1'
     testImplementation 'org.mockito:mockito-inline:5.2.0'
@@ -240,8 +239,9 @@ dependencies {
     androidTestImplementation "org.mockito.kotlin:mockito-kotlin:3.2.0"
     androidTestImplementation "io.mockk:mockk:1.4.1"
     androidTestImplementation 'androidx.paging:paging-testing:3.2.0-beta01'
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4:$compose_version")
+    androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
     androidTestImplementation 'com.google.dagger:hilt-android-testing:2.44'
-    kaptAndroidTest 'com.google.dagger:hilt-android-compiler:2.44'
-    androidTestAnnotationProcessor 'com.google.dagger:hilt-android-compiler:2.44'
+    androidTestImplementation "androidx.work:work-testing:$work_version"
+    kaptAndroidTest "com.google.dagger:hilt-android-compiler:hilt_version"
+    androidTestAnnotationProcessor "com.google.dagger:hilt-android-compiler:hilt_version"
 }
