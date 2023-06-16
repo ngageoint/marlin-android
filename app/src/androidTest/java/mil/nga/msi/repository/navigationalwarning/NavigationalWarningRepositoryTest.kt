@@ -1,15 +1,21 @@
 package mil.nga.msi.repository.navigationalwarning
 
+import androidx.lifecycle.asFlow
 import androidx.lifecycle.asLiveData
+import androidx.work.Data
+import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mil.nga.msi.MarlinNotification
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.navigationwarning.NavigationArea
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarning
 import mil.nga.msi.repository.preferences.UserPreferencesRepository
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito
@@ -19,6 +25,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import java.time.Instant
 import java.util.Date
+import java.util.UUID
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class NavigationalWarningRepositoryTest {
@@ -146,5 +153,61 @@ class NavigationalWarningRepositoryTest {
       viewModel.fetchNavigationalWarnings(refresh = true)
 
       verify(localDataSource).insert(remoteWarnings)
+   }
+
+   @Test
+   fun should_be_fetching_if_work_is_running() = runTest {
+      val workManager = mock<WorkManager>()
+      `when`(workManager.getWorkInfosForUniqueWorkLiveData(Mockito.any())).thenAnswer {
+         val workInfo = WorkInfo(
+            UUID.randomUUID(),
+            WorkInfo.State.RUNNING,
+            Data(emptyMap<String, String>()),
+            emptyList(),
+            Data(emptyMap<String, String>()),
+            0,
+            0
+         )
+         flowOf(listOf(workInfo)).asLiveData()
+      }
+
+      val viewModel = NavigationalWarningRepository(
+         workManager = workManager,
+         localDataSource = mock(),
+         remoteDataSource = mock(),
+         notification = mock(),
+         userPreferencesRepository = mock()
+      )
+
+      val fetching = viewModel.fetching.asFlow().first()
+      Assert.assertEquals(true, fetching)
+   }
+
+   @Test
+   fun should_not_be_fetching_if_work_is_not_running() = runTest {
+      val workManager = mock<WorkManager>()
+      `when`(workManager.getWorkInfosForUniqueWorkLiveData(Mockito.any())).thenAnswer {
+         val workInfo = WorkInfo(
+            UUID.randomUUID(),
+            WorkInfo.State.SUCCEEDED,
+            Data(emptyMap<String, String>()),
+            emptyList(),
+            Data(emptyMap<String, String>()),
+            0,
+            0
+         )
+         flowOf(listOf(workInfo)).asLiveData()
+      }
+
+      val viewModel = NavigationalWarningRepository(
+         workManager = workManager,
+         localDataSource = mock(),
+         remoteDataSource = mock(),
+         notification = mock(),
+         userPreferencesRepository = mock()
+      )
+
+      val fetching = viewModel.fetching.asFlow().first()
+      Assert.assertEquals(false, fetching)
    }
 }
