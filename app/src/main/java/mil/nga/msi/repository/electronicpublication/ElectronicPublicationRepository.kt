@@ -15,7 +15,6 @@ import mil.nga.msi.datasource.electronicpublication.ElectronicPublicationType
 import java.io.File
 import javax.inject.Inject
 
-
 class ElectronicPublicationRepository @Inject constructor(
     private val localData: ElectronicPublicationLocalDataSource,
     private val downloadManager: DownloadManager,
@@ -42,16 +41,13 @@ class ElectronicPublicationRepository @Inject constructor(
         }
     }
 
-    suspend fun removeDownload(ePub: ElectronicPublication) {
-        if (ePub.localDownloadId == null) {
-            return
+    suspend fun removeDownload(publication: ElectronicPublication) {
+        publication.localDownloadId?.let { downloadId ->
+            localData.updateToRemoveDownload(publication) { downloadManager.remove(downloadId) }
         }
-        localData.updateToRemoveDownload(ePub, { downloadManager.remove(ePub.localDownloadId) })
     }
 
-    suspend fun cancelDownload(ePub: ElectronicPublication) {
-        removeDownload(ePub)
-    }
+    suspend fun cancelDownload(publication: ElectronicPublication) = removeDownload(publication)
 
     /**
      * Query the downloads in progress and update their status in the local database.  The
@@ -61,11 +57,11 @@ class ElectronicPublicationRepository @Inject constructor(
     suspend fun updateDownloadProgress() {
         localData.updateDownloadProgress() { downloadingEPubs ->
             val ePubsByDownloadId = downloadingEPubs.associateBy { it.localDownloadId }
-            val downloadIds = downloadingEPubs.map({ it.localDownloadId!! })
+            val downloadIds = downloadingEPubs.map { it.localDownloadId!! }
             val downloadIdsArray = LongArray(downloadIds.size)
             downloadIds.forEachIndexed { pos, id -> downloadIdsArray[pos] = id }
             var downloadQuery = DownloadManager.Query()
-            if (downloadIds.size > 0) {
+            if (downloadIds.isNotEmpty()) {
                 downloadQuery = downloadQuery.setFilterById(*downloadIdsArray)
             }
             val downloads = downloadManager.query(downloadQuery)
@@ -86,7 +82,7 @@ class ElectronicPublicationRepository @Inject constructor(
                         val bytes = downloads.getLong(colBytes)
                         val mediaType = downloads.getString(colMediaType)
                         val localUri = downloads.getString(colLocalUri)
-                        Log.d("ElectronicPublicationRepository", "downloading publication ${remoteUri} to ${localUri}")
+                        Log.d("ElectronicPublicationRepository", "downloading publication $remoteUri to $localUri")
                         ePubsByDownloadId[downloadId]?.let { downloadingEPub ->
                             val update = when (status) {
                                 DownloadManager.STATUS_FAILED -> downloadingEPub.copy(
