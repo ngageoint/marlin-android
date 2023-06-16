@@ -11,25 +11,24 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.flow.emptyFlow
 import mil.nga.msi.type.Developer
 import mil.nga.msi.ui.theme.MsiTheme
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
+import org.mockito.MockitoAnnotations
 
 @HiltAndroidTest
 class AboutComposeTest {
 
-//   @get:Rule(order = 0)
-//   var hiltRule = HiltAndroidRule(this)
-
-   @get:Rule(order = 1)
+   @get:Rule
    val composeRule = createComposeRule()
 
-//   @Before
-//   fun setup() {
-//      hiltRule.inject()
-//   }
+   @Before
+   fun setup() {
+      MockitoAnnotations.openMocks(this)
+   }
 
    @Test
    fun navigation_warning_should_be_hidden() {

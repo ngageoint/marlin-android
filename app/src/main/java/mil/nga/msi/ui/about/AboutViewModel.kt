@@ -1,5 +1,6 @@
 package mil.nga.msi.ui.about
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
@@ -16,6 +17,7 @@ class AboutViewModel @Inject constructor(
 
    fun setDeveloperMode() {
       viewModelScope.launch {
+         Log.i("Billy", "set developer mode on mock repo")
          userPreferencesRepository.setDeveloperMode()
       }
    }
