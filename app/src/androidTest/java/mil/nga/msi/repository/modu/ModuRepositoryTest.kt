@@ -2,9 +2,15 @@ package mil.nga.msi.repository.modu
 
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.asLiveData
+import androidx.paging.testing.asPagingSourceFactory
 import androidx.work.Data
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.first
@@ -12,29 +18,16 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mil.nga.msi.MarlinNotification
 import mil.nga.msi.datasource.DataSource
-import mil.nga.msi.datasource.asam.Asam
 import mil.nga.msi.datasource.modu.Modu
 import mil.nga.msi.repository.preferences.UserPreferencesRepository
 import org.junit.Assert
-import org.junit.Before
 import org.junit.Test
-import org.mockito.Mockito
-import org.mockito.Mockito.`when`
-import org.mockito.MockitoAnnotations
-import org.mockito.kotlin.any
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
 import java.time.Instant
 import java.util.Date
 import java.util.UUID
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ModuRepositoryTest {
-
-   @Before
-   fun setup() {
-      MockitoAnnotations.openMocks(this)
-   }
 
    @Test
    fun should_notify_new_modus() = runTest {
@@ -48,36 +41,40 @@ class ModuRepositoryTest {
          Modu("1", Date(), 0.0, 0.0)
       )
 
-      val workManager = mock<WorkManager>()
-      `when`(workManager.getWorkInfosForUniqueWorkLiveData(Mockito.any())).thenAnswer {
-         emptyFlow<Boolean>().asLiveData()
-      }
+      val workManager = mockk<WorkManager>()
+      every {
+         workManager.getWorkInfosForUniqueWorkLiveData(any())
+      } returns emptyFlow<List<WorkInfo>>().asLiveData()
 
-      val localDataSource = mock<ModuLocalDataSource>()
-      `when`(localDataSource.insert(Mockito.anyList())).thenAnswer { Unit }
-      `when`(localDataSource.existingModus(Mockito.anyList())).thenAnswer { localModus }
-      `when`(localDataSource.getModus()).thenAnswer { localModus }
+      val localDataSource = mockk<ModuLocalDataSource>()
+      coEvery { localDataSource.insert(any()) } returns Unit
+      coEvery { localDataSource.existingModus(any()) } returns localModus
+      coEvery { localDataSource.getModus() } returns localModus
+      coEvery { localDataSource.observeModus() } answers { flowOf(emptyList()) }
 
-      val remoteDataSource = mock<ModuRemoteDataSource>()
-      `when`(remoteDataSource.fetchModus()).thenAnswer { remoteModus }
+      val remoteDataSource = mockk<ModuRemoteDataSource>()
+      coEvery { remoteDataSource.fetchModus() } returns remoteModus
 
-      val notification = mock<MarlinNotification>()
+      val notification = mockk<MarlinNotification>()
+      every { notification.modu(any()) } returns Unit
 
-      val userPreferencesRepository = mock<UserPreferencesRepository>()
-      `when`(userPreferencesRepository.fetched(DataSource.MODU)).thenAnswer { Instant.now() }
+      val userPreferencesRepository = mockk<UserPreferencesRepository>()
+      coEvery { userPreferencesRepository.fetched(DataSource.MODU) } returns Instant.now()
 
       val viewModel = ModuRepository(
          workManager = workManager,
          localDataSource = localDataSource,
          remoteDataSource = remoteDataSource,
          notification = notification,
-         filterRepository = mock(),
+         filterRepository = mockk(),
          userPreferencesRepository = userPreferencesRepository
       )
 
       viewModel.fetchModus(refresh = true)
 
-      verify(notification).modu(remoteModus.minus(localModus.toSet()))
+      verify {
+         notification.modu(remoteModus.minus(localModus.toSet()))
+      }
    }
 
    @Test
@@ -88,40 +85,46 @@ class ModuRepositoryTest {
          Modu("3", Date(), 0.0, 0.0)
       )
 
-      val workManager = mock<WorkManager>()
-      `when`(workManager.getWorkInfosForUniqueWorkLiveData(Mockito.any())).thenAnswer {
-         emptyFlow<Boolean>().asLiveData()
-      }
+      val workManager = mockk<WorkManager>()
+      coEvery {
+         workManager.getWorkInfosForUniqueWorkLiveData(any())
+      } returns emptyFlow<List<WorkInfo>>().asLiveData()
 
-      val localDataSource = mock<ModuLocalDataSource>()
-      `when`(localDataSource.insert(Mockito.anyList())).thenAnswer { Unit }
-      `when`(localDataSource.existingModus(Mockito.anyList())).thenAnswer { emptyList<Modu>() }
-      `when`(localDataSource.getModus()).thenAnswer { emptyList<Modu>() }
 
-      val remoteDataSource = mock<ModuRemoteDataSource>()
-      `when`(remoteDataSource.fetchModus()).thenAnswer { remoteModus }
+      val localDataSource = mockk<ModuLocalDataSource>()
+      coEvery { localDataSource.insert(any()) } returns Unit
+      coEvery { localDataSource.existingModus(any()) } returns emptyList()
+      coEvery { localDataSource.getModus() } returns emptyList()
+      coEvery { localDataSource.observeModus() } answers { flowOf(emptyList()) }
 
-      val userPreferencesRepository = mock<UserPreferencesRepository>()
-      `when`(userPreferencesRepository.fetched(DataSource.MODU)).thenAnswer { null }
+      val remoteDataSource = mockk<ModuRemoteDataSource>()
+      coEvery { remoteDataSource.fetchModus() } returns remoteModus
+
+      val userPreferencesRepository = mockk<UserPreferencesRepository>()
+      coEvery { userPreferencesRepository.fetched(DataSource.MODU) } returns null
 
       val viewModel = ModuRepository(
          workManager = workManager,
          localDataSource = localDataSource,
          remoteDataSource = remoteDataSource,
-         notification = mock(),
-         filterRepository = mock(),
+         notification = mockk(),
+         filterRepository = mockk(),
          userPreferencesRepository = userPreferencesRepository
       )
 
       viewModel.fetchModus(refresh = true)
 
-      verify(localDataSource).insert(remoteModus)
+      coVerify {
+         localDataSource.insert(remoteModus)
+      }
    }
 
    @Test
    fun should_be_fetching_if_work_is_running() = runTest {
-      val workManager = mock<WorkManager>()
-      `when`(workManager.getWorkInfosForUniqueWorkLiveData(Mockito.any())).thenAnswer {
+      val workManager = mockk<WorkManager>()
+      coEvery {
+         workManager.getWorkInfosForUniqueWorkLiveData(any())
+      } answers  {
          val workInfo = WorkInfo(
             UUID.randomUUID(),
             WorkInfo.State.RUNNING,
@@ -134,13 +137,16 @@ class ModuRepositoryTest {
          flowOf(listOf(workInfo)).asLiveData()
       }
 
+      val localDataSource = mockk<ModuLocalDataSource>()
+      coEvery { localDataSource.observeModus() } answers { flowOf(emptyList()) }
+
       val viewModel = ModuRepository(
          workManager = workManager,
-         localDataSource = mock(),
-         remoteDataSource = mock(),
-         notification = mock(),
-         filterRepository = mock(),
-         userPreferencesRepository = mock()
+         localDataSource = localDataSource,
+         remoteDataSource = mockk(),
+         notification = mockk(),
+         filterRepository = mockk(),
+         userPreferencesRepository = mockk()
       )
 
       val fetching = viewModel.fetching.asFlow().first()
@@ -149,8 +155,10 @@ class ModuRepositoryTest {
 
    @Test
    fun should_not_be_fetching_if_work_is_not_running() = runTest {
-      val workManager = mock<WorkManager>()
-      `when`(workManager.getWorkInfosForUniqueWorkLiveData(Mockito.any())).thenAnswer {
+      val workManager = mockk<WorkManager>()
+      coEvery {
+         workManager.getWorkInfosForUniqueWorkLiveData(any())
+      } answers {
          val workInfo = WorkInfo(
             UUID.randomUUID(),
             WorkInfo.State.SUCCEEDED,
@@ -163,13 +171,16 @@ class ModuRepositoryTest {
          flowOf(listOf(workInfo)).asLiveData()
       }
 
+      val localDataSource = mockk<ModuLocalDataSource>()
+      coEvery { localDataSource.observeModus() } answers { flowOf(emptyList()) }
+
       val viewModel = ModuRepository(
          workManager = workManager,
-         localDataSource = mock(),
-         remoteDataSource = mock(),
-         notification = mock(),
-         filterRepository = mock(),
-         userPreferencesRepository = mock()
+         localDataSource = localDataSource,
+         remoteDataSource = mockk(),
+         notification = mockk(),
+         filterRepository = mockk(),
+         userPreferencesRepository = mockk()
       )
 
       val fetching = viewModel.fetching.asFlow().first()

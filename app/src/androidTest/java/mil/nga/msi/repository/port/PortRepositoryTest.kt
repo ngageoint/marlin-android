@@ -2,9 +2,16 @@ package mil.nga.msi.repository.port
 
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.asLiveData
+import androidx.paging.testing.asPagingSourceFactory
 import androidx.work.Data
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
+import io.mockk.clearAllMocks
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.first
@@ -12,26 +19,20 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mil.nga.msi.MarlinNotification
 import mil.nga.msi.datasource.DataSource
-import mil.nga.msi.datasource.modu.Modu
 import mil.nga.msi.datasource.port.Port
 import mil.nga.msi.repository.preferences.UserPreferencesRepository
+import org.junit.After
 import org.junit.Assert
-import org.junit.Before
 import org.junit.Test
-import org.mockito.Mockito
-import org.mockito.Mockito.`when`
-import org.mockito.MockitoAnnotations
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
 import java.time.Instant
 import java.util.UUID
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class PortRepositoryTest {
 
-   @Before
-   fun setup() {
-      MockitoAnnotations.openMocks(this)
+   @After
+   fun tearDown() {
+      clearAllMocks()
    }
 
    @Test
@@ -46,36 +47,43 @@ class PortRepositoryTest {
          Port(1, "1", 0.0, 0.0)
       )
 
-      val workManager = mock<WorkManager>()
-      `when`(workManager.getWorkInfosForUniqueWorkLiveData(Mockito.any())).thenAnswer {
-         emptyFlow<Boolean>().asLiveData()
+      val workManager = mockk<WorkManager>()
+      every {
+         workManager.getWorkInfosForUniqueWorkLiveData(any())
+      } returns emptyFlow<List<WorkInfo>>().asLiveData()
+
+      val localDataSource = mockk<PortLocalDataSource>()
+      coEvery { localDataSource.insert(any()) } returns Unit
+      coEvery { localDataSource.existingPorts(any()) } returns localPorts
+      coEvery { localDataSource.getPorts() } returns localPorts
+      val scope = this
+      coEvery { localDataSource.observePortListItems(any()) } answers {
+         flowOf(emptyList<Port>()).asPagingSourceFactory(scope)()
       }
 
-      val localDataSource = mock<PortLocalDataSource>()
-      `when`(localDataSource.insert(Mockito.anyList())).thenAnswer { Unit }
-      `when`(localDataSource.existingPorts(Mockito.anyList())).thenAnswer { localPorts }
-      `when`(localDataSource.getPorts()).thenAnswer { localPorts }
+      val remoteDataSource = mockk<PortRemoteDataSource>()
+      coEvery { remoteDataSource.fetchPorts() } returns remotePorts
 
-      val remoteDataSource = mock<PortRemoteDataSource>()
-      `when`(remoteDataSource.fetchPorts()).thenAnswer { remotePorts }
+      val notification = mockk<MarlinNotification>()
+      every { notification.port(any()) } returns Unit
 
-      val notification = mock<MarlinNotification>()
-
-      val userPreferencesRepository = mock<UserPreferencesRepository>()
-      `when`(userPreferencesRepository.fetched(DataSource.PORT)).thenAnswer { Instant.now() }
+      val userPreferencesRepository = mockk<UserPreferencesRepository>()
+      coEvery { userPreferencesRepository.fetched(DataSource.PORT) } returns Instant.now()
 
       val viewModel = PortRepository(
          workManager = workManager,
          localDataSource = localDataSource,
          remoteDataSource = remoteDataSource,
          notification = notification,
-         filterRepository = mock(),
+         filterRepository = mockk(),
          userPreferencesRepository = userPreferencesRepository
       )
 
       viewModel.fetchPorts(refresh = true)
 
-      verify(notification).port(remotePorts.minus(localPorts.toSet()))
+      verify {
+         notification.port(remotePorts.minus(localPorts.toSet()))
+      }
    }
 
    @Test
@@ -86,40 +94,49 @@ class PortRepositoryTest {
          Port(3, "3", 0.0, 0.0)
       )
 
-      val workManager = mock<WorkManager>()
-      `when`(workManager.getWorkInfosForUniqueWorkLiveData(Mockito.any())).thenAnswer {
-         emptyFlow<Boolean>().asLiveData()
+      val workManager = mockk<WorkManager>()
+      coEvery {
+         workManager.getWorkInfosForUniqueWorkLiveData(any())
+      } returns emptyFlow<List<WorkInfo>>().asLiveData()
+
+
+      val localDataSource = mockk<PortLocalDataSource>()
+      coEvery { localDataSource.insert(any()) } returns Unit
+      coEvery { localDataSource.existingPorts(any()) } returns emptyList()
+      coEvery { localDataSource.getPorts() } returns emptyList()
+      val scope = this
+      coEvery { localDataSource.observePortListItems(any()) } answers {
+         flowOf(emptyList<Port>()).asPagingSourceFactory(scope)()
       }
 
-      val localDataSource = mock<PortLocalDataSource>()
-      `when`(localDataSource.insert(Mockito.anyList())).thenAnswer { Unit }
-      `when`(localDataSource.existingPorts(Mockito.anyList())).thenAnswer { emptyList<Modu>() }
-      `when`(localDataSource.getPorts()).thenAnswer { emptyList<Modu>() }
+      val remoteDataSource = mockk<PortRemoteDataSource>()
+      coEvery { remoteDataSource.fetchPorts() } returns remotePorts
 
-      val remoteDataSource = mock<PortRemoteDataSource>()
-      `when`(remoteDataSource.fetchPorts()).thenAnswer { remotePorts }
-
-      val userPreferencesRepository = mock<UserPreferencesRepository>()
-      `when`(userPreferencesRepository.fetched(DataSource.PORT)).thenAnswer { null }
+      val userPreferencesRepository = mockk<UserPreferencesRepository>()
+      coEvery { userPreferencesRepository.fetched(DataSource.PORT) } returns null
 
       val viewModel = PortRepository(
          workManager = workManager,
          localDataSource = localDataSource,
          remoteDataSource = remoteDataSource,
-         notification = mock(),
-         filterRepository = mock(),
+         notification = mockk(),
+         filterRepository = mockk(),
          userPreferencesRepository = userPreferencesRepository
       )
 
       viewModel.fetchPorts(refresh = true)
 
-      verify(localDataSource).insert(remotePorts)
+      coVerify {
+         localDataSource.insert(remotePorts)
+      }
    }
 
    @Test
    fun should_be_fetching_if_work_is_running() = runTest {
-      val workManager = mock<WorkManager>()
-      `when`(workManager.getWorkInfosForUniqueWorkLiveData(Mockito.any())).thenAnswer {
+      val workManager = mockk<WorkManager>()
+      coEvery {
+         workManager.getWorkInfosForUniqueWorkLiveData(any())
+      } answers  {
          val workInfo = WorkInfo(
             UUID.randomUUID(),
             WorkInfo.State.RUNNING,
@@ -132,13 +149,19 @@ class PortRepositoryTest {
          flowOf(listOf(workInfo)).asLiveData()
       }
 
+      val scope = this
+      val localDataSource = mockk<PortLocalDataSource>()
+      coEvery { localDataSource.observePortListItems(any()) } answers {
+         flowOf(emptyList<Port>()).asPagingSourceFactory(scope)()
+      }
+
       val viewModel = PortRepository(
          workManager = workManager,
-         localDataSource = mock(),
-         remoteDataSource = mock(),
-         notification = mock(),
-         filterRepository = mock(),
-         userPreferencesRepository = mock()
+         localDataSource = localDataSource,
+         remoteDataSource = mockk(),
+         notification = mockk(),
+         filterRepository = mockk(),
+         userPreferencesRepository = mockk()
       )
 
       val fetching = viewModel.fetching.asFlow().first()
@@ -147,8 +170,10 @@ class PortRepositoryTest {
 
    @Test
    fun should_not_be_fetching_if_work_is_not_running() = runTest {
-      val workManager = mock<WorkManager>()
-      `when`(workManager.getWorkInfosForUniqueWorkLiveData(Mockito.any())).thenAnswer {
+      val workManager = mockk<WorkManager>()
+      coEvery {
+         workManager.getWorkInfosForUniqueWorkLiveData(any())
+      } answers {
          val workInfo = WorkInfo(
             UUID.randomUUID(),
             WorkInfo.State.SUCCEEDED,
@@ -161,13 +186,19 @@ class PortRepositoryTest {
          flowOf(listOf(workInfo)).asLiveData()
       }
 
+      val scope = this
+      val localDataSource = mockk<PortLocalDataSource>()
+      coEvery { localDataSource.observePortListItems(any()) } answers {
+         flowOf(emptyList<Port>()).asPagingSourceFactory(scope)()
+      }
+
       val viewModel = PortRepository(
          workManager = workManager,
-         localDataSource = mock(),
-         remoteDataSource = mock(),
-         notification = mock(),
-         filterRepository = mock(),
-         userPreferencesRepository = mock()
+         localDataSource = localDataSource,
+         remoteDataSource = mockk(),
+         notification = mockk(),
+         filterRepository = mockk(),
+         userPreferencesRepository = mockk()
       )
 
       val fetching = viewModel.fetching.asFlow().first()

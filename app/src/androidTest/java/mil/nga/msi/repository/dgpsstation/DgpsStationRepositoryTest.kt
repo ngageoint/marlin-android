@@ -1,11 +1,17 @@
 package mil.nga.msi.repository.dgpsstation
 
-import android.util.Log
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.asLiveData
+import androidx.paging.testing.asPagingSourceFactory
 import androidx.work.Data
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
+import io.mockk.clearAllMocks
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.first
@@ -16,31 +22,24 @@ import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.dgpsstation.DgpsStation
 import mil.nga.msi.datasource.light.PublicationVolume
 import mil.nga.msi.repository.preferences.UserPreferencesRepository
+import org.junit.After
 import org.junit.Assert
-import org.junit.Before
 import org.junit.Test
-import org.mockito.Mockito
-import org.mockito.Mockito.anyList
-import org.mockito.kotlin.any
-import org.mockito.Mockito.`when`
-import org.mockito.MockitoAnnotations
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.times
-import org.mockito.kotlin.verify
 import java.time.Instant
-import java.util.Date
 import java.util.UUID
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class DgpsStationRepositoryTest {
 
-   @Before
-   fun setup() {
-      MockitoAnnotations.openMocks(this)
+   @After
+   fun tearDown() {
+      clearAllMocks()
    }
 
    @Test
    fun should_notify_new_stations() = runTest {
+      val scope = this
+
       val remoteStations = listOf(
          DgpsStation("1", "1", 1f, "01", "2023", 0.0, 0.0),
          DgpsStation("2", "2", 2f, "01", "2023", 0.0, 0.0),
@@ -51,30 +50,34 @@ class DgpsStationRepositoryTest {
          DgpsStation("1", "1", 1f, "01", "2023", 0.0, 0.0)
       )
 
-      val workManager = mock<WorkManager>()
-      `when`(workManager.getWorkInfosForUniqueWorkLiveData(Mockito.any())).thenAnswer {
-         emptyFlow<Boolean>().asLiveData()
+      val workManager = mockk<WorkManager>()
+      every {
+         workManager.getWorkInfosForUniqueWorkLiveData(any())
+      } returns emptyFlow<List<WorkInfo>>().asLiveData()
+
+      val localDataSource = mockk<DgpsStationLocalDataSource>()
+      coEvery { localDataSource.insert(any()) } returns Unit
+      coEvery { localDataSource.existingDgpsStations(any()) } returns localStations
+      coEvery { localDataSource.getDgpsStations() } returns localStations
+      coEvery { localDataSource.observeDgpsStationListItems(any()) } answers {
+         flowOf(emptyList<DgpsStation>()).asPagingSourceFactory(scope)()
       }
 
-      val localDataSource = mock<DgpsStationLocalDataSource>()
-      `when`(localDataSource.insert(remoteStations)).thenAnswer { Unit }
-      `when`(localDataSource.existingDgpsStations(anyList())).thenAnswer { localStations }
-      `when`(localDataSource.getDgpsStations()).thenAnswer { localStations }
+      val remoteDataSource = mockk<DgpsStationRemoteDataSource>()
+      coEvery { remoteDataSource.fetchDgpsStations(any()) } returns remoteStations
 
-      val remoteDataSource = mock<DgpsStationRemoteDataSource>()
-      `when`(remoteDataSource.fetchDgpsStations(any())).thenAnswer { remoteStations }
+      val notification = mockk<MarlinNotification>()
+      every { notification.dgpsStation(any()) } returns Unit
 
-      val notification = mock<MarlinNotification>()
-
-      val userPreferencesRepository = mock<UserPreferencesRepository>()
-      `when`(userPreferencesRepository.fetched(DataSource.DGPS_STATION)).thenAnswer { Instant.now() }
+      val userPreferencesRepository = mockk<UserPreferencesRepository>()
+      coEvery { userPreferencesRepository.fetched(DataSource.DGPS_STATION) } returns Instant.now()
 
       val viewModel = DgpsStationRepository(
          workManager = workManager,
          localDataSource = localDataSource,
          remoteDataSource = remoteDataSource,
          notification = notification,
-         filterRepository = mock(),
+         filterRepository = mockk(),
          userPreferencesRepository = userPreferencesRepository
       )
 
@@ -84,7 +87,9 @@ class DgpsStationRepositoryTest {
          remoteStations.minus(localStations.toSet())
       }
 
-      verify(notification).dgpsStation(difference)
+      verify {
+         notification.dgpsStation(difference)
+      }
    }
 
    @Test
@@ -95,40 +100,48 @@ class DgpsStationRepositoryTest {
          DgpsStation("3", "3", 3f, "01", "2023", 0.0, 0.0)
       )
 
-      val workManager = mock<WorkManager>()
-      `when`(workManager.getWorkInfosForUniqueWorkLiveData(Mockito.any())).thenAnswer {
-         emptyFlow<Boolean>().asLiveData()
-      }
+      val workManager = mockk<WorkManager>()
+      coEvery {
+         workManager.getWorkInfosForUniqueWorkLiveData(any())
+      } returns emptyFlow<List<WorkInfo>>().asLiveData()
 
-      val localDataSource = mock<DgpsStationLocalDataSource>()
-      `when`(localDataSource.insert(remoteStations)).thenAnswer { Unit }
-      `when`(localDataSource.existingDgpsStations(anyList())).thenAnswer { emptyList<DgpsStation>() }
-      `when`(localDataSource.getDgpsStations()).thenAnswer { emptyList<DgpsStation>() }
 
-      val remoteDataSource = mock<DgpsStationRemoteDataSource>()
-      `when`(remoteDataSource.fetchDgpsStations(any())).thenAnswer { remoteStations }
+      val localDataSource = mockk<DgpsStationLocalDataSource>()
+      coEvery { localDataSource.insert(any()) } returns Unit
+      coEvery { localDataSource.existingDgpsStations(any()) } returns emptyList()
+      coEvery { localDataSource.getDgpsStations() } returns emptyList()
 
-      val userPreferencesRepository = mock<UserPreferencesRepository>()
-      `when`(userPreferencesRepository.fetched(DataSource.DGPS_STATION)).thenAnswer { null }
+      val remoteDataSource = mockk<DgpsStationRemoteDataSource>()
+      coEvery { remoteDataSource.fetchDgpsStations(any()) } returns remoteStations
+
+      val notification = mockk<MarlinNotification>()
+      every { notification.dgpsStation(any()) } returns Unit
+
+      val userPreferencesRepository = mockk<UserPreferencesRepository>()
+      coEvery { userPreferencesRepository.fetched(DataSource.DGPS_STATION) } returns null
 
       val viewModel = DgpsStationRepository(
          workManager = workManager,
          localDataSource = localDataSource,
          remoteDataSource = remoteDataSource,
-         notification = mock(),
-         filterRepository = mock(),
+         notification = notification,
+         filterRepository = mockk(),
          userPreferencesRepository = userPreferencesRepository
       )
 
       viewModel.fetchDgpsStations(refresh = true)
 
-      verify(localDataSource, times(PublicationVolume.values().size)).insert(remoteStations)
+      coVerify(exactly = PublicationVolume.values().size) {
+         localDataSource.insert(remoteStations)
+      }
    }
 
    @Test
    fun should_be_fetching_if_work_is_running() = runTest {
-      val workManager = mock<WorkManager>()
-      `when`(workManager.getWorkInfosForUniqueWorkLiveData(Mockito.any())).thenAnswer {
+      val workManager = mockk<WorkManager>()
+      coEvery {
+         workManager.getWorkInfosForUniqueWorkLiveData(any())
+      } answers  {
          val workInfo = WorkInfo(
             UUID.randomUUID(),
             WorkInfo.State.RUNNING,
@@ -143,11 +156,11 @@ class DgpsStationRepositoryTest {
 
       val viewModel = DgpsStationRepository(
          workManager = workManager,
-         localDataSource = mock(),
-         remoteDataSource = mock(),
-         notification = mock(),
-         filterRepository = mock(),
-         userPreferencesRepository = mock()
+         localDataSource = mockk(),
+         remoteDataSource = mockk(),
+         notification = mockk(),
+         filterRepository = mockk(),
+         userPreferencesRepository = mockk()
       )
 
       val fetching = viewModel.fetching.asFlow().first()
@@ -156,8 +169,10 @@ class DgpsStationRepositoryTest {
 
    @Test
    fun should_not_be_fetching_if_work_is_not_running() = runTest {
-      val workManager = mock<WorkManager>()
-      `when`(workManager.getWorkInfosForUniqueWorkLiveData(Mockito.any())).thenAnswer {
+      val workManager = mockk<WorkManager>()
+      coEvery {
+         workManager.getWorkInfosForUniqueWorkLiveData(any())
+      } answers {
          val workInfo = WorkInfo(
             UUID.randomUUID(),
             WorkInfo.State.SUCCEEDED,
@@ -172,11 +187,11 @@ class DgpsStationRepositoryTest {
 
       val viewModel = DgpsStationRepository(
          workManager = workManager,
-         localDataSource = mock(),
-         remoteDataSource = mock(),
-         notification = mock(),
-         filterRepository = mock(),
-         userPreferencesRepository = mock()
+         localDataSource = mockk(),
+         remoteDataSource = mockk(),
+         notification = mockk(),
+         filterRepository = mockk(),
+         userPreferencesRepository = mockk()
       )
 
       val fetching = viewModel.fetching.asFlow().first()

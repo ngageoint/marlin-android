@@ -19,6 +19,7 @@ class LoadAsamWorker @AssistedInject constructor(
 ) : CoroutineWorker(context, params) {
    override suspend fun doWork(): Result = try {
       if (dataSource.isEmpty()) {
+
          context.assets.open("asam.json").use { input ->
             val reader = JsonReader(InputStreamReader(input))
             val asams = AsamsTypeAdapter().read(reader).asams

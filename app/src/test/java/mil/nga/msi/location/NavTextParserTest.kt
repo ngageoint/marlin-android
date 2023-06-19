@@ -2,51 +2,9 @@ package mil.nga.msi.location
 
 import mil.nga.msi.coordinate.WGS84
 import org.junit.Assert
-import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.mockito.MockitoAnnotations
-import org.mockito.junit.MockitoJUnitRunner
 
-@RunWith(MockitoJUnitRunner::class)
 class NavTextParserTest {
-
-   @Before
-   fun setup() {
-      MockitoAnnotations.openMocks(this)
-   }
-
-   @Test
-   fun testMap() {
-      val things = listOf(
-         listOf("odd" to 1, "even" to 2, "odd" to 3),
-         listOf("even" to 4, "odd" to 5, "even" to 6),
-         listOf("odd" to 7, "even" to 8, "odd" to 9)
-      )
-
-      val all = things.flatten()
-
-      val listOfMaps= things.map { inner ->
-         inner.groupBy { it.first }
-      }
-
-      val flattened = listOfMaps
-         .flatMap { it.asSequence() }
-         .associate { it.key to it.value }
-
-
-      val result = listOfMaps
-         .asSequence()
-         .flatMap { it.asSequence() }
-         .groupBy({ it.key }, { it.value })
-
-      val map = listOfMaps
-         .flatMap { it.entries }
-         .groupBy { it.key }
-         .mapValues { entry -> entry.value.map { it.value } }
-
-
-   }
 
    @Test
    fun testParseLocation() {
@@ -161,26 +119,4 @@ class NavTextParserTest {
       )
       Assert.assertEquals("", chart)
    }
-
-   @Test
-   fun testParseHeading() {
-      val parser = NavTextParser()
-
-//      parser.parseHeading(listOf("NETHERLANDS ANTILLES.","NAVTEX STATION CURACAO (H) 12-10.31N 068-51.82W OFF AIR."))
-//      Assert.assertEquals("NETHERLANDS ANTILLES.", parser.areaName)
-//      Assert.assertEquals("NAVTEX STATION CURACAO (H) 12-10.31N 068-51.82W OFF AIR.", parser.specificArea)
-//      Assert.assertEquals(1, parser.locations.size)
-//      Assert.assertEquals("Point", parser.locations.first().locationType)
-//      Assert.assertEquals("12-10.31N 068-51.82W", parser.locations.first().location.first())
-   }
-
-//   @Test
-//   fun testSplitNumbers() {
-//      val parser = spyk<LocationParser>()
-//
-//      val splitNumbers = parser.javaClass.getDeclaredMethod("splitNumbers", List::class.java)
-//      splitNumbers.isAccessible = true
-//      val numbers = splitNumbers.invoke(parser, "string parameter") as? List<*>
-//      Assert.assertEquals(true, true)
-//   }
 }

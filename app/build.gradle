@@ -79,6 +79,8 @@ android {
 
     packagingOptions {
         exclude 'META-INF/INDEX.LIST'
+        exclude 'META-INF/LICENSE.md'
+        exclude 'META-INF/LICENSE-notice.md'
     }
 
     kotlin {
@@ -222,26 +224,16 @@ dependencies {
     testImplementation libs.junit4
     testImplementation project(':testing')
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
     androidTestImplementation project(':testing')
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_version"
 
     testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4'
-    testImplementation 'org.mockito:mockito-core:5.3.1'
-    testImplementation 'org.mockito:mockito-inline:5.2.0'
-    testImplementation "org.mockito.kotlin:mockito-kotlin:3.2.0"
-    testImplementation "io.mockk:mockk:1.4.1"
+    testImplementation "io.mockk:mockk:1.13.2"
 
-    androidTestImplementation 'org.mockito:mockito-core:5.3.1'
-    androidTestImplementation 'com.linkedin.dexmaker:dexmaker-mockito-inline:2.28.3'
-    androidTestImplementation "org.mockito.kotlin:mockito-kotlin:3.2.0"
-    androidTestImplementation "io.mockk:mockk:1.4.1"
+    androidTestImplementation "io.mockk:mockk-android:1.13.2"
     androidTestImplementation 'androidx.paging:paging-testing:3.2.0-beta01'
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
-    androidTestImplementation 'com.google.dagger:hilt-android-testing:2.44'
     androidTestImplementation "androidx.work:work-testing:$work_version"
-    kaptAndroidTest "com.google.dagger:hilt-android-compiler:hilt_version"
-    androidTestAnnotationProcessor "com.google.dagger:hilt-android-compiler:hilt_version"
 }

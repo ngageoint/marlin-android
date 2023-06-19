@@ -1,24 +1,17 @@
 package mil.nga.msi.network.port
 
+import io.mockk.coEvery
+import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mil.nga.msi.datasource.port.Port
 import mil.nga.msi.repository.port.PortRemoteDataSource
 import org.junit.Assert.assertEquals
-import org.junit.Before
 import org.junit.Test
-import org.mockito.MockitoAnnotations
-import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.mock
 import retrofit2.Response
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class PortServiceTest {
-
-    @Before
-    fun setup() {
-        MockitoAnnotations.openMocks(this)
-    }
 
     @Test
     fun testRemoteDataSource() = runTest {
@@ -29,11 +22,10 @@ class PortServiceTest {
             )
         )
 
-        val mockService = mock<PortService> {
-            onBlocking {
-                getPorts()
-            } doReturn Response.success(mockResponse)
-        }
+        val mockService = mockk<PortService>()
+        coEvery {
+            mockService.getPorts()
+        } returns Response.success(mockResponse)
 
         val dataSource = PortRemoteDataSource(mockService)
         val ports = dataSource.fetchPorts()

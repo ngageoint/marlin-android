@@ -20,7 +20,7 @@ import mil.nga.msi.startup.modu.ModuInitializer.Companion.FETCH_LATEST_MODUS_TAS
 import javax.inject.Inject
 
 class ModuRepository @Inject constructor(
-   private val workManager: WorkManager,
+   workManager: WorkManager,
    private val localDataSource: ModuLocalDataSource,
    private val remoteDataSource: ModuRemoteDataSource,
    private val notification: MarlinNotification,

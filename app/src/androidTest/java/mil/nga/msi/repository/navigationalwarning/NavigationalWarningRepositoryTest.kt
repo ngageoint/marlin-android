@@ -5,6 +5,12 @@ import androidx.lifecycle.asLiveData
 import androidx.work.Data
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
+import io.mockk.clearAllMocks
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.first
@@ -15,14 +21,9 @@ import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.navigationwarning.NavigationArea
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarning
 import mil.nga.msi.repository.preferences.UserPreferencesRepository
+import org.junit.After
 import org.junit.Assert
-import org.junit.Before
 import org.junit.Test
-import org.mockito.Mockito
-import org.mockito.Mockito.`when`
-import org.mockito.MockitoAnnotations
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
 import java.time.Instant
 import java.util.Date
 import java.util.UUID
@@ -30,9 +31,9 @@ import java.util.UUID
 @OptIn(ExperimentalCoroutinesApi::class)
 class NavigationalWarningRepositoryTest {
 
-   @Before
-   fun setup() {
-      MockitoAnnotations.openMocks(this)
+   @After
+   fun tearDown() {
+      clearAllMocks()
    }
 
    @Test
@@ -47,25 +48,25 @@ class NavigationalWarningRepositoryTest {
          NavigationalWarning("1", 1, 2023, NavigationArea.HYDROARC, Date())
       )
 
-      val workManager = mock<WorkManager>()
-      `when`(workManager.getWorkInfosForUniqueWorkLiveData(Mockito.any())).thenAnswer {
-         emptyFlow<Boolean>().asLiveData()
-      }
+      val workManager = mockk<WorkManager>()
+      every {
+         workManager.getWorkInfosForUniqueWorkLiveData(any())
+      } returns emptyFlow<List<WorkInfo>>().asLiveData()
 
-      val localDataSource = mock<NavigationalWarningLocalDataSource>()
-      `when`(localDataSource.insert(Mockito.anyList())).thenAnswer { Unit }
-      `when`(localDataSource.existingNavigationalWarnings(Mockito.anyList())).thenAnswer { localWarnings }
-      `when`(localDataSource.getNavigationalWarnings()).thenAnswer { localWarnings }
+      val localDataSource = mockk<NavigationalWarningLocalDataSource>()
+      coEvery { localDataSource.insert(any()) } returns Unit
+      coEvery { localDataSource.deleteNavigationalWarnings(any()) } returns Unit
+      coEvery { localDataSource.existingNavigationalWarnings(any()) } returns localWarnings
+      coEvery { localDataSource.getNavigationalWarnings() } returns localWarnings
 
-      val remoteDataSource = mock<NavigationalWarningRemoteDataSource>()
-      `when`(remoteDataSource.fetchNavigationalWarnings()).thenAnswer { remoteWarnings }
+      val remoteDataSource = mockk<NavigationalWarningRemoteDataSource>()
+      coEvery { remoteDataSource.fetchNavigationalWarnings() } returns remoteWarnings
 
-      val notification = mock<MarlinNotification>()
+      val notification = mockk<MarlinNotification>()
+      every { notification.navigationWarning(any()) } returns Unit
 
-      val userPreferencesRepository = mock<UserPreferencesRepository>()
-      `when`(userPreferencesRepository.fetched(DataSource.NAVIGATION_WARNING)).thenAnswer {
-         Instant.now()
-      }
+      val userPreferencesRepository = mockk<UserPreferencesRepository>()
+      coEvery { userPreferencesRepository.fetched(DataSource.NAVIGATION_WARNING) } returns Instant.now()
 
       val viewModel = NavigationalWarningRepository(
          workManager = workManager,
@@ -77,46 +78,53 @@ class NavigationalWarningRepositoryTest {
 
       viewModel.fetchNavigationalWarnings(refresh = true)
 
-      verify(notification).navigationWarning(remoteWarnings.minus(localWarnings.toSet()))
+      verify {
+         notification.navigationWarning(remoteWarnings.minus(localWarnings.toSet()))
+      }
    }
 
    @Test
    fun should_delete_unreturned_navigational_warnings() = runTest {
-      val workManager = mock<WorkManager>()
-      `when`(workManager.getWorkInfosForUniqueWorkLiveData(Mockito.any())).thenAnswer {
-         emptyFlow<Boolean>().asLiveData()
-      }
+      val workManager = mockk<WorkManager>()
+      every {
+         workManager.getWorkInfosForUniqueWorkLiveData(any())
+      } returns emptyFlow<List<WorkInfo>>().asLiveData()
 
-      val localDataSource = mock<NavigationalWarningLocalDataSource>()
-      `when`(localDataSource.insert(Mockito.anyList())).thenAnswer { Unit }
-      `when`(localDataSource.getNavigationalWarnings()).thenAnswer {
+      val localDataSource = mockk<NavigationalWarningLocalDataSource>()
+      coEvery { localDataSource.insert(any()) } returns Unit
+      coEvery { localDataSource.deleteNavigationalWarnings(any()) } returns Unit
+      coEvery { localDataSource.getNavigationalWarnings() } coAnswers {
          listOf(
             NavigationalWarning("1", 1, 2023, NavigationArea.HYDROARC, Date())
          )
       }
 
-      val remoteDataSource = mock<NavigationalWarningRemoteDataSource>()
-      `when`(remoteDataSource.fetchNavigationalWarnings()).thenAnswer {
+      val remoteDataSource = mockk<NavigationalWarningRemoteDataSource>()
+      coEvery {remoteDataSource.fetchNavigationalWarnings()  } coAnswers {
          listOf(
             NavigationalWarning("2", 2, 2023, NavigationArea.HYDROARC, Date()),
             NavigationalWarning("3", 3, 2023, NavigationArea.HYDROARC, Date())
          )
       }
 
-      val userPreferencesRepository = mock<UserPreferencesRepository>()
-      `when`(userPreferencesRepository.fetched(DataSource.NAVIGATION_WARNING)).thenAnswer { null }
+      val userPreferencesRepository = mockk<UserPreferencesRepository>()
+      coEvery { userPreferencesRepository.fetched(DataSource.NAVIGATION_WARNING) } coAnswers {
+         null
+      }
 
       val viewModel = NavigationalWarningRepository(
          workManager = workManager,
          localDataSource = localDataSource,
          remoteDataSource = remoteDataSource,
-         notification = mock(),
+         notification = mockk(),
          userPreferencesRepository = userPreferencesRepository
       )
 
       viewModel.fetchNavigationalWarnings(refresh = true)
 
-      verify(localDataSource).deleteNavigationalWarnings(listOf(1))
+      coVerify {
+         localDataSource.deleteNavigationalWarnings(listOf(1))
+      }
    }
 
    @Test
@@ -127,38 +135,45 @@ class NavigationalWarningRepositoryTest {
          NavigationalWarning("3", 3, 2023, NavigationArea.HYDROARC, Date())
       )
 
-      val workManager = mock<WorkManager>()
-      `when`(workManager.getWorkInfosForUniqueWorkLiveData(Mockito.any())).thenAnswer {
-         emptyFlow<Boolean>().asLiveData()
-      }
+      val workManager = mockk<WorkManager>()
+      coEvery {
+         workManager.getWorkInfosForUniqueWorkLiveData(any())
+      } returns emptyFlow<List<WorkInfo>>().asLiveData()
 
-      val localDataSource = mock<NavigationalWarningLocalDataSource>()
-      `when`(localDataSource.insert(Mockito.anyList())).thenAnswer { Unit }
-      `when`(localDataSource.getNavigationalWarnings()).thenAnswer { emptyList<NavigationalWarning>() }
 
-      val remoteDataSource = mock<NavigationalWarningRemoteDataSource>()
-      `when`(remoteDataSource.fetchNavigationalWarnings()).thenAnswer { remoteWarnings }
+      val localDataSource = mockk<NavigationalWarningLocalDataSource>()
+      coEvery { localDataSource.insert(any()) } returns Unit
+      coEvery { localDataSource.deleteNavigationalWarnings(any()) } returns Unit
+      coEvery { localDataSource.existingNavigationalWarnings(any()) } returns emptyList()
+      coEvery { localDataSource.getNavigationalWarnings() } returns emptyList()
 
-      val userPreferencesRepository = mock<UserPreferencesRepository>()
-      `when`(userPreferencesRepository.fetched(DataSource.NAVIGATION_WARNING)).thenAnswer { null }
+      val remoteDataSource = mockk<NavigationalWarningRemoteDataSource>()
+      coEvery { remoteDataSource.fetchNavigationalWarnings() } returns remoteWarnings
+
+      val userPreferencesRepository = mockk<UserPreferencesRepository>()
+      coEvery { userPreferencesRepository.fetched(DataSource.NAVIGATION_WARNING) } returns null
 
       val viewModel = NavigationalWarningRepository(
          workManager = workManager,
          localDataSource = localDataSource,
          remoteDataSource = remoteDataSource,
-         notification = mock(),
+         notification = mockk(),
          userPreferencesRepository = userPreferencesRepository
       )
 
       viewModel.fetchNavigationalWarnings(refresh = true)
 
-      verify(localDataSource).insert(remoteWarnings)
+      coVerify {
+         localDataSource.insert(remoteWarnings)
+      }
    }
 
    @Test
    fun should_be_fetching_if_work_is_running() = runTest {
-      val workManager = mock<WorkManager>()
-      `when`(workManager.getWorkInfosForUniqueWorkLiveData(Mockito.any())).thenAnswer {
+      val workManager = mockk<WorkManager>()
+      coEvery {
+         workManager.getWorkInfosForUniqueWorkLiveData(any())
+      } answers  {
          val workInfo = WorkInfo(
             UUID.randomUUID(),
             WorkInfo.State.RUNNING,
@@ -173,10 +188,10 @@ class NavigationalWarningRepositoryTest {
 
       val viewModel = NavigationalWarningRepository(
          workManager = workManager,
-         localDataSource = mock(),
-         remoteDataSource = mock(),
-         notification = mock(),
-         userPreferencesRepository = mock()
+         localDataSource = mockk(),
+         remoteDataSource = mockk(),
+         notification = mockk(),
+         userPreferencesRepository = mockk()
       )
 
       val fetching = viewModel.fetching.asFlow().first()
@@ -185,8 +200,10 @@ class NavigationalWarningRepositoryTest {
 
    @Test
    fun should_not_be_fetching_if_work_is_not_running() = runTest {
-      val workManager = mock<WorkManager>()
-      `when`(workManager.getWorkInfosForUniqueWorkLiveData(Mockito.any())).thenAnswer {
+      val workManager = mockk<WorkManager>()
+      coEvery {
+         workManager.getWorkInfosForUniqueWorkLiveData(any())
+      } answers {
          val workInfo = WorkInfo(
             UUID.randomUUID(),
             WorkInfo.State.SUCCEEDED,
@@ -201,10 +218,10 @@ class NavigationalWarningRepositoryTest {
 
       val viewModel = NavigationalWarningRepository(
          workManager = workManager,
-         localDataSource = mock(),
-         remoteDataSource = mock(),
-         notification = mock(),
-         userPreferencesRepository = mock()
+         localDataSource = mockk(),
+         remoteDataSource = mockk(),
+         notification = mockk(),
+         userPreferencesRepository = mockk()
       )
 
       val fetching = viewModel.fetching.asFlow().first()

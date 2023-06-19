@@ -1,5 +1,8 @@
 package mil.nga.msi.network.light
 
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mil.nga.msi.datasource.light.Light
@@ -7,23 +10,12 @@ import mil.nga.msi.datasource.light.PublicationVolume
 import mil.nga.msi.repository.light.LightLocalDataSource
 import mil.nga.msi.repository.light.LightRemoteDataSource
 import org.junit.Assert.assertEquals
-import org.junit.Before
 import org.junit.Test
-import org.mockito.MockitoAnnotations
-import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
 import retrofit2.Response
 import java.util.Calendar
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class LightServiceTest {
-
-    @Before
-    fun setup() {
-        MockitoAnnotations.openMocks(this)
-    }
 
     @Test
     fun testRemoteDataSource() = runTest {
@@ -54,8 +46,8 @@ class LightServiceTest {
             )
         )
 
-        val mockService = mock<LightService>()
-        whenever(
+        val mockService = mockk<LightService>()
+        coEvery {
             mockService.getLights(
                 volume = PublicationVolume.PUB_110.volumeQuery,
                 output = "json",
@@ -63,29 +55,31 @@ class LightServiceTest {
                 maxNoticeNumber = noticesNumbers.second,
                 includeRemovals = "false"
             )
-        ) doReturn Response.success(mockResponse)
+        } returns Response.success(mockResponse)
 
-        whenever(
+        coEvery {
             mockService.getLights(
                 volume = PublicationVolume.PUB_110.volumeQuery
             )
-        ) doReturn Response.success(mockResponse)
+        } returns Response.success(mockResponse)
 
-        val mockDataSource = mock<LightLocalDataSource> {
-            onBlocking {
-                getLatestLight(volumeNumber = PublicationVolume.PUB_110.volumeTitle)
-            } doReturn latestLight
-        }
+
+        val mockDataSource = mockk<LightLocalDataSource>()
+        coEvery {
+            mockDataSource.getLatestLight(volumeNumber = PublicationVolume.PUB_110.volumeTitle)
+        } returns latestLight
 
         val repository = LightRemoteDataSource(mockService, mockDataSource)
         val lights = repository.fetchLights(publicationVolume = PublicationVolume.PUB_110)
         assertEquals(2, lights.size)
 
-        verify(mockService).getLights(
-            volume = PublicationVolume.PUB_110.volumeQuery,
-            minNoticeNumber = noticesNumbers.first,
-            maxNoticeNumber = noticesNumbers.second,
-        )
+        coVerify {
+            mockService.getLights(
+                volume = PublicationVolume.PUB_110.volumeQuery,
+                minNoticeNumber = noticesNumbers.first,
+                maxNoticeNumber = noticesNumbers.second
+            )
+        }
     }
 
     companion object {

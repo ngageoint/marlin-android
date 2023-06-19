@@ -1,5 +1,9 @@
 package mil.nga.msi.network.dgpsstation
 
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mil.nga.msi.datasource.dgpsstation.DgpsStation
@@ -9,23 +13,12 @@ import mil.nga.msi.network.dgpsstations.DgpsStationService
 import mil.nga.msi.repository.dgpsstation.DgpsStationLocalDataSource
 import mil.nga.msi.repository.dgpsstation.DgpsStationRemoteDataSource
 import org.junit.Assert.assertEquals
-import org.junit.Before
 import org.junit.Test
-import org.mockito.MockitoAnnotations
-import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
 import retrofit2.Response
 import java.util.Calendar
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class DgpsStationServiceTest {
-
-    @Before
-    fun setup() {
-        MockitoAnnotations.openMocks(this)
-    }
 
     @Test
     fun testRemoteDataSource() = runTest {
@@ -54,36 +47,39 @@ class DgpsStationServiceTest {
             )
         )
 
-        val mockService = mock<DgpsStationService>()
-        whenever(
+        val mockService = mockk<DgpsStationService>()
+        coEvery {
             mockService.getDgpsStations(
                 volume = PublicationVolume.PUB_110.volumeQuery,
                 minNoticeNumber = noticesNumbers.first,
                 maxNoticeNumber = noticesNumbers.second
             )
-        ) doReturn Response.success(mockResponse)
+        } returns Response.success(mockResponse)
 
-        whenever(
+
+        coEvery {
             mockService.getDgpsStations(
                 volume = PublicationVolume.PUB_110.volumeQuery
             )
-        ) doReturn Response.success(mockResponse)
+        } returns Response.success(mockResponse)
 
-        val mockDataSource = mock<DgpsStationLocalDataSource> {
-            onBlocking {
-                getLatestDgpsStation(volumeNumber = PublicationVolume.PUB_110.volumeTitle)
-            } doReturn latestStation
-        }
+        val mockDataSource = mockk<DgpsStationLocalDataSource>()
+        coEvery {
+            mockDataSource.getLatestDgpsStation(volumeNumber = PublicationVolume.PUB_110.volumeTitle)
+
+        } returns latestStation
 
         val repository = DgpsStationRemoteDataSource(mockService, mockDataSource)
         val stations = repository.fetchDgpsStations(publicationVolume = PublicationVolume.PUB_110)
         assertEquals(2, stations.size)
 
-        verify(mockService).getDgpsStations(
-            volume = PublicationVolume.PUB_110.volumeQuery,
-            minNoticeNumber = noticesNumbers.first,
-            maxNoticeNumber = noticesNumbers.second
-        )
+        coVerify {
+            mockService.getDgpsStations(
+                volume = PublicationVolume.PUB_110.volumeQuery,
+                minNoticeNumber = noticesNumbers.first,
+                maxNoticeNumber = noticesNumbers.second
+            )
+        }
     }
 
     companion object {

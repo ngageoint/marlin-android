@@ -2,9 +2,16 @@ package mil.nga.msi.repository.asam
 
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.asLiveData
+import androidx.paging.testing.asPagingSourceFactory
 import androidx.work.Data
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
+import io.mockk.clearAllMocks
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.first
@@ -13,15 +20,11 @@ import kotlinx.coroutines.test.runTest
 import mil.nga.msi.MarlinNotification
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.asam.Asam
+import mil.nga.msi.datasource.asam.AsamListItem
 import mil.nga.msi.repository.preferences.UserPreferencesRepository
+import org.junit.After
 import org.junit.Assert
-import org.junit.Before
 import org.junit.Test
-import org.mockito.Mockito
-import org.mockito.Mockito.`when`
-import org.mockito.MockitoAnnotations
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
 import java.time.Instant
 import java.util.Date
 import java.util.UUID
@@ -29,9 +32,9 @@ import java.util.UUID
 @OptIn(ExperimentalCoroutinesApi::class)
 class AsamRepositoryTest {
 
-   @Before
-   fun setup() {
-      MockitoAnnotations.openMocks(this)
+   @After
+   fun tearDown() {
+      clearAllMocks()
    }
 
    @Test
@@ -46,36 +49,43 @@ class AsamRepositoryTest {
          Asam("1", Date(), 0.0, 0.0)
       )
 
-      val workManager = mock<WorkManager>()
-      `when`(workManager.getWorkInfosForUniqueWorkLiveData(Mockito.any())).thenAnswer {
-         emptyFlow<Boolean>().asLiveData()
+      val workManager = mockk<WorkManager>()
+      every {
+         workManager.getWorkInfosForUniqueWorkLiveData(any())
+      } returns emptyFlow<List<WorkInfo>>().asLiveData()
+
+      val localDataSource = mockk<AsamLocalDataSource>()
+      coEvery { localDataSource.insert(any()) } returns emptyList()
+      coEvery { localDataSource.existingAsams(any()) } returns localAsams
+      coEvery { localDataSource.getAsams() } returns localAsams
+      val scope = this
+      coEvery { localDataSource.observeAsams() } answers {
+         flowOf(emptyList<AsamListItem>()).asPagingSourceFactory(scope)()
       }
 
-      val localDataSource = mock<AsamLocalDataSource>()
-      `when`(localDataSource.insert(Mockito.anyList())).thenAnswer { Unit }
-      `when`(localDataSource.existingAsams(Mockito.anyList())).thenAnswer { localAsams }
-      `when`(localDataSource.getAsams()).thenAnswer { localAsams }
+      val remoteDataSource = mockk<AsamRemoteDataSource>()
+      coEvery { remoteDataSource.fetchAsams() } returns remoteAsams
 
-      val remoteDataSource = mock<AsamRemoteDataSource>()
-      `when`(remoteDataSource.fetchAsams()).thenAnswer { remoteAsams }
+      val notification = mockk<MarlinNotification>()
+      every { notification.asam(any()) } returns Unit
 
-      val notification = mock<MarlinNotification>()
-
-      val userPreferencesRepository = mock<UserPreferencesRepository>()
-      `when`(userPreferencesRepository.fetched(DataSource.ASAM)).thenAnswer { Instant.now() }
+      val userPreferencesRepository = mockk<UserPreferencesRepository>()
+      coEvery { userPreferencesRepository.fetched(DataSource.ASAM) } returns Instant.now()
 
       val viewModel = AsamRepository(
          workManager = workManager,
          localDataSource = localDataSource,
          remoteDataSource = remoteDataSource,
          notification = notification,
-         filterRepository = mock(),
+         filterRepository = mockk(),
          userPreferencesRepository = userPreferencesRepository
       )
 
       viewModel.fetchAsams(refresh = true)
 
-      verify(notification).asam(remoteAsams.minus(localAsams.toSet()))
+      verify {
+         notification.asam(remoteAsams.minus(localAsams.toSet()))
+      }
    }
 
    @Test
@@ -86,40 +96,49 @@ class AsamRepositoryTest {
          Asam("3", Date(), 0.0, 0.0)
       )
 
-      val workManager = mock<WorkManager>()
-      `when`(workManager.getWorkInfosForUniqueWorkLiveData(Mockito.any())).thenAnswer {
-         emptyFlow<Boolean>().asLiveData()
+      val workManager = mockk<WorkManager>()
+      coEvery {
+         workManager.getWorkInfosForUniqueWorkLiveData(any())
+      } returns emptyFlow<List<WorkInfo>>().asLiveData()
+
+
+      val localDataSource = mockk<AsamLocalDataSource>()
+      coEvery { localDataSource.insert(any()) } returns emptyList()
+      coEvery { localDataSource.existingAsams(any()) } returns emptyList()
+      coEvery { localDataSource.getAsams() } returns emptyList()
+      val scope = this
+      coEvery { localDataSource.observeAsams() } answers {
+         flowOf(emptyList<AsamListItem>()).asPagingSourceFactory(scope)()
       }
 
-      val localDataSource = mock<AsamLocalDataSource>()
-      `when`(localDataSource.insert(Mockito.anyList())).thenAnswer { Unit }
-      `when`(localDataSource.existingAsams(Mockito.anyList())).thenAnswer { emptyList<Asam>() }
-      `when`(localDataSource.getAsams()).thenAnswer { emptyList<Asam>() }
+      val remoteDataSource = mockk<AsamRemoteDataSource>()
+      coEvery { remoteDataSource.fetchAsams() } returns remoteAsams
 
-      val remoteDataSource = mock<AsamRemoteDataSource>()
-      `when`(remoteDataSource.fetchAsams()).thenAnswer { remoteAsams }
-
-      val userPreferencesRepository = mock<UserPreferencesRepository>()
-      `when`(userPreferencesRepository.fetched(DataSource.ASAM)).thenAnswer { null }
+      val userPreferencesRepository = mockk<UserPreferencesRepository>()
+      coEvery { userPreferencesRepository.fetched(DataSource.ASAM) } returns null
 
       val viewModel = AsamRepository(
          workManager = workManager,
          localDataSource = localDataSource,
          remoteDataSource = remoteDataSource,
-         notification = mock(),
-         filterRepository = mock(),
+         notification = mockk(),
+         filterRepository = mockk(),
          userPreferencesRepository = userPreferencesRepository
       )
 
       viewModel.fetchAsams(refresh = true)
 
-      verify(localDataSource).insert(remoteAsams)
+      coVerify {
+         localDataSource.insert(remoteAsams)
+      }
    }
 
    @Test
    fun should_be_fetching_if_work_is_running() = runTest {
-      val workManager = mock<WorkManager>()
-      `when`(workManager.getWorkInfosForUniqueWorkLiveData(Mockito.any())).thenAnswer {
+      val workManager = mockk<WorkManager>()
+      coEvery {
+         workManager.getWorkInfosForUniqueWorkLiveData(any())
+      } answers  {
          val workInfo = WorkInfo(
             UUID.randomUUID(),
             WorkInfo.State.RUNNING,
@@ -132,13 +151,19 @@ class AsamRepositoryTest {
          flowOf(listOf(workInfo)).asLiveData()
       }
 
+      val scope = this
+      val localDataSource = mockk<AsamLocalDataSource>()
+      coEvery { localDataSource.observeAsams() } answers {
+         flowOf(emptyList<AsamListItem>()).asPagingSourceFactory(scope)()
+      }
+
       val viewModel = AsamRepository(
          workManager = workManager,
-         localDataSource = mock(),
-         remoteDataSource = mock(),
-         notification = mock(),
-         filterRepository = mock(),
-         userPreferencesRepository = mock()
+         localDataSource = localDataSource,
+         remoteDataSource = mockk(),
+         notification = mockk(),
+         filterRepository = mockk(),
+         userPreferencesRepository = mockk()
       )
 
       val fetching = viewModel.fetching.asFlow().first()
@@ -147,8 +172,10 @@ class AsamRepositoryTest {
 
    @Test
    fun should_not_be_fetching_if_work_is_not_running() = runTest {
-      val workManager = mock<WorkManager>()
-      `when`(workManager.getWorkInfosForUniqueWorkLiveData(Mockito.any())).thenAnswer {
+      val workManager = mockk<WorkManager>()
+      coEvery {
+         workManager.getWorkInfosForUniqueWorkLiveData(any())
+      } answers {
          val workInfo = WorkInfo(
             UUID.randomUUID(),
             WorkInfo.State.SUCCEEDED,
@@ -161,13 +188,19 @@ class AsamRepositoryTest {
          flowOf(listOf(workInfo)).asLiveData()
       }
 
+      val scope = this
+      val localDataSource = mockk<AsamLocalDataSource>()
+      coEvery { localDataSource.observeAsams() } answers {
+         flowOf(emptyList<AsamListItem>()).asPagingSourceFactory(scope)()
+      }
+
       val viewModel = AsamRepository(
          workManager = workManager,
-         localDataSource = mock(),
-         remoteDataSource = mock(),
-         notification = mock(),
-         filterRepository = mock(),
-         userPreferencesRepository = mock()
+         localDataSource = localDataSource,
+         remoteDataSource = mockk(),
+         notification = mockk(),
+         filterRepository = mockk(),
+         userPreferencesRepository = mockk()
       )
 
       val fetching = viewModel.fetching.asFlow().first()

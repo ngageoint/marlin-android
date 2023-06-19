@@ -1,5 +1,8 @@
 package mil.nga.msi.network.radiobeacon
 
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mil.nga.msi.datasource.light.PublicationVolume
@@ -7,23 +10,12 @@ import mil.nga.msi.datasource.radiobeacon.RadioBeacon
 import mil.nga.msi.repository.radiobeacon.RadioBeaconLocalDataSource
 import mil.nga.msi.repository.radiobeacon.RadioBeaconRemoteDataSource
 import org.junit.Assert.assertEquals
-import org.junit.Before
 import org.junit.Test
-import org.mockito.MockitoAnnotations
-import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
 import retrofit2.Response
 import java.util.Calendar
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class RadioBeaconServiceTest {
-
-    @Before
-    fun setup() {
-        MockitoAnnotations.openMocks(this)
-    }
 
     @Test
     fun testRemoteDataSource() = runTest {
@@ -36,8 +28,8 @@ class RadioBeaconServiceTest {
             )
         )
 
-        val mockService = mock<RadioBeaconService>()
-        whenever(
+        val mockService = mockk<RadioBeaconService>()
+        coEvery {
             mockService.getRadioBeacons(
                 volume = PublicationVolume.PUB_110.volumeQuery,
                 output = "json",
@@ -45,29 +37,30 @@ class RadioBeaconServiceTest {
                 maxNoticeNumber = noticesNumbers.second,
                 includeRemovals = "false"
             )
-        ) doReturn Response.success(mockResponse)
+        } returns Response.success(mockResponse)
 
-        whenever(
+        coEvery {
             mockService.getRadioBeacons(
                 volume = PublicationVolume.PUB_110.volumeQuery
             )
-        ) doReturn Response.success(mockResponse)
+        } returns Response.success(mockResponse)
 
-        val mockDataSource = mock<RadioBeaconLocalDataSource> {
-            onBlocking {
-                getLatestRadioBeacon(volumeNumber = PublicationVolume.PUB_110.volumeTitle)
-            } doReturn latestBeacon
-        }
+        val mockDataSource = mockk<RadioBeaconLocalDataSource>()
+        coEvery {
+            mockDataSource.getLatestRadioBeacon(volumeNumber = PublicationVolume.PUB_110.volumeTitle)
+        } returns latestBeacon
 
         val repository = RadioBeaconRemoteDataSource(mockService, mockDataSource)
         val beacons = repository.fetchRadioBeacons(publicationVolume = PublicationVolume.PUB_110)
         assertEquals(2, beacons.size)
 
-        verify(mockService).getRadioBeacons(
-            volume = PublicationVolume.PUB_110.volumeQuery,
-            minNoticeNumber = noticesNumbers.first,
-            maxNoticeNumber = noticesNumbers.second,
-        )
+        coVerify {
+            mockService.getRadioBeacons(
+                volume = PublicationVolume.PUB_110.volumeQuery,
+                minNoticeNumber = noticesNumbers.first,
+                maxNoticeNumber = noticesNumbers.second,
+            )
+        }
     }
 
     companion object {
