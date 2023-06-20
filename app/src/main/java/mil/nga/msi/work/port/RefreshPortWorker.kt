@@ -23,10 +23,10 @@ class RefreshPortWorker @AssistedInject constructor(
    private val notification: MarlinNotification
 ) : CoroutineWorker(context, params) {
    override suspend fun doWork(): Result = try {
-      val fetched = userPreferencesRepository.fetched(DataSource.RADIO_BEACON)
+      val fetched = userPreferencesRepository.fetched(DataSource.PORT)
       if (fetched == null || fetched.isBefore(Instant.now().minus(FETCH_INTERVAL_HOURS, ChronoUnit.HOURS))) {
          repository.fetchPorts(true)
-         userPreferencesRepository.setFetched(DataSource.RADIO_BEACON, Instant.now())
+         userPreferencesRepository.setFetched(DataSource.PORT, Instant.now())
       }
       Result.success()
    } catch (error: Throwable) {

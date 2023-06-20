@@ -8,7 +8,7 @@ import androidx.work.WorkManager
 import mil.nga.msi.di.AppInitializer
 import mil.nga.msi.repository.electronicpublication.ElectronicPublicationRepository
 import mil.nga.msi.startup.WorkManagerInitializer
-import mil.nga.msi.work.electronicpublication.SeedElectronicPublicationsWorker
+import mil.nga.msi.work.electronicpublication.LoadElectronicPublicationsWorker
 import javax.inject.Inject
 
 class ElectronicPublicationInitializer: Initializer<Unit> {
@@ -21,8 +21,8 @@ class ElectronicPublicationInitializer: Initializer<Unit> {
     override fun create(context: Context) {
         // Inject Hilt dependencies
         AppInitializer.resolve(context).inject(this)
-        val seedRequest = OneTimeWorkRequest.Builder(SeedElectronicPublicationsWorker::class.java).build()
-        workManager.enqueueUniqueWork(SeedElectronicPublicationsWorker.SEED_ELECTRONIC_PUBLICATIONS_WORK, ExistingWorkPolicy.KEEP, seedRequest)
+        val seedRequest = OneTimeWorkRequest.Builder(LoadElectronicPublicationsWorker::class.java).build()
+        workManager.enqueueUniqueWork(LoadElectronicPublicationsWorker.SEED_ELECTRONIC_PUBLICATIONS_WORK, ExistingWorkPolicy.KEEP, seedRequest)
     }
 
     override fun dependencies(): List<Class<out Initializer<*>>> {

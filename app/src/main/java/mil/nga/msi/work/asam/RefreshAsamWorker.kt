@@ -25,7 +25,7 @@ class RefreshAsamWorker @AssistedInject constructor(
 
    override suspend fun doWork(): Result = try {
       val fetched = userPreferencesRepository.fetched(DataSource.ASAM)
-      if (fetched == null || fetched.isBefore(Instant.now().minus(FETCH_INTERVAL_HOURS, ChronoUnit.SECONDS))) {
+      if (fetched == null || fetched.isBefore(Instant.now().minus(FETCH_INTERVAL_HOURS, ChronoUnit.HOURS))) {
          repository.fetchAsams(true)
          userPreferencesRepository.setFetched(DataSource.ASAM, Instant.now())
       }

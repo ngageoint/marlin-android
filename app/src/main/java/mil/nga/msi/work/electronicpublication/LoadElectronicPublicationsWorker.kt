@@ -16,18 +16,19 @@ import mil.nga.msi.repository.electronicpublication.ElectronicPublicationLocalDa
 import java.io.InputStreamReader
 
 @HiltWorker
-class SeedElectronicPublicationsWorker @AssistedInject constructor(
+class LoadElectronicPublicationsWorker @AssistedInject constructor(
     @Assisted private val context: Context,
     @Assisted params: WorkerParameters,
-    private val localData: ElectronicPublicationLocalDataSource) : CoroutineWorker(context, params) {
+    private val dataSource: ElectronicPublicationLocalDataSource
+) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result = try {
-        if (localData.isEmpty()) {
+        if (dataSource.isEmpty()) {
             context.assets.open("epubs.json").use { input ->
                 val reader = JsonReader(InputStreamReader(input))
                 val gson = GsonBuilder().registerTypeAdapter(object: TypeToken<ElectronicPublication>() {}.type, ElectronicPublicationTypeAdapter()).create()
                 val ePubs = gson.fromJson<List<ElectronicPublication>>(reader, object: TypeToken<ArrayList<ElectronicPublication>>() {}.type)
-                localData.insert(ePubs)
+                dataSource.insert(ePubs)
             }
         }
         Result.success()
