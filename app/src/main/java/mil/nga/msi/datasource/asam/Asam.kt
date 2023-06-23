@@ -4,7 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.google.android.gms.maps.model.LatLng
-import mil.nga.msi.coordinate.DMS
+import mil.nga.msi.datasource.bookmark.Bookmark
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -22,26 +22,31 @@ data class Asam(
    val latitude: Double,
 
    @ColumnInfo(name = "longitude")
-   val longitude: Double
-) {
+   val longitude: Double,
+
    @ColumnInfo(name = "position")
-   var position: String? = null
+   var position: String? = null,
 
    @ColumnInfo(name = "navigation_area")
-   var navigationArea: String? = null
+   var navigationArea: String? = null,
 
    @ColumnInfo(name = "subregion")
-   var subregion: String? = null
+   var subregion: String? = null,
 
    @ColumnInfo(name = "description")
-   var description: String? = null
+   var description: String? = null,
 
    @ColumnInfo(name = "hostility")
-   var hostility: String? = null
+   var hostility: String? = null,
 
    @ColumnInfo(name = "victim")
-   var victim: String? = null
+   var victim: String? = null,
 
+   override var bookmarked: Boolean = false,
+   override var bookmarkDate: Date? = null,
+   override var bookmarkNotes: String? = null
+
+): Bookmark() {
    @Transient
    val latLng = LatLng(latitude, longitude)
 

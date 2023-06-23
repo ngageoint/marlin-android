@@ -176,6 +176,7 @@ class MarlinNotification @Inject constructor(
          DataSource.ELECTRONIC_PUBLICATION -> ElectronicPublicationFetchNotificationId
          DataSource.NOTICE_TO_MARINERS -> NoticeToMarinersFetchNotificationId
          DataSource.GEOPACKAGE -> -1
+         DataSource.BOOKMARK -> -1
       }
    }
 

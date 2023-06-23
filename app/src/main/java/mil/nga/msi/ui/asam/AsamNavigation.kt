@@ -12,6 +12,8 @@ import com.google.accompanist.navigation.material.bottomSheet
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import mil.nga.msi.datasource.DataSource
+import mil.nga.msi.datasource.asam.Asam
+import mil.nga.msi.ui.action.AsamAction
 import mil.nga.msi.ui.asam.detail.AsamDetailScreen
 import mil.nga.msi.ui.asam.list.AsamsScreen
 import mil.nga.msi.ui.asam.sheet.AsamSheetScreen
@@ -43,11 +45,12 @@ fun NavGraphBuilder.asamGraph(
    share: (Pair<String, String>) -> Unit,
    showSnackbar: (String) -> Unit
 ) {
-   val shareAsam: (String) -> Unit = {
-      share(Pair("Share ASAM Information", it))
+   val shareAsam: (Asam) -> Unit = { asam ->
+      share(Pair("Share ASAM Information", asam.toString()))
    }
 
-   val zoomTo: (NavPoint) -> Unit = { point ->
+   val zoomTo: (Asam) -> Unit = { asam ->
+      val point = NavPoint(asam.latitude, asam.longitude)
       val encoded = Uri.encode(Json.encodeToString(point))
       navController.navigate(MapRoute.Map.name + "?point=${encoded}")
    }
@@ -75,9 +78,11 @@ fun NavGraphBuilder.asamGraph(
             },
             onAction = { action ->
                when(action) {
-                  is AsamAction.Zoom -> zoomTo(action.point)
-                  is AsamAction.Share -> shareAsam(action.text)
-                  is AsamAction.Location -> showSnackbar("${action.text} copied to clipboard")
+                  is AsamAction.Zoom -> zoomTo(action.asam)
+                  is AsamAction.Share -> shareAsam(action.asam)
+                  is AsamAction.Location -> {
+                     showSnackbar("${action.text} copied to clipboard")
+                  }
                }
             }
          )
@@ -91,9 +96,11 @@ fun NavGraphBuilder.asamGraph(
                close = { navController.popBackStack() },
                onAction = { action ->
                   when(action) {
-                     is AsamAction.Zoom -> zoomTo(action.point)
-                     is AsamAction.Share -> shareAsam(action.text)
-                     is AsamAction.Location -> showSnackbar("${action.text} copied to clipboard")
+                     is AsamAction.Zoom -> zoomTo(action.asam)
+                     is AsamAction.Share -> shareAsam(action.asam)
+                     is AsamAction.Location -> {
+                        showSnackbar("${action.text} copied to clipboard")
+                     }
                   }
                }
             )

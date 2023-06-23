@@ -5,18 +5,28 @@ import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.di.DataStoreModule
 import mil.nga.msi.type.UserPreferences
 
-val dataStoreMigration_1_2 = object : DataMigration<UserPreferences> {
+val dataStoreMigration_2_3 = object : DataMigration<UserPreferences> {
    override suspend fun migrate(currentData: UserPreferences): UserPreferences {
-      // Add Notice To Mariners data source
+      // Remove last tab in tabs and place in non-tabs
+      val lastTab = currentData.tabsList.last()
+      val tabs = currentData.tabsList.toMutableList().apply {
+         removeLast()
+      }
+
+      // Add Bookmark data source
       val nonTabs = currentData.nonTabsList.toMutableSet().apply {
-         add(DataSource.NOTICE_TO_MARINERS.name)
-      }.toList()
+         add(DataSource.BOOKMARK.name)
+      }.toList().toMutableList().apply {
+         add(0, lastTab)
+      }
 
       return currentData
          .toBuilder()
+         .clearTabs()
+         .addAllTabs(tabs)
          .clearNonTabs()
          .addAllNonTabs(nonTabs)
-         .setVersion(2)
+         .setVersion(3)
          .build()
    }
 

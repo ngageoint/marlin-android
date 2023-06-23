@@ -2,6 +2,7 @@ package mil.nga.msi.ui.navigation
 
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.ui.asam.AsamRoute
+import mil.nga.msi.ui.bookmark.BookmarkRoute
 import mil.nga.msi.ui.dgpsstation.DgpsStationRoute
 import mil.nga.msi.ui.electronicpublication.ElectronicPublicationRoute
 import mil.nga.msi.ui.geopackage.GeoPackageRoute
@@ -24,6 +25,7 @@ private val mainRoutes: Map<DataSource, Route> = DataSource.values().fold(mapOf(
         DataSource.ELECTRONIC_PUBLICATION -> ElectronicPublicationRoute.Main
         DataSource.NOTICE_TO_MARINERS -> NoticeToMarinersRoute.Main
         DataSource.GEOPACKAGE -> GeoPackageRoute.Sheet
+        DataSource.BOOKMARK -> BookmarkRoute.Main
     }
     dataSourceToRoute + (dataSource to route)
 }

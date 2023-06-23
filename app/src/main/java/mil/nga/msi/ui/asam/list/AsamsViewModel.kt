@@ -14,11 +14,13 @@ import androidx.paging.liveData
 import androidx.paging.map
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.asam.Asam
 import mil.nga.msi.filter.Filter
 import mil.nga.msi.filter.FilterParameterType
 import mil.nga.msi.repository.asam.AsamRepository
+import mil.nga.msi.repository.bookmark.BookmarkRepository
 import mil.nga.msi.repository.preferences.FilterRepository
 import mil.nga.msi.repository.preferences.SortRepository
 import mil.nga.msi.sort.Sort
@@ -27,9 +29,9 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
-sealed class AsamListItem {
-   data class AsamItem(val asam : Asam) : AsamListItem()
-   data class HeaderItem(val header : String) : AsamListItem()
+sealed class AsamListItemState {
+   data class AsamItemState(val asam : Asam) : AsamListItemState()
+   data class HeaderItemState(val header : String) : AsamListItemState()
 }
 
 @HiltViewModel
@@ -37,6 +39,7 @@ class AsamsViewModel @Inject constructor(
    filterRepository: FilterRepository,
    sortRepository: SortRepository,
    private val asamRepository: AsamRepository,
+   private val bookmarkRepository: BookmarkRepository
 ): ViewModel() {
 
    private val queryParameters = MediatorLiveData<Pair<List<Filter>, Sort?>>().apply {
@@ -59,8 +62,8 @@ class AsamsViewModel @Inject constructor(
       }.liveData
    }.asFlow().map { pagingData ->
       pagingData
-         .map { AsamListItem.AsamItem(it) }
-         .insertSeparators { item1: AsamListItem.AsamItem?, item2: AsamListItem.AsamItem? ->
+         .map { AsamListItemState.AsamItemState(it) }
+         .insertSeparators { item1: AsamListItemState.AsamItemState?, item2: AsamListItemState.AsamItemState? ->
             val section = queryParameters.value?.second?.section ?: false
             val primarySortParameter = queryParameters.value?.second?.parameters?.firstOrNull()
 
@@ -76,7 +79,13 @@ class AsamsViewModel @Inject constructor(
 
    suspend fun getAsam(reference: String) = asamRepository.getAsam(reference)
 
-   private fun header(sort: SortParameter, item1: AsamListItem.AsamItem?, item2: AsamListItem.AsamItem?): AsamListItem.HeaderItem? {
+   fun toggleBookmark(asam: Asam, notes: String? = null) {
+      viewModelScope.launch {
+         bookmarkRepository.setBookmark(asam, !asam.bookmarked, notes)
+      }
+   }
+
+   private fun header(sort: SortParameter, item1: AsamListItemState.AsamItemState?, item2: AsamListItemState.AsamItemState?): AsamListItemState.HeaderItemState? {
       return when (sort.parameter.type) {
          FilterParameterType.DATE -> {
             val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy - MM - dd")
@@ -86,9 +95,9 @@ class AsamsViewModel @Inject constructor(
             val date2String = date2?.format(formatter)
 
             if (date1String == null && date2String != null) {
-               AsamListItem.HeaderItem(date2String)
+               AsamListItemState.HeaderItemState(date2String)
             } else if (date1String != null && date2String != null && date1String != date2String) {
-               AsamListItem.HeaderItem(date2String)
+               AsamListItemState.HeaderItemState(date2String)
             } else null
          }
          else -> {
@@ -96,9 +105,9 @@ class AsamsViewModel @Inject constructor(
             val item2String = parameterToName(sort.parameter.parameter, item2?.asam)
 
             if (item1String == null && item2String != null) {
-               AsamListItem.HeaderItem(item2String)
+               AsamListItemState.HeaderItemState(item2String)
             } else if (item1String != null && item2String != null && item1String != item2String) {
-               AsamListItem.HeaderItem(item2String)
+               AsamListItemState.HeaderItemState(item2String)
             } else null
          }
       }

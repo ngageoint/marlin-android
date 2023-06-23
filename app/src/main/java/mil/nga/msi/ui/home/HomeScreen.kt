@@ -12,6 +12,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import mil.nga.msi.ui.about.settingsGraph
 import mil.nga.msi.ui.asam.asamGraph
+import mil.nga.msi.ui.bookmark.bookmarksGraph
 import mil.nga.msi.ui.dgpsstation.dgpsStationGraph
 import mil.nga.msi.ui.electronicpublication.electronicPublicationGraph
 import mil.nga.msi.ui.embark.EmbarkRoute
@@ -176,6 +177,11 @@ fun NavGraphBuilder.homeGraph(
       showSnackbar = { showSnackbar(SnackbarState(message = it)) },
    )
    noticeToMarinersGraph(
+      navController = navController,
+      bottomBarVisibility = { bottomBarVisibility(it) },
+      openNavigationDrawer = openNavigationDrawer
+   )
+   bookmarksGraph(
       navController = navController,
       bottomBarVisibility = { bottomBarVisibility(it) },
       openNavigationDrawer = openNavigationDrawer

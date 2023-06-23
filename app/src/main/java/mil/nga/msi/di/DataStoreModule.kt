@@ -17,6 +17,7 @@ import mil.nga.msi.datasource.filter.LightFilter
 import mil.nga.msi.datasource.filter.ModuFilter
 import mil.nga.msi.datasource.navigationwarning.NavigationArea
 import mil.nga.msi.di.migrations.dataStoreMigration_1_2
+import mil.nga.msi.di.migrations.dataStoreMigration_2_3
 import mil.nga.msi.filter.ComparatorType
 import mil.nga.msi.sort.SortDirection
 import mil.nga.msi.type.*
@@ -34,7 +35,7 @@ class DataStoreModule {
       val userPreferencesSerializer = object : Serializer<UserPreferences> {
          override val defaultValue: UserPreferences =
             UserPreferences.newBuilder()
-               .setVersion(1)
+               .setVersion(VERSION)
                .setMap(
                   MapPreferences.newBuilder()
                      .setMapLayer(BaseMapType.NORMAL.value)
@@ -64,7 +65,7 @@ class DataStoreModule {
                   )
                )
                .addAllTabs(
-                  listOf(DataSource.ASAM, DataSource.MODU, DataSource.NAVIGATION_WARNING, DataSource.LIGHT).map { it.name }
+                  listOf(DataSource.ASAM, DataSource.MODU, DataSource.NAVIGATION_WARNING).map { it.name }
                )
                .addAllNonTabs(
                   listOf(
@@ -72,7 +73,8 @@ class DataStoreModule {
                      DataSource.RADIO_BEACON,
                      DataSource.DGPS_STATION,
                      DataSource.ELECTRONIC_PUBLICATION,
-                     DataSource.NOTICE_TO_MARINERS
+                     DataSource.NOTICE_TO_MARINERS,
+                     DataSource.BOOKMARK
                   ).map { it.name })
                .putAllSort(sortDefaults)
                .putAllFilters(filterDefaults)
@@ -96,14 +98,15 @@ class DataStoreModule {
          serializer = userPreferencesSerializer,
          produceFile = { application.applicationContext.dataStoreFile("user_preferences.pb") },
          migrations = listOf(
-            dataStoreMigration_1_2
+            dataStoreMigration_1_2,
+            dataStoreMigration_2_3
          ),
          corruptionHandler = null
       )
    }
 
    companion object {
-      const val VERSION = 1
+      const val VERSION = 3
 
       val filterDefaults = mapOf(
          DataSource.ASAM.name to Filters.newBuilder()

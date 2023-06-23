@@ -7,31 +7,25 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.PagingData
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
-import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
-import mil.nga.msi.coordinate.DMS
 import mil.nga.msi.datasource.asam.Asam
-import mil.nga.msi.ui.asam.AsamAction
+import mil.nga.msi.ui.action.AsamAction
+import mil.nga.msi.ui.asam.AsamFooter
 import mil.nga.msi.ui.asam.AsamRoute
-import mil.nga.msi.ui.coordinate.CoordinateTextButton
+import mil.nga.msi.ui.asam.AsamSummary
 import mil.nga.msi.ui.main.TopBar
-import mil.nga.msi.ui.navigation.NavPoint
-import java.text.SimpleDateFormat
 import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -85,12 +79,13 @@ fun AsamsScreen(
       Asams(
          pagingState = viewModel.asams,
          onTap = onTap,
-         onCopyLocation = { onAction(AsamAction.Location(it)) },
          onZoom = { onAction(AsamAction.Zoom(it)) },
+         onBookmark = { viewModel.toggleBookmark(it) },
+         onCopyLocation = { onAction(AsamAction.Location(it)) },
          onShare = { reference ->
             scope.launch {
                viewModel.getAsam(reference)?.let { asam ->
-                  onAction(AsamAction.Share(asam.toString()))
+                  onAction(AsamAction.Share(asam))
                }
             }
          }
@@ -100,10 +95,11 @@ fun AsamsScreen(
 
 @Composable
 private fun Asams(
-   pagingState: Flow<PagingData<AsamListItem>>,
+   pagingState: Flow<PagingData<AsamListItemState>>,
    onTap: (String) -> Unit,
-   onZoom: (NavPoint) -> Unit,
+   onZoom: (Asam) -> Unit,
    onShare: (String) -> Unit,
+   onBookmark: (Asam) -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
    val lazyItems = pagingState.collectAsLazyPagingItems()
@@ -117,29 +113,30 @@ private fun Asams(
             count = lazyItems.itemCount,
             key = lazyItems.itemKey {
                when (it) {
-                  is AsamListItem.AsamItem -> it.asam.reference
-                  is AsamListItem.HeaderItem -> it.header
+                  is AsamListItemState.AsamItemState -> it.asam.reference
+                  is AsamListItemState.HeaderItemState -> it.header
                }
             },
             contentType = lazyItems.itemContentType {
                when (it) {
-                  is AsamListItem.AsamItem -> "asam"
-                  is AsamListItem.HeaderItem -> "header"
+                  is AsamListItemState.AsamItemState -> "asam"
+                  is AsamListItemState.HeaderItemState -> "header"
                }
             }
          ) { index ->
             lazyItems[index]?.let { item ->
                when (item) {
-                  is AsamListItem.AsamItem -> {
+                  is AsamListItemState.AsamItemState -> {
                      AsamCard(
                         asam = item.asam,
                         onTap = onTap,
                         onCopyLocation = { onCopyLocation(it) },
-                        onZoom = { onZoom(NavPoint(item.asam.latitude, item.asam.longitude)) },
-                        onShare = { onShare(item.asam.reference) }
+                        onZoom = { onZoom(item.asam) },
+                        onShare = { onShare(item.asam.reference) },
+                        onBookmark = { onBookmark(item.asam) }
                      )
                   }
-                  is AsamListItem.HeaderItem -> {
+                  is AsamListItemState.HeaderItemState -> {
                      Text(
                         text = item.header,
                         fontWeight = FontWeight.Medium,
@@ -160,6 +157,7 @@ private fun AsamCard(
    onTap: (String) -> Unit,
    onShare: () -> Unit,
    onZoom: () -> Unit,
+   onBookmark: () -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
    Card(
@@ -168,108 +166,13 @@ private fun AsamCard(
          .padding(bottom = 8.dp)
          .clickable { onTap(asam.reference) }
    ) {
-      AsamContent(asam, onShare, onZoom, onCopyLocation)
-   }
-}
-
-@Composable
-private fun AsamContent(
-   asam: Asam,
-   onShare: () -> Unit,
-   onZoom: () -> Unit,
-   onCopyLocation: (String) -> Unit
-) {
-   Column(Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
-      CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-         asam.date.let { date ->
-            val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
-            Text(
-               text = dateFormat.format(date),
-               fontWeight = FontWeight.SemiBold,
-               style = MaterialTheme.typography.labelSmall,
-               maxLines = 1,
-               overflow = TextOverflow.Ellipsis
-            )
-         }
-      }
-
-      val header = listOfNotNull(asam.hostility, asam.victim).joinToString(": ")
-      Text(
-         text = header,
-         style = MaterialTheme.typography.titleLarge,
-         maxLines = 1,
-         overflow = TextOverflow.Ellipsis,
-         modifier = Modifier.padding(top = 16.dp)
-      )
-
-      CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-         asam.description?.let {
-            Text(
-               text = it,
-               style = MaterialTheme.typography.bodyMedium,
-               modifier = Modifier.padding(top = 4.dp)
-            )
-         }
-      }
-
+      AsamSummary(asam)
       AsamFooter(
          asam = asam,
-         onShare = onShare,
          onZoom = onZoom,
+         onShare = onShare,
+         onBookmark = onBookmark,
          onCopyLocation = onCopyLocation
       )
-   }
-}
-
-@Composable
-private fun AsamFooter(
-   asam: Asam,
-   onShare: () -> Unit,
-   onZoom: () -> Unit,
-   onCopyLocation: (String) -> Unit
-) {
-   Row(
-      verticalAlignment = Alignment.CenterVertically,
-      horizontalArrangement = Arrangement.SpaceBetween,
-      modifier = Modifier
-         .fillMaxWidth()
-         .padding(top = 8.dp)
-   ) {
-      AsamLocation(asam.latLng, onCopyLocation)
-      AsamActions(onShare, onZoom)
-   }
-}
-
-@Composable
-private fun AsamLocation(
-   latLng: LatLng,
-   onCopyLocation: (String) -> Unit
-) {
-   CoordinateTextButton(
-      latLng = latLng,
-      onCopiedToClipboard = { onCopyLocation(it) }
-   )
-}
-
-@Composable
-private fun AsamActions(
-   onShare: () -> Unit,
-   onZoom: () -> Unit
-) {
-   Row {
-      IconButton(
-         onClick = { onShare() }
-      ) {
-         Icon(Icons.Default.Share,
-            tint = MaterialTheme.colorScheme.tertiary,
-            contentDescription = "Share ASAM"
-         )
-      }
-      IconButton(onClick = { onZoom() }) {
-         Icon(Icons.Default.GpsFixed,
-            tint = MaterialTheme.colorScheme.tertiary,
-            contentDescription = "Zoom to ASAM"
-         )
-      }
    }
 }
