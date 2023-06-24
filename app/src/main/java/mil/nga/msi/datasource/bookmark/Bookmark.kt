@@ -3,7 +3,7 @@ package mil.nga.msi.datasource.bookmark
 import androidx.room.ColumnInfo
 import java.util.Date
 
-open class Bookmark(
+abstract class Bookmark(
    @ColumnInfo(name = "bookmarked")
    open var bookmarked: Boolean = false,
 
@@ -12,4 +12,6 @@ open class Bookmark(
 
    @ColumnInfo(name = "bookmark_notes")
    open var bookmarkNotes: String? = null
-)
+) {
+   abstract val bookmarkId: String
+}

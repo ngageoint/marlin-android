@@ -20,6 +20,7 @@ import mil.nga.msi.datasource.asam.Asam
 import mil.nga.msi.filter.Filter
 import mil.nga.msi.filter.FilterParameterType
 import mil.nga.msi.repository.asam.AsamRepository
+import mil.nga.msi.repository.bookmark.BookmarkKey
 import mil.nga.msi.repository.bookmark.BookmarkRepository
 import mil.nga.msi.repository.preferences.FilterRepository
 import mil.nga.msi.repository.preferences.SortRepository
@@ -79,9 +80,9 @@ class AsamsViewModel @Inject constructor(
 
    suspend fun getAsam(reference: String) = asamRepository.getAsam(reference)
 
-   fun toggleBookmark(asam: Asam, notes: String? = null) {
+   fun removeBookmark(asam: Asam) {
       viewModelScope.launch {
-         bookmarkRepository.setBookmark(asam, !asam.bookmarked, notes)
+         bookmarkRepository.setBookmark(BookmarkKey.fromAsam(asam), false)
       }
    }
 

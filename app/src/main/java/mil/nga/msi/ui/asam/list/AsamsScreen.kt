@@ -20,7 +20,9 @@ import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
+import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.asam.Asam
+import mil.nga.msi.repository.bookmark.BookmarkKey
 import mil.nga.msi.ui.action.AsamAction
 import mil.nga.msi.ui.asam.AsamFooter
 import mil.nga.msi.ui.asam.AsamRoute
@@ -80,7 +82,13 @@ fun AsamsScreen(
          pagingState = viewModel.asams,
          onTap = onTap,
          onZoom = { onAction(AsamAction.Zoom(it)) },
-         onBookmark = { viewModel.toggleBookmark(it) },
+         onBookmark = {
+            if (it.bookmarked) {
+               viewModel.removeBookmark(it)
+            } else {
+               onAction(AsamAction.Bookmark(BookmarkKey.fromAsam(it)))
+            }
+          },
          onCopyLocation = { onAction(AsamAction.Location(it)) },
          onShare = { reference ->
             scope.launch {

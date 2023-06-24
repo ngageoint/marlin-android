@@ -25,6 +25,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.android.gms.maps.model.TileProvider
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.asam.Asam
+import mil.nga.msi.repository.bookmark.BookmarkKey
 import mil.nga.msi.ui.action.AsamAction
 import mil.nga.msi.ui.asam.AsamFooter
 import mil.nga.msi.ui.asam.AsamViewModel
@@ -55,7 +56,13 @@ fun AsamDetailScreen(
          tileProvider = viewModel.tileProvider,
          onZoom = { onAction(AsamAction.Zoom(it)) },
          onShare = { onAction(AsamAction.Share(it)) },
-         onBookmark = { viewModel.toggleBookmark(it) },
+         onBookmark = {
+            if (it.bookmarked) {
+               viewModel.removeBookmark(it)
+            } else {
+               onAction(AsamAction.Bookmark(BookmarkKey.fromAsam(it)))
+            }
+         },
          onCopyLocation = { onAction(AsamAction.Location(it)) }
       )
    }

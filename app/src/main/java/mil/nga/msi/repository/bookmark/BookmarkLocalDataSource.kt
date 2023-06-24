@@ -2,7 +2,7 @@ package mil.nga.msi.repository.bookmark
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.merge
-import mil.nga.msi.datasource.asam.Asam
+import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.asam.AsamDao
 import mil.nga.msi.datasource.bookmark.Bookmark
 import java.util.Date
@@ -18,13 +18,13 @@ class BookmarkLocalDataSource @Inject constructor(
    }
 
    suspend fun setBookmark(
-      item: Any,
+      bookmark: BookmarkKey,
       bookmarked: Boolean,
       notes: String? = null
    ) {
       val date = if(bookmarked) Date() else null
-      when (item) {
-         is Asam -> asamDao.setBookmarked(item.reference, bookmarked, date, notes)
+      when (bookmark.dataSource) {
+         DataSource.ASAM -> asamDao.setBookmarked(bookmark.id, bookmarked, date, notes)
          else -> {}
       }
    }

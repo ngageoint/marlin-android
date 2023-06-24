@@ -17,6 +17,7 @@ import mil.nga.msi.ui.action.AsamAction
 import mil.nga.msi.ui.asam.detail.AsamDetailScreen
 import mil.nga.msi.ui.asam.list.AsamsScreen
 import mil.nga.msi.ui.asam.sheet.AsamSheetScreen
+import mil.nga.msi.ui.bookmark.BookmarkRoute
 import mil.nga.msi.ui.filter.FilterScreen
 import mil.nga.msi.ui.map.MapRoute
 import mil.nga.msi.ui.navigation.NavPoint
@@ -83,6 +84,10 @@ fun NavGraphBuilder.asamGraph(
                   is AsamAction.Location -> {
                      showSnackbar("${action.text} copied to clipboard")
                   }
+                  is AsamAction.Bookmark -> {
+                     val encoded = Uri.encode(Json.encodeToString(action.bookmark))
+                     navController.navigate( "${BookmarkRoute.Notes.name}?bookmark=$encoded")
+                  }
                }
             }
          )
@@ -100,6 +105,10 @@ fun NavGraphBuilder.asamGraph(
                      is AsamAction.Share -> shareAsam(action.asam)
                      is AsamAction.Location -> {
                         showSnackbar("${action.text} copied to clipboard")
+                     }
+                     is AsamAction.Bookmark -> {
+                        val encoded = Uri.encode(Json.encodeToString(action.bookmark))
+                        navController.navigate( "${BookmarkRoute.Notes.name}?bookmark=$encoded")
                      }
                   }
                }

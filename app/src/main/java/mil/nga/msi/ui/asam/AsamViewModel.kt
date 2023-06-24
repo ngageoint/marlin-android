@@ -8,6 +8,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import mil.nga.msi.datasource.asam.Asam
 import mil.nga.msi.repository.asam.AsamRepository
+import mil.nga.msi.repository.bookmark.BookmarkKey
 import mil.nga.msi.repository.bookmark.BookmarkRepository
 import javax.inject.Inject
 import javax.inject.Named
@@ -23,9 +24,9 @@ class AsamViewModel @Inject constructor(
       return repository.observeAsam(id)
    }
 
-   fun toggleBookmark(asam: Asam, notes: String? = null) {
+   fun removeBookmark(asam: Asam) {
       viewModelScope.launch {
-         bookmarkRepository.setBookmark(asam, !asam.bookmarked, notes)
+         bookmarkRepository.setBookmark(BookmarkKey.fromAsam(asam), false)
       }
    }
 }

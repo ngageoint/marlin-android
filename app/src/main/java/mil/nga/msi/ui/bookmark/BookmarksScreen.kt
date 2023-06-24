@@ -1,11 +1,5 @@
 package mil.nga.msi.ui.bookmark
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.FastOutLinearInEasing
-import androidx.compose.animation.core.LinearOutSlowInEasing
-import androidx.compose.animation.core.TweenSpec
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -16,6 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -53,11 +48,12 @@ fun BookmarksScreen(
          bookmarks = bookmarks,
          onTap = onTap,
          onAction = onAction,
-         onBookmark = { viewModel.toggleBookmark(it) }
+         onBookmark = { viewModel.removeBookmark(it) }
       )
    }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun Bookmarks(
    bookmarks: List<Bookmark>,
@@ -71,15 +67,11 @@ private fun Bookmarks(
          modifier = Modifier.padding(8.dp)
       ) {
          items(
-            count = bookmarks.count()
+            count = bookmarks.count(),
+            key = { bookmarks[it].bookmarkId }
          ) { index ->
             val bookmark = bookmarks[index]
-            AnimatedVisibility(
-               visible = bookmark.bookmarked,
-               exit = fadeOut(
-                  animationSpec = TweenSpec(20000, 0, FastOutLinearInEasing)
-               )
-            ) {
+            Box(Modifier.animateItemPlacement()) {
                Bookmark(
                   bookmark = bookmark,
                   onTap = onTap,
@@ -145,6 +137,10 @@ private fun Bookmark(
 
          AsamSummary(asam = asam)
 
+         asam.bookmarkNotes?.let { notes ->
+            BookmarkNotes(notes = notes)
+         }
+
          AsamFooter(
             asam = asam,
             onZoom = {
@@ -157,6 +153,28 @@ private fun Bookmark(
             onCopyLocation = {
                onAction(AsamAction.Location(it))
             }
+         )
+      }
+   }
+}
+
+@Composable
+private fun BookmarkNotes(
+   notes: String
+) {
+   Column(
+      Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+   ) {
+      CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+         Text(
+            text = "BOOKMARK NOTES",
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(bottom = 4.dp)
+         )
+
+         Text(
+            text = notes,
+            style = MaterialTheme.typography.bodyMedium
          )
       }
    }

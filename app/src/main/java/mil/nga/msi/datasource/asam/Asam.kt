@@ -50,6 +50,9 @@ data class Asam(
    @Transient
    val latLng = LatLng(latitude, longitude)
 
+   @Transient
+   override val bookmarkId = reference
+
    override fun toString(): String {
       val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
       return "ASAM\n\n" +

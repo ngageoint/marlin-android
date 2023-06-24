@@ -8,8 +8,8 @@ class BookmarkRepository @Inject constructor(
    fun observeBookmarks() = localDataSource.observeBookmarks()
 
    suspend fun setBookmark(
-      item: Any,
+      bookmark: BookmarkKey,
       bookmarked: Boolean,
       notes: String? = null
-   ) = localDataSource.setBookmark(item, bookmarked, notes)
+   ) = localDataSource.setBookmark(bookmark, bookmarked, notes)
 }
