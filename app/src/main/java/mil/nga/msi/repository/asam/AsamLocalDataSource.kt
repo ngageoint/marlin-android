@@ -30,5 +30,5 @@ class AsamLocalDataSource @Inject constructor(
       bookmarked: Boolean,
       date: Date? = null,
       notes: String? = null
-   ) = dao.setBookmarked(reference, bookmarked, date, notes)
+   ) = dao.setBookmark(reference, bookmarked, date, notes)
 }

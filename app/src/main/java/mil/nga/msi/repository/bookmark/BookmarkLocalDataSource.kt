@@ -24,7 +24,7 @@ class BookmarkLocalDataSource @Inject constructor(
    ) {
       val date = if(bookmarked) Date() else null
       when (bookmark.dataSource) {
-         DataSource.ASAM -> asamDao.setBookmarked(bookmark.id, bookmarked, date, notes)
+         DataSource.ASAM -> asamDao.setBookmark(bookmark.id, bookmarked, date, notes)
          else -> {}
       }
    }
