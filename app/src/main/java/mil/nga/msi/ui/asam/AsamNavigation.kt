@@ -1,6 +1,5 @@
 package mil.nga.msi.ui.asam
 
-import android.net.Uri
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
@@ -9,18 +8,13 @@ import androidx.navigation.navDeepLink
 import androidx.navigation.navigation
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import com.google.accompanist.navigation.material.bottomSheet
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.asam.Asam
 import mil.nga.msi.ui.action.AsamAction
 import mil.nga.msi.ui.asam.detail.AsamDetailScreen
 import mil.nga.msi.ui.asam.list.AsamsScreen
 import mil.nga.msi.ui.asam.sheet.AsamSheetScreen
-import mil.nga.msi.ui.bookmark.BookmarkRoute
 import mil.nga.msi.ui.filter.FilterScreen
-import mil.nga.msi.ui.map.MapRoute
-import mil.nga.msi.ui.navigation.NavPoint
 import mil.nga.msi.ui.navigation.Route
 import mil.nga.msi.ui.sort.SortScreen
 
@@ -50,12 +44,6 @@ fun NavGraphBuilder.asamGraph(
       share(Pair("Share ASAM Information", asam.toString()))
    }
 
-   val zoomTo: (Asam) -> Unit = { asam ->
-      val point = NavPoint(asam.latitude, asam.longitude)
-      val encoded = Uri.encode(Json.encodeToString(point))
-      navController.navigate(MapRoute.Map.name + "?point=${encoded}")
-   }
-
    navigation(
       route = AsamRoute.Main.name,
       startDestination = AsamRoute.List.name
@@ -74,20 +62,11 @@ fun NavGraphBuilder.asamGraph(
             openSort = {
                navController.navigate(AsamRoute.Sort.name)
             },
-            onTap = { reference ->
-               navController.navigate("${AsamRoute.Detail.name}?reference=$reference")
-            },
             onAction = { action ->
                when(action) {
-                  is AsamAction.Zoom -> zoomTo(action.asam)
                   is AsamAction.Share -> shareAsam(action.asam)
-                  is AsamAction.Location -> {
-                     showSnackbar("${action.text} copied to clipboard")
-                  }
-                  is AsamAction.Bookmark -> {
-                     val encoded = Uri.encode(Json.encodeToString(action.bookmark))
-                     navController.navigate( "${BookmarkRoute.Notes.name}?bookmark=$encoded")
-                  }
+                  is AsamAction.Location -> showSnackbar("${action.text} copied to clipboard")
+                  else -> action.navigate(navController)
                }
             }
          )
@@ -101,15 +80,9 @@ fun NavGraphBuilder.asamGraph(
                close = { navController.popBackStack() },
                onAction = { action ->
                   when(action) {
-                     is AsamAction.Zoom -> zoomTo(action.asam)
                      is AsamAction.Share -> shareAsam(action.asam)
-                     is AsamAction.Location -> {
-                        showSnackbar("${action.text} copied to clipboard")
-                     }
-                     is AsamAction.Bookmark -> {
-                        val encoded = Uri.encode(Json.encodeToString(action.bookmark))
-                        navController.navigate( "${BookmarkRoute.Notes.name}?bookmark=$encoded")
-                     }
+                     is AsamAction.Location -> showSnackbar("${action.text} copied to clipboard")
+                     else -> action.navigate(navController)
                   }
                }
             )

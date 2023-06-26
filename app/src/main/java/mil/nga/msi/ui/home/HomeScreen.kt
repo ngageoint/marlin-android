@@ -184,6 +184,8 @@ fun NavGraphBuilder.homeGraph(
    bookmarksGraph(
       navController = navController,
       bottomBarVisibility = { bottomBarVisibility(it) },
+      share = { share(it) },
+      showSnackbar = { showSnackbar(SnackbarState(message = it)) },
       openNavigationDrawer = openNavigationDrawer
    )
    settingsGraph(

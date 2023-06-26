@@ -27,11 +27,11 @@ import mil.nga.msi.ui.asam.AsamSummary
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.modu.ModuFooter
 import mil.nga.msi.ui.modu.ModuSummary
+import mil.nga.msi.ui.navigation.NavPoint
 
 @Composable
 fun BookmarksScreen(
    openDrawer: () -> Unit,
-   onTap: (String) -> Unit,
    onAction: (Action) -> Unit,
    viewModel: BookmarksViewModel = hiltViewModel()
 ) {
@@ -46,7 +46,6 @@ fun BookmarksScreen(
 
       Bookmarks(
          bookmarks = bookmarks,
-         onTap = onTap,
          onAction = onAction,
          onBookmark = { viewModel.removeBookmark(it) }
       )
@@ -57,7 +56,6 @@ fun BookmarksScreen(
 @Composable
 private fun Bookmarks(
    bookmarks: List<Bookmark>,
-   onTap: (String) -> Unit,
    onBookmark: (BookmarkAction) -> Unit,
    onAction: (Action) -> Unit
 ) {
@@ -74,7 +72,6 @@ private fun Bookmarks(
             Box(Modifier.animateItemPlacement()) {
                Bookmark(
                   bookmark = bookmark,
-                  onTap = onTap,
                   onBookmark = onBookmark,
                   onAction = onAction
                )
@@ -87,7 +84,6 @@ private fun Bookmarks(
 @Composable
 private fun Bookmark(
    bookmark: Any,
-   onTap: (String) -> Unit,
    onBookmark: (BookmarkAction) -> Unit,
    onAction: (Action) -> Unit
 ) {
@@ -95,7 +91,6 @@ private fun Bookmark(
       is Asam -> {
          AsamBookmark(
             asam = bookmark,
-            onTap = onTap,
             onAction = onAction,
             onBookmark = {
                onBookmark(BookmarkAction.AsamBookmark(bookmark))
@@ -105,7 +100,6 @@ private fun Bookmark(
       is Modu -> {
          ModuBookmark(
             modu = bookmark,
-            onTap = onTap,
             onAction = onAction,
             onBookmark = {
                onBookmark(BookmarkAction.ModuBookmark(bookmark))
@@ -117,15 +111,14 @@ private fun Bookmark(
 
 @Composable fun AsamBookmark(
    asam: Asam,
-   onTap: (String) -> Unit,
    onBookmark: () -> Unit,
-   onAction: (AsamAction) -> Unit
+   onAction: (Action) -> Unit
 ) {
    Card(
       Modifier
          .fillMaxWidth()
          .padding(bottom = 8.dp)
-         .clickable { onTap(asam.reference) }
+         .clickable { onAction(AsamAction.Tap(asam)) }
    ) {
       Column(Modifier.padding(vertical = 8.dp)) {
          DataSourceIcon(dataSource = DataSource.ASAM)
@@ -138,7 +131,7 @@ private fun Bookmark(
          AsamFooter(
             asam = asam,
             onZoom = {
-               onAction(AsamAction.Zoom(asam))
+               onAction(Action.Zoom(NavPoint(asam.latitude, asam.longitude)))
             },
             onShare = {
                onAction(AsamAction.Share(asam))
@@ -154,7 +147,6 @@ private fun Bookmark(
 
 @Composable fun ModuBookmark(
    modu: Modu,
-   onTap: (String) -> Unit,
    onBookmark: () -> Unit,
    onAction: (Action) -> Unit
 ) {
@@ -162,7 +154,7 @@ private fun Bookmark(
       Modifier
          .fillMaxWidth()
          .padding(bottom = 8.dp)
-         .clickable { onTap(modu.name) }
+         .clickable { onAction(ModuAction.Tap(modu)) }
    ) {
       Column(Modifier.padding(vertical = 8.dp)) {
          DataSourceIcon(dataSource = DataSource.MODU)
@@ -175,7 +167,7 @@ private fun Bookmark(
          ModuFooter(
             modu = modu,
             onZoom = {
-               onAction(ModuAction.Zoom(modu))
+               onAction(Action.Zoom(NavPoint(modu.latitude, modu.longitude)))
             },
             onShare = {
                onAction(ModuAction.Share(modu))

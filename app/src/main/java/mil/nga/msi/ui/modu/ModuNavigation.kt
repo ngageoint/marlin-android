@@ -13,6 +13,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.modu.Modu
+import mil.nga.msi.ui.action.Action
 import mil.nga.msi.ui.action.ModuAction
 import mil.nga.msi.ui.bookmark.BookmarkRoute
 import mil.nga.msi.ui.filter.FilterScreen
@@ -50,12 +51,6 @@ fun NavGraphBuilder.moduGraph(
       share(Pair("Share MODU Information", modu.toString()))
    }
 
-   val zoomTo: (Modu) -> Unit = { modu ->
-      val point = NavPoint(modu.latitude, modu.longitude)
-      val encoded = Uri.encode(Json.encodeToString(point))
-      navController.navigate(MapRoute.Map.name + "?point=${encoded}")
-   }
-
    navigation(
       route = ModuRoute.Main.name,
       startDestination = ModuRoute.List.name,
@@ -74,18 +69,11 @@ fun NavGraphBuilder.moduGraph(
             openSort = {
                navController.navigate(ModuRoute.Sort.name)
             },
-            onTap = { name ->
-               navController.navigate( "${ModuRoute.Detail.name}?name=$name")
-            },
             onAction = { action ->
                when(action) {
-                  is ModuAction.Zoom -> zoomTo(action.modu)
                   is ModuAction.Share -> shareModu(action.modu)
                   is ModuAction.Location -> showSnackbar("${action.text} copied to clipboard")
-                  is ModuAction.Bookmark -> {
-                     val encoded = Uri.encode(Json.encodeToString(action.bookmark))
-                     navController.navigate( "${BookmarkRoute.Notes.name}?bookmark=$encoded")
-                  }
+                  else -> action.navigate(navController)
                }
             }
          )
@@ -97,15 +85,11 @@ fun NavGraphBuilder.moduGraph(
             ModuDetailScreen(
                name,
                close = { navController.popBackStack() },
-               onAction = { action: ModuAction ->
+               onAction = { action: Action ->
                   when(action) {
-                     is ModuAction.Zoom -> zoomTo(action.modu)
                      is ModuAction.Share -> shareModu(action.modu)
                      is ModuAction.Location -> showSnackbar("${action.text} copied to clipboard")
-                     is ModuAction.Bookmark -> {
-                        val encoded = Uri.encode(Json.encodeToString(action.bookmark))
-                        navController.navigate( "${BookmarkRoute.Notes.name}?bookmark=$encoded")
-                     }
+                     else -> action.navigate(navController)
                   }
                }
             )

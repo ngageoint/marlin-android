@@ -27,11 +27,13 @@ import com.google.android.gms.maps.model.TileProvider
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.modu.Modu
 import mil.nga.msi.repository.bookmark.BookmarkKey
+import mil.nga.msi.ui.action.Action
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.MapClip
 import mil.nga.msi.ui.action.ModuAction
 import mil.nga.msi.ui.modu.ModuFooter
 import mil.nga.msi.ui.modu.ModuViewModel
+import mil.nga.msi.ui.navigation.NavPoint
 import mil.nga.msi.ui.theme.onSurfaceDisabled
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -40,7 +42,7 @@ import java.util.Locale
 fun ModuDetailScreen(
    name: String,
    close: () -> Unit,
-   onAction: (ModuAction) -> Unit,
+   onAction: (Action) -> Unit,
    viewModel: ModuViewModel = hiltViewModel()
 ) {
    val modu by viewModel.getModu(name).observeAsState()
@@ -55,9 +57,9 @@ fun ModuDetailScreen(
       ModuDetailContent(
          modu = modu,
          tileProvider = viewModel.tileProvider,
-         onZoom = { onAction(ModuAction.Zoom(it)) },
+         onZoom = { onAction(Action.Zoom(NavPoint(it.latitude, it.longitude))) },
          onShare = { onAction(ModuAction.Share(it)) },
-         onBookmark = { onAction(ModuAction.Bookmark(BookmarkKey.fromModu(it))) },
+         onBookmark = { onAction(Action.Bookmark(BookmarkKey.fromModu(it))) },
          onCopyLocation = { onAction(ModuAction.Location(it)) }
       )
    }

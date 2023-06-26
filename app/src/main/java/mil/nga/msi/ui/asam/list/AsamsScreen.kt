@@ -9,7 +9,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -19,14 +18,15 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.launch
 import mil.nga.msi.datasource.asam.Asam
 import mil.nga.msi.repository.bookmark.BookmarkKey
+import mil.nga.msi.ui.action.Action
 import mil.nga.msi.ui.action.AsamAction
 import mil.nga.msi.ui.asam.AsamFooter
 import mil.nga.msi.ui.asam.AsamRoute
 import mil.nga.msi.ui.asam.AsamSummary
 import mil.nga.msi.ui.main.TopBar
+import mil.nga.msi.ui.navigation.NavPoint
 import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -35,11 +35,9 @@ fun AsamsScreen(
    openDrawer: () -> Unit,
    openFilter: () -> Unit,
    openSort: () -> Unit,
-   onTap: (String) -> Unit,
-   onAction: (AsamAction) -> Unit,
+   onAction: (Action) -> Unit,
    viewModel: AsamsViewModel = hiltViewModel()
 ) {
-   val scope = rememberCoroutineScope()
    val filters by viewModel.asamFilters.observeAsState(emptyList())
 
    Column(modifier = Modifier.fillMaxSize()) {
@@ -79,23 +77,7 @@ fun AsamsScreen(
 
       Asams(
          pagingState = viewModel.asams,
-         onTap = onTap,
-         onZoom = { onAction(AsamAction.Zoom(it)) },
-         onBookmark = {
-            if (it.bookmarked) {
-               viewModel.removeBookmark(it)
-            } else {
-               onAction(AsamAction.Bookmark(BookmarkKey.fromAsam(it)))
-            }
-         },
-         onCopyLocation = { onAction(AsamAction.Location(it)) },
-         onShare = { reference ->
-            scope.launch {
-               viewModel.getAsam(reference)?.let { asam ->
-                  onAction(AsamAction.Share(asam))
-               }
-            }
-         }
+         onAction = onAction
       )
    }
 }
@@ -103,11 +85,7 @@ fun AsamsScreen(
 @Composable
 private fun Asams(
    pagingState: Flow<PagingData<AsamListItemState>>,
-   onTap: (String) -> Unit,
-   onZoom: (Asam) -> Unit,
-   onShare: (String) -> Unit,
-   onBookmark: (Asam) -> Unit,
-   onCopyLocation: (String) -> Unit
+   onAction: (Action) -> Unit
 ) {
    val lazyItems = pagingState.collectAsLazyPagingItems()
 
@@ -136,11 +114,7 @@ private fun Asams(
                   is AsamListItemState.AsamItemState -> {
                      AsamCard(
                         asam = item.asam,
-                        onTap = onTap,
-                        onCopyLocation = { onCopyLocation(it) },
-                        onZoom = { onZoom(item.asam) },
-                        onShare = { onShare(item.asam.reference) },
-                        onBookmark = { onBookmark(item.asam) }
+                        onAction = onAction
                      )
                   }
                   is AsamListItemState.HeaderItemState -> {
@@ -161,25 +135,21 @@ private fun Asams(
 @Composable
 private fun AsamCard(
    asam: Asam,
-   onTap: (String) -> Unit,
-   onShare: () -> Unit,
-   onZoom: () -> Unit,
-   onBookmark: () -> Unit,
-   onCopyLocation: (String) -> Unit
+   onAction: (Action) -> Unit
 ) {
    Card(
       Modifier
          .fillMaxWidth()
          .padding(bottom = 8.dp)
-         .clickable { onTap(asam.reference) }
+         .clickable { onAction(AsamAction.Tap(asam)) }
    ) {
       AsamSummary(asam)
       AsamFooter(
          asam = asam,
-         onZoom = onZoom,
-         onShare = onShare,
-         onBookmark = onBookmark,
-         onCopyLocation = onCopyLocation
+         onZoom = { onAction(Action.Zoom(NavPoint(asam.latitude, asam.longitude))) },
+         onShare = { onAction(AsamAction.Share(asam)) },
+         onBookmark = { onAction(Action.Bookmark(BookmarkKey.fromAsam(asam))) },
+         onCopyLocation = { onAction(AsamAction.Location(it)) }
       )
    }
 }
