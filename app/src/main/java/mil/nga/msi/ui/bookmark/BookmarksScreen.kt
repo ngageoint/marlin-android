@@ -1,9 +1,6 @@
 package mil.nga.msi.ui.bookmark
 
-import android.util.Log
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -14,12 +11,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import mil.nga.msi.R
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.asam.Asam
 import mil.nga.msi.datasource.bookmark.Bookmark
@@ -28,6 +22,7 @@ import mil.nga.msi.ui.action.Action
 import mil.nga.msi.ui.action.AsamAction
 import mil.nga.msi.ui.action.ModuAction
 import mil.nga.msi.ui.asam.AsamFooter
+import mil.nga.msi.ui.datasource.DataSourceIcon
 import mil.nga.msi.ui.asam.AsamSummary
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.modu.ModuFooter
@@ -41,7 +36,6 @@ fun BookmarksScreen(
    viewModel: BookmarksViewModel = hiltViewModel()
 ) {
    val bookmarks by viewModel.bookmarks.observeAsState(emptyList())
-   Log.i("Billy", "bookmarks ${bookmarks.size}")
 
    Column(modifier = Modifier.fillMaxSize()) {
       TopBar(
@@ -134,23 +128,7 @@ private fun Bookmark(
          .clickable { onTap(asam.reference) }
    ) {
       Column(Modifier.padding(vertical = 8.dp)) {
-         Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier
-               .padding(horizontal = 16.dp)
-               .size(48.dp)
-         ) {
-            Canvas(modifier = Modifier.fillMaxSize(), onDraw = {
-               drawCircle(color = DataSource.ASAM.color)
-            })
-
-            Image(
-               painter = painterResource(id = R.drawable.ic_asam_24dp),
-               modifier = Modifier.size(24.dp),
-               contentDescription = "ASAM icon",
-            )
-         }
-
+         DataSourceIcon(dataSource = DataSource.ASAM)
          AsamSummary(asam = asam)
 
          asam.bookmarkNotes?.let { notes ->
@@ -187,23 +165,7 @@ private fun Bookmark(
          .clickable { onTap(modu.name) }
    ) {
       Column(Modifier.padding(vertical = 8.dp)) {
-         Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier
-               .padding(horizontal = 16.dp)
-               .size(48.dp)
-         ) {
-            Canvas(modifier = Modifier.fillMaxSize(), onDraw = {
-               drawCircle(color = DataSource.MODU.color)
-            })
-
-            Image(
-               painter = painterResource(id = R.drawable.ic_modu_24dp),
-               modifier = Modifier.size(24.dp),
-               contentDescription = "MODU icon",
-            )
-         }
-
+         DataSourceIcon(dataSource = DataSource.MODU)
          ModuSummary(modu = modu)
 
          modu.bookmarkNotes?.let { notes ->

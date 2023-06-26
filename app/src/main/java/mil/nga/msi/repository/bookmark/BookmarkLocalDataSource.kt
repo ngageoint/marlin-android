@@ -20,8 +20,7 @@ class BookmarkLocalDataSource @Inject constructor(
          moduDao.observeBookmarkedModus()
       ) { asams, modus ->
          val bookmarks = asams + modus
-         val foo = bookmarks.sortedByDescending { it.bookmarkDate }
-         foo
+         bookmarks.sortedByDescending { it.bookmarkDate }
       }
    }
 

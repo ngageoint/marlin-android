@@ -59,7 +59,7 @@ private fun ModuActions(
          Icon(
             imageVector = if (bookmarked) Icons.Default.Bookmark else Icons.Outlined.BookmarkBorder,
             tint = MaterialTheme.colorScheme.tertiary,
-            contentDescription = "Bookmark ASAM"
+            contentDescription = "Bookmark MODU"
          )
       }
       IconButton(onClick = { onShare() }) {
