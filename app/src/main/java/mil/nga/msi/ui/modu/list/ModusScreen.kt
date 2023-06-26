@@ -26,7 +26,6 @@ import mil.nga.msi.ui.action.ModuAction
 import mil.nga.msi.ui.modu.ModuFooter
 import mil.nga.msi.ui.modu.ModuRoute
 import mil.nga.msi.ui.modu.ModuSummary
-import mil.nga.msi.ui.navigation.NavPoint
 import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -144,7 +143,7 @@ private fun ModuCard(
       ModuSummary(modu = modu)
       ModuFooter(
          modu,
-         onZoom = { onAction(Action.Zoom(NavPoint(modu.latitude, modu.longitude))) },
+         onZoom = { onAction(Action.Zoom(modu.latLng)) },
          onShare = { onAction(ModuAction.Share(modu)) },
          onBookmark = { onAction(Action.Bookmark(BookmarkKey.fromModu(modu))) },
          onCopyLocation = { onAction(ModuAction.Location(it)) }

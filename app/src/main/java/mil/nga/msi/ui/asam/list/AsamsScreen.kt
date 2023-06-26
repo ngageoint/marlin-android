@@ -26,7 +26,6 @@ import mil.nga.msi.ui.asam.AsamFooter
 import mil.nga.msi.ui.asam.AsamRoute
 import mil.nga.msi.ui.asam.AsamSummary
 import mil.nga.msi.ui.main.TopBar
-import mil.nga.msi.ui.navigation.NavPoint
 import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -146,7 +145,7 @@ private fun AsamCard(
       AsamSummary(asam)
       AsamFooter(
          asam = asam,
-         onZoom = { onAction(Action.Zoom(NavPoint(asam.latitude, asam.longitude))) },
+         onZoom = { onAction(Action.Zoom(asam.latLng)) },
          onShare = { onAction(AsamAction.Share(asam)) },
          onBookmark = { onAction(Action.Bookmark(BookmarkKey.fromAsam(asam))) },
          onCopyLocation = { onAction(AsamAction.Location(it)) }

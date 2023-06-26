@@ -33,7 +33,6 @@ import mil.nga.msi.ui.map.MapClip
 import mil.nga.msi.ui.action.ModuAction
 import mil.nga.msi.ui.modu.ModuFooter
 import mil.nga.msi.ui.modu.ModuViewModel
-import mil.nga.msi.ui.navigation.NavPoint
 import mil.nga.msi.ui.theme.onSurfaceDisabled
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -57,7 +56,7 @@ fun ModuDetailScreen(
       ModuDetailContent(
          modu = modu,
          tileProvider = viewModel.tileProvider,
-         onZoom = { onAction(Action.Zoom(NavPoint(it.latitude, it.longitude))) },
+         onZoom = { onAction(Action.Zoom(it.latLng)) },
          onShare = { onAction(ModuAction.Share(it)) },
          onBookmark = { onAction(Action.Bookmark(BookmarkKey.fromModu(it))) },
          onCopyLocation = { onAction(ModuAction.Location(it)) }

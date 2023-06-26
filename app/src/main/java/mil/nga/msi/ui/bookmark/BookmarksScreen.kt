@@ -131,7 +131,7 @@ private fun Bookmark(
          AsamFooter(
             asam = asam,
             onZoom = {
-               onAction(Action.Zoom(NavPoint(asam.latitude, asam.longitude)))
+               onAction(Action.Zoom(asam.latLng))
             },
             onShare = {
                onAction(AsamAction.Share(asam))
@@ -167,7 +167,7 @@ private fun Bookmark(
          ModuFooter(
             modu = modu,
             onZoom = {
-               onAction(Action.Zoom(NavPoint(modu.latitude, modu.longitude)))
+               onAction(Action.Zoom(modu.latLng))
             },
             onShare = {
                onAction(ModuAction.Share(modu))

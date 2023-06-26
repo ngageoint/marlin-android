@@ -55,7 +55,7 @@ fun AsamDetailScreen(
       AsamDetailContent(
          asam = asam,
          tileProvider = viewModel.tileProvider,
-         onZoom = { onAction(Action.Zoom(NavPoint(it.latitude, it.longitude))) },
+         onZoom = { onAction(Action.Zoom(it.latLng)) },
          onShare = { onAction(AsamAction.Share(it)) },
          onBookmark = {
             if (it.bookmarked) {
