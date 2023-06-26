@@ -3,7 +3,6 @@ package mil.nga.msi.repository.asam
 import androidx.sqlite.db.SimpleSQLiteQuery
 import mil.nga.msi.datasource.asam.Asam
 import mil.nga.msi.datasource.asam.AsamDao
-import java.util.Date
 import javax.inject.Inject
 
 class AsamLocalDataSource @Inject constructor(
@@ -24,11 +23,4 @@ class AsamLocalDataSource @Inject constructor(
    suspend fun getAsams(): List<Asam> = dao.getAsams()
 
    suspend fun existingAsams(references: List<String>) = dao.getAsams(references)
-
-   suspend fun setBookmarked(
-      reference: String,
-      bookmarked: Boolean,
-      date: Date? = null,
-      notes: String? = null
-   ) = dao.setBookmark(reference, bookmarked, date, notes)
 }

@@ -7,30 +7,26 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.PagingData
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
-import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import mil.nga.msi.datasource.modu.Modu
-import mil.nga.msi.ui.coordinate.CoordinateTextButton
+import mil.nga.msi.repository.bookmark.BookmarkKey
 import mil.nga.msi.ui.main.TopBar
-import mil.nga.msi.ui.modu.ModuAction
+import mil.nga.msi.ui.action.ModuAction
+import mil.nga.msi.ui.modu.ModuFooter
 import mil.nga.msi.ui.modu.ModuRoute
-import mil.nga.msi.ui.navigation.NavPoint
-import java.text.SimpleDateFormat
+import mil.nga.msi.ui.modu.ModuSummary
 import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -85,10 +81,17 @@ fun ModusScreen(
          onTap = onTap,
          onCopyLocation = { onAction(ModuAction.Location(it)) },
          onZoom = { onAction( ModuAction.Zoom(it)) },
+         onBookmark = {
+            if (it.bookmarked) {
+               viewModel.removeBookmark(it)
+            } else {
+               onAction(ModuAction.Bookmark(BookmarkKey.fromModu(it)))
+            }
+         },
          onShare = { name ->
             scope.launch {
                viewModel.getModu(name)?.let { modu ->
-                  onAction(ModuAction.Share(modu.toString()))
+                  onAction(ModuAction.Share(modu))
                }
             }
          }
@@ -100,8 +103,9 @@ fun ModusScreen(
 private fun Modus(
    pagingState: Flow<PagingData<ModuListItem>>,
    onTap: (String) -> Unit,
-   onZoom: (NavPoint) -> Unit,
+   onZoom: (Modu) -> Unit,
    onShare: (String) -> Unit,
+   onBookmark: (Modu) -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
    val lazyItems = pagingState.collectAsLazyPagingItems()
@@ -131,8 +135,9 @@ private fun Modus(
                      ModuCard(
                         modu = item.modu,
                         onTap = onTap,
-                        onZoom = { onZoom(NavPoint(item.modu.latitude, item.modu.longitude)) },
+                        onZoom = { onZoom(item.modu) },
                         onShare = { item.modu.name.let { onShare(it) } },
+                        onBookmark = { onBookmark(item.modu) },
                         onCopyLocation = onCopyLocation
                      )
                   }
@@ -157,6 +162,7 @@ private fun ModuCard(
    onTap: (String) -> Unit,
    onZoom: () -> Unit,
    onShare: () -> Unit,
+   onBookmark: () -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
    if (modu != null) {
@@ -166,109 +172,8 @@ private fun ModuCard(
             .padding(bottom = 8.dp)
             .clickable { onTap(modu.name) }
       ) {
-         ModuContent(modu, onZoom, onShare, onCopyLocation)
-      }
-   }
-}
-
-@Composable
-private fun ModuContent(
-   modu: Modu,
-   onZoom: () -> Unit,
-   onShare: () -> Unit,
-   onCopyLocation: (String) -> Unit
-) {
-   Column(Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
-      CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-         modu.date.let { date ->
-            val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
-            Text(
-               text = dateFormat.format(date),
-               fontWeight = FontWeight.SemiBold,
-               style = MaterialTheme.typography.labelSmall,
-               maxLines = 1,
-               overflow = TextOverflow.Ellipsis
-            )
-         }
-      }
-
-      Text(
-         text = modu.name,
-         style = MaterialTheme.typography.titleLarge,
-         maxLines = 1,
-         overflow = TextOverflow.Ellipsis,
-         modifier = Modifier.padding(top = 16.dp)
-      )
-
-      CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-         modu.rigStatus?.let {
-            Text(
-               text = it.name,
-               style = MaterialTheme.typography.bodyMedium,
-               modifier = Modifier.padding(top = 4.dp)
-            )
-         }
-
-         modu.specialStatus?.let {
-            Text(
-               text = it,
-               style = MaterialTheme.typography.bodyMedium
-            )
-         }
-      }
-      
-      ModuFooter(modu, onZoom, onShare, onCopyLocation)
-   }
-}
-
-@Composable
-private fun ModuFooter(
-   modu: Modu,
-   onZoom: () -> Unit,
-   onShare: () -> Unit,
-   onCopyLocation: (String) -> Unit
-) {
-   Row(
-      verticalAlignment = Alignment.CenterVertically,
-      horizontalArrangement = Arrangement.SpaceBetween,
-      modifier = Modifier
-         .fillMaxWidth()
-         .padding(top = 8.dp)
-   ) {
-      ModuLocation(modu.latLng, onCopyLocation)
-      ModuActions(onZoom, onShare)
-   }
-}
-
-
-@Composable
-private fun ModuLocation(
-   latLng: LatLng,
-   onCopyLocation: (String) -> Unit
-) {
-   CoordinateTextButton(
-      latLng = latLng,
-      onCopiedToClipboard = { onCopyLocation(it) }
-   )
-}
-
-@Composable
-private fun ModuActions(
-   onZoom: () -> Unit,
-   onShare: () -> Unit
-) {
-   Row {
-      IconButton(onClick = { onShare() }) {
-         Icon(Icons.Default.Share,
-            tint = MaterialTheme.colorScheme.tertiary,
-            contentDescription = "Share MODU"
-         )
-      }
-      IconButton(onClick = { onZoom() }) {
-         Icon(Icons.Default.GpsFixed,
-            tint = MaterialTheme.colorScheme.tertiary,
-            contentDescription = "Zoom to MODU"
-         )
+         ModuSummary(modu = modu)
+         ModuFooter(modu, onZoom, onShare, onBookmark, onCopyLocation)
       }
    }
 }

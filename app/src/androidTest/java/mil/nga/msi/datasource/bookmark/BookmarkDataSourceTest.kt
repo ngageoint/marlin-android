@@ -1,33 +1,26 @@
 package mil.nga.msi.datasource.bookmark
 
-import androidx.lifecycle.asFlow
-import androidx.lifecycle.asLiveData
-import androidx.paging.testing.asPagingSourceFactory
-import androidx.work.Data
-import androidx.work.WorkInfo
-import androidx.work.WorkManager
+import android.util.Log
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
-import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.asam.Asam
 import mil.nga.msi.datasource.asam.AsamDao
-import mil.nga.msi.datasource.asam.AsamListItem
+import mil.nga.msi.datasource.modu.Modu
+import mil.nga.msi.datasource.modu.ModuDao
 import mil.nga.msi.repository.bookmark.BookmarkKey
 import mil.nga.msi.repository.bookmark.BookmarkLocalDataSource
-import mil.nga.msi.repository.preferences.UserPreferencesRepository
 import org.junit.After
-import org.junit.Assert
+import org.junit.Assert.assertEquals
 import org.junit.Test
+import java.text.SimpleDateFormat
 import java.util.Date
-import java.util.UUID
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class BookmarkDataSourceTest {
@@ -35,6 +28,43 @@ class BookmarkDataSourceTest {
    @After
    fun tearDown() {
       clearAllMocks()
+   }
+
+   @Test
+   fun should_combine_and_sort_bookmark_flow() = runTest {
+      val dateFormat = SimpleDateFormat("yyyy-MM-dd")
+
+      val asamDao = mockk<AsamDao>()
+      coEvery { asamDao.observeBookmarkedAsams() } answers {
+         flowOf(
+            listOf(
+               Asam("1", Date(), 0.0, 0.0).apply { bookmarkDate =  dateFormat.parse("2020-01-01")!!},
+               Asam("2", Date(), 0.0, 0.0).apply { bookmarkDate =  dateFormat.parse("2023-01-01")!!},
+            )
+         )
+      }
+
+      val moduDao = mockk<ModuDao>()
+      coEvery { moduDao.observeBookmarkedModus() } answers {
+         flowOf(
+            listOf(
+               Modu("3", Date(), 0.0, 0.0).apply { bookmarkDate =  dateFormat.parse("2022-01-01")!!},
+               Modu("4", Date(), 0.0, 0.0).apply { bookmarkDate =  dateFormat.parse("2021-01-01")!!},
+            )
+         )
+      }
+
+      val dataSource = BookmarkLocalDataSource(
+         asamDao = asamDao,
+         moduDao = moduDao
+      )
+
+      val bookmarks = dataSource.observeBookmarks().first()
+      assertEquals(4, bookmarks.size)
+      assertEquals(dateFormat.parse("2023-01-01")!!, bookmarks[0].bookmarkDate)
+      assertEquals(dateFormat.parse("2022-01-01")!!, bookmarks[1].bookmarkDate)
+      assertEquals(dateFormat.parse("2021-01-01")!!, bookmarks[2].bookmarkDate)
+      assertEquals(dateFormat.parse("2020-01-01")!!, bookmarks[3].bookmarkDate)
    }
 
    @Test
@@ -48,7 +78,8 @@ class BookmarkDataSourceTest {
       coEvery { asamDao.setBookmark(any(), any(), any(), any()) } returns Unit
 
       val dataSource = BookmarkLocalDataSource(
-         asamDao = asamDao
+         asamDao = asamDao,
+         moduDao = mockk()
       )
 
       dataSource.setBookmark(bookmark, bookmarked, notes)
@@ -68,13 +99,57 @@ class BookmarkDataSourceTest {
       coEvery { asamDao.setBookmark(any(), any(), any(), any()) } returns Unit
 
       val dataSource = BookmarkLocalDataSource(
-         asamDao = asamDao
+         asamDao = asamDao,
+         moduDao = mockk()
       )
 
       dataSource.setBookmark(bookmark, bookmarked)
 
       coVerify {
          asamDao.setBookmark(reference, bookmarked, null, null)
+      }
+   }
+
+   @Test
+   fun should_bookmark_modu() = runTest {
+      val name = "1"
+      val notes = "notes"
+      val bookmarked = true
+      val bookmark = BookmarkKey.fromModu(Modu(name, Date(), 0.0, 0.0))
+
+      val moduDao = mockk<ModuDao>()
+      coEvery { moduDao.setBookmark(any(), any(), any(), any()) } returns Unit
+
+      val dataSource = BookmarkLocalDataSource(
+         asamDao = mockk(),
+         moduDao = moduDao
+      )
+
+      dataSource.setBookmark(bookmark, bookmarked, notes)
+
+      coVerify {
+         moduDao.setBookmark(name, bookmarked, any(), notes)
+      }
+   }
+
+   @Test
+   fun should_unbookmark_modu() = runTest {
+      val name = "1"
+      val bookmarked = false
+      val bookmark = BookmarkKey.fromModu(Modu(name, Date(), 0.0, 0.0))
+
+      val moduDao = mockk<ModuDao>()
+      coEvery { moduDao.setBookmark(any(), any(), any(), any()) } returns Unit
+
+      val dataSource = BookmarkLocalDataSource(
+         asamDao = mockk(),
+         moduDao = moduDao
+      )
+
+      dataSource.setBookmark(bookmark, bookmarked)
+
+      coVerify {
+         moduDao.setBookmark(name, bookmarked, null, null)
       }
    }
 }

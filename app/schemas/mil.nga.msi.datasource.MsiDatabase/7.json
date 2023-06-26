@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 7,
-    "identityHash": "23f33ee278f22547b4eb6d7a730ca9f8",
+    "identityHash": "0b5a17853d0f99f98dcf03267770da94",
     "entities": [
       {
         "tableName": "asams",
@@ -821,7 +821,7 @@
       },
       {
         "tableName": "modus",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `date` INTEGER NOT NULL, `latitude` REAL NOT NULL, `longitude` REAL NOT NULL, `rig_status` TEXT, `special_status` TEXT, `distance` REAL, `position` TEXT, `navigation_area` TEXT, `region` TEXT, `subregion` TEXT, PRIMARY KEY(`name`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `date` INTEGER NOT NULL, `latitude` REAL NOT NULL, `longitude` REAL NOT NULL, `bookmarked` INTEGER NOT NULL, `bookmarkDate` INTEGER, `bookmarkNotes` TEXT, `rig_status` TEXT, `special_status` TEXT, `distance` REAL, `position` TEXT, `navigation_area` TEXT, `region` TEXT, `subregion` TEXT, PRIMARY KEY(`name`))",
         "fields": [
           {
             "fieldPath": "name",
@@ -846,6 +846,24 @@
             "columnName": "longitude",
             "affinity": "REAL",
             "notNull": true
+          },
+          {
+            "fieldPath": "bookmarked",
+            "columnName": "bookmarked",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "bookmarkDate",
+            "columnName": "bookmarkDate",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "bookmarkNotes",
+            "columnName": "bookmarkNotes",
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "rigStatus",
@@ -1864,7 +1882,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '23f33ee278f22547b4eb6d7a730ca9f8')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '0b5a17853d0f99f98dcf03267770da94')"
     ]
   }
 }

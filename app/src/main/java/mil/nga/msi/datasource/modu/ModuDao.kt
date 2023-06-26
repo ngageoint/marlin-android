@@ -5,6 +5,7 @@ import androidx.paging.PagingSource
 import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteQuery
 import kotlinx.coroutines.flow.Flow
+import java.util.Date
 
 @Dao
 interface ModuDao {
@@ -56,5 +57,11 @@ interface ModuDao {
       minLongitude: Double,
       maxLongitude: Double
    ): List<Modu>
+
+   @Query("UPDATE modus SET bookmarked = :bookmarked, bookmarkDate = :date, bookmarkNotes = :notes WHERE name = :name")
+   suspend fun setBookmark(name: String, bookmarked: Boolean, date: Date? = null, notes: String? = null)
+
+   @Query("SELECT * from modus WHERE bookmarked = 1 ORDER BY bookmarkDate")
+   fun observeBookmarkedModus(): Flow<List<Modu>>
 }
 

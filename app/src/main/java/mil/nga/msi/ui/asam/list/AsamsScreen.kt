@@ -20,7 +20,6 @@ import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
-import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.asam.Asam
 import mil.nga.msi.repository.bookmark.BookmarkKey
 import mil.nga.msi.ui.action.AsamAction
@@ -88,7 +87,7 @@ fun AsamsScreen(
             } else {
                onAction(AsamAction.Bookmark(BookmarkKey.fromAsam(it)))
             }
-          },
+         },
          onCopyLocation = { onAction(AsamAction.Location(it)) },
          onShare = { reference ->
             scope.launch {

@@ -14,10 +14,13 @@ import androidx.paging.liveData
 import androidx.paging.map
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.modu.Modu
 import mil.nga.msi.filter.Filter
 import mil.nga.msi.filter.FilterParameterType
+import mil.nga.msi.repository.bookmark.BookmarkKey
+import mil.nga.msi.repository.bookmark.BookmarkRepository
 import mil.nga.msi.repository.modu.ModuRepository
 import mil.nga.msi.repository.preferences.FilterRepository
 import mil.nga.msi.repository.preferences.SortRepository
@@ -35,6 +38,7 @@ sealed class ModuListItem {
 @HiltViewModel
 class ModusViewModel @Inject constructor(
    private val moduRepository: ModuRepository,
+   private val bookmarkRepository: BookmarkRepository,
    filterRepository: FilterRepository,
    sortRepository: SortRepository,
 ): ViewModel() {
@@ -74,6 +78,12 @@ class ModusViewModel @Inject constructor(
    }.asLiveData()
 
    suspend fun getModu(name: String) = moduRepository.getModu(name)
+
+   fun removeBookmark(modu: Modu) {
+      viewModelScope.launch {
+         bookmarkRepository.setBookmark(BookmarkKey.fromModu(modu), false)
+      }
+   }
 
    private fun header(sort: SortParameter, item1: ModuListItem.ModuItem?, item2: ModuListItem.ModuItem?): ModuListItem.HeaderItem? {
       return when (sort.parameter.type) {

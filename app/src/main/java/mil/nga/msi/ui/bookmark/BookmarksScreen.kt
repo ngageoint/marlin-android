@@ -1,5 +1,6 @@
 package mil.nga.msi.ui.bookmark
 
+import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -22,11 +23,15 @@ import mil.nga.msi.R
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.asam.Asam
 import mil.nga.msi.datasource.bookmark.Bookmark
+import mil.nga.msi.datasource.modu.Modu
 import mil.nga.msi.ui.action.Action
 import mil.nga.msi.ui.action.AsamAction
+import mil.nga.msi.ui.action.ModuAction
 import mil.nga.msi.ui.asam.AsamFooter
 import mil.nga.msi.ui.asam.AsamSummary
 import mil.nga.msi.ui.main.TopBar
+import mil.nga.msi.ui.modu.ModuFooter
+import mil.nga.msi.ui.modu.ModuSummary
 
 @Composable
 fun BookmarksScreen(
@@ -36,6 +41,7 @@ fun BookmarksScreen(
    viewModel: BookmarksViewModel = hiltViewModel()
 ) {
    val bookmarks by viewModel.bookmarks.observeAsState(emptyList())
+   Log.i("Billy", "bookmarks ${bookmarks.size}")
 
    Column(modifier = Modifier.fillMaxSize()) {
       TopBar(
@@ -102,6 +108,16 @@ private fun Bookmark(
             }
          )
       }
+      is Modu -> {
+         ModuBookmark(
+            modu = bookmark,
+            onTap = onTap,
+            onAction = onAction,
+            onBookmark = {
+               onBookmark(BookmarkAction.ModuBookmark(bookmark))
+            }
+         )
+      }
    }
 }
 
@@ -152,6 +168,59 @@ private fun Bookmark(
             onBookmark = onBookmark,
             onCopyLocation = {
                onAction(AsamAction.Location(it))
+            }
+         )
+      }
+   }
+}
+
+@Composable fun ModuBookmark(
+   modu: Modu,
+   onTap: (String) -> Unit,
+   onBookmark: () -> Unit,
+   onAction: (Action) -> Unit
+) {
+   Card(
+      Modifier
+         .fillMaxWidth()
+         .padding(bottom = 8.dp)
+         .clickable { onTap(modu.name) }
+   ) {
+      Column(Modifier.padding(vertical = 8.dp)) {
+         Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+               .padding(horizontal = 16.dp)
+               .size(48.dp)
+         ) {
+            Canvas(modifier = Modifier.fillMaxSize(), onDraw = {
+               drawCircle(color = DataSource.MODU.color)
+            })
+
+            Image(
+               painter = painterResource(id = R.drawable.ic_modu_24dp),
+               modifier = Modifier.size(24.dp),
+               contentDescription = "MODU icon",
+            )
+         }
+
+         ModuSummary(modu = modu)
+
+         modu.bookmarkNotes?.let { notes ->
+            BookmarkNotes(notes = notes)
+         }
+
+         ModuFooter(
+            modu = modu,
+            onZoom = {
+               onAction(ModuAction.Zoom(modu))
+            },
+            onShare = {
+               onAction(ModuAction.Share(modu))
+            },
+            onBookmark = onBookmark,
+            onCopyLocation = {
+               onAction(ModuAction.Location(it))
             }
          )
       }
