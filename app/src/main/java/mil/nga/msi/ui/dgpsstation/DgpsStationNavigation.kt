@@ -10,14 +10,14 @@ import com.google.accompanist.navigation.material.bottomSheet
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import mil.nga.msi.datasource.DataSource
+import mil.nga.msi.datasource.dgpsstation.DgpsStation
 import mil.nga.msi.repository.dgpsstation.DgpsStationKey
+import mil.nga.msi.ui.action.DgpsStationAction
 import mil.nga.msi.ui.dgpsstation.detail.DgpsStationDetailScreen
 import mil.nga.msi.ui.dgpsstation.list.DgpsStationsScreen
 import mil.nga.msi.ui.dgpsstation.sheet.DgpsStationSheetScreen
 import mil.nga.msi.ui.filter.FilterScreen
-import mil.nga.msi.ui.map.MapRoute
 import mil.nga.msi.ui.navigation.DgpsStation
-import mil.nga.msi.ui.navigation.NavPoint
 import mil.nga.msi.ui.navigation.Route
 import mil.nga.msi.ui.sort.SortScreen
 
@@ -43,13 +43,8 @@ fun NavGraphBuilder.dgpsStationGraph(
    share: (Pair<String, String>) -> Unit,
    showSnackbar: (String) -> Unit
 ) {
-   val shareDgps: (String) -> Unit = {
-      share(Pair("Share DGPS Information", it))
-   }
-
-   val zoomTo: (NavPoint) -> Unit = { point ->
-      val encoded = Uri.encode(Json.encodeToString(point))
-      navController.navigate(MapRoute.Map.name + "?point=${encoded}")
+   val shareDgps: (DgpsStation) -> Unit = {
+      share(Pair("Share DGPS Information", it.toString()))
    }
 
    navigation(
@@ -70,15 +65,11 @@ fun NavGraphBuilder.dgpsStationGraph(
             openSort = {
                navController.navigate(DgpsStationRoute.Sort.name)
             },
-            onTap = { key ->
-               val encoded = Uri.encode(Json.encodeToString(key))
-               navController.navigate( "${DgpsStationRoute.Detail.name}?key=$encoded")
-            },
             onAction = { action ->
                when(action) {
-                  is DgpsStationAction.Zoom -> zoomTo(action.point)
-                  is DgpsStationAction.Share -> shareDgps(action.text)
+                  is DgpsStationAction.Share -> shareDgps(action.dgpsStation)
                   is DgpsStationAction.Location -> showSnackbar("${action.text} copied to clipboard")
+                  else -> action.navigate(navController)
                }
             }
          )
@@ -98,9 +89,9 @@ fun NavGraphBuilder.dgpsStationGraph(
                close = { navController.popBackStack() },
                onAction = { action ->
                   when(action) {
-                     is DgpsStationAction.Zoom -> zoomTo(action.point)
-                     is DgpsStationAction.Share -> shareDgps(action.text)
+                     is DgpsStationAction.Share -> shareDgps(action.dgpsStation)
                      is DgpsStationAction.Location -> showSnackbar("${action.text} copied to clipboard")
+                     else -> action.navigate(navController)
                   }
                }
             )

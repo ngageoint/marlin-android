@@ -1,17 +1,17 @@
 package mil.nga.msi.datasource.bookmark
 
-import android.util.Log
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
-import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mil.nga.msi.datasource.asam.Asam
 import mil.nga.msi.datasource.asam.AsamDao
+import mil.nga.msi.datasource.dgpsstation.DgpsStation
+import mil.nga.msi.datasource.dgpsstation.DgpsStationDao
 import mil.nga.msi.datasource.modu.Modu
 import mil.nga.msi.datasource.modu.ModuDao
 import mil.nga.msi.repository.bookmark.BookmarkKey
@@ -28,6 +28,54 @@ class BookmarkDataSourceTest {
    @After
    fun tearDown() {
       clearAllMocks()
+   }
+
+   @Test
+   fun should_combine_all_bookmark_flows() = runTest {
+      val asamDao = mockk<AsamDao>()
+      coEvery { asamDao.observeBookmarkedAsams() } answers {
+         flowOf(
+            listOf(Asam("1", Date(), 0.0, 0.0))
+         )
+      }
+
+      val dgpsStationDao = mockk<DgpsStationDao>()
+      coEvery { dgpsStationDao.observeBookmarkedDgpsStations() } answers {
+         flowOf(
+            listOf(
+               DgpsStation(
+                  id = "1",
+                  volumeNumber = "1",
+                  featureNumber = 1f,
+                  noticeWeek = "01",
+                  noticeYear = "23",
+                  latitude = 1.0,
+                  longitude = 1.0
+               )
+            )
+         )
+      }
+
+      val moduDao = mockk<ModuDao>()
+      coEvery { moduDao.observeBookmarkedModus() } answers {
+         flowOf(
+            listOf(Modu("1", Date(), 0.0, 0.0))
+         )
+      }
+
+      val dataSource = BookmarkLocalDataSource(
+         asamDao = asamDao,
+         moduDao = moduDao,
+         dgpsStationDao = dgpsStationDao
+      )
+
+      dataSource.observeBookmarks().first()
+
+      coVerify {
+         asamDao.observeBookmarkedAsams()
+         dgpsStationDao.observeBookmarkedDgpsStations()
+         moduDao.observeBookmarkedModus()
+      }
    }
 
    @Test
@@ -56,7 +104,8 @@ class BookmarkDataSourceTest {
 
       val dataSource = BookmarkLocalDataSource(
          asamDao = asamDao,
-         moduDao = moduDao
+         moduDao = moduDao,
+         dgpsStationDao = mockk()
       )
 
       val bookmarks = dataSource.observeBookmarks().first()
@@ -79,7 +128,8 @@ class BookmarkDataSourceTest {
 
       val dataSource = BookmarkLocalDataSource(
          asamDao = asamDao,
-         moduDao = mockk()
+         moduDao = mockk(),
+         dgpsStationDao = mockk()
       )
 
       dataSource.setBookmark(bookmark, bookmarked, notes)
@@ -100,7 +150,8 @@ class BookmarkDataSourceTest {
 
       val dataSource = BookmarkLocalDataSource(
          asamDao = asamDao,
-         moduDao = mockk()
+         moduDao = mockk(),
+         dgpsStationDao = mockk()
       )
 
       dataSource.setBookmark(bookmark, bookmarked)
@@ -122,7 +173,8 @@ class BookmarkDataSourceTest {
 
       val dataSource = BookmarkLocalDataSource(
          asamDao = mockk(),
-         moduDao = moduDao
+         moduDao = moduDao,
+         dgpsStationDao = mockk()
       )
 
       dataSource.setBookmark(bookmark, bookmarked, notes)
@@ -143,13 +195,81 @@ class BookmarkDataSourceTest {
 
       val dataSource = BookmarkLocalDataSource(
          asamDao = mockk(),
-         moduDao = moduDao
+         moduDao = moduDao,
+         dgpsStationDao = mockk()
       )
 
       dataSource.setBookmark(bookmark, bookmarked)
 
       coVerify {
          moduDao.setBookmark(name, bookmarked, null, null)
+      }
+   }
+
+   @Test
+   fun should_bookmark_dgps_station() = runTest {
+      val volumeNumber = "1"
+      val featureNumber = 1f
+      val notes = "notes"
+      val bookmarked = true
+      val bookmark = BookmarkKey.fromDgpsStation(
+         DgpsStation(
+            id = "1",
+            volumeNumber = volumeNumber,
+            featureNumber = featureNumber,
+            noticeWeek = "01",
+            noticeYear = "23",
+            latitude = 1.0,
+            longitude = 1.0
+         )
+      )
+
+      val dgpsStationDao = mockk<DgpsStationDao>()
+      coEvery { dgpsStationDao.setBookmark(any(), any(), any(), any(), any()) } returns Unit
+
+      val dataSource = BookmarkLocalDataSource(
+         asamDao = mockk(),
+         moduDao = mockk(),
+         dgpsStationDao = dgpsStationDao
+      )
+
+      dataSource.setBookmark(bookmark, bookmarked, notes)
+
+      coVerify {
+         dgpsStationDao.setBookmark(volumeNumber, featureNumber, bookmarked, any(), notes)
+      }
+   }
+
+   @Test
+   fun should_unbookmark_dgps_station() = runTest {
+      val volumeNumber = "1"
+      val featureNumber = 1f
+      val bookmarked = false
+      val bookmark = BookmarkKey.fromDgpsStation(
+         DgpsStation(
+            id = "1",
+            volumeNumber = volumeNumber,
+            featureNumber = featureNumber,
+            noticeWeek = "01",
+            noticeYear = "23",
+            latitude = 1.0,
+            longitude = 1.0
+         )
+      )
+
+      val dgpsStationDao = mockk<DgpsStationDao>()
+      coEvery { dgpsStationDao.setBookmark(any(), any(), any(), any(), any()) } returns Unit
+
+      val dataSource = BookmarkLocalDataSource(
+         asamDao = mockk(),
+         moduDao = mockk(),
+         dgpsStationDao = dgpsStationDao
+      )
+
+      dataSource.setBookmark(bookmark, bookmarked)
+
+      coVerify {
+         dgpsStationDao.setBookmark(volumeNumber, featureNumber, bookmarked, null, null)
       }
    }
 }

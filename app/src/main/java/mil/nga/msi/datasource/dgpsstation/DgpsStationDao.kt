@@ -4,6 +4,8 @@ import androidx.paging.PagingSource
 import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteQuery
 import kotlinx.coroutines.flow.Flow
+import mil.nga.msi.datasource.asam.Asam
+import java.util.Date
 
 @Dao
 interface DgpsStationDao {
@@ -44,4 +46,10 @@ interface DgpsStationDao {
    @RawQuery(observedEntities = [DgpsStation::class])
    @RewriteQueriesToDropUnusedColumns
    fun observeDgpsStationMapItems(query: SupportSQLiteQuery): Flow<List<DgpsStationMapItem>>
+
+   @Query("UPDATE dgps_stations SET bookmarked = :bookmarked, bookmarkDate = :date, bookmarkNotes = :notes WHERE volume_number = :volumeNumber AND feature_number = :featureNumber")
+   suspend fun setBookmark(volumeNumber: String, featureNumber: Float, bookmarked: Boolean, date: Date? = null, notes: String? = null)
+
+   @Query("SELECT * from dgps_stations WHERE bookmarked = 1 ORDER BY bookmarkDate")
+   fun observeBookmarkedDgpsStations(): Flow<List<DgpsStation>>
 }

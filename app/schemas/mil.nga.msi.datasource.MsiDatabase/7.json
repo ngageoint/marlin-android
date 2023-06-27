@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 7,
-    "identityHash": "0b5a17853d0f99f98dcf03267770da94",
+    "identityHash": "5493c46d4fdf097b645a8029359d185d",
     "entities": [
       {
         "tableName": "asams",
@@ -98,7 +98,7 @@
       },
       {
         "tableName": "dgps_stations",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `volume_number` TEXT NOT NULL, `feature_number` REAL NOT NULL, `notice_week` TEXT NOT NULL, `notice_year` TEXT NOT NULL, `latitude` REAL NOT NULL, `longitude` REAL NOT NULL, `aid_type` TEXT, `geopolitical_heading` TEXT, `region_heading` TEXT, `preceding_note` TEXT, `name` TEXT, `position` TEXT, `station_id` TEXT, `range` INTEGER, `frequency` REAL, `transfer_rate` INTEGER, `remarks` TEXT, `post_note` TEXT, `notice_number` INTEGER, `remove_from_list` TEXT, `delete_flag` TEXT, `section_header` TEXT NOT NULL, PRIMARY KEY(`volume_number`, `feature_number`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `volume_number` TEXT NOT NULL, `feature_number` REAL NOT NULL, `notice_week` TEXT NOT NULL, `notice_year` TEXT NOT NULL, `latitude` REAL NOT NULL, `longitude` REAL NOT NULL, `bookmarked` INTEGER NOT NULL, `bookmarkDate` INTEGER, `bookmarkNotes` TEXT, `aid_type` TEXT, `geopolitical_heading` TEXT, `region_heading` TEXT, `preceding_note` TEXT, `name` TEXT, `position` TEXT, `station_id` TEXT, `range` INTEGER, `frequency` REAL, `transfer_rate` INTEGER, `remarks` TEXT, `post_note` TEXT, `notice_number` INTEGER, `remove_from_list` TEXT, `delete_flag` TEXT, `section_header` TEXT NOT NULL, PRIMARY KEY(`volume_number`, `feature_number`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -141,6 +141,24 @@
             "columnName": "longitude",
             "affinity": "REAL",
             "notNull": true
+          },
+          {
+            "fieldPath": "bookmarked",
+            "columnName": "bookmarked",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "bookmarkDate",
+            "columnName": "bookmarkDate",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "bookmarkNotes",
+            "columnName": "bookmarkNotes",
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "aidType",
@@ -1882,7 +1900,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '0b5a17853d0f99f98dcf03267770da94')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '5493c46d4fdf097b645a8029359d185d')"
     ]
   }
 }

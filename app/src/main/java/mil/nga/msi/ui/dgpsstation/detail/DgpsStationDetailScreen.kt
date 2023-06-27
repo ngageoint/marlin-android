@@ -34,19 +34,19 @@ import com.google.android.gms.maps.model.TileProvider
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.dgpsstation.DgpsStation
 import mil.nga.msi.repository.dgpsstation.DgpsStationKey
-import mil.nga.msi.ui.dgpsstation.DgpsStationAction
+import mil.nga.msi.ui.action.Action
+import mil.nga.msi.ui.action.DgpsStationAction
 import mil.nga.msi.ui.dgpsstation.DgpsStationViewModel
 import mil.nga.msi.ui.coordinate.CoordinateTextButton
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.MapClip
-import mil.nga.msi.ui.navigation.NavPoint
 import mil.nga.msi.ui.theme.onSurfaceDisabled
 
 @Composable
 fun DgpsStationDetailScreen(
    key: DgpsStationKey,
    close: () -> Unit,
-   onAction: (DgpsStationAction) -> Unit,
+   onAction: (Action) -> Unit,
    viewModel: DgpsStationViewModel = hiltViewModel()
 ) {
    val dgpsStation by viewModel.getDgpsStation(key.volumeNumber, key.featureNumber).observeAsState()
@@ -58,23 +58,19 @@ fun DgpsStationDetailScreen(
          onNavigationClicked = { close() }
       )
 
-      RadioBeaconDetailContent(
+      DgpsStationContent(
          dgpsStation = dgpsStation,
          tileProvider = viewModel.tileProvider,
-         onZoom = { onAction(DgpsStationAction.Zoom(it)) },
-         onShare = { onAction(DgpsStationAction.Share(it.toString())) },
-         onCopyLocation = { onAction(DgpsStationAction.Location(it)) }
+         onAction = onAction
       )
    }
 }
 
 @Composable
-private fun RadioBeaconDetailContent(
+private fun DgpsStationContent(
    dgpsStation: DgpsStation?,
    tileProvider: TileProvider,
-   onZoom: (NavPoint) -> Unit,
-   onShare: (DgpsStation) -> Unit,
-   onCopyLocation: (String) -> Unit
+   onAction: (Action) -> Unit
 ) {
    if (dgpsStation != null) {
       Surface(
@@ -85,7 +81,7 @@ private fun RadioBeaconDetailContent(
                .padding(all = 8.dp)
                .verticalScroll(rememberScrollState())
          ) {
-            DgpsStationHeader(dgpsStation, tileProvider, onZoom, onShare, onCopyLocation)
+            DgpsStationHeader(dgpsStation, tileProvider, onAction)
             DgpsStationInformation(dgpsStation)
          }
       }
@@ -96,9 +92,7 @@ private fun RadioBeaconDetailContent(
 private fun DgpsStationHeader(
    dgpsStation: DgpsStation,
    tileProvider: TileProvider,
-   onZoom: (NavPoint) -> Unit,
-   onShare: (DgpsStation) -> Unit,
-   onCopyLocation: (String) -> Unit
+   onAction: (Action) -> Unit
 ) {
    Card {
       Column {
@@ -151,9 +145,16 @@ private fun DgpsStationHeader(
 
             DgpsStationFooter(
                dgpsStation,
-               onZoom = { onZoom(NavPoint(dgpsStation.latitude, dgpsStation.longitude))},
-               onShare = { onShare(dgpsStation) },
-               onCopyLocation)
+               onZoom = {
+                  onAction(Action.Zoom(dgpsStation.latLng))
+               },
+               onShare = {
+                  onAction(DgpsStationAction.Share(dgpsStation))
+               },
+               onCopyLocation = {
+                  onAction(DgpsStationAction.Location(it))
+               }
+            )
          }
       }
    }

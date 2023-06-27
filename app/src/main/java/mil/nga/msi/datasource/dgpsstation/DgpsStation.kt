@@ -5,6 +5,9 @@ import androidx.room.Entity
 import androidx.room.Index
 import com.google.android.gms.maps.model.LatLng
 import mil.nga.msi.coordinate.DMS
+import mil.nga.msi.datasource.bookmark.Bookmark
+import mil.nga.msi.repository.dgpsstation.DgpsStationKey
+import java.util.Date
 
 @Entity(
    tableName = "dgps_stations",
@@ -31,8 +34,12 @@ data class DgpsStation(
    val latitude: Double,
 
    @ColumnInfo(name = "longitude")
-   val longitude: Double
-) {
+   val longitude: Double,
+
+   override var bookmarked: Boolean = false,
+   override var bookmarkDate: Date? = null,
+   override var bookmarkNotes: String? = null
+): Bookmark() {
    @ColumnInfo(name = "aid_type")
    var aidType: String? = null
 
@@ -80,6 +87,9 @@ data class DgpsStation(
 
    @ColumnInfo(name = "section_header")
    var sectionHeader: String = ""
+
+   @Transient
+   override val bookmarkId = DgpsStationKey(volumeNumber, featureNumber).id()
 
    @Transient
    val latLng = LatLng(latitude, longitude)

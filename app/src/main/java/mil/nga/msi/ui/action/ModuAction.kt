@@ -11,7 +11,6 @@ sealed class ModuAction(): Action() {
       }
    }
 
-
    class Location(val text: String): ModuAction()
    class Share(val modu: Modu) : ModuAction()
 }

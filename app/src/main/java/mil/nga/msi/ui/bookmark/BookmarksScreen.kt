@@ -17,17 +17,21 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.asam.Asam
 import mil.nga.msi.datasource.bookmark.Bookmark
+import mil.nga.msi.datasource.dgpsstation.DgpsStation
 import mil.nga.msi.datasource.modu.Modu
+import mil.nga.msi.repository.bookmark.BookmarkKey
 import mil.nga.msi.ui.action.Action
 import mil.nga.msi.ui.action.AsamAction
 import mil.nga.msi.ui.action.ModuAction
 import mil.nga.msi.ui.asam.AsamFooter
 import mil.nga.msi.ui.datasource.DataSourceIcon
 import mil.nga.msi.ui.asam.AsamSummary
+import mil.nga.msi.ui.action.DgpsStationAction
+import mil.nga.msi.ui.dgpsstation.DgpsStationFooter
+import mil.nga.msi.ui.dgpsstation.DgpsStationSummary
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.modu.ModuFooter
 import mil.nga.msi.ui.modu.ModuSummary
-import mil.nga.msi.ui.navigation.NavPoint
 
 @Composable
 fun BookmarksScreen(
@@ -91,19 +95,19 @@ private fun Bookmark(
       is Asam -> {
          AsamBookmark(
             asam = bookmark,
-            onAction = onAction,
-            onBookmark = {
-               onBookmark(BookmarkAction.AsamBookmark(bookmark))
-            }
+            onAction = onAction
+         )
+      }
+      is DgpsStation -> {
+         DgpsStationBookmark(
+            dgpsStation = bookmark,
+            onAction = onAction
          )
       }
       is Modu -> {
          ModuBookmark(
             modu = bookmark,
-            onAction = onAction,
-            onBookmark = {
-               onBookmark(BookmarkAction.ModuBookmark(bookmark))
-            }
+            onAction = onAction
          )
       }
    }
@@ -111,7 +115,6 @@ private fun Bookmark(
 
 @Composable fun AsamBookmark(
    asam: Asam,
-   onBookmark: () -> Unit,
    onAction: (Action) -> Unit
 ) {
    Card(
@@ -136,7 +139,9 @@ private fun Bookmark(
             onShare = {
                onAction(AsamAction.Share(asam))
             },
-            onBookmark = onBookmark,
+            onBookmark = {
+               onAction(Action.Bookmark(BookmarkKey.fromAsam(asam)))
+            },
             onCopyLocation = {
                onAction(AsamAction.Location(it))
             }
@@ -145,9 +150,45 @@ private fun Bookmark(
    }
 }
 
+@Composable fun DgpsStationBookmark(
+   dgpsStation: DgpsStation,
+   onAction: (Action) -> Unit
+) {
+   Card(
+      Modifier
+         .fillMaxWidth()
+         .padding(bottom = 8.dp)
+         .clickable { onAction(DgpsStationAction.Tap(dgpsStation)) }
+   ) {
+      Column(Modifier.padding(vertical = 8.dp)) {
+         DataSourceIcon(dataSource = DataSource.DGPS_STATION)
+         DgpsStationSummary(dgpsStation = dgpsStation)
+
+         dgpsStation.bookmarkNotes?.let { notes ->
+            BookmarkNotes(notes = notes)
+         }
+
+         DgpsStationFooter(
+            dgpsStation = dgpsStation,
+            onZoom = {
+               onAction(Action.Zoom(dgpsStation.latLng))
+            },
+            onShare = {
+               onAction(DgpsStationAction.Share(dgpsStation))
+            },
+            onBookmark = {
+               onAction(Action.Bookmark(BookmarkKey.fromDgpsStation(dgpsStation)))
+            },
+            onCopyLocation = {
+               onAction(ModuAction.Location(it))
+            }
+         )
+      }
+   }
+}
+
 @Composable fun ModuBookmark(
    modu: Modu,
-   onBookmark: () -> Unit,
    onAction: (Action) -> Unit
 ) {
    Card(
@@ -172,7 +213,9 @@ private fun Bookmark(
             onShare = {
                onAction(ModuAction.Share(modu))
             },
-            onBookmark = onBookmark,
+            onBookmark = {
+               onAction(Action.Bookmark(BookmarkKey.fromModu(modu)))
+            },
             onCopyLocation = {
                onAction(ModuAction.Location(it))
             }
