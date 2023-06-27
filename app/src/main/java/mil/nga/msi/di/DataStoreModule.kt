@@ -69,6 +69,7 @@ class DataStoreModule {
                )
                .addAllNonTabs(
                   listOf(
+                     DataSource.LIGHT,
                      DataSource.PORT,
                      DataSource.RADIO_BEACON,
                      DataSource.DGPS_STATION,

@@ -17,35 +17,33 @@ import mil.nga.msi.datasource.dgpsstation.DgpsStation
 fun DgpsStationSummary(
    dgpsStation: DgpsStation?
 ) {
-   Column(Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
-      CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-         Text(
-            text = "${dgpsStation?.featureNumber?.toString().orEmpty()} ${dgpsStation?.volumeNumber.orEmpty()}",
-            fontWeight = FontWeight.SemiBold,
-            style = MaterialTheme.typography.labelSmall,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-         )
-      }
+   CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+      Text(
+         text = "${dgpsStation?.featureNumber?.toString().orEmpty()} ${dgpsStation?.volumeNumber.orEmpty()}",
+         fontWeight = FontWeight.SemiBold,
+         style = MaterialTheme.typography.labelSmall,
+         maxLines = 1,
+         overflow = TextOverflow.Ellipsis
+      )
+   }
 
-      dgpsStation?.name?.let { name ->
-         Text(
-            text = name,
-            style = MaterialTheme.typography.titleLarge,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.padding(top = 16.dp)
-         )
-      }
+   dgpsStation?.name?.let { name ->
+      Text(
+         text = name,
+         style = MaterialTheme.typography.titleLarge,
+         maxLines = 1,
+         overflow = TextOverflow.Ellipsis,
+         modifier = Modifier.padding(top = 16.dp)
+      )
+   }
 
-      CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-         dgpsStation?.remarks?.let { remarks ->
-            Text(
-               text = remarks,
-               style = MaterialTheme.typography.bodyMedium,
-               modifier = Modifier.padding(top = 8.dp)
-            )
-         }
+   CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+      dgpsStation?.remarks?.let { remarks ->
+         Text(
+            text = remarks,
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.padding(top = 8.dp)
+         )
       }
    }
 }

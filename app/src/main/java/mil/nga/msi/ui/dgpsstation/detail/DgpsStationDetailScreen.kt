@@ -115,7 +115,7 @@ private fun DgpsStationHeader(
             tileProvider = tileProvider
          )
 
-         Column(Modifier.padding(horizontal = 8.dp, vertical = 8.dp)) {
+         Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
             CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                Text(
                   text = "${dgpsStation.featureNumber} ${dgpsStation.volumeNumber}",
@@ -124,16 +124,13 @@ private fun DgpsStationHeader(
                   maxLines = 1,
                   overflow = TextOverflow.Ellipsis
                )
-            }
 
-            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                Text(
                   text = dgpsStation.sectionHeader,
-                  style = MaterialTheme.typography.bodyMedium
+                  style = MaterialTheme.typography.bodyLarge,
+                  modifier = Modifier.padding(top = 8.dp)
                )
-            }
 
-            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                dgpsStation.remarks?.let { remarks ->
                   Text(
                      text = remarks,
@@ -214,7 +211,7 @@ private fun DgpsStationActions(
 private fun DgpsStationInformation(
    dgpsStation: DgpsStation
 ) {
-   CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceDisabled) {
+   CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
       Text(
          text = "ADDITIONAL INFORMATION",
          style = MaterialTheme.typography.titleMedium,

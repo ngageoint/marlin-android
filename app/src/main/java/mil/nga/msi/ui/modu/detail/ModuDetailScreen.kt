@@ -139,6 +139,22 @@ private fun ModuHeader(
                }
             }
 
+            modu.rigStatus?.let {
+               Text(
+                  text = it.name,
+                  style = MaterialTheme.typography.bodyLarge,
+                  modifier = Modifier.padding(top = 8.dp)
+               )
+            }
+
+            modu.specialStatus?.let {
+               Text(
+                  text = it,
+                  style = MaterialTheme.typography.bodyMedium,
+                  modifier = Modifier.padding(top = 8.dp)
+               )
+            }
+
             ModuFooter(modu, onZoom, onShare, onBookmark, onCopyLocation)
          }
       }
@@ -164,8 +180,6 @@ private fun ModuInformation(
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
       ) {
-         ModuProperty(title = "Rig Status", value = modu.rigStatus.toString())
-         ModuProperty(title = "Special Status", value = modu.specialStatus)
          ModuProperty(title = "Distance", value = modu.distance?.toString())
          ModuProperty(title = "Position", value = modu.position)
          ModuProperty(title = "Navigation Area", value = modu.navigationArea)

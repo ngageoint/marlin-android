@@ -47,7 +47,7 @@ fun ModuSummary(
          modu?.rigStatus?.let {
             Text(
                text = it.name,
-               style = MaterialTheme.typography.bodyMedium,
+               style = MaterialTheme.typography.bodyLarge,
                modifier = Modifier.padding(top = 4.dp)
             )
          }

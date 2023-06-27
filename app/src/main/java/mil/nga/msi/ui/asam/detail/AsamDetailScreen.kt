@@ -29,6 +29,7 @@ import mil.nga.msi.repository.bookmark.BookmarkKey
 import mil.nga.msi.ui.action.Action
 import mil.nga.msi.ui.action.AsamAction
 import mil.nga.msi.ui.asam.AsamFooter
+import mil.nga.msi.ui.asam.AsamSummary
 import mil.nga.msi.ui.asam.AsamViewModel
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.MapClip
@@ -95,7 +96,6 @@ private fun AsamDetailContent(
                onBookmark = { onBookmark(asam) },
                onCopyLocation = onCopyLocation
             )
-            AsamDescription(asam.description)
             AsamInformation(asam)
          }
       }
@@ -133,14 +133,22 @@ private fun AsamHeader(
 
          Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
             CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-               asam.date.let { date ->
-                  val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+               val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+               Text(
+                  text = dateFormat.format(asam.date),
+                  fontWeight = FontWeight.SemiBold,
+                  style = MaterialTheme.typography.labelSmall,
+                  maxLines = 1,
+                  overflow = TextOverflow.Ellipsis
+               )
+
+               asam.description?.let {
                   Text(
-                     text = dateFormat.format(date),
-                     fontWeight = FontWeight.SemiBold,
-                     style = MaterialTheme.typography.labelSmall,
-                     maxLines = 1,
-                     overflow = TextOverflow.Ellipsis
+                     text = it,
+                     maxLines = 5,
+                     overflow = TextOverflow.Ellipsis,
+                     style = MaterialTheme.typography.bodyMedium,
+                     modifier = Modifier.padding(top = 8.dp)
                   )
                }
             }
@@ -158,39 +166,14 @@ private fun AsamHeader(
 }
 
 @Composable
-private fun AsamDescription(
-   description: String?
-) {
-   Column(Modifier.padding(vertical = 16.dp)) {
-      CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-         Text(
-            text = "DESCRIPTION",
-            style = MaterialTheme.typography.titleMedium
-         )
-      }
-
-      Card(
-         modifier = Modifier.padding(vertical = 8.dp)
-      ) {
-         description?.let {
-            Text(
-               text = it,
-               style = MaterialTheme.typography.bodyMedium,
-               modifier = Modifier.padding(all = 16.dp)
-            )
-         }
-      }
-   }
-}
-
-@Composable
 private fun AsamInformation(
    asam: Asam
 ) {
    CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
       Text(
          text = "ADDITIONAL INFORMATION",
-         style = MaterialTheme.typography.titleMedium
+         style = MaterialTheme.typography.titleMedium,
+         modifier = Modifier.padding(top = 24.dp)
       )
    }
 

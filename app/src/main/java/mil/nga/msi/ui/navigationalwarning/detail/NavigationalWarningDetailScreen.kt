@@ -153,7 +153,6 @@ private fun NavigationalWarningHeader(
             )
          }
 
-         NavigationalWarningProperty(title = "Status", value = state.warning.status)
          NavigationalWarningProperty(title = "Authority", value = state.warning.authority)
          state.warning.cancelDate?.let { date ->
             NavigationalWarningProperty(title = "Cancel Date", value = dateFormat.format(date))
