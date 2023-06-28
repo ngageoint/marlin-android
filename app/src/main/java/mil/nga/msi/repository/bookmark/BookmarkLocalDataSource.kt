@@ -34,12 +34,13 @@ class BookmarkLocalDataSource @Inject constructor(
       notes: String? = null
    ) {
       val date = if(bookmarked) Date() else null
+      val bookmarkNotes = if (notes?.isBlank() == true) null else notes
       when (bookmark.dataSource) {
-         DataSource.ASAM -> asamDao.setBookmark(bookmark.id, bookmarked, date, notes)
-         DataSource.MODU -> moduDao.setBookmark(bookmark.id, bookmarked, date, notes)
+         DataSource.ASAM -> asamDao.setBookmark(bookmark.id, bookmarked, date, bookmarkNotes)
+         DataSource.MODU -> moduDao.setBookmark(bookmark.id, bookmarked, date, bookmarkNotes)
          DataSource.DGPS_STATION -> {
             val key = DgpsStationKey.fromId(bookmark.id)
-            dgpsStationDao.setBookmark(key.volumeNumber, key.featureNumber, bookmarked, date, notes)
+            dgpsStationDao.setBookmark(key.volumeNumber, key.featureNumber, bookmarked, date, bookmarkNotes)
          }
          else -> {}
       }

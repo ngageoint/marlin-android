@@ -14,9 +14,13 @@ import androidx.paging.liveData
 import androidx.paging.map
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import mil.nga.msi.datasource.DataSource
+import mil.nga.msi.datasource.asam.Asam
 import mil.nga.msi.datasource.dgpsstation.DgpsStation
 import mil.nga.msi.filter.Filter
+import mil.nga.msi.repository.bookmark.BookmarkKey
+import mil.nga.msi.repository.bookmark.BookmarkRepository
 import mil.nga.msi.repository.dgpsstation.DgpsStationRepository
 import mil.nga.msi.repository.preferences.FilterRepository
 import mil.nga.msi.repository.preferences.SortRepository
@@ -33,7 +37,8 @@ sealed class DgpsStationListItem {
 class DgpsStationsViewModel @Inject constructor(
    filterRepository: FilterRepository,
    sortRepository: SortRepository,
-   private val dgpsStationRepository: DgpsStationRepository
+   private val dgpsStationRepository: DgpsStationRepository,
+   private val bookmarkRepository: BookmarkRepository
 ): ViewModel() {
 
    private val queryParameters = MediatorLiveData<Pair<List<Filter>, Sort?>>().apply {
@@ -71,10 +76,11 @@ class DgpsStationsViewModel @Inject constructor(
       entry[DataSource.DGPS_STATION] ?: emptyList()
    }.asLiveData()
 
-   suspend fun getDgpsStation(
-      volumeNumber: String,
-      featureNumber: Float
-   ): DgpsStation? = dgpsStationRepository.getDgpsStation(volumeNumber, featureNumber)
+   fun removeBookmark(dgpsStation: DgpsStation) {
+      viewModelScope.launch {
+         bookmarkRepository.setBookmark(BookmarkKey.fromDgpsStation(dgpsStation), false)
+      }
+   }
 
    private fun header(sort: SortParameter, item1: DgpsStationListItem.DgpsStationItem?, item2: DgpsStationListItem.DgpsStationItem?): DgpsStationListItem.HeaderItem? {
       val item1String = parameterToName(sort.parameter.parameter, item1?.dgpsStation)

@@ -58,7 +58,13 @@ fun ModuDetailScreen(
          tileProvider = viewModel.tileProvider,
          onZoom = { onAction(Action.Zoom(it.latLng)) },
          onShare = { onAction(ModuAction.Share(it)) },
-         onBookmark = { onAction(Action.Bookmark(BookmarkKey.fromModu(it))) },
+         onBookmark = {
+            if (it.bookmarked) {
+               viewModel.removeBookmark(it)
+            } else {
+               onAction(Action.Bookmark(BookmarkKey.fromModu(it)))
+            }
+         },
          onCopyLocation = { onAction(ModuAction.Location(it)) }
       )
    }
@@ -152,6 +158,20 @@ private fun ModuHeader(
                   text = it,
                   style = MaterialTheme.typography.bodyMedium,
                   modifier = Modifier.padding(top = 8.dp)
+               )
+            }
+
+            modu.bookmarkNotes?.let { notes ->
+               Text(
+                  text = "Bookmark Notes",
+                  style = MaterialTheme.typography.titleMedium,
+                  fontWeight = FontWeight.Medium,
+                  modifier = Modifier.padding(top = 16.dp, bottom = 4.dp)
+               )
+
+               Text(
+                  text = notes,
+                  style = MaterialTheme.typography.bodyMedium
                )
             }
 

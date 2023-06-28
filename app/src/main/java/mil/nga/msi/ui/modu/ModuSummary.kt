@@ -57,6 +57,20 @@ fun ModuSummary(
                style = MaterialTheme.typography.bodyMedium
             )
          }
+
+         modu?.bookmarkNotes?.let { notes ->
+            Text(
+               text = "Bookmark Notes",
+               style = MaterialTheme.typography.titleMedium,
+               fontWeight = FontWeight.Medium,
+               modifier = Modifier.padding(top = 16.dp, bottom = 4.dp)
+            )
+
+            Text(
+               text = notes,
+               style = MaterialTheme.typography.bodyMedium
+            )
+         }
       }
    }
 }

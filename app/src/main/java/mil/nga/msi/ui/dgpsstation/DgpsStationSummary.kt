@@ -1,6 +1,5 @@
 package mil.nga.msi.ui.dgpsstation
 
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
@@ -43,6 +42,20 @@ fun DgpsStationSummary(
             text = remarks,
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.padding(top = 8.dp)
+         )
+      }
+
+      dgpsStation?.bookmarkNotes?.let { notes ->
+         Text(
+            text = "Bookmark Notes",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Medium,
+            modifier = Modifier.padding(top = 16.dp, bottom = 4.dp)
+         )
+
+         Text(
+            text = notes,
+            style = MaterialTheme.typography.bodyMedium
          )
       }
    }

@@ -76,7 +76,17 @@ fun AsamsScreen(
 
       Asams(
          pagingState = viewModel.asams,
-         onAction = onAction
+         onTap = { onAction(AsamAction.Tap(it)) },
+         onZoom = { onAction(Action.Zoom(it.latLng)) },
+         onShare = { onAction(AsamAction.Share(it)) },
+         onBookmark = {
+            if (it.bookmarked) {
+               viewModel.removeBookmark(it)
+            } else {
+               onAction(Action.Bookmark(BookmarkKey.fromAsam(it)))
+            }
+         },
+         onCopyLocation = { onAction(AsamAction.Location(it)) }
       )
    }
 }
@@ -84,7 +94,11 @@ fun AsamsScreen(
 @Composable
 private fun Asams(
    pagingState: Flow<PagingData<AsamListItemState>>,
-   onAction: (Action) -> Unit
+   onTap: (Asam) -> Unit,
+   onZoom: (Asam) -> Unit,
+   onShare: (Asam) -> Unit,
+   onBookmark: (Asam) -> Unit,
+   onCopyLocation: (String) -> Unit
 ) {
    val lazyItems = pagingState.collectAsLazyPagingItems()
 
@@ -113,7 +127,11 @@ private fun Asams(
                   is AsamListItemState.AsamItemState -> {
                      AsamCard(
                         asam = item.asam,
-                        onAction = onAction
+                        onTap = onTap,
+                        onZoom = onZoom,
+                        onShare = onShare,
+                        onBookmark = onBookmark,
+                        onCopyLocation = onCopyLocation
                      )
                   }
                   is AsamListItemState.HeaderItemState -> {
@@ -134,21 +152,25 @@ private fun Asams(
 @Composable
 private fun AsamCard(
    asam: Asam,
-   onAction: (Action) -> Unit
-) {
+   onTap: (Asam) -> Unit,
+   onZoom: (Asam) -> Unit,
+   onShare: (Asam) -> Unit,
+   onBookmark: (Asam) -> Unit,
+   onCopyLocation: (String) -> Unit)
+{
    Card(
       Modifier
          .fillMaxWidth()
          .padding(bottom = 8.dp)
-         .clickable { onAction(AsamAction.Tap(asam)) }
+         .clickable { onTap(asam) }
    ) {
       AsamSummary(asam)
       AsamFooter(
          asam = asam,
-         onZoom = { onAction(Action.Zoom(asam.latLng)) },
-         onShare = { onAction(AsamAction.Share(asam)) },
-         onBookmark = { onAction(Action.Bookmark(BookmarkKey.fromAsam(asam))) },
-         onCopyLocation = { onAction(AsamAction.Location(it)) }
+         onZoom = { onZoom(asam) },
+         onShare = { onShare(asam) },
+         onBookmark = { onBookmark(asam) },
+         onCopyLocation = { onCopyLocation(it) }
       )
    }
 }

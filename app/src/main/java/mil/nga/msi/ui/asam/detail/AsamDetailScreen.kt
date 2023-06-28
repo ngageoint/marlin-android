@@ -29,7 +29,6 @@ import mil.nga.msi.repository.bookmark.BookmarkKey
 import mil.nga.msi.ui.action.Action
 import mil.nga.msi.ui.action.AsamAction
 import mil.nga.msi.ui.asam.AsamFooter
-import mil.nga.msi.ui.asam.AsamSummary
 import mil.nga.msi.ui.asam.AsamViewModel
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.MapClip
@@ -96,6 +95,7 @@ private fun AsamDetailContent(
                onBookmark = { onBookmark(asam) },
                onCopyLocation = onCopyLocation
             )
+
             AsamInformation(asam)
          }
       }
@@ -149,6 +149,20 @@ private fun AsamHeader(
                      overflow = TextOverflow.Ellipsis,
                      style = MaterialTheme.typography.bodyMedium,
                      modifier = Modifier.padding(top = 8.dp)
+                  )
+               }
+
+               asam.bookmarkNotes?.let { notes ->
+                  Text(
+                     text = "Bookmark Notes",
+                     style = MaterialTheme.typography.titleMedium,
+                     fontWeight = FontWeight.Medium,
+                     modifier = Modifier.padding(top = 16.dp, bottom = 4.dp)
+                  )
+
+                  Text(
+                     text = notes,
+                     style = MaterialTheme.typography.bodyMedium
                   )
                }
             }

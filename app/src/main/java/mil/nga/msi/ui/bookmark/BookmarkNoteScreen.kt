@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material3.Icon
@@ -23,6 +24,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import mil.nga.msi.repository.bookmark.BookmarkKey
@@ -33,21 +35,27 @@ fun BookmarkNotesScreen(
    onDone: () -> Unit,
    viewModel: BookmarkViewModel = hiltViewModel()
 ) {
-   var notes by remember { mutableStateOf(bookmark?.notes) }
+   var notes by remember { mutableStateOf(bookmark?.notes.orEmpty()) }
+
+   val onNoteComplete: () -> Unit  = {
+      bookmark?.let { viewModel.saveBookmark(it, notes) }
+      onDone()
+   }
 
    Column(Modifier.fillMaxWidth()) {
-      Note(notes) { notes = it }
+      Note(
+         note = notes,
+         onNoteDone = onNoteComplete,
+         onNoteChanged = { notes = it }
+      )
 
       Box(
          contentAlignment = Alignment.CenterEnd,
          modifier = Modifier.fillMaxWidth()
       ) {
          TextButton(
-            onClick = {
-               bookmark?.let { viewModel.saveBookmark(it, notes) }
-               onDone()
-            },
-            Modifier.padding(bottom = 16.dp, end = 16.dp)
+            onClick = onNoteComplete,
+            modifier = Modifier.padding(bottom = 16.dp, end = 16.dp)
          ) {
             Text("Done")
          }
@@ -57,8 +65,9 @@ fun BookmarkNotesScreen(
 
 @Composable
 fun Note(
-   note: String?,
+   note: String,
    onNoteChanged: (String) -> Unit,
+   onNoteDone: () -> Unit
 ) {
    val focusManager = LocalFocusManager.current
 
@@ -83,10 +92,16 @@ fun Note(
       }
 
       TextField(
-         value = note.orEmpty(),
+         value = note,
          minLines = 3,
          onValueChange = { onNoteChanged(it) },
-         keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
+         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+         keyboardActions = KeyboardActions(
+            onDone = {
+               onNoteDone()
+               focusManager.clearFocus()
+            }
+         ),
          modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 16.dp)
