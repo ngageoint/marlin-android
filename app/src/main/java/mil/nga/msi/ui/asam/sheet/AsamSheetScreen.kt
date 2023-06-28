@@ -22,12 +22,14 @@ fun AsamSheetScreen(
    onDetails: (() -> Unit)? = null,
    viewModel: AsamViewModel = hiltViewModel()
 ) {
-   val asam by viewModel.getAsam(reference).observeAsState()
+   viewModel.setAsamReference(reference)
+   val asamWithBookmark by viewModel.asamWithBookmark.observeAsState()
 
    Column(modifier = modifier) {
       Column(Modifier.padding(vertical = 8.dp)) {
          DataSourceIcon(dataSource = DataSource.ASAM)
-         AsamSummary(asam = asam)
+
+         asamWithBookmark?.let { AsamSummary(asamWithBookmark = it)}
 
          TextButton(
             onClick = { onDetails?.invoke() },

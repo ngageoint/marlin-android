@@ -17,17 +17,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.google.android.gms.maps.model.LatLng
-import mil.nga.msi.datasource.asam.Asam
+import mil.nga.msi.datasource.asam.AsamWithBookmark
 import mil.nga.msi.ui.coordinate.CoordinateTextButton
 
 @Composable
 fun AsamFooter(
-   asam: Asam,
+   asamWithBookmark: AsamWithBookmark,
    onShare: () -> Unit,
    onZoom: () -> Unit,
    onBookmark: () -> Unit,
-   onCopyLocation: (String) -> Unit
+   onCopyLocation: (String) -> Unit,
 ) {
+   val (asam, bookmark) = asamWithBookmark
    Row(
       verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.SpaceBetween,
@@ -36,7 +37,12 @@ fun AsamFooter(
          .padding(top = 8.dp)
    ) {
       AsamLocation(asam.latLng, onCopyLocation)
-      AsamActions(asam.bookmarked, onShare, onZoom, onBookmark)
+      AsamActions(
+         bookmarked = bookmark != null,
+         onShare,
+         onZoom,
+         onBookmark
+      )
    }
 }
 

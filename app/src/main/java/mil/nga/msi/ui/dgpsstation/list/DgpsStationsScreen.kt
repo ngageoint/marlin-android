@@ -19,6 +19,7 @@ import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
 import kotlinx.coroutines.flow.Flow
 import mil.nga.msi.datasource.dgpsstation.DgpsStation
+import mil.nga.msi.datasource.dgpsstation.DgpsStationWithBookmark
 import mil.nga.msi.repository.bookmark.BookmarkKey
 import mil.nga.msi.ui.action.Action
 import mil.nga.msi.ui.action.AsamAction
@@ -79,11 +80,11 @@ fun DgpsStationsScreen(
          onTap = { onAction(DgpsStationAction.Tap(it)) },
          onZoom = { onAction(Action.Zoom(it.latLng)) },
          onShare = { onAction(DgpsStationAction.Share(it)) },
-         onBookmark = {
-            if (it.bookmarked) {
-               viewModel.removeBookmark(it)
+         onBookmark = { (dgpsStation, bookmark) ->
+            if (bookmark == null) {
+               onAction(Action.Bookmark(BookmarkKey.fromDgpsStation(dgpsStation)))
             } else {
-               onAction(Action.Bookmark(BookmarkKey.fromDgpsStation(it)))
+               viewModel.deleteBookmark(bookmark)
             }
          },
          onCopyLocation = { onAction(AsamAction.Location(it)) }
@@ -97,7 +98,7 @@ private fun DgpsStations(
    onTap: (DgpsStation) -> Unit,
    onZoom: (DgpsStation) -> Unit,
    onShare: (DgpsStation) -> Unit,
-   onBookmark: (DgpsStation) -> Unit,
+   onBookmark: (DgpsStationWithBookmark) -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
    val lazyItems = pagingState.collectAsLazyPagingItems()
@@ -111,7 +112,7 @@ private fun DgpsStations(
             count = lazyItems.itemCount,
             key = lazyItems.itemKey {
                when (it) {
-                  is DgpsStationListItem.DgpsStationItem -> it.dgpsStation.id
+                  is DgpsStationListItem.DgpsStationItem -> it.dgpsStationWithBookmark.dgpsStation.id
                   is DgpsStationListItem.HeaderItem -> it.header
                }
             },
@@ -134,11 +135,11 @@ private fun DgpsStations(
                   }
                   is DgpsStationListItem.DgpsStationItem -> {
                      DgpsStationCard(
-                        dgpsStation = item.dgpsStation,
-                        onTap = onTap,
-                        onZoom = onZoom,
-                        onShare = onShare,
-                        onBookmark = onBookmark,
+                        dgpsStationWithBookmark = item.dgpsStationWithBookmark,
+                        onTap = { onTap(item.dgpsStationWithBookmark.dgpsStation) },
+                        onZoom = { onZoom(item.dgpsStationWithBookmark.dgpsStation) },
+                        onShare = { onShare(item.dgpsStationWithBookmark.dgpsStation) },
+                        onBookmark = { onBookmark(item.dgpsStationWithBookmark) },
                         onCopyLocation = onCopyLocation
                      )
                   }
@@ -151,21 +152,21 @@ private fun DgpsStations(
 
 @Composable
 private fun DgpsStationCard(
-   dgpsStation: DgpsStation,
-   onTap: (DgpsStation) -> Unit,
-   onZoom: (DgpsStation) -> Unit,
-   onShare: (DgpsStation) -> Unit,
-   onBookmark: (DgpsStation) -> Unit,
+   dgpsStationWithBookmark: DgpsStationWithBookmark,
+   onTap: () -> Unit,
+   onZoom: () -> Unit,
+   onShare: () -> Unit,
+   onBookmark: () -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
    Card(
       Modifier
          .fillMaxWidth()
          .padding(bottom = 8.dp)
-         .clickable { onTap(dgpsStation) }
+         .clickable { onTap() }
    ) {
       DgpsStationContent(
-         dgpsStation,
+         dgpsStationWithBookmark,
          onZoom = onZoom,
          onShare = onShare,
          onBookmark = onBookmark,
@@ -176,20 +177,20 @@ private fun DgpsStationCard(
 
 @Composable
 private fun DgpsStationContent(
-   dgpsStation: DgpsStation,
-   onZoom: (DgpsStation) -> Unit,
-   onShare: (DgpsStation) -> Unit,
-   onBookmark: (DgpsStation) -> Unit,
+   dgpsStationWithBookmark: DgpsStationWithBookmark,
+   onZoom: () -> Unit,
+   onShare: () -> Unit,
+   onBookmark: () -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
    Column(Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
-      DgpsStationSummary(dgpsStation = dgpsStation)
+      DgpsStationSummary(dgpsStationWithBookmark)
 
       DgpsStationFooter(
-         dgpsStation = dgpsStation,
-         onShare = { onShare(dgpsStation) },
-         onZoom = { onZoom(dgpsStation) },
-         onBookmark = { onBookmark(dgpsStation) },
+         dgpsStationWithBookmark,
+         onShare = { onShare() },
+         onZoom = { onZoom() },
+         onBookmark = { onBookmark() },
          onCopyLocation = onCopyLocation
       )
    }

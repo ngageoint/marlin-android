@@ -7,7 +7,9 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mil.nga.msi.datasource.MsiDatabase
+import mil.nga.msi.datasource.UserDatabase
 import mil.nga.msi.datasource.asam.AsamDao
+import mil.nga.msi.datasource.bookmark.BookmarkDao
 import mil.nga.msi.datasource.dgpsstation.DgpsStationDao
 import mil.nga.msi.datasource.electronicpublication.ElectronicPublicationDao
 import mil.nga.msi.datasource.layer.LayerDao
@@ -25,9 +27,16 @@ class RoomModule {
 
    @Provides
    @Singleton
-   fun provideDatabase(application: Application): MsiDatabase {
+   fun provideMsiDatabase(application: Application): MsiDatabase {
       return Room.databaseBuilder(application.applicationContext, MsiDatabase::class.java, "msi")
          .fallbackToDestructiveMigration()
+         .build()
+   }
+
+   @Provides
+   @Singleton
+   fun provideUserDatabase(application: Application): UserDatabase {
+      return Room.databaseBuilder(application.applicationContext, UserDatabase::class.java, "user")
          .build()
    }
 
@@ -90,5 +99,11 @@ class RoomModule {
    @Singleton
    fun provideElectronicPublicationDao(database: MsiDatabase): ElectronicPublicationDao {
       return database.electronicPublicationDao()
+   }
+
+   @Provides
+   @Singleton
+   fun provideBookmarkDao(database: UserDatabase): BookmarkDao {
+      return database.bookmarkDao()
    }
 }

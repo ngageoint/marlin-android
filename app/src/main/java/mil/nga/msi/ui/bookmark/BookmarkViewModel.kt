@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import mil.nga.msi.datasource.bookmark.Bookmark
 import mil.nga.msi.repository.bookmark.BookmarkKey
 import mil.nga.msi.repository.bookmark.BookmarkRepository
 import javax.inject.Inject
@@ -13,9 +14,10 @@ class BookmarkViewModel @Inject constructor(
    private val bookmarkRepository: BookmarkRepository
 ): ViewModel() {
 
-   fun saveBookmark(bookmark: BookmarkKey, notes: String? = null) {
+   fun saveBookmark(key: BookmarkKey, notes: String? = null) {
       viewModelScope.launch {
-         bookmarkRepository.setBookmark(bookmark, true, notes)
+         val bookmark = Bookmark(id = key.id, dataSource = key.dataSource, notes = notes)
+         bookmarkRepository.insert(bookmark)
       }
    }
 }

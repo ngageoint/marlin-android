@@ -38,7 +38,9 @@ fun BookmarkNotesScreen(
    var notes by remember { mutableStateOf(bookmark?.notes.orEmpty()) }
 
    val onNoteComplete: () -> Unit  = {
-      bookmark?.let { viewModel.saveBookmark(it, notes) }
+      bookmark?.let {
+         viewModel.saveBookmark(it, notes)
+      }
       onDone()
    }
 
@@ -57,7 +59,7 @@ fun BookmarkNotesScreen(
             onClick = onNoteComplete,
             modifier = Modifier.padding(bottom = 16.dp, end = 16.dp)
          ) {
-            Text("Done")
+            Text("Bookmark")
          }
       }
    }

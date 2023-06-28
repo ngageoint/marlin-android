@@ -16,9 +16,11 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.asam.Asam
-import mil.nga.msi.datasource.bookmark.Bookmark
+import mil.nga.msi.datasource.asam.AsamWithBookmark
 import mil.nga.msi.datasource.dgpsstation.DgpsStation
+import mil.nga.msi.datasource.dgpsstation.DgpsStationWithBookmark
 import mil.nga.msi.datasource.modu.Modu
+import mil.nga.msi.datasource.modu.ModuWithBookmark
 import mil.nga.msi.repository.bookmark.BookmarkKey
 import mil.nga.msi.ui.action.Action
 import mil.nga.msi.ui.action.AsamAction
@@ -49,9 +51,12 @@ fun BookmarksScreen(
       )
 
       Bookmarks(
-         bookmarks = bookmarks,
-         onAction = onAction,
-         onBookmark = { viewModel.removeBookmark(it) }
+         bookmarks = bookmarks.filterNotNull(),
+         onAction = { action ->
+            if (action is Action.Bookmark) {
+               viewModel.deleteBookmark(action.key)
+            } else onAction(action)
+         }
       )
    }
 }
@@ -59,8 +64,7 @@ fun BookmarksScreen(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun Bookmarks(
-   bookmarks: List<Bookmark>,
-   onBookmark: (BookmarkAction) -> Unit,
+   bookmarks: List<ItemWithBookmark>,
    onAction: (Action) -> Unit
 ) {
    Surface(Modifier.fillMaxSize()) {
@@ -70,13 +74,15 @@ private fun Bookmarks(
       ) {
          items(
             count = bookmarks.count(),
-            key = { bookmarks[it].bookmarkId }
+            key = {
+               val bookmark = bookmarks[it].bookmark
+               "${bookmark.dataSource}-${bookmark.id}"
+            }
          ) { index ->
             val bookmark = bookmarks[index]
             Box(Modifier.animateItemPlacement()) {
                Bookmark(
-                  bookmark = bookmark,
-                  onBookmark = onBookmark,
+                  itemWithBookmark = bookmark,
                   onAction = onAction
                )
             }
@@ -87,60 +93,53 @@ private fun Bookmarks(
 
 @Composable
 private fun Bookmark(
-   bookmark: Any,
-   onBookmark: (BookmarkAction) -> Unit,
+   itemWithBookmark: ItemWithBookmark,
    onAction: (Action) -> Unit
 ) {
-   when (bookmark) {
+   when (itemWithBookmark.item) {
       is Asam -> {
-         AsamBookmark(
-            asam = bookmark,
-            onAction = onAction
-         )
+         val asam = AsamWithBookmark(itemWithBookmark.item, itemWithBookmark.bookmark)
+         AsamBookmark(asamWithBookmark = asam, onAction = onAction)
       }
       is DgpsStation -> {
-         DgpsStationBookmark(
-            dgpsStation = bookmark,
-            onAction = onAction
-         )
+         val dgpsStation = DgpsStationWithBookmark(itemWithBookmark.item, itemWithBookmark.bookmark)
+         DgpsStationBookmark(dgpsStationWithBookmark = dgpsStation, onAction = onAction)
       }
       is Modu -> {
-         ModuBookmark(
-            modu = bookmark,
-            onAction = onAction
-         )
+         val modu = ModuWithBookmark(itemWithBookmark.item, itemWithBookmark.bookmark)
+         ModuBookmark(moduWithBookmark = modu, onAction = onAction)
       }
    }
 }
 
 @Composable fun AsamBookmark(
-   asam: Asam,
+   asamWithBookmark: AsamWithBookmark,
    onAction: (Action) -> Unit
 ) {
    Card(
       Modifier
          .fillMaxWidth()
          .padding(bottom = 8.dp)
-         .clickable { onAction(AsamAction.Tap(asam)) }
+         .clickable { onAction(AsamAction.Tap(asamWithBookmark.asam)) }
    ) {
       Column(Modifier.padding(vertical = 8.dp)) {
          DataSourceIcon(dataSource = DataSource.ASAM)
-         AsamSummary(asam = asam)
+         AsamSummary(asamWithBookmark)
 
-         asam.bookmarkNotes?.let { notes ->
+         asamWithBookmark.bookmark?.notes?.let { notes ->
             BookmarkNotes(notes = notes)
          }
 
          AsamFooter(
-            asam = asam,
+            asamWithBookmark = asamWithBookmark,
             onZoom = {
-               onAction(Action.Zoom(asam.latLng))
+               onAction(Action.Zoom(asamWithBookmark.asam.latLng))
             },
             onShare = {
-               onAction(AsamAction.Share(asam))
+               onAction(AsamAction.Share(asamWithBookmark.asam))
             },
             onBookmark = {
-               onAction(Action.Bookmark(BookmarkKey.fromAsam(asam)))
+               onAction(Action.Bookmark(BookmarkKey.fromAsam(asamWithBookmark.asam)))
             },
             onCopyLocation = {
                onAction(AsamAction.Location(it))
@@ -151,9 +150,11 @@ private fun Bookmark(
 }
 
 @Composable fun DgpsStationBookmark(
-   dgpsStation: DgpsStation,
+   dgpsStationWithBookmark: DgpsStationWithBookmark,
    onAction: (Action) -> Unit
 ) {
+   val (dgpsStation, bookmark) = dgpsStationWithBookmark
+
    Card(
       Modifier
          .fillMaxWidth()
@@ -162,14 +163,12 @@ private fun Bookmark(
    ) {
       Column(Modifier.padding(vertical = 8.dp)) {
          DataSourceIcon(dataSource = DataSource.DGPS_STATION)
-         DgpsStationSummary(dgpsStation = dgpsStation)
+         DgpsStationSummary(dgpsStationWithBookmark)
 
-         dgpsStation.bookmarkNotes?.let { notes ->
-            BookmarkNotes(notes = notes)
-         }
+         bookmark?.notes?.let { BookmarkNotes(notes = it) }
 
          DgpsStationFooter(
-            dgpsStation = dgpsStation,
+            dgpsStationWithBookmark = dgpsStationWithBookmark,
             onZoom = {
                onAction(Action.Zoom(dgpsStation.latLng))
             },
@@ -188,9 +187,11 @@ private fun Bookmark(
 }
 
 @Composable fun ModuBookmark(
-   modu: Modu,
+   moduWithBookmark: ModuWithBookmark,
    onAction: (Action) -> Unit
 ) {
+   val (modu, bookmark) = moduWithBookmark
+
    Card(
       Modifier
          .fillMaxWidth()
@@ -199,14 +200,14 @@ private fun Bookmark(
    ) {
       Column(Modifier.padding(vertical = 8.dp)) {
          DataSourceIcon(dataSource = DataSource.MODU)
-         ModuSummary(modu = modu)
+         ModuSummary(moduWithBookmark)
 
-         modu.bookmarkNotes?.let { notes ->
+         bookmark?.notes?.let { notes ->
             BookmarkNotes(notes = notes)
          }
 
          ModuFooter(
-            modu = modu,
+            moduWithBookmark = moduWithBookmark,
             onZoom = {
                onAction(Action.Zoom(modu.latLng))
             },

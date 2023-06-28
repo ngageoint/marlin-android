@@ -40,18 +40,10 @@ data class Asam(
    var hostility: String? = null,
 
    @ColumnInfo(name = "victim")
-   var victim: String? = null,
-
-   override var bookmarked: Boolean = false,
-   override var bookmarkDate: Date? = null,
-   override var bookmarkNotes: String? = null
-
-): Bookmark() {
+   var victim: String? = null
+) {
    @Transient
    val latLng = LatLng(latitude, longitude)
-
-   @Transient
-   override val bookmarkId = reference
 
    override fun toString(): String {
       val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)

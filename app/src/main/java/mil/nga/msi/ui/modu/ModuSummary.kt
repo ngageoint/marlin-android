@@ -11,17 +11,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import mil.nga.msi.datasource.modu.Modu
+import mil.nga.msi.datasource.modu.ModuWithBookmark
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 @Composable
 fun ModuSummary(
-   modu: Modu?
+   moduWithBookmark: ModuWithBookmark
 ) {
+   val (modu, bookmark) = moduWithBookmark
+
    Column(Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
       CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-         modu?.date?.let { date ->
+         modu.date.let { date ->
             val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
             Text(
                text = dateFormat.format(date),
@@ -33,32 +35,30 @@ fun ModuSummary(
          }
       }
 
-      modu?.name?.let { name ->
-         Text(
-            text = name,
-            style = MaterialTheme.typography.titleLarge,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.padding(top = 16.dp)
-         )
-      }
+      Text(
+         text = modu.name,
+         style = MaterialTheme.typography.titleLarge,
+         maxLines = 1,
+         overflow = TextOverflow.Ellipsis,
+         modifier = Modifier.padding(top = 16.dp)
+      )
 
       CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-         modu?.rigStatus?.let {
+         modu.rigStatus?.let {
             Text(
                text = it.name,
                style = MaterialTheme.typography.bodyLarge,
                modifier = Modifier.padding(top = 4.dp)
             )
          }
-         modu?.specialStatus?.let {
+         modu.specialStatus?.let {
             Text(
                text = it,
                style = MaterialTheme.typography.bodyMedium
             )
          }
 
-         modu?.bookmarkNotes?.let { notes ->
+         bookmark?.notes?.let { notes ->
             Text(
                text = "Bookmark Notes",
                style = MaterialTheme.typography.titleMedium,

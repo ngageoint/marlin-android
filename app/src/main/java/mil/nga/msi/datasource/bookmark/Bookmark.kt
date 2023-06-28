@@ -1,17 +1,24 @@
 package mil.nga.msi.datasource.bookmark
 
 import androidx.room.ColumnInfo
+import androidx.room.Entity
+ import mil.nga.msi.datasource.DataSource
 import java.util.Date
 
-abstract class Bookmark(
-   @ColumnInfo(name = "bookmarked")
-   open var bookmarked: Boolean = false,
+@Entity(
+   tableName = "bookmarks",
+   primaryKeys = ["id", "data_source"]
+)
+data class Bookmark(
+   @ColumnInfo(name = "id")
+   val id: String,
 
-   @ColumnInfo(name = "bookmark_timestamp")
-   open var bookmarkDate: Date? = null,
+   @ColumnInfo(name = "data_source")
+   val dataSource: DataSource,
 
-   @ColumnInfo(name = "bookmark_notes")
-   open var bookmarkNotes: String? = null
-) {
-   abstract val bookmarkId: String
-}
+   @ColumnInfo(name = "timestamp")
+   var date: Date = Date(),
+
+   @ColumnInfo(name = "notes")
+   var notes: String? = null
+)

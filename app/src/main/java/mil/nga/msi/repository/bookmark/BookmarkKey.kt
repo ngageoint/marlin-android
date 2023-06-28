@@ -17,17 +17,17 @@ data class BookmarkKey(
    val notes: String? = null
 ): Parcelable {
    companion object {
-      fun fromAsam(asam: Asam): BookmarkKey {
-         return BookmarkKey(asam.reference, DataSource.ASAM, asam.bookmarkNotes)
+      fun fromAsam(asam: Asam, notes: String? = null): BookmarkKey {
+         return BookmarkKey(asam.reference, DataSource.ASAM, notes)
       }
 
-      fun fromDgpsStation(dgpsStation: DgpsStation): BookmarkKey {
+      fun fromDgpsStation(dgpsStation: DgpsStation, notes: String? = null): BookmarkKey {
          val id = DgpsStationKey.fromDgpsStation(dgpsStation).id()
-         return BookmarkKey(id, DataSource.DGPS_STATION, dgpsStation.bookmarkNotes)
+         return BookmarkKey(id, DataSource.DGPS_STATION, notes)
       }
 
-      fun fromModu(modu: Modu): BookmarkKey {
-         return BookmarkKey(modu.name, DataSource.MODU, modu.bookmarkNotes)
+      fun fromModu(modu: Modu, notes: String? = null): BookmarkKey {
+         return BookmarkKey(modu.name, DataSource.MODU, notes)
       }
    }
 }

@@ -1,37 +1,35 @@
 package mil.nga.msi.ui.asam.list
 
-import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asFlow
 import androidx.lifecycle.asLiveData
-import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import androidx.paging.insertSeparators
-import androidx.paging.liveData
 import androidx.paging.map
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.asam.Asam
-import mil.nga.msi.filter.Filter
+import mil.nga.msi.datasource.asam.AsamWithBookmark
+import mil.nga.msi.datasource.bookmark.Bookmark
 import mil.nga.msi.filter.FilterParameterType
 import mil.nga.msi.repository.asam.AsamRepository
-import mil.nga.msi.repository.bookmark.BookmarkKey
 import mil.nga.msi.repository.bookmark.BookmarkRepository
 import mil.nga.msi.repository.preferences.FilterRepository
 import mil.nga.msi.repository.preferences.SortRepository
-import mil.nga.msi.sort.Sort
 import mil.nga.msi.sort.SortParameter
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 sealed class AsamListItemState {
-   data class AsamItemState(val asam : Asam) : AsamListItemState()
+   data class AsamItemState(val asamWithBookmark : AsamWithBookmark) : AsamListItemState()
    data class HeaderItemState(val header : String) : AsamListItemState()
 }
 
@@ -43,46 +41,43 @@ class AsamsViewModel @Inject constructor(
    private val bookmarkRepository: BookmarkRepository
 ): ViewModel() {
 
-   private val queryParameters = MediatorLiveData<Pair<List<Filter>, Sort?>>().apply {
-      addSource(filterRepository.filters.asLiveData()) { entry ->
-         val filters = entry[DataSource.ASAM] ?: emptyList()
-         value = Pair(filters, value?.second)
-      }
-
-      addSource(sortRepository.sort.asLiveData()) { entry ->
-         val filters = value?.first ?: emptyList()
-         value = Pair(filters, entry[DataSource.ASAM])
-      }
-   }
-
-   val asams = queryParameters.switchMap { pair ->
-      val filters = pair.first
-      val sort = pair.second
+   @OptIn(ExperimentalCoroutinesApi::class)
+   val asams = combine(
+      sortRepository.sort,
+      filterRepository.filters,
+      bookmarkRepository.observeBookmarks(DataSource.ASAM)
+   ) { sort, filters, _ ->
+      sort to filters
+   }.flatMapLatest { (sort, filters) ->
       Pager(PagingConfig(pageSize = 20), null) {
-         asamRepository.observeAsamListItems(filters, sort?.parameters ?: emptyList())
-      }.liveData
-   }.asFlow().map { pagingData ->
-      pagingData
-         .map { AsamListItemState.AsamItemState(it) }
-         .insertSeparators { item1: AsamListItemState.AsamItemState?, item2: AsamListItemState.AsamItemState? ->
-            val section = queryParameters.value?.second?.section ?: false
-            val primarySortParameter = queryParameters.value?.second?.parameters?.firstOrNull()
+         asamRepository.observeAsamListItems(
+            sort = sort[DataSource.ASAM]?.parameters ?: emptyList(),
+            filters = filters[DataSource.ASAM] ?: emptyList()
+         )
+      }.flow.map { pagingData ->
+         pagingData
+            .map { asam ->
+               val bookmark = bookmarkRepository.getBookmark(DataSource.ASAM, asam.reference)
+               AsamListItemState.AsamItemState(AsamWithBookmark(asam, bookmark))
+            }
+            .insertSeparators { item1: AsamListItemState.AsamItemState?, item2: AsamListItemState.AsamItemState? ->
+               val section = sort[DataSource.ASAM]?.section == true
+               val primarySortParameter = sort[DataSource.ASAM]?.parameters?.firstOrNull()
 
-            if (section && primarySortParameter != null) {
-               header(primarySortParameter, item1, item2)
-            } else null
-         }
+               if (section && primarySortParameter != null) {
+                  header(primarySortParameter, item1, item2)
+               } else null
+            }
+      }
    }.cachedIn(viewModelScope)
 
    val asamFilters = filterRepository.filters.map { entry ->
       entry[DataSource.ASAM] ?: emptyList()
    }.asLiveData()
 
-   suspend fun getAsam(reference: String) = asamRepository.getAsam(reference)
-
-   fun removeBookmark(asam: Asam) {
+   fun deleteBookmark(bookmark: Bookmark) {
       viewModelScope.launch {
-         bookmarkRepository.setBookmark(BookmarkKey.fromAsam(asam), false)
+         bookmarkRepository.delete(bookmark)
       }
    }
 
@@ -90,9 +85,9 @@ class AsamsViewModel @Inject constructor(
       return when (sort.parameter.type) {
          FilterParameterType.DATE -> {
             val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy - MM - dd")
-            val date1 = item1?.asam?.date?.toInstant()?.atZone(ZoneId.systemDefault())?.toLocalDate()
+            val date1 = item1?.asamWithBookmark?.asam?.date?.toInstant()?.atZone(ZoneId.systemDefault())?.toLocalDate()
             val date1String = date1?.format(formatter)
-            val date2 = item2?.asam?.date?.toInstant()?.atZone(ZoneId.systemDefault())?.toLocalDate()
+            val date2 = item2?.asamWithBookmark?.asam?.date?.toInstant()?.atZone(ZoneId.systemDefault())?.toLocalDate()
             val date2String = date2?.format(formatter)
 
             if (date1String == null && date2String != null) {
@@ -102,8 +97,8 @@ class AsamsViewModel @Inject constructor(
             } else null
          }
          else -> {
-            val item1String = parameterToName(sort.parameter.parameter, item1?.asam)
-            val item2String = parameterToName(sort.parameter.parameter, item2?.asam)
+            val item1String = parameterToName(sort.parameter.parameter, item1?.asamWithBookmark?.asam)
+            val item2String = parameterToName(sort.parameter.parameter, item2?.asamWithBookmark?.asam)
 
             if (item1String == null && item2String != null) {
                AsamListItemState.HeaderItemState(item2String)

@@ -26,6 +26,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.TileProvider
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.modu.Modu
+import mil.nga.msi.datasource.modu.ModuWithBookmark
 import mil.nga.msi.repository.bookmark.BookmarkKey
 import mil.nga.msi.ui.action.Action
 import mil.nga.msi.ui.main.TopBar
@@ -44,7 +45,8 @@ fun ModuDetailScreen(
    onAction: (Action) -> Unit,
    viewModel: ModuViewModel = hiltViewModel()
 ) {
-   val modu by viewModel.getModu(name).observeAsState()
+   viewModel.setName(name)
+   val moduWithBookmark by viewModel.moduWithBookmark.observeAsState()
 
    Column {
       TopBar(
@@ -54,15 +56,15 @@ fun ModuDetailScreen(
       )
 
       ModuDetailContent(
-         modu = modu,
+         moduWithBookmark,
          tileProvider = viewModel.tileProvider,
          onZoom = { onAction(Action.Zoom(it.latLng)) },
          onShare = { onAction(ModuAction.Share(it)) },
-         onBookmark = {
-            if (it.bookmarked) {
-               viewModel.removeBookmark(it)
+         onBookmark = { (modu, bookmark) ->
+            if (bookmark ==  null) {
+               onAction(Action.Bookmark(BookmarkKey.fromModu(modu)))
             } else {
-               onAction(Action.Bookmark(BookmarkKey.fromModu(it)))
+               viewModel.deleteBookmark(bookmark)
             }
          },
          onCopyLocation = { onAction(ModuAction.Location(it)) }
@@ -72,14 +74,14 @@ fun ModuDetailScreen(
 
 @Composable
 private fun ModuDetailContent(
-   modu: Modu?,
+   moduWithBookmark: ModuWithBookmark?,
    tileProvider: TileProvider,
    onZoom: (Modu) -> Unit,
    onShare: (Modu) -> Unit,
-   onBookmark: (Modu) -> Unit,
+   onBookmark: (ModuWithBookmark) -> Unit,
    onCopyLocation: (String) -> Unit,
 ) {
-   if (modu != null) {
+   if (moduWithBookmark != null) {
       Surface(
          modifier = Modifier.fillMaxHeight()
       ) {
@@ -88,14 +90,15 @@ private fun ModuDetailContent(
                .padding(all = 8.dp)
                .verticalScroll(rememberScrollState())
          ) {
-            ModuHeader(modu,
-               tileProvider,
-               onZoom = { onZoom(modu) },
-               onShare = { onShare(modu) },
-               onBookmark = { onBookmark(modu) },
+            ModuHeader(
+               moduWithBookmark,
+               tileProvider = tileProvider,
+               onZoom = { onZoom(moduWithBookmark.modu) },
+               onShare = { onShare(moduWithBookmark.modu) },
+               onBookmark = { onBookmark(moduWithBookmark) },
                onCopyLocation
             )
-            ModuInformation(modu)
+            ModuInformation(moduWithBookmark.modu)
          }
       }
    }
@@ -103,13 +106,15 @@ private fun ModuDetailContent(
 
 @Composable
 private fun ModuHeader(
-   modu: Modu,
+   moduWithBookmark: ModuWithBookmark,
    tileProvider: TileProvider,
    onZoom: () -> Unit,
    onShare: () -> Unit,
    onBookmark: () -> Unit,
    onCopyLocation: (String) -> Unit,
 ) {
+   val (modu, bookmark) = moduWithBookmark
+
    Card(
       modifier = Modifier.padding(bottom = 16.dp)
    ) {
@@ -161,7 +166,7 @@ private fun ModuHeader(
                )
             }
 
-            modu.bookmarkNotes?.let { notes ->
+            bookmark?.notes?.let { notes ->
                Text(
                   text = "Bookmark Notes",
                   style = MaterialTheme.typography.titleMedium,
@@ -175,7 +180,7 @@ private fun ModuHeader(
                )
             }
 
-            ModuFooter(modu, onZoom, onShare, onBookmark, onCopyLocation)
+            ModuFooter(moduWithBookmark, onZoom, onShare, onBookmark, onCopyLocation)
          }
       }
    }

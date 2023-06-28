@@ -25,6 +25,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.android.gms.maps.model.TileProvider
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.asam.Asam
+import mil.nga.msi.datasource.asam.AsamWithBookmark
 import mil.nga.msi.repository.bookmark.BookmarkKey
 import mil.nga.msi.ui.action.Action
 import mil.nga.msi.ui.action.AsamAction
@@ -43,7 +44,8 @@ fun AsamDetailScreen(
    onAction: (Action) -> Unit,
    viewModel: AsamViewModel = hiltViewModel()
 ) {
-   val asam by viewModel.getAsam(reference).observeAsState()
+   viewModel.setAsamReference(reference)
+   val asamWithBookmark by viewModel.asamWithBookmark.observeAsState()
 
    Column {
       TopBar(
@@ -53,15 +55,15 @@ fun AsamDetailScreen(
       )
 
       AsamDetailContent(
-         asam = asam,
+         asamWithBookmark = asamWithBookmark,
          tileProvider = viewModel.tileProvider,
          onZoom = { onAction(Action.Zoom(it.latLng)) },
          onShare = { onAction(AsamAction.Share(it)) },
-         onBookmark = {
-            if (it.bookmarked) {
-               viewModel.removeBookmark(it)
+         onBookmark = { (asam, bookmark) ->
+            if (bookmark == null) {
+               onAction(Action.Bookmark(BookmarkKey.fromAsam(asam)))
             } else {
-               onAction(Action.Bookmark(BookmarkKey.fromAsam(it)))
+               viewModel.deleteBookmark(bookmark)
             }
          },
          onCopyLocation = { onAction(AsamAction.Location(it)) }
@@ -71,14 +73,14 @@ fun AsamDetailScreen(
 
 @Composable
 private fun AsamDetailContent(
-   asam: Asam?,
+   asamWithBookmark: AsamWithBookmark?,
    tileProvider: TileProvider,
    onZoom: (Asam) -> Unit,
    onShare: (Asam) -> Unit,
-   onBookmark: (Asam) -> Unit,
+   onBookmark: (AsamWithBookmark) -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
-   if (asam != null) {
+   if (asamWithBookmark != null) {
       Surface(
          modifier = Modifier.fillMaxHeight()
       ) {
@@ -88,15 +90,15 @@ private fun AsamDetailContent(
                .verticalScroll(rememberScrollState())
          ) {
             AsamHeader(
-               asam = asam,
+               asamWithBookmark = asamWithBookmark,
                tileProvider = tileProvider,
-               onZoom = { onZoom(asam) },
-               onShare = { onShare(asam) },
-               onBookmark = { onBookmark(asam) },
+               onZoom = { onZoom(asamWithBookmark.asam) },
+               onShare = { onShare(asamWithBookmark.asam) },
+               onBookmark = { onBookmark(asamWithBookmark) },
                onCopyLocation = onCopyLocation
             )
 
-            AsamInformation(asam)
+            AsamInformation(asamWithBookmark.asam)
          }
       }
    }
@@ -104,13 +106,15 @@ private fun AsamDetailContent(
 
 @Composable
 private fun AsamHeader(
-   asam: Asam,
+   asamWithBookmark: AsamWithBookmark,
    tileProvider: TileProvider,
    onZoom: (NavPoint) -> Unit,
    onShare: () -> Unit,
    onBookmark: () -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
+   val (asam, bookmark) = asamWithBookmark
+
    Card {
       Column {
          Surface(
@@ -152,23 +156,25 @@ private fun AsamHeader(
                   )
                }
 
-               asam.bookmarkNotes?.let { notes ->
-                  Text(
-                     text = "Bookmark Notes",
-                     style = MaterialTheme.typography.titleMedium,
-                     fontWeight = FontWeight.Medium,
-                     modifier = Modifier.padding(top = 16.dp, bottom = 4.dp)
-                  )
+               bookmark?.notes?.let { notes ->
+                  if (notes.isNotBlank()) {
+                     Text(
+                        text = "Bookmark Notes",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Medium,
+                        modifier = Modifier.padding(top = 16.dp, bottom = 4.dp)
+                     )
 
-                  Text(
-                     text = notes,
-                     style = MaterialTheme.typography.bodyMedium
-                  )
+                     Text(
+                        text = notes,
+                        style = MaterialTheme.typography.bodyMedium
+                     )
+                  }
                }
             }
 
             AsamFooter(
-               asam,
+               asamWithBookmark,
                onZoom = { onZoom(NavPoint(asam.latitude, asam.longitude))},
                onShare = onShare,
                onBookmark = onBookmark,

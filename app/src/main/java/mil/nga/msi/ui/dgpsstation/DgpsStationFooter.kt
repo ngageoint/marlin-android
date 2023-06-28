@@ -17,17 +17,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.google.android.gms.maps.model.LatLng
-import mil.nga.msi.datasource.dgpsstation.DgpsStation
+import mil.nga.msi.datasource.dgpsstation.DgpsStationWithBookmark
 import mil.nga.msi.ui.coordinate.CoordinateTextButton
 
 @Composable
 fun DgpsStationFooter(
-   dgpsStation: DgpsStation,
+   dgpsStationWithBookmark: DgpsStationWithBookmark,
    onBookmark: () -> Unit,
    onShare: () -> Unit,
    onZoom: () -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
+   val (dgpsStation, bookmark) = dgpsStationWithBookmark
+
    Row(
       verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.SpaceBetween,
@@ -36,7 +38,12 @@ fun DgpsStationFooter(
          .padding(top = 8.dp)
    ) {
       DgpsStationLocation(dgpsStation.latLng, onCopyLocation)
-      DgpsStationActions(dgpsStation.bookmarked, onBookmark, onShare, onZoom)
+      DgpsStationActions(
+         bookmarked = bookmark != null,
+         onBookmark,
+         onShare,
+         onZoom
+      )
    }
 }
 
@@ -63,7 +70,7 @@ private fun DgpsStationActions(
          Icon(
             imageVector = if (bookmarked) Icons.Default.Bookmark else Icons.Outlined.BookmarkBorder,
             tint = MaterialTheme.colorScheme.tertiary,
-            contentDescription = "Bookmark ASAM"
+            contentDescription = "Bookmark DGPS Station"
          )
       }
       IconButton(onClick = { onShare() }) {

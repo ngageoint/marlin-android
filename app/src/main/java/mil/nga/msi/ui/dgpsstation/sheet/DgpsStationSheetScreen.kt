@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import mil.nga.msi.datasource.DataSource
-import mil.nga.msi.datasource.dgpsstation.DgpsStation
+import mil.nga.msi.datasource.dgpsstation.DgpsStationWithBookmark
 import mil.nga.msi.repository.dgpsstation.DgpsStationKey
 import mil.nga.msi.ui.datasource.DataSourceIcon
 import mil.nga.msi.ui.dgpsstation.DgpsStationSummary
@@ -24,10 +24,11 @@ fun DgpsStationSheetScreen(
    onDetails: (() -> Unit)? = null,
    viewModel: DgpsStationViewModel = hiltViewModel()
 ) {
-   val dgpsStation by viewModel.getDgpsStation(key.volumeNumber, key.featureNumber).observeAsState()
+   viewModel.setDgpsStationKey(key)
+   val dgpsStation by viewModel.dgpsStationWithBookmark.observeAsState()
 
    Column(modifier = modifier) {
-      DgpsStationContent(dgpsStation = dgpsStation) {
+      DgpsStationContent(dgpsStation) {
          onDetails?.invoke()
       }
    }
@@ -35,12 +36,13 @@ fun DgpsStationSheetScreen(
 
 @Composable
 private fun DgpsStationContent(
-   dgpsStation: DgpsStation?,
+   dgpsStationWithBookmark: DgpsStationWithBookmark?,
    onDetails: () -> Unit,
 ) {
    Column(modifier = Modifier.padding(vertical = 8.dp)) {
       DataSourceIcon(dataSource = DataSource.DGPS_STATION)
-      DgpsStationSummary(dgpsStation = dgpsStation)
+
+      dgpsStationWithBookmark?.let { DgpsStationSummary(dgpsStationWithBookmark = it) }
 
       TextButton(
          onClick = { onDetails() }

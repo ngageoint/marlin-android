@@ -19,6 +19,7 @@ import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
 import kotlinx.coroutines.flow.Flow
 import mil.nga.msi.datasource.modu.Modu
+import mil.nga.msi.datasource.modu.ModuWithBookmark
 import mil.nga.msi.repository.bookmark.BookmarkKey
 import mil.nga.msi.ui.action.Action
 import mil.nga.msi.ui.action.AsamAction
@@ -79,11 +80,11 @@ fun ModusScreen(
          onTap = { onAction(ModuAction.Tap(it)) },
          onZoom = { onAction(Action.Zoom(it.latLng)) },
          onShare = { onAction(ModuAction.Share(it)) },
-         onBookmark = {
-            if (it.bookmarked) {
-               viewModel.removeBookmark(it)
+         onBookmark = { (modu, bookmark) ->
+            if (bookmark == null) {
+               onAction(Action.Bookmark(BookmarkKey.fromModu(modu)))
             } else {
-               onAction(Action.Bookmark(BookmarkKey.fromModu(it)))
+               viewModel.deleteBookmark(bookmark)
             }
          },
          onCopyLocation = { onAction(AsamAction.Location(it)) }
@@ -97,7 +98,7 @@ private fun Modus(
    onTap: (Modu) -> Unit,
    onZoom: (Modu) -> Unit,
    onShare: (Modu) -> Unit,
-   onBookmark: (Modu) -> Unit,
+   onBookmark: (ModuWithBookmark) -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
    val lazyItems = pagingState.collectAsLazyPagingItems()
@@ -110,7 +111,7 @@ private fun Modus(
             count = lazyItems.itemCount,
             key = lazyItems.itemKey {
                when (it) {
-                  is ModuListItem.ModuItem -> it.modu.name
+                  is ModuListItem.ModuItem -> it.moduWithBookmark.modu.name
                   is ModuListItem.HeaderItem -> it.header
                }
             },
@@ -125,11 +126,11 @@ private fun Modus(
                when (item) {
                   is ModuListItem.ModuItem -> {
                      ModuCard(
-                        modu = item.modu,
-                        onTap = onTap,
-                        onZoom = onZoom,
-                        onShare = onShare,
-                        onBookmark = onBookmark,
+                        moduWithBookmark = item.moduWithBookmark,
+                        onTap = { onTap(item.moduWithBookmark.modu) },
+                        onZoom = { onZoom(item.moduWithBookmark.modu) },
+                        onShare = { onShare(item.moduWithBookmark.modu) },
+                        onBookmark = { onBookmark(item.moduWithBookmark) },
                         onCopyLocation = onCopyLocation
                      )
                   }
@@ -150,25 +151,25 @@ private fun Modus(
 
 @Composable
 private fun ModuCard(
-   modu: Modu,
-   onTap: (Modu) -> Unit,
-   onZoom: (Modu) -> Unit,
-   onShare: (Modu) -> Unit,
-   onBookmark: (Modu) -> Unit,
+   moduWithBookmark: ModuWithBookmark,
+   onTap: () -> Unit,
+   onZoom: () -> Unit,
+   onShare: () -> Unit,
+   onBookmark: () -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
    Card(
       Modifier
          .fillMaxWidth()
          .padding(bottom = 8.dp)
-         .clickable { onTap(modu) }
+         .clickable { onTap() }
    ) {
-      ModuSummary(modu = modu)
+      ModuSummary(moduWithBookmark = moduWithBookmark)
       ModuFooter(
-         modu,
-         onZoom = { onZoom(modu) },
-         onShare = { onShare(modu) },
-         onBookmark = { onBookmark(modu) },
+         moduWithBookmark,
+         onZoom = onZoom,
+         onShare = onShare,
+         onBookmark = onBookmark,
          onCopyLocation = onCopyLocation
       )
    }

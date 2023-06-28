@@ -24,12 +24,8 @@ data class Modu(
    val latitude: Double,
 
    @ColumnInfo(name = "longitude")
-   val longitude: Double,
-
-   override var bookmarked: Boolean = false,
-   override var bookmarkDate: Date? = null,
-   override var bookmarkNotes: String? = null
-): Bookmark() {
+   val longitude: Double
+) {
 
    @ColumnInfo(name = "rig_status")
    var rigStatus: RigStatus? = null
@@ -54,9 +50,6 @@ data class Modu(
 
    @Transient
    val latLng = LatLng(latitude, longitude)
-
-   @Transient
-   override val bookmarkId = name
 
    override fun toString(): String {
       val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)

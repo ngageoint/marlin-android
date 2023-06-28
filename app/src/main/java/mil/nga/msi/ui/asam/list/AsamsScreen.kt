@@ -19,6 +19,7 @@ import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
 import kotlinx.coroutines.flow.Flow
 import mil.nga.msi.datasource.asam.Asam
+import mil.nga.msi.datasource.asam.AsamWithBookmark
 import mil.nga.msi.repository.bookmark.BookmarkKey
 import mil.nga.msi.ui.action.Action
 import mil.nga.msi.ui.action.AsamAction
@@ -79,11 +80,11 @@ fun AsamsScreen(
          onTap = { onAction(AsamAction.Tap(it)) },
          onZoom = { onAction(Action.Zoom(it.latLng)) },
          onShare = { onAction(AsamAction.Share(it)) },
-         onBookmark = {
-            if (it.bookmarked) {
-               viewModel.removeBookmark(it)
+         onBookmark = { (asam, bookmark) ->
+            if (bookmark == null) {
+               onAction(Action.Bookmark(BookmarkKey.fromAsam(asam)))
             } else {
-               onAction(Action.Bookmark(BookmarkKey.fromAsam(it)))
+               viewModel.deleteBookmark(bookmark)
             }
          },
          onCopyLocation = { onAction(AsamAction.Location(it)) }
@@ -97,7 +98,7 @@ private fun Asams(
    onTap: (Asam) -> Unit,
    onZoom: (Asam) -> Unit,
    onShare: (Asam) -> Unit,
-   onBookmark: (Asam) -> Unit,
+   onBookmark: (AsamWithBookmark) -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
    val lazyItems = pagingState.collectAsLazyPagingItems()
@@ -111,7 +112,7 @@ private fun Asams(
             count = lazyItems.itemCount,
             key = lazyItems.itemKey {
                when (it) {
-                  is AsamListItemState.AsamItemState -> it.asam.reference
+                  is AsamListItemState.AsamItemState -> it.asamWithBookmark.asam.reference
                   is AsamListItemState.HeaderItemState -> it.header
                }
             },
@@ -126,11 +127,11 @@ private fun Asams(
                when (item) {
                   is AsamListItemState.AsamItemState -> {
                      AsamCard(
-                        asam = item.asam,
-                        onTap = onTap,
-                        onZoom = onZoom,
-                        onShare = onShare,
-                        onBookmark = onBookmark,
+                        asamWithBookmark = item.asamWithBookmark,
+                        onTap = { onTap(item.asamWithBookmark.asam) },
+                        onZoom = { onZoom(item.asamWithBookmark.asam) },
+                        onShare = { onShare(item.asamWithBookmark.asam) },
+                        onBookmark = { onBookmark(item.asamWithBookmark) },
                         onCopyLocation = onCopyLocation
                      )
                   }
@@ -151,26 +152,26 @@ private fun Asams(
 
 @Composable
 private fun AsamCard(
-   asam: Asam,
-   onTap: (Asam) -> Unit,
-   onZoom: (Asam) -> Unit,
-   onShare: (Asam) -> Unit,
-   onBookmark: (Asam) -> Unit,
+   asamWithBookmark: AsamWithBookmark,
+   onTap: () -> Unit,
+   onZoom: () -> Unit,
+   onShare: () -> Unit,
+   onBookmark: () -> Unit,
    onCopyLocation: (String) -> Unit)
 {
    Card(
       Modifier
          .fillMaxWidth()
          .padding(bottom = 8.dp)
-         .clickable { onTap(asam) }
+         .clickable { onTap() }
    ) {
-      AsamSummary(asam)
+      AsamSummary(asamWithBookmark)
       AsamFooter(
-         asam = asam,
-         onZoom = { onZoom(asam) },
-         onShare = { onShare(asam) },
-         onBookmark = { onBookmark(asam) },
-         onCopyLocation = { onCopyLocation(it) }
+         asamWithBookmark = asamWithBookmark,
+         onZoom = onZoom,
+         onShare = onShare,
+         onBookmark = onBookmark,
+         onCopyLocation = onCopyLocation
       )
    }
 }

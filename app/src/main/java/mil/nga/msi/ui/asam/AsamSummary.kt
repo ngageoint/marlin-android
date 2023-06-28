@@ -11,30 +11,30 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import mil.nga.msi.datasource.asam.Asam
+import mil.nga.msi.datasource.asam.AsamWithBookmark
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 @Composable
 fun AsamSummary(
-   asam: Asam?
+   asamWithBookmark: AsamWithBookmark
 ) {
+   val (asam, bookmark) = asamWithBookmark
+
    Column(modifier = Modifier.padding(vertical = 8.dp)) {
       Column(Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
          CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-            asam?.date?.let { date ->
-               val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
-               Text(
-                  text = dateFormat.format(date),
-                  fontWeight = FontWeight.SemiBold,
-                  style = MaterialTheme.typography.labelSmall,
-                  maxLines = 1,
-                  overflow = TextOverflow.Ellipsis
-               )
-            }
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+            Text(
+               text = dateFormat.format(asam.date),
+               fontWeight = FontWeight.SemiBold,
+               style = MaterialTheme.typography.labelSmall,
+               maxLines = 1,
+               overflow = TextOverflow.Ellipsis
+            )
          }
 
-         val header = listOfNotNull(asam?.hostility, asam?.victim)
+         val header = listOfNotNull(asam.hostility, asam.victim)
          if (header.isNotEmpty()) {
             Text(
                text = header.joinToString(": "),
@@ -47,7 +47,7 @@ fun AsamSummary(
 
 
          CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-            asam?.description?.let {
+            asam.description?.let {
                Text(
                   text = it,
                   maxLines = 3,
@@ -57,18 +57,20 @@ fun AsamSummary(
                )
             }
 
-            asam?.bookmarkNotes?.let { notes ->
-               Text(
-                  text = "Bookmark Notes",
-                  style = MaterialTheme.typography.titleMedium,
-                  fontWeight = FontWeight.Medium,
-                  modifier = Modifier.padding(top = 16.dp, bottom = 4.dp)
-               )
+            bookmark?.notes?.let { notes ->
+               if (notes.isNotBlank()) {
+                  Text(
+                     text = "Bookmark Notes",
+                     style = MaterialTheme.typography.titleMedium,
+                     fontWeight = FontWeight.Medium,
+                     modifier = Modifier.padding(top = 16.dp, bottom = 4.dp)
+                  )
 
-               Text(
-                  text = notes,
-                  style = MaterialTheme.typography.bodyMedium
-               )
+                  Text(
+                     text = notes,
+                     style = MaterialTheme.typography.bodyMedium
+                  )
+               }
             }
          }
       }

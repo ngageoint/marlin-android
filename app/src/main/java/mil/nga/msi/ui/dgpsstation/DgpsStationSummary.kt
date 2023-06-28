@@ -10,15 +10,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import mil.nga.msi.datasource.dgpsstation.DgpsStation
+import mil.nga.msi.datasource.dgpsstation.DgpsStationWithBookmark
 
 @Composable
 fun DgpsStationSummary(
-   dgpsStation: DgpsStation?
+   dgpsStationWithBookmark: DgpsStationWithBookmark
 ) {
+   val (dgpsStation, bookmark) = dgpsStationWithBookmark
+
    CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
       Text(
-         text = "${dgpsStation?.featureNumber?.toString().orEmpty()} ${dgpsStation?.volumeNumber.orEmpty()}",
+         text = "${dgpsStation.featureNumber.toString()} ${dgpsStation.volumeNumber}",
          fontWeight = FontWeight.SemiBold,
          style = MaterialTheme.typography.labelSmall,
          maxLines = 1,
@@ -26,7 +28,7 @@ fun DgpsStationSummary(
       )
    }
 
-   dgpsStation?.name?.let { name ->
+   dgpsStation.name?.let { name ->
       Text(
          text = name,
          style = MaterialTheme.typography.titleLarge,
@@ -37,7 +39,7 @@ fun DgpsStationSummary(
    }
 
    CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-      dgpsStation?.remarks?.let { remarks ->
+      dgpsStation.remarks?.let { remarks ->
          Text(
             text = remarks,
             style = MaterialTheme.typography.bodyMedium,
@@ -45,18 +47,20 @@ fun DgpsStationSummary(
          )
       }
 
-      dgpsStation?.bookmarkNotes?.let { notes ->
-         Text(
-            text = "Bookmark Notes",
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Medium,
-            modifier = Modifier.padding(top = 16.dp, bottom = 4.dp)
-         )
+      bookmark?.notes?.let { notes ->
+         if (notes.isNotEmpty()) {
+            Text(
+               text = "Bookmark Notes",
+               style = MaterialTheme.typography.titleMedium,
+               fontWeight = FontWeight.Medium,
+               modifier = Modifier.padding(top = 16.dp, bottom = 4.dp)
+            )
 
-         Text(
-            text = notes,
-            style = MaterialTheme.typography.bodyMedium
-         )
+            Text(
+               text = notes,
+               style = MaterialTheme.typography.bodyMedium
+            )
+         }
       }
    }
 }

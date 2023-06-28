@@ -15,24 +15,30 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.google.android.gms.maps.model.LatLng
-import mil.nga.msi.datasource.modu.Modu
+import mil.nga.msi.datasource.modu.ModuWithBookmark
 import mil.nga.msi.ui.coordinate.CoordinateTextButton
 
 @Composable
 fun ModuFooter(
-   modu: Modu,
+   moduWithBookmark: ModuWithBookmark,
    onZoom: () -> Unit,
    onShare: () -> Unit,
    onBookmark: () -> Unit,
    onCopyLocation: (String) -> Unit,
 ) {
+   val (modu, bookmark) = moduWithBookmark
    Row(
       verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.SpaceBetween,
       modifier = Modifier.fillMaxWidth()
    ) {
       ModuLocation(modu.latLng, onCopyLocation)
-      ModuActions(modu.bookmarked, onZoom, onShare, onBookmark)
+      ModuActions(
+         bookmarked = bookmark != null,
+         onZoom,
+         onShare,
+         onBookmark
+      )
    }
 }
 
