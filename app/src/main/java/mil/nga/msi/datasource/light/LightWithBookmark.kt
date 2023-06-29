@@ -6,8 +6,3 @@ data class LightWithBookmark(
    val light: Light,
    val bookmark: Bookmark?
 )
-
-data class LightsWithBookmark(
-   val lights: List<Light>,
-   val bookmark: Bookmark?
-)

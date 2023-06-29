@@ -1,6 +1,5 @@
 package mil.nga.msi.ui.light
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
@@ -9,11 +8,12 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.bookmark.Bookmark
-import mil.nga.msi.datasource.light.LightsWithBookmark
+import mil.nga.msi.datasource.light.LightWithBookmark
 import mil.nga.msi.repository.bookmark.BookmarkRepository
 import mil.nga.msi.repository.light.LightKey
 import mil.nga.msi.repository.light.LightRepository
@@ -35,13 +35,18 @@ class LightViewModel @Inject constructor(
    }
 
    @OptIn(ExperimentalCoroutinesApi::class)
-   val lightsWithBookmark = _lightKeyFlow.flatMapLatest { key ->
+   val lightState = _lightKeyFlow.flatMapLatest { key ->
       combine(
          lightRepository.observeLight(key.volumeNumber, key.featureNumber),
          bookmarkRepository.observeBookmark(DataSource.LIGHT, key.id())
-      ) { light, bookmark ->
-         LightsWithBookmark(light, bookmark)
-      }
+      ) { lights, bookmark ->
+         if (lights.isNotEmpty()) {
+            LightState(
+               lightWithBookmark = LightWithBookmark(lights.first(), bookmark),
+               characteristics = lights.drop(0),
+            )
+         } else null
+      }.filterNotNull()
    }.asLiveData()
 
    fun deleteBookmark(bookmark: Bookmark) {

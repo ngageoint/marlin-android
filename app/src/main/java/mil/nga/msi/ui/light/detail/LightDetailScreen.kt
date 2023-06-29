@@ -46,7 +46,6 @@ import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.light.Light
 import mil.nga.msi.datasource.light.LightSector
 import mil.nga.msi.datasource.light.LightWithBookmark
-import mil.nga.msi.datasource.light.LightsWithBookmark
 import mil.nga.msi.repository.bookmark.BookmarkKey
 import mil.nga.msi.repository.light.LightKey
 import mil.nga.msi.ui.action.Action
@@ -55,6 +54,7 @@ import mil.nga.msi.ui.action.LightAction
 import mil.nga.msi.ui.light.LightRoute
 import mil.nga.msi.ui.light.LightViewModel
 import mil.nga.msi.ui.light.LightFooter
+import mil.nga.msi.ui.light.LightState
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.MapClip
 import mil.nga.msi.ui.theme.onSurfaceDisabled
@@ -67,7 +67,7 @@ fun LightDetailScreen(
    viewModel: LightViewModel = hiltViewModel()
 ) {
    viewModel.setLightKey(key)
-   val lightsWithBookmark by viewModel.lightsWithBookmark.observeAsState()
+   val lightState by viewModel.lightState.observeAsState()
 
    Column {
       TopBar(
@@ -77,7 +77,7 @@ fun LightDetailScreen(
       )
 
       LightDetailContent(
-         lightsWithBookmark = lightsWithBookmark,
+         lightState = lightState,
          tileProvider = viewModel.tileProvider,
          onZoom = { onAction(Action.Zoom(it.latLng)) },
          onShare = { onAction(LightAction.Share(it)) },
@@ -95,17 +95,15 @@ fun LightDetailScreen(
 
 @Composable
 private fun LightDetailContent(
-   lightsWithBookmark: LightsWithBookmark?,
+   lightState: LightState?,
    tileProvider: TileProvider,
    onZoom: (Light) -> Unit,
    onShare: (Light) -> Unit,
    onBookmark: (LightWithBookmark) -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
-   if (lightsWithBookmark?.lights?.isNotEmpty() == true) {
-      val light = lightsWithBookmark.lights.first()
-      val characteristics = lightsWithBookmark.lights.drop(0)
-      val lightWithBookmark = LightWithBookmark(light, lightsWithBookmark.bookmark)
+   if (lightState != null) {
+      val (lightWithBookmark, characteristics) = lightState
 
       Surface(
          modifier = Modifier.fillMaxHeight()
@@ -118,8 +116,8 @@ private fun LightDetailContent(
             LightHeader(
                lightWithBookmark,
                tileProvider,
-               onZoom = { onZoom(light) },
-               onShare = { onShare(light) },
+               onZoom = { onZoom(lightWithBookmark.light) },
+               onShare = { onShare(lightWithBookmark.light) },
                onBookmark = { onBookmark(lightWithBookmark) },
                onCopyLocation
             )
