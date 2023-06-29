@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.asam.Asam
 import mil.nga.msi.datasource.dgpsstation.DgpsStation
+import mil.nga.msi.datasource.light.Light
 import mil.nga.msi.datasource.modu.Modu
 import mil.nga.msi.repository.dgpsstation.DgpsStationKey
 
@@ -24,6 +25,10 @@ data class BookmarkKey(
       fun fromDgpsStation(dgpsStation: DgpsStation, notes: String? = null): BookmarkKey {
          val id = DgpsStationKey.fromDgpsStation(dgpsStation).id()
          return BookmarkKey(id, DataSource.DGPS_STATION, notes)
+      }
+
+      fun fromLight(light: Light, notes: String? = null): BookmarkKey {
+         return BookmarkKey(light.id, DataSource.LIGHT, notes)
       }
 
       fun fromModu(modu: Modu, notes: String? = null): BookmarkKey {

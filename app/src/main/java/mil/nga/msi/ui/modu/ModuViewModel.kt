@@ -24,7 +24,7 @@ class ModuViewModel @Inject constructor(
    private val bookmarkRepository: BookmarkRepository,
    @Named("moduTileProvider") val tileProvider: TileProvider
 ): ViewModel() {
-   private val _nameFlow = MutableSharedFlow<String>()
+   private val _nameFlow = MutableSharedFlow<String>(replay = 1)
    fun setName(name: String) {
       viewModelScope.launch {
          _nameFlow.emit(name)

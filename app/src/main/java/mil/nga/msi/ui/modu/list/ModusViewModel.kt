@@ -45,7 +45,7 @@ class ModusViewModel @Inject constructor(
    val modus = combine(
       sortRepository.sort,
       filterRepository.filters,
-      bookmarkRepository.observeBookmarks(DataSource.ASAM)
+      bookmarkRepository.observeBookmarks(DataSource.MODU)
    ) { sort, filters, _ ->
       sort to filters
    }.flatMapLatest { (sort, filters) ->

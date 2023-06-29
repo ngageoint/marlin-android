@@ -55,6 +55,9 @@ interface LightDao {
    @Query("SELECT * FROM lights WHERE volume_number = :volumeNumber AND feature_number = :featureNumber ORDER BY characteristic_number")
    fun observeLight(volumeNumber: String, featureNumber: String): Flow<List<Light>>
 
+   @Query("SELECT * FROM lights WHERE volume_number = :volumeNumber AND feature_number = :featureNumber AND characteristic_number = :characteristicNumber ORDER BY characteristic_number")
+   fun observeLight(volumeNumber: String, featureNumber: String, characteristicNumber: Int): Flow<List<Light>>
+
    @RawQuery(observedEntities = [Light::class])
    fun observeLightListItems(query: SupportSQLiteQuery): PagingSource<Int, Light>
 

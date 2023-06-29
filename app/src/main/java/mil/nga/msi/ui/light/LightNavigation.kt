@@ -10,13 +10,13 @@ import com.google.accompanist.navigation.material.bottomSheet
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import mil.nga.msi.datasource.DataSource
+import mil.nga.msi.datasource.light.Light
 import mil.nga.msi.repository.light.LightKey
+import mil.nga.msi.ui.action.LightAction
 import mil.nga.msi.ui.filter.FilterScreen
 import mil.nga.msi.ui.light.detail.LightDetailScreen
 import mil.nga.msi.ui.light.list.LightsScreen
 import mil.nga.msi.ui.light.sheet.LightSheetScreen
-import mil.nga.msi.ui.map.MapRoute
-import mil.nga.msi.ui.navigation.NavPoint
 import mil.nga.msi.ui.navigation.NavTypeLightKey
 import mil.nga.msi.ui.navigation.Route
 import mil.nga.msi.ui.sort.SortScreen
@@ -43,13 +43,8 @@ fun NavGraphBuilder.lightGraph(
    share: (Pair<String, String>) -> Unit,
    showSnackbar: (String) -> Unit
 ) {
-   val shareLight: (String) -> Unit = {
-      share(Pair("Share Light Information", it))
-   }
-
-   val zoomTo: (NavPoint) -> Unit = { point ->
-      val encoded = Uri.encode(Json.encodeToString(point))
-      navController.navigate(MapRoute.Map.name + "?point=${encoded}")
+   val shareLight: (Light) -> Unit = { light ->
+      share(Pair("Share Light Information", light.toString()))
    }
 
    navigation(
@@ -70,15 +65,11 @@ fun NavGraphBuilder.lightGraph(
             openSort = {
                navController.navigate(LightRoute.Sort.name)
             },
-            onTap = { key ->
-               val encoded = Uri.encode(Json.encodeToString(key))
-               navController.navigate( "${LightRoute.Detail.name}?key=$encoded")
-            },
             onAction = { action ->
                when(action) {
-                  is LightAction.Zoom -> zoomTo(action.point)
-                  is LightAction.Share -> shareLight(action.text)
+                  is LightAction.Share -> shareLight(action.light)
                   is LightAction.Location -> showSnackbar("${action.text} copied to clipboard")
+                  else -> action.navigate(navController)
                }
             }
          )
@@ -98,9 +89,9 @@ fun NavGraphBuilder.lightGraph(
                close = { navController.popBackStack() },
                onAction = { action ->
                   when(action) {
-                     is LightAction.Zoom -> zoomTo(action.point)
-                     is LightAction.Share -> shareLight(action.text)
+                     is LightAction.Share -> shareLight(action.light)
                      is LightAction.Location -> showSnackbar("${action.text} copied to clipboard")
+                     else -> action.navigate(navController)
                   }
                }
             )

@@ -33,7 +33,6 @@ import mil.nga.msi.ui.asam.AsamFooter
 import mil.nga.msi.ui.asam.AsamViewModel
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.MapClip
-import mil.nga.msi.ui.navigation.NavPoint
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -108,7 +107,7 @@ private fun AsamDetailContent(
 private fun AsamHeader(
    asamWithBookmark: AsamWithBookmark,
    tileProvider: TileProvider,
-   onZoom: (NavPoint) -> Unit,
+   onZoom: () -> Unit,
    onShare: () -> Unit,
    onBookmark: () -> Unit,
    onCopyLocation: (String) -> Unit
@@ -175,7 +174,7 @@ private fun AsamHeader(
 
             AsamFooter(
                asamWithBookmark,
-               onZoom = { onZoom(NavPoint(asam.latitude, asam.longitude))},
+               onZoom = onZoom,
                onShare = onShare,
                onBookmark = onBookmark,
                onCopyLocation = onCopyLocation

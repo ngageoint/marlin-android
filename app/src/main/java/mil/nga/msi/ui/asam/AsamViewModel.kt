@@ -23,9 +23,8 @@ class AsamViewModel @Inject constructor(
    private val asamRepository: AsamRepository,
    private val bookmarkRepository: BookmarkRepository,
    @Named("asamTileProvider") val tileProvider: TileProvider
-
 ): ViewModel() {
-   private val _referenceFlow = MutableSharedFlow<String>()
+   private val _referenceFlow = MutableSharedFlow<String>(replay = 1)
    fun setAsamReference(reference: String) {
       viewModelScope.launch {
          _referenceFlow.emit(reference)

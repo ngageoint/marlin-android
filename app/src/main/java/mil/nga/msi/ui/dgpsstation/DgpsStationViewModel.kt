@@ -25,7 +25,7 @@ class DgpsStationViewModel @Inject constructor(
    private val bookmarkRepository: BookmarkRepository,
    @Named("dgpsStationTileProvider") val tileProvider: TileProvider
 ): ViewModel() {
-   private val _dgpsStationKeyFlow = MutableSharedFlow<DgpsStationKey>()
+   private val _dgpsStationKeyFlow = MutableSharedFlow<DgpsStationKey>(replay = 1)
    fun setDgpsStationKey(key: DgpsStationKey) {
       viewModelScope.launch {
          _dgpsStationKeyFlow.emit(key)
