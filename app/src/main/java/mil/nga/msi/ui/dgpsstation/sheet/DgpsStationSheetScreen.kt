@@ -39,10 +39,18 @@ private fun DgpsStationContent(
    dgpsStationWithBookmark: DgpsStationWithBookmark?,
    onDetails: () -> Unit,
 ) {
-   Column(modifier = Modifier.padding(vertical = 8.dp)) {
-      DataSourceIcon(dataSource = DataSource.DGPS_STATION)
+   Column(modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
+      DataSourceIcon(
+         dataSource = DataSource.DGPS_STATION,
+         modifier = Modifier.padding(bottom = 16.dp)
+      )
 
-      dgpsStationWithBookmark?.let { DgpsStationSummary(dgpsStationWithBookmark = it) }
+      dgpsStationWithBookmark?.let {
+         DgpsStationSummary(
+            dgpsStationWithBookmark = it,
+            modifier = Modifier.padding(bottom = 16.dp)
+         )
+      }
 
       TextButton(
          onClick = { onDetails() }

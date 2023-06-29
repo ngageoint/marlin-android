@@ -12,67 +12,56 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import mil.nga.msi.datasource.asam.AsamWithBookmark
+import mil.nga.msi.ui.bookmark.BookmarkNotes
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 @Composable
 fun AsamSummary(
-   asamWithBookmark: AsamWithBookmark
+   asamWithBookmark: AsamWithBookmark,
+   modifier: Modifier = Modifier
 ) {
    val (asam, bookmark) = asamWithBookmark
 
-   Column(modifier = Modifier.padding(vertical = 8.dp)) {
-      Column(Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
-         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-            val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
-            Text(
-               text = dateFormat.format(asam.date),
-               fontWeight = FontWeight.SemiBold,
-               style = MaterialTheme.typography.labelSmall,
-               maxLines = 1,
-               overflow = TextOverflow.Ellipsis
-            )
-         }
+   Column(modifier = modifier) {
+      CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+         val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+         Text(
+            text = dateFormat.format(asam.date),
+            fontWeight = FontWeight.SemiBold,
+            style = MaterialTheme.typography.labelSmall,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+         )
+      }
 
-         val header = listOfNotNull(asam.hostility, asam.victim)
-         if (header.isNotEmpty()) {
+      val header = listOfNotNull(asam.hostility, asam.victim)
+      if (header.isNotEmpty()) {
+         Text(
+            text = header.joinToString(": "),
+            style = MaterialTheme.typography.titleLarge,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.padding(top = 16.dp)
+         )
+      }
+
+
+      CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+         asam.description?.let {
             Text(
-               text = header.joinToString(": "),
-               style = MaterialTheme.typography.titleLarge,
-               maxLines = 1,
+               text = it,
+               maxLines = 3,
                overflow = TextOverflow.Ellipsis,
-               modifier = Modifier.padding(top = 16.dp)
+               style = MaterialTheme.typography.bodyMedium,
+               modifier = Modifier.padding(top = 8.dp)
             )
          }
 
-
-         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-            asam.description?.let {
-               Text(
-                  text = it,
-                  maxLines = 3,
-                  overflow = TextOverflow.Ellipsis,
-                  style = MaterialTheme.typography.bodyMedium,
-                  modifier = Modifier.padding(top = 8.dp)
-               )
-            }
-
-            bookmark?.notes?.let { notes ->
-               if (notes.isNotBlank()) {
-                  Text(
-                     text = "Bookmark Notes",
-                     style = MaterialTheme.typography.titleMedium,
-                     fontWeight = FontWeight.Medium,
-                     modifier = Modifier.padding(top = 16.dp, bottom = 4.dp)
-                  )
-
-                  Text(
-                     text = notes,
-                     style = MaterialTheme.typography.bodyMedium
-                  )
-               }
-            }
-         }
+         BookmarkNotes(
+            notes = bookmark?.notes,
+            modifier = Modifier.padding(top = 16.dp)
+         )
       }
    }
 }

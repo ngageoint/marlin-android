@@ -31,6 +31,7 @@ import mil.nga.msi.repository.bookmark.BookmarkKey
 import mil.nga.msi.repository.dgpsstation.DgpsStationKey
 import mil.nga.msi.ui.action.Action
 import mil.nga.msi.ui.action.DgpsStationAction
+import mil.nga.msi.ui.bookmark.BookmarkNotes
 import mil.nga.msi.ui.datasource.DataSourceFooter
 import mil.nga.msi.ui.dgpsstation.DgpsStationViewModel
 import mil.nga.msi.ui.main.TopBar
@@ -151,39 +152,31 @@ private fun DgpsStationHeader(
                )
 
                dgpsStation.remarks?.let { remarks ->
-                  Text(
-                     text = remarks,
-                     style = MaterialTheme.typography.bodyMedium,
-                     modifier = Modifier.padding(top = 8.dp)
-                  )
-               }
-
-               bookmark?.notes?.let { notes ->
-                  if (notes.isNotBlank()) {
+                  if (remarks.isNotBlank()) {
                      Text(
-                        text = "Bookmark Notes",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Medium,
-                        modifier = Modifier.padding(top = 16.dp, bottom = 4.dp)
-                     )
-
-                     Text(
-                        text = notes,
-                        style = MaterialTheme.typography.bodyMedium
+                        text = remarks,
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(top = 8.dp)
                      )
                   }
                }
-            }
 
-            DataSourceFooter(
-               latLng = dgpsStation.latLng,
-               bookmarked = bookmark != null,
-               onZoom = onZoom,
-               onShare = onShare,
-               onBookmark = onBookmark,
-               onCopyLocation = onCopyLocation
-            )
+               BookmarkNotes(
+                  notes = bookmark?.notes,
+                  modifier = Modifier.padding(top = 16.dp)
+               )
+            }
          }
+
+         DataSourceFooter(
+            latLng = dgpsStation.latLng,
+            bookmarked = bookmark != null,
+            onZoom = onZoom,
+            onShare = onShare,
+            onBookmark = onBookmark,
+            onCopyLocation = onCopyLocation,
+            modifier = Modifier.padding(start = 8.dp, end = 8.dp, bottom = 8.dp)
+         )
       }
    }
 }
@@ -204,7 +197,7 @@ private fun DgpsStationInformation(
       val information = dgpsStation.information()
       if (information.any { entry -> entry.value?.toString().orEmpty().isNotEmpty() }) {
 
-         Column(Modifier.padding(8.dp)) {
+         Column(Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
             information.forEach { entry ->
                DgpsStationProperty(title = entry.key, value = entry.value)
             }

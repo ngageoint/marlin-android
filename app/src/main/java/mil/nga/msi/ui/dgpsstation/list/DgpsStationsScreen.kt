@@ -159,42 +159,28 @@ private fun DgpsStationCard(
    onBookmark: () -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
+   val (dgpsStation, bookmark) = dgpsStationWithBookmark
+
    Card(
       Modifier
          .fillMaxWidth()
          .padding(bottom = 8.dp)
          .clickable { onTap() }
    ) {
-      DgpsStationContent(
-         dgpsStationWithBookmark,
-         onZoom = onZoom,
-         onShare = onShare,
-         onBookmark = onBookmark,
-         onCopyLocation = onCopyLocation
-      )
-   }
-}
+      Column(Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
+         DgpsStationSummary(
+            dgpsStationWithBookmark,
+            modifier = Modifier.padding(bottom = 8.dp)
+         )
 
-@Composable
-private fun DgpsStationContent(
-   dgpsStationWithBookmark: DgpsStationWithBookmark,
-   onZoom: () -> Unit,
-   onShare: () -> Unit,
-   onBookmark: () -> Unit,
-   onCopyLocation: (String) -> Unit
-) {
-   val (dgpsStation, bookmark) = dgpsStationWithBookmark
-
-   Column(Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
-      DgpsStationSummary(dgpsStationWithBookmark)
-
-      DataSourceFooter(
-         latLng = dgpsStation.latLng,
-         bookmarked = bookmark != null,
-         onShare = { onShare() },
-         onZoom = { onZoom() },
-         onBookmark = { onBookmark() },
-         onCopyLocation = onCopyLocation
-      )
+         DataSourceFooter(
+            latLng = dgpsStation.latLng,
+            bookmarked = bookmark != null,
+            onShare = { onShare() },
+            onZoom = { onZoom() },
+            onBookmark = { onBookmark() },
+            onCopyLocation = onCopyLocation
+         )
+      }
    }
 }

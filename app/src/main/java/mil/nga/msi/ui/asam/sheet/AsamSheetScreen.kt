@@ -26,14 +26,21 @@ fun AsamSheetScreen(
    val asamWithBookmark by viewModel.asamWithBookmark.observeAsState()
 
    Column(modifier = modifier) {
-      Column(Modifier.padding(vertical = 8.dp)) {
-         DataSourceIcon(dataSource = DataSource.ASAM)
+      Column(Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
+         DataSourceIcon(
+            dataSource = DataSource.ASAM,
+            modifier = Modifier.padding(bottom = 16.dp)
+         )
 
-         asamWithBookmark?.let { AsamSummary(asamWithBookmark = it)}
+         asamWithBookmark?.let {
+            AsamSummary(
+               asamWithBookmark = it,
+               modifier = Modifier.padding(bottom = 16.dp)
+            )
+         }
 
          TextButton(
-            onClick = { onDetails?.invoke() },
-            modifier = Modifier.padding(horizontal = 16.dp)
+            onClick = { onDetails?.invoke() }
          ) {
             Text("MORE DETAILS")
          }

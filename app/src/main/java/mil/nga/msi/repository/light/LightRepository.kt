@@ -53,11 +53,11 @@ class LightRepository @Inject constructor(
       featureNumber: String,
    ) = localDataSource.observeLight(volumeNumber, featureNumber)
 
-   fun observeLight(
+   suspend fun getLight(
       volumeNumber: String,
       featureNumber: String,
       characteristicNumber: Int
-   ) = localDataSource.observeLight(volumeNumber, featureNumber, characteristicNumber)
+   ) = localDataSource.getLight(volumeNumber, featureNumber, characteristicNumber)
 
    fun getLights(filters: List<Filter>): List<Light> {
       val query = QueryBuilder("lights", filters).buildQuery()

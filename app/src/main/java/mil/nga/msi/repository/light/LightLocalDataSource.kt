@@ -21,11 +21,11 @@ class LightLocalDataSource @Inject constructor(
       featureNumber: String
    ) = dao.observeLight(volumeNumber, featureNumber)
 
-   fun observeLight(
+   suspend fun getLight(
       volumeNumber: String,
       featureNumber: String,
       characteristicNumber: Int
-   ) = dao.observeLight(volumeNumber, featureNumber, characteristicNumber)
+   ) = dao.getLight(volumeNumber, featureNumber, characteristicNumber)
 
    fun getLights(
       minLatitude: Double,

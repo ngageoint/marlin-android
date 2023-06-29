@@ -1,6 +1,7 @@
 package mil.nga.msi.ui.datasource
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -15,6 +16,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.unit.dp
 import com.google.android.gms.maps.model.LatLng
 import mil.nga.msi.ui.coordinate.CoordinateTextButton
@@ -27,21 +29,22 @@ fun DataSourceFooter(
    onZoom: () -> Unit,
    onBookmark: () -> Unit,
    onCopyLocation: (String) -> Unit,
+   modifier: Modifier = Modifier
 ) {
-   Row(
-      verticalAlignment = Alignment.CenterVertically,
-      horizontalArrangement = Arrangement.SpaceBetween,
-      modifier = Modifier
-         .fillMaxWidth()
-         .padding(top = 8.dp)
-   ) {
-      Location(latLng, onCopyLocation)
-      Actions(
-         bookmarked,
-         onShare,
-         onZoom,
-         onBookmark
-      )
+   Column(modifier = modifier) {
+      Row(
+         verticalAlignment = Alignment.CenterVertically,
+         horizontalArrangement = Arrangement.SpaceBetween,
+         modifier = Modifier.fillMaxWidth()
+      ) {
+         Location(latLng, onCopyLocation)
+         Actions(
+            bookmarked,
+            onShare,
+            onZoom,
+            onBookmark
+         )
+      }
    }
 }
 

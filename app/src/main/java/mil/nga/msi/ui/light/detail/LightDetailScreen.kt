@@ -51,6 +51,7 @@ import mil.nga.msi.repository.light.LightKey
 import mil.nga.msi.ui.action.Action
 import mil.nga.msi.ui.action.AsamAction
 import mil.nga.msi.ui.action.LightAction
+import mil.nga.msi.ui.bookmark.BookmarkNotes
 import mil.nga.msi.ui.datasource.DataSourceFooter
 import mil.nga.msi.ui.light.LightRoute
 import mil.nga.msi.ui.light.LightViewModel
@@ -195,21 +196,10 @@ private fun LightHeader(
                }
             }
 
-            bookmark?.notes?.let { notes ->
-               if (notes.isNotBlank()) {
-                  Text(
-                     text = "Bookmark Notes",
-                     style = MaterialTheme.typography.titleMedium,
-                     fontWeight = FontWeight.Medium,
-                     modifier = Modifier.padding(top = 16.dp, bottom = 4.dp)
-                  )
-
-                  Text(
-                     text = notes,
-                     style = MaterialTheme.typography.bodyMedium
-                  )
-               }
-            }
+            BookmarkNotes(
+               notes = bookmark?.notes,
+               modifier = Modifier.padding(top = 16.dp)
+            )
 
             DataSourceFooter(
                latLng = light.latLng,
@@ -217,7 +207,8 @@ private fun LightHeader(
                onShare = onShare,
                onZoom = onZoom,
                onBookmark = onBookmark,
-               onCopyLocation =  onCopyLocation
+               onCopyLocation =  onCopyLocation,
+               modifier = Modifier.padding(top = 8.dp)
             )
          }
       }

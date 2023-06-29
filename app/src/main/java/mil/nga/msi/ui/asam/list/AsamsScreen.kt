@@ -167,14 +167,20 @@ private fun AsamCard(
          .padding(bottom = 8.dp)
          .clickable { onTap() }
    ) {
-      AsamSummary(asamWithBookmark)
-      DataSourceFooter(
-         latLng = asam.latLng,
-         bookmarked = bookmark != null,
-         onZoom = onZoom,
-         onShare = onShare,
-         onBookmark = onBookmark,
-         onCopyLocation = onCopyLocation
-      )
+      Column(Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
+         AsamSummary(
+            asamWithBookmark,
+            modifier = Modifier.padding(bottom = 8.dp)
+         )
+
+         DataSourceFooter(
+            latLng = asam.latLng,
+            bookmarked = bookmark != null,
+            onZoom = onZoom,
+            onShare = onShare,
+            onBookmark = onBookmark,
+            onCopyLocation = onCopyLocation
+         )
+      }
    }
 }

@@ -17,11 +17,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.google.android.gms.maps.model.LatLng
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.asam.Asam
 import mil.nga.msi.datasource.asam.AsamWithBookmark
 import mil.nga.msi.datasource.dgpsstation.DgpsStation
 import mil.nga.msi.datasource.dgpsstation.DgpsStationWithBookmark
+import mil.nga.msi.datasource.light.Light
+import mil.nga.msi.datasource.light.LightWithBookmark
 import mil.nga.msi.datasource.modu.Modu
 import mil.nga.msi.datasource.modu.ModuWithBookmark
 import mil.nga.msi.repository.bookmark.BookmarkKey
@@ -31,10 +34,20 @@ import mil.nga.msi.ui.action.ModuAction
 import mil.nga.msi.ui.datasource.DataSourceIcon
 import mil.nga.msi.ui.asam.AsamSummary
 import mil.nga.msi.ui.action.DgpsStationAction
+import mil.nga.msi.ui.action.LightAction
 import mil.nga.msi.ui.datasource.DataSourceFooter
 import mil.nga.msi.ui.dgpsstation.DgpsStationSummary
+import mil.nga.msi.ui.light.LightSummary
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.modu.ModuSummary
+
+sealed class BookmarkAction() {
+   object Tap: BookmarkAction()
+   object Zoom: BookmarkAction()
+   object Share: BookmarkAction()
+   object Bookmark: BookmarkAction()
+   class Location(val text: String): BookmarkAction()
+}
 
 @Composable
 fun BookmarksScreen(
@@ -145,6 +158,10 @@ private fun Bookmark(
          val dgpsStation = DgpsStationWithBookmark(itemWithBookmark.item, itemWithBookmark.bookmark)
          DgpsStationBookmark(dgpsStationWithBookmark = dgpsStation, onAction = onAction)
       }
+      is Light -> {
+         val light = LightWithBookmark(itemWithBookmark.item, itemWithBookmark.bookmark)
+         LightBookmark(lightWithBookmark = light, onAction = onAction)
+      }
       is Modu -> {
          val modu = ModuWithBookmark(itemWithBookmark.item, itemWithBookmark.bookmark)
          ModuBookmark(moduWithBookmark = modu, onAction = onAction)
@@ -158,36 +175,21 @@ private fun Bookmark(
 ) {
    val (asam, bookmark) = asamWithBookmark
 
-   Card(
-      Modifier
-         .fillMaxWidth()
-         .padding(bottom = 8.dp)
-         .clickable { onAction(AsamAction.Tap(asam)) }
-   ) {
-      Column(Modifier.padding(vertical = 8.dp)) {
-         DataSourceIcon(dataSource = DataSource.ASAM)
-
-         AsamSummary(asamWithBookmark)
-
-         bookmark?.notes?.let { notes -> BookmarkNotes(notes = notes) }
-
-         DataSourceFooter(
-            latLng = asam.latLng,
-            bookmarked = bookmark != null,
-            onZoom = {
-               onAction(Action.Zoom(asam.latLng))
-            },
-            onShare = {
-               onAction(AsamAction.Share(asam))
-            },
-            onBookmark = {
-               onAction(Action.Bookmark(BookmarkKey.fromAsam(asam)))
-            },
-            onCopyLocation = {
-               onAction(AsamAction.Location(it))
-            }
-         )
+   BookmarkCard(
+      bookmarked = bookmark != null,
+      dataSource = DataSource.ASAM,
+      location = asam.latLng,
+      onAction = { action ->
+         when(action) {
+            BookmarkAction.Tap -> onAction(AsamAction.Tap(asam))
+            BookmarkAction.Zoom -> onAction(Action.Zoom(asam.latLng))
+            BookmarkAction.Share -> onAction(AsamAction.Share(asam))
+            BookmarkAction.Bookmark -> onAction(Action.Bookmark(BookmarkKey.fromAsam(asam)))
+            is BookmarkAction.Location -> onAction(AsamAction.Location(action.text))
+         }
       }
+   ) {
+      AsamSummary(asamWithBookmark)
    }
 }
 
@@ -197,37 +199,47 @@ private fun Bookmark(
 ) {
    val (dgpsStation, bookmark) = dgpsStationWithBookmark
 
-   Card(
-      Modifier
-         .fillMaxWidth()
-         .padding(bottom = 8.dp)
-         .clickable { onAction(DgpsStationAction.Tap(dgpsStation)) }
-   ) {
-      Column(Modifier.padding(vertical = 8.dp)) {
-         DataSourceIcon(dataSource = DataSource.DGPS_STATION)
-         DgpsStationSummary(dgpsStationWithBookmark)
-
-         bookmark?.notes?.let { BookmarkNotes(notes = it) }
-
-         DataSourceFooter(
-            latLng = dgpsStation.latLng,
-            bookmarked = bookmark != null,
-            onZoom = {
-               onAction(Action.Zoom(dgpsStation.latLng))
-            },
-            onShare = {
-               onAction(DgpsStationAction.Share(dgpsStation))
-            },
-            onBookmark = {
-               onAction(Action.Bookmark(BookmarkKey.fromDgpsStation(dgpsStation)))
-            },
-            onCopyLocation = {
-               onAction(ModuAction.Location(it))
-            }
-         )
+   BookmarkCard(
+      bookmarked = bookmark != null,
+      dataSource = DataSource.DGPS_STATION,
+      location = dgpsStation.latLng,
+      onAction = { action ->
+         when(action) {
+            BookmarkAction.Tap -> onAction(DgpsStationAction.Tap(dgpsStation))
+            BookmarkAction.Zoom -> onAction(Action.Zoom(dgpsStation.latLng))
+            BookmarkAction.Share -> onAction(DgpsStationAction.Share(dgpsStation))
+            BookmarkAction.Bookmark -> onAction(Action.Bookmark(BookmarkKey.fromDgpsStation(dgpsStation)))
+            is BookmarkAction.Location -> onAction(AsamAction.Location(action.text))
+         }
       }
+   ) {
+      DgpsStationSummary(dgpsStationWithBookmark)
    }
 }
+@Composable fun LightBookmark(
+   lightWithBookmark: LightWithBookmark,
+   onAction: (Action) -> Unit
+) {
+   val (light, bookmark) = lightWithBookmark
+
+   BookmarkCard(
+      bookmarked = bookmark != null,
+      dataSource = DataSource.LIGHT,
+      location = light.latLng,
+      onAction = { action ->
+         when(action) {
+            BookmarkAction.Tap -> onAction(LightAction.Tap(light))
+            BookmarkAction.Zoom -> onAction(Action.Zoom(light.latLng))
+            BookmarkAction.Share -> onAction(LightAction.Share(light))
+            BookmarkAction.Bookmark -> onAction(Action.Bookmark(BookmarkKey.fromLight(light)))
+            is BookmarkAction.Location -> onAction(LightAction.Location(action.text))
+         }
+      }
+   ) {
+      LightSummary(lightWithBookmark = lightWithBookmark)
+   }
+}
+
 
 @Composable fun ModuBookmark(
    moduWithBookmark: ModuWithBookmark,
@@ -235,57 +247,53 @@ private fun Bookmark(
 ) {
    val (modu, bookmark) = moduWithBookmark
 
+   BookmarkCard(
+      bookmarked = bookmark != null,
+      dataSource = DataSource.MODU,
+      location = modu.latLng,
+      onAction = { action ->
+         when(action) {
+            BookmarkAction.Tap -> onAction(ModuAction.Tap(modu))
+            BookmarkAction.Zoom -> onAction(Action.Zoom(modu.latLng))
+            BookmarkAction.Share -> onAction(ModuAction.Share(modu))
+            BookmarkAction.Bookmark -> onAction(Action.Bookmark(BookmarkKey.fromModu(modu)))
+            is BookmarkAction.Location -> onAction(ModuAction.Location(action.text))
+         }
+      }
+   ) {
+      ModuSummary(moduWithBookmark = moduWithBookmark)
+   }
+}
+
+@Composable fun BookmarkCard(
+   bookmarked: Boolean,
+   dataSource: DataSource,
+   location: LatLng,
+   onAction: (BookmarkAction) -> Unit,
+   summary: @Composable ColumnScope.() -> Unit
+) {
+
    Card(
       Modifier
          .fillMaxWidth()
          .padding(bottom = 8.dp)
-         .clickable { onAction(ModuAction.Tap(modu)) }
+         .clickable { onAction(BookmarkAction.Tap) }
    ) {
-      Column(Modifier.padding(vertical = 8.dp)) {
-         DataSourceIcon(dataSource = DataSource.MODU)
-         ModuSummary(moduWithBookmark)
+      Column(Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
+         DataSourceIcon(
+            dataSource = dataSource,
+            modifier = Modifier.padding(vertical = 8.dp)
+         )
 
-         bookmark?.notes?.let { notes ->
-            BookmarkNotes(notes = notes)
-         }
+         summary()
 
          DataSourceFooter(
-            latLng = modu.latLng,
-            bookmarked = bookmark != null,
-            onZoom = {
-               onAction(Action.Zoom(modu.latLng))
-            },
-            onShare = {
-               onAction(ModuAction.Share(modu))
-            },
-            onBookmark = {
-               onAction(Action.Bookmark(BookmarkKey.fromModu(modu)))
-            },
-            onCopyLocation = {
-               onAction(ModuAction.Location(it))
-            }
-         )
-      }
-   }
-}
-
-@Composable
-private fun BookmarkNotes(
-   notes: String
-) {
-   Column(
-      Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-   ) {
-      CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-         Text(
-            text = "BOOKMARK NOTES",
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(bottom = 4.dp)
-         )
-
-         Text(
-            text = notes,
-            style = MaterialTheme.typography.bodyMedium
+            latLng = location,
+            bookmarked = bookmarked,
+            onZoom = { onAction(BookmarkAction.Zoom) },
+            onShare = { onAction(BookmarkAction.Share) },
+            onBookmark = { onAction(BookmarkAction.Bookmark) },
+            onCopyLocation = { onAction(BookmarkAction.Location(it)) }
          )
       }
    }

@@ -40,14 +40,18 @@ private fun LightContent(
    onDetails: () -> Unit,
 ) {
    Column(
-      modifier = Modifier.padding(vertical = 8.dp)
+      modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp)
    ) {
       if (lightState?.lightWithBookmark != null) {
-         DataSourceIcon(dataSource = DataSource.LIGHT)
+         DataSourceIcon(
+            dataSource = DataSource.LIGHT,
+            modifier = Modifier.padding(bottom = 16.dp)
+         )
 
-         Column(Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
-            LightSummary(lightWithBookmark = lightState.lightWithBookmark)
-         }
+         LightSummary(
+            lightWithBookmark = lightState.lightWithBookmark,
+            modifier = Modifier.padding(bottom = 16.dp)
+         )
 
          TextButton(
             onClick = { onDetails() }

@@ -30,6 +30,7 @@ import mil.nga.msi.repository.bookmark.BookmarkKey
 import mil.nga.msi.ui.action.Action
 import mil.nga.msi.ui.action.AsamAction
 import mil.nga.msi.ui.asam.AsamViewModel
+import mil.nga.msi.ui.bookmark.BookmarkNotes
 import mil.nga.msi.ui.datasource.DataSourceFooter
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.MapClip
@@ -151,36 +152,23 @@ private fun AsamHeader(
                      maxLines = 5,
                      overflow = TextOverflow.Ellipsis,
                      style = MaterialTheme.typography.bodyMedium,
-                     modifier = Modifier.padding(top = 8.dp)
+                     modifier = Modifier.padding(vertical = 16.dp)
                   )
                }
 
-               bookmark?.notes?.let { notes ->
-                  if (notes.isNotBlank()) {
-                     Text(
-                        text = "Bookmark Notes",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Medium,
-                        modifier = Modifier.padding(top = 16.dp, bottom = 4.dp)
-                     )
-
-                     Text(
-                        text = notes,
-                        style = MaterialTheme.typography.bodyMedium
-                     )
-                  }
-               }
+               BookmarkNotes(notes = bookmark?.notes)
             }
-
-            DataSourceFooter(
-               latLng = asam.latLng,
-               bookmarked = bookmark != null,
-               onZoom = onZoom,
-               onShare = onShare,
-               onBookmark = onBookmark,
-               onCopyLocation = onCopyLocation
-            )
          }
+
+         DataSourceFooter(
+            latLng = asam.latLng,
+            bookmarked = bookmark != null,
+            onZoom = onZoom,
+            onShare = onShare,
+            onBookmark = onBookmark,
+            onCopyLocation = onCopyLocation,
+            modifier = Modifier.padding(start = 8.dp, end = 8.dp, bottom = 8.dp)
+         )
       }
    }
 }
