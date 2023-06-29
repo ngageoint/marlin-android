@@ -29,8 +29,8 @@ import mil.nga.msi.datasource.asam.AsamWithBookmark
 import mil.nga.msi.repository.bookmark.BookmarkKey
 import mil.nga.msi.ui.action.Action
 import mil.nga.msi.ui.action.AsamAction
-import mil.nga.msi.ui.asam.AsamFooter
 import mil.nga.msi.ui.asam.AsamViewModel
+import mil.nga.msi.ui.datasource.DataSourceFooter
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.MapClip
 import java.text.SimpleDateFormat
@@ -172,8 +172,9 @@ private fun AsamHeader(
                }
             }
 
-            AsamFooter(
-               asamWithBookmark,
+            DataSourceFooter(
+               latLng = asam.latLng,
+               bookmarked = bookmark != null,
                onZoom = onZoom,
                onShare = onShare,
                onBookmark = onBookmark,

@@ -25,7 +25,7 @@ import mil.nga.msi.ui.action.Action
 import mil.nga.msi.ui.action.AsamAction
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.action.ModuAction
-import mil.nga.msi.ui.modu.ModuFooter
+import mil.nga.msi.ui.datasource.DataSourceFooter
 import mil.nga.msi.ui.modu.ModuRoute
 import mil.nga.msi.ui.modu.ModuSummary
 import java.util.*
@@ -158,6 +158,8 @@ private fun ModuCard(
    onBookmark: () -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
+   val (modu, bookmark) = moduWithBookmark
+
    Card(
       Modifier
          .fillMaxWidth()
@@ -165,8 +167,9 @@ private fun ModuCard(
          .clickable { onTap() }
    ) {
       ModuSummary(moduWithBookmark = moduWithBookmark)
-      ModuFooter(
-         moduWithBookmark,
+      DataSourceFooter(
+         latLng = modu.latLng,
+         bookmarked = bookmark != null,
          onZoom = onZoom,
          onShare = onShare,
          onBookmark = onBookmark,

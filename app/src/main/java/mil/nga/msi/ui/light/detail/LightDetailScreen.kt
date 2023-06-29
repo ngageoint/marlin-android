@@ -51,9 +51,9 @@ import mil.nga.msi.repository.light.LightKey
 import mil.nga.msi.ui.action.Action
 import mil.nga.msi.ui.action.AsamAction
 import mil.nga.msi.ui.action.LightAction
+import mil.nga.msi.ui.datasource.DataSourceFooter
 import mil.nga.msi.ui.light.LightRoute
 import mil.nga.msi.ui.light.LightViewModel
-import mil.nga.msi.ui.light.LightFooter
 import mil.nga.msi.ui.light.LightState
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.MapClip
@@ -211,8 +211,9 @@ private fun LightHeader(
                }
             }
 
-            LightFooter(
-               lightWithBookmark = lightWithBookmark,
+            DataSourceFooter(
+               latLng = light.latLng,
+               bookmarked = bookmark != null,
                onShare = onShare,
                onZoom = onZoom,
                onBookmark = onBookmark,

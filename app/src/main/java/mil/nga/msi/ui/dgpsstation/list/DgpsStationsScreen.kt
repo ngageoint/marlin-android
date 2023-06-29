@@ -24,8 +24,8 @@ import mil.nga.msi.repository.bookmark.BookmarkKey
 import mil.nga.msi.ui.action.Action
 import mil.nga.msi.ui.action.AsamAction
 import mil.nga.msi.ui.action.DgpsStationAction
+import mil.nga.msi.ui.datasource.DataSourceFooter
 import mil.nga.msi.ui.dgpsstation.DgpsStationRoute
-import mil.nga.msi.ui.dgpsstation.DgpsStationFooter
 import mil.nga.msi.ui.dgpsstation.DgpsStationSummary
 import mil.nga.msi.ui.main.TopBar
 
@@ -183,11 +183,14 @@ private fun DgpsStationContent(
    onBookmark: () -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
+   val (dgpsStation, bookmark) = dgpsStationWithBookmark
+
    Column(Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
       DgpsStationSummary(dgpsStationWithBookmark)
 
-      DgpsStationFooter(
-         dgpsStationWithBookmark,
+      DataSourceFooter(
+         latLng = dgpsStation.latLng,
+         bookmarked = bookmark != null,
          onShare = { onShare() },
          onZoom = { onZoom() },
          onBookmark = { onBookmark() },

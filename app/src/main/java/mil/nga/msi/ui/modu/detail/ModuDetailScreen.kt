@@ -32,7 +32,7 @@ import mil.nga.msi.ui.action.Action
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.MapClip
 import mil.nga.msi.ui.action.ModuAction
-import mil.nga.msi.ui.modu.ModuFooter
+import mil.nga.msi.ui.datasource.DataSourceFooter
 import mil.nga.msi.ui.modu.ModuViewModel
 import mil.nga.msi.ui.theme.onSurfaceDisabled
 import java.text.SimpleDateFormat
@@ -180,7 +180,14 @@ private fun ModuHeader(
                )
             }
 
-            ModuFooter(moduWithBookmark, onZoom, onShare, onBookmark, onCopyLocation)
+            DataSourceFooter(
+               latLng = modu.latLng,
+               bookmarked = bookmark != null,
+               onZoom,
+               onShare,
+               onBookmark,
+               onCopyLocation
+            )
          }
       }
    }

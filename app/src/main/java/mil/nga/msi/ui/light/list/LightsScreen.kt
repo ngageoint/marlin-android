@@ -18,19 +18,16 @@ import androidx.compose.material.icons.filled.SwapVert
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.PagingData
@@ -43,8 +40,8 @@ import mil.nga.msi.datasource.light.LightWithBookmark
 import mil.nga.msi.repository.bookmark.BookmarkKey
 import mil.nga.msi.ui.action.Action
 import mil.nga.msi.ui.action.LightAction
+import mil.nga.msi.ui.datasource.DataSourceFooter
 import mil.nga.msi.ui.light.LightRoute
-import mil.nga.msi.ui.light.LightFooter
 import mil.nga.msi.ui.light.LightSummary
 import mil.nga.msi.ui.main.TopBar
 
@@ -202,11 +199,14 @@ private fun LightContent(
    onBookmark: () -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
+   val (light, bookmark) = lightWithBookmark
+
    Column(Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
       LightSummary(lightWithBookmark = lightWithBookmark)
 
-      LightFooter(
-         lightWithBookmark = lightWithBookmark,
+      DataSourceFooter(
+         latLng = light.latLng,
+         bookmarked = bookmark != null,
          onShare = onShare,
          onZoom = onZoom,
          onBookmark = onBookmark,

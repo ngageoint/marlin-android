@@ -6,12 +6,15 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.Bookmarks
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import mil.nga.msi.datasource.DataSource
@@ -25,14 +28,12 @@ import mil.nga.msi.repository.bookmark.BookmarkKey
 import mil.nga.msi.ui.action.Action
 import mil.nga.msi.ui.action.AsamAction
 import mil.nga.msi.ui.action.ModuAction
-import mil.nga.msi.ui.asam.AsamFooter
 import mil.nga.msi.ui.datasource.DataSourceIcon
 import mil.nga.msi.ui.asam.AsamSummary
 import mil.nga.msi.ui.action.DgpsStationAction
-import mil.nga.msi.ui.dgpsstation.DgpsStationFooter
+import mil.nga.msi.ui.datasource.DataSourceFooter
 import mil.nga.msi.ui.dgpsstation.DgpsStationSummary
 import mil.nga.msi.ui.main.TopBar
-import mil.nga.msi.ui.modu.ModuFooter
 import mil.nga.msi.ui.modu.ModuSummary
 
 @Composable
@@ -50,14 +51,53 @@ fun BookmarksScreen(
          onNavigationClicked = { openDrawer() }
       )
 
-      Bookmarks(
-         bookmarks = bookmarks.filterNotNull(),
-         onAction = { action ->
-            if (action is Action.Bookmark) {
-               viewModel.deleteBookmark(action.key)
-            } else onAction(action)
+      if (bookmarks.isEmpty()) {
+         EmptyState()
+      } else {
+         Bookmarks(
+            bookmarks = bookmarks,
+            onAction = { action ->
+               if (action is Action.Bookmark) {
+                  viewModel.deleteBookmark(action.key)
+               } else onAction(action)
+            }
+         )
+      }
+   }
+}
+
+@Composable
+private fun EmptyState() {
+   Box(
+      modifier = Modifier.fillMaxSize(),
+      contentAlignment = Alignment.Center,
+   ) {
+      Column(
+         horizontalAlignment = Alignment.CenterHorizontally,
+      ) {
+         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+            Icon(
+               Icons.Outlined.Bookmarks,
+               modifier = Modifier
+                  .size(220.dp)
+                  .padding(bottom = 32.dp),
+               contentDescription = "Bookmark icon"
+            )
+
+            Text(
+               text = "No Bookmarks",
+               style = MaterialTheme.typography.headlineMedium,
+               modifier = Modifier.padding(bottom = 16.dp)
+            )
+
+            Text(
+               text = "Bookmark an item and it will show up here.",
+               style = MaterialTheme.typography.titleLarge,
+               modifier = Modifier.padding(horizontal = 32.dp),
+               textAlign = TextAlign.Center
+            )
          }
-      )
+      }
    }
 }
 
@@ -116,30 +156,32 @@ private fun Bookmark(
    asamWithBookmark: AsamWithBookmark,
    onAction: (Action) -> Unit
 ) {
+   val (asam, bookmark) = asamWithBookmark
+
    Card(
       Modifier
          .fillMaxWidth()
          .padding(bottom = 8.dp)
-         .clickable { onAction(AsamAction.Tap(asamWithBookmark.asam)) }
+         .clickable { onAction(AsamAction.Tap(asam)) }
    ) {
       Column(Modifier.padding(vertical = 8.dp)) {
          DataSourceIcon(dataSource = DataSource.ASAM)
+
          AsamSummary(asamWithBookmark)
 
-         asamWithBookmark.bookmark?.notes?.let { notes ->
-            BookmarkNotes(notes = notes)
-         }
+         bookmark?.notes?.let { notes -> BookmarkNotes(notes = notes) }
 
-         AsamFooter(
-            asamWithBookmark = asamWithBookmark,
+         DataSourceFooter(
+            latLng = asam.latLng,
+            bookmarked = bookmark != null,
             onZoom = {
-               onAction(Action.Zoom(asamWithBookmark.asam.latLng))
+               onAction(Action.Zoom(asam.latLng))
             },
             onShare = {
-               onAction(AsamAction.Share(asamWithBookmark.asam))
+               onAction(AsamAction.Share(asam))
             },
             onBookmark = {
-               onAction(Action.Bookmark(BookmarkKey.fromAsam(asamWithBookmark.asam)))
+               onAction(Action.Bookmark(BookmarkKey.fromAsam(asam)))
             },
             onCopyLocation = {
                onAction(AsamAction.Location(it))
@@ -167,8 +209,9 @@ private fun Bookmark(
 
          bookmark?.notes?.let { BookmarkNotes(notes = it) }
 
-         DgpsStationFooter(
-            dgpsStationWithBookmark = dgpsStationWithBookmark,
+         DataSourceFooter(
+            latLng = dgpsStation.latLng,
+            bookmarked = bookmark != null,
             onZoom = {
                onAction(Action.Zoom(dgpsStation.latLng))
             },
@@ -206,8 +249,9 @@ private fun Bookmark(
             BookmarkNotes(notes = notes)
          }
 
-         ModuFooter(
-            moduWithBookmark = moduWithBookmark,
+         DataSourceFooter(
+            latLng = modu.latLng,
+            bookmarked = bookmark != null,
             onZoom = {
                onAction(Action.Zoom(modu.latLng))
             },

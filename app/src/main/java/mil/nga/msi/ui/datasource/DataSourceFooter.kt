@@ -1,4 +1,4 @@
-package mil.nga.msi.ui.light
+package mil.nga.msi.ui.datasource
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -17,19 +17,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.google.android.gms.maps.model.LatLng
-import mil.nga.msi.datasource.light.LightWithBookmark
 import mil.nga.msi.ui.coordinate.CoordinateTextButton
 
 @Composable
-fun LightFooter(
-   lightWithBookmark: LightWithBookmark,
+fun DataSourceFooter(
+   latLng: LatLng,
+   bookmarked: Boolean,
    onShare: () -> Unit,
    onZoom: () -> Unit,
    onBookmark: () -> Unit,
-   onCopyLocation: (String) -> Unit
+   onCopyLocation: (String) -> Unit,
 ) {
-   val (light, bookmark) = lightWithBookmark
-
    Row(
       verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.SpaceBetween,
@@ -37,9 +35,9 @@ fun LightFooter(
          .fillMaxWidth()
          .padding(top = 8.dp)
    ) {
-      LightLocation(light.latLng, onCopyLocation)
-      LightActions(
-         bookmarked = bookmark != null,
+      Location(latLng, onCopyLocation)
+      Actions(
+         bookmarked,
          onShare,
          onZoom,
          onBookmark
@@ -48,7 +46,7 @@ fun LightFooter(
 }
 
 @Composable
-private fun LightLocation(
+private fun Location(
    latLng: LatLng,
    onCopyLocation: (String) -> Unit
 ) {
@@ -59,10 +57,10 @@ private fun LightLocation(
 }
 
 @Composable
-private fun LightActions(
+private fun Actions(
    bookmarked: Boolean,
-   onShare: () -> Unit,
    onZoom: () -> Unit,
+   onShare: () -> Unit,
    onBookmark: () -> Unit
 ) {
    Row {
@@ -70,23 +68,21 @@ private fun LightActions(
          Icon(
             imageVector = if (bookmarked) Icons.Default.Bookmark else Icons.Outlined.BookmarkBorder,
             tint = MaterialTheme.colorScheme.tertiary,
-            contentDescription = "Bookmark Light"
+            contentDescription = "Bookmark ASAM"
          )
       }
-      IconButton(
-         onClick = { onShare() }
-      ) {
+      IconButton(onClick = { onShare() }) {
          Icon(
             Icons.Default.Share,
             tint = MaterialTheme.colorScheme.tertiary,
-            contentDescription = "Share Light"
+            contentDescription = "Share ASAM"
          )
       }
       IconButton(onClick = { onZoom() }) {
          Icon(
             Icons.Default.GpsFixed,
             tint = MaterialTheme.colorScheme.tertiary,
-            contentDescription = "Zoom to Light"
+            contentDescription = "Zoom to ASAM"
          )
       }
    }

@@ -23,9 +23,9 @@ import mil.nga.msi.datasource.asam.AsamWithBookmark
 import mil.nga.msi.repository.bookmark.BookmarkKey
 import mil.nga.msi.ui.action.Action
 import mil.nga.msi.ui.action.AsamAction
-import mil.nga.msi.ui.asam.AsamFooter
 import mil.nga.msi.ui.asam.AsamRoute
 import mil.nga.msi.ui.asam.AsamSummary
+import mil.nga.msi.ui.datasource.DataSourceFooter
 import mil.nga.msi.ui.main.TopBar
 import java.util.*
 
@@ -159,6 +159,8 @@ private fun AsamCard(
    onBookmark: () -> Unit,
    onCopyLocation: (String) -> Unit)
 {
+   val (asam, bookmark) = asamWithBookmark
+
    Card(
       Modifier
          .fillMaxWidth()
@@ -166,8 +168,9 @@ private fun AsamCard(
          .clickable { onTap() }
    ) {
       AsamSummary(asamWithBookmark)
-      AsamFooter(
-         asamWithBookmark = asamWithBookmark,
+      DataSourceFooter(
+         latLng = asam.latLng,
+         bookmarked = bookmark != null,
          onZoom = onZoom,
          onShare = onShare,
          onBookmark = onBookmark,
