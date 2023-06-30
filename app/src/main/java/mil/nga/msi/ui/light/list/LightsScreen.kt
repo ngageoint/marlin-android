@@ -94,7 +94,7 @@ fun LightsScreen(
       Lights(
          pagingState = viewModel.lights,
          onTap = { onAction(LightAction.Tap(it)) },
-         onZoom = { onAction(Action.Zoom(it.latLng)) },
+         onZoom = { onAction(LightAction.Zoom(it.latLng)) },
          onShare = { onAction(LightAction.Share(it)) },
          onBookmark = { (light, bookmark) ->
             if (bookmark == null) {

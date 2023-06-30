@@ -78,7 +78,7 @@ fun DgpsStationsScreen(
       DgpsStations(
          pagingState = viewModel.dgpsStations,
          onTap = { onAction(DgpsStationAction.Tap(it)) },
-         onZoom = { onAction(Action.Zoom(it.latLng)) },
+         onZoom = { onAction(DgpsStationAction.Zoom(it.latLng)) },
          onShare = { onAction(DgpsStationAction.Share(it)) },
          onBookmark = { (dgpsStation, bookmark) ->
             if (bookmark == null) {

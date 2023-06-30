@@ -33,6 +33,7 @@ fun DataSourceIcon(
             DataSource.DGPS_STATION -> R.drawable.ic_dgps_icon_24
             DataSource.LIGHT -> R.drawable.ic_baseline_lightbulb_24
             DataSource.MODU -> R.drawable.ic_modu_24dp
+            DataSource.NAVIGATION_WARNING -> R.drawable.ic_round_warning_24
             else -> 1
          }
 

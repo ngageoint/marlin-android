@@ -78,7 +78,7 @@ fun AsamsScreen(
       Asams(
          pagingState = viewModel.asams,
          onTap = { onAction(AsamAction.Tap(it)) },
-         onZoom = { onAction(Action.Zoom(it.latLng)) },
+         onZoom = { onAction(AsamAction.Zoom(it.latLng)) },
          onShare = { onAction(AsamAction.Share(it)) },
          onBookmark = { (asam, bookmark) ->
             if (bookmark == null) {

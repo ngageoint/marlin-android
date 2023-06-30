@@ -27,7 +27,10 @@ import mil.nga.msi.datasource.light.Light
 import mil.nga.msi.datasource.light.LightWithBookmark
 import mil.nga.msi.datasource.modu.Modu
 import mil.nga.msi.datasource.modu.ModuWithBookmark
+import mil.nga.msi.datasource.navigationwarning.NavigationalWarning
+import mil.nga.msi.datasource.navigationwarning.NavigationalWarningWithBookmark
 import mil.nga.msi.repository.bookmark.BookmarkKey
+import mil.nga.msi.repository.navigationalwarning.NavigationalWarningKey
 import mil.nga.msi.ui.action.Action
 import mil.nga.msi.ui.action.AsamAction
 import mil.nga.msi.ui.action.ModuAction
@@ -35,11 +38,13 @@ import mil.nga.msi.ui.datasource.DataSourceIcon
 import mil.nga.msi.ui.asam.AsamSummary
 import mil.nga.msi.ui.action.DgpsStationAction
 import mil.nga.msi.ui.action.LightAction
+import mil.nga.msi.ui.action.NavigationalWarningAction
 import mil.nga.msi.ui.datasource.DataSourceFooter
 import mil.nga.msi.ui.dgpsstation.DgpsStationSummary
 import mil.nga.msi.ui.light.LightSummary
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.modu.ModuSummary
+import mil.nga.msi.ui.navigationalwarning.NavigationalWarningSummary
 
 sealed class BookmarkAction() {
    object Tap: BookmarkAction()
@@ -166,6 +171,10 @@ private fun Bookmark(
          val modu = ModuWithBookmark(itemWithBookmark.item, itemWithBookmark.bookmark)
          ModuBookmark(moduWithBookmark = modu, onAction = onAction)
       }
+      is NavigationalWarning -> {
+         val warningWithBookmark = NavigationalWarningWithBookmark(itemWithBookmark.item, itemWithBookmark.bookmark)
+         NavigationalWarningBookmark(warningWithBookmark = warningWithBookmark, onAction = onAction)
+      }
    }
 }
 
@@ -182,7 +191,7 @@ private fun Bookmark(
       onAction = { action ->
          when(action) {
             BookmarkAction.Tap -> onAction(AsamAction.Tap(asam))
-            BookmarkAction.Zoom -> onAction(Action.Zoom(asam.latLng))
+            BookmarkAction.Zoom -> onAction(AsamAction.Zoom(asam.latLng))
             BookmarkAction.Share -> onAction(AsamAction.Share(asam))
             BookmarkAction.Bookmark -> onAction(Action.Bookmark(BookmarkKey.fromAsam(asam)))
             is BookmarkAction.Location -> onAction(AsamAction.Location(action.text))
@@ -206,7 +215,7 @@ private fun Bookmark(
       onAction = { action ->
          when(action) {
             BookmarkAction.Tap -> onAction(DgpsStationAction.Tap(dgpsStation))
-            BookmarkAction.Zoom -> onAction(Action.Zoom(dgpsStation.latLng))
+            BookmarkAction.Zoom -> onAction(DgpsStationAction.Zoom(dgpsStation.latLng))
             BookmarkAction.Share -> onAction(DgpsStationAction.Share(dgpsStation))
             BookmarkAction.Bookmark -> onAction(Action.Bookmark(BookmarkKey.fromDgpsStation(dgpsStation)))
             is BookmarkAction.Location -> onAction(AsamAction.Location(action.text))
@@ -229,7 +238,7 @@ private fun Bookmark(
       onAction = { action ->
          when(action) {
             BookmarkAction.Tap -> onAction(LightAction.Tap(light))
-            BookmarkAction.Zoom -> onAction(Action.Zoom(light.latLng))
+            BookmarkAction.Zoom -> onAction(LightAction.Zoom(light.latLng))
             BookmarkAction.Share -> onAction(LightAction.Share(light))
             BookmarkAction.Bookmark -> onAction(Action.Bookmark(BookmarkKey.fromLight(light)))
             is BookmarkAction.Location -> onAction(LightAction.Location(action.text))
@@ -239,7 +248,6 @@ private fun Bookmark(
       LightSummary(lightWithBookmark = lightWithBookmark)
    }
 }
-
 
 @Composable fun ModuBookmark(
    moduWithBookmark: ModuWithBookmark,
@@ -254,7 +262,7 @@ private fun Bookmark(
       onAction = { action ->
          when(action) {
             BookmarkAction.Tap -> onAction(ModuAction.Tap(modu))
-            BookmarkAction.Zoom -> onAction(Action.Zoom(modu.latLng))
+            BookmarkAction.Zoom -> onAction(ModuAction.Zoom(modu.latLng))
             BookmarkAction.Share -> onAction(ModuAction.Share(modu))
             BookmarkAction.Bookmark -> onAction(Action.Bookmark(BookmarkKey.fromModu(modu)))
             is BookmarkAction.Location -> onAction(ModuAction.Location(action.text))
@@ -265,10 +273,40 @@ private fun Bookmark(
    }
 }
 
+@Composable fun NavigationalWarningBookmark(
+   warningWithBookmark: NavigationalWarningWithBookmark,
+   onAction: (Action) -> Unit
+) {
+   val (warning, bookmark) = warningWithBookmark
+
+   BookmarkCard(
+      bookmarked = bookmark != null,
+      dataSource = DataSource.NAVIGATION_WARNING,
+      onAction = { action ->
+         when(action) {
+            BookmarkAction.Tap -> {
+               val key = NavigationalWarningKey.fromNavigationWarning(warning)
+               onAction(NavigationalWarningAction.Tap(key))
+            }
+            BookmarkAction.Zoom -> {
+               warning.bounds()?.let {
+                  onAction(NavigationalWarningAction.Zoom(it))
+               }
+            }
+            BookmarkAction.Share -> onAction(NavigationalWarningAction.Share(warning))
+            BookmarkAction.Bookmark -> onAction(Action.Bookmark(BookmarkKey.fromNavigationalWarning(warning)))
+            is BookmarkAction.Location -> onAction(NavigationalWarningAction.Location(action.text))
+         }
+      }
+   ) {
+      NavigationalWarningSummary(navigationWarningWithBookmark = warningWithBookmark)
+   }
+}
+
 @Composable fun BookmarkCard(
    bookmarked: Boolean,
    dataSource: DataSource,
-   location: LatLng,
+   location: LatLng? = null,
    onAction: (BookmarkAction) -> Unit,
    summary: @Composable ColumnScope.() -> Unit
 ) {

@@ -20,11 +20,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowUpward
-import androidx.compose.material.icons.filled.GpsFixed
-import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -49,10 +46,14 @@ import kotlinx.coroutines.launch
 import mil.nga.msi.datasource.navigationwarning.NavigationArea
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarning
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarningListItem
+import mil.nga.msi.datasource.navigationwarning.NavigationalWarningListItemWithBookmark
+import mil.nga.msi.repository.bookmark.BookmarkKey
 import mil.nga.msi.repository.navigationalwarning.NavigationalWarningKey
+import mil.nga.msi.ui.action.Action
+import mil.nga.msi.ui.datasource.DataSourceFooter
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.navigationalwarning.NavigationWarningRoute
-import mil.nga.msi.ui.navigationalwarning.NavigationalWarningAction
+import mil.nga.msi.ui.action.NavigationalWarningAction
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -60,13 +61,13 @@ import java.util.Locale
 fun NavigationalWarningsScreen(
    navigationArea: NavigationArea,
    close: () -> Unit,
-   onTap: (NavigationalWarningKey) -> Unit,
-   onAction: (NavigationalWarningAction) -> Unit,
+   onAction: (Action) -> Unit,
    viewModel: NavigationalWarningsViewModel = hiltViewModel()
 ) {
    val scope = rememberCoroutineScope()
    viewModel.setNavigationArea(navigationArea)
    val lastViewed by viewModel.getLastViewedWarning().observeAsState()
+   val items by viewModel.navigationalWarningsByArea.observeAsState(emptyList())
 
    Column(modifier = Modifier.fillMaxSize()) {
       TopBar(
@@ -75,26 +76,37 @@ fun NavigationalWarningsScreen(
          onNavigationClicked = { close() }
       )
 
-      val items by viewModel.navigationalWarningsByArea.observeAsState(emptyList())
       if (items.isNotEmpty()) {
          NavigationalWarnings(
             items = items,
             lastViewed = lastViewed,
-            onTap = { onTap(it) },
-            onShare = { key ->
+            onTap = {
+               val key = NavigationalWarningKey.fromNavigationWarning(it)
+               onAction(NavigationalWarningAction.Tap(key))
+            },
+            onShare = { warning ->
                scope.launch {
+                  val key = NavigationalWarningKey.fromNavigationWarning(warning)
                   viewModel.getNavigationalWarning(key)?.let { warning ->
-                     onAction(NavigationalWarningAction.Share(warning.toString()))
+                     onAction(NavigationalWarningAction.Share(warning))
                   }
                }
             },
-            onZoom = { key ->
+            onZoom = { warning ->
                scope.launch {
+                  val key = NavigationalWarningKey.fromNavigationWarning(warning)
                   viewModel.getNavigationalWarning(key)?.let { warning ->
                      warning.bounds()?.let { bounds ->
                         onAction(NavigationalWarningAction.Zoom(bounds))
                      }
                   }
+               }
+            },
+            onBookmark = { (warning, bookmark) ->
+               if (bookmark == null) {
+                  onAction(Action.Bookmark(BookmarkKey.fromNavigationalWarning(warning)))
+               } else {
+                  viewModel.deleteBookmark(bookmark)
                }
             },
             onItemViewed = { viewModel.setNavigationalWarningViewed(navigationArea, it) }
@@ -105,16 +117,17 @@ fun NavigationalWarningsScreen(
 
 @Composable
 private fun NavigationalWarnings(
-   items: List<NavigationalWarningListItem>,
+   items: List<NavigationalWarningListItemWithBookmark>,
    lastViewed: NavigationalWarning?,
-   onTap: (NavigationalWarningKey) -> Unit,
-   onShare: (NavigationalWarningKey) -> Unit,
-   onZoom: (NavigationalWarningKey) -> Unit,
+   onTap: (NavigationalWarningListItem) -> Unit,
+   onShare: (NavigationalWarningListItem) -> Unit,
+   onZoom: (NavigationalWarningListItem) -> Unit,
+   onBookmark: (NavigationalWarningListItemWithBookmark) -> Unit,
    onItemViewed: (NavigationalWarningListItem) -> Unit
 ) {
    val contentPadding = PaddingValues(vertical = 16.dp, horizontal = 8.dp)
-   val index = items.indexOfFirst {
-      it.number == lastViewed?.number && it.year == lastViewed.year
+   val index = items.indexOfFirst { (warning, _) ->
+      warning.number == lastViewed?.number && warning.year == lastViewed.year
    }.takeIf { index -> index >= 0 } ?: (items.size - 1)
 
    val scope = rememberCoroutineScope()
@@ -143,7 +156,7 @@ private fun NavigationalWarnings(
             itemsIndexed(
                items = items,
                key = { _, item ->
-                  NavigationalWarningKey.fromNavigationWarning(item)
+                  NavigationalWarningKey.fromNavigationWarning(item.navigationalWarning)
                }
             ) { i, item ->
                NavigationalWarningCard(
@@ -152,6 +165,7 @@ private fun NavigationalWarnings(
                   onTap = onTap,
                   onShare = { onShare(it) },
                   onZoom = onZoom,
+                  onBookmark = onBookmark,
                   onItemViewed = {
                      if (i < index) {
                         onItemViewed(it)
@@ -207,12 +221,15 @@ private fun NavigationalWarnings(
 @Composable
 private fun NavigationalWarningCard(
    state: LazyListState,
-   item: NavigationalWarningListItem,
-   onTap: (NavigationalWarningKey) -> Unit,
-   onShare: (NavigationalWarningKey) -> Unit,
-   onZoom: ((NavigationalWarningKey) -> Unit)? = null,
-   onItemViewed: (NavigationalWarningListItem) -> Unit
+   item: NavigationalWarningListItemWithBookmark,
+   onTap: (NavigationalWarningListItem) -> Unit,
+   onShare: (NavigationalWarningListItem) -> Unit,
+   onBookmark: (NavigationalWarningListItemWithBookmark) -> Unit,
+   onItemViewed: (NavigationalWarningListItem) -> Unit,
+   onZoom: ((NavigationalWarningListItem) -> Unit)? = null,
 ) {
+   val warning = item.navigationalWarning
+
    val isItemWithKeyInView by remember {
       derivedStateOf {
          val visibleItemsInfo = state.layoutInfo.visibleItemsInfo
@@ -220,32 +237,33 @@ private fun NavigationalWarningCard(
             false
          } else {
             val firstItem = visibleItemsInfo.first()
-            if (NavigationalWarningKey.fromNavigationWarning(item) == firstItem.key) {
+            if (NavigationalWarningKey.fromNavigationWarning(warning) == firstItem.key) {
                val offset = firstItem.offset - state.layoutInfo.viewportStartOffset
                offset >= 0
             } else {
                state.layoutInfo
                   .visibleItemsInfo
-                  .any { it.key == NavigationalWarningKey.fromNavigationWarning(item) }
+                  .any { it.key == NavigationalWarningKey.fromNavigationWarning(warning) }
             }
          }
       }
    }
 
    if (isItemWithKeyInView) {
-      LaunchedEffect(Unit) { onItemViewed(item) }
+      LaunchedEffect(Unit) { onItemViewed(warning) }
    }
 
    Card(
       Modifier
          .fillMaxWidth()
-         .clickable { onTap(NavigationalWarningKey.fromNavigationWarning(item)) }
+         .clickable { onTap(warning) }
    ) {
       NavigationalWarningContent(
          item,
-         onShare = { onShare(NavigationalWarningKey.fromNavigationWarning(item)) },
-         onZoom = if (item.geoJson != null) {
-            { onZoom?.invoke(NavigationalWarningKey.fromNavigationWarning(item)) }
+         onShare = { onShare(warning) },
+         onBookmark = { onBookmark(item) },
+         onZoom = if (warning.geoJson != null) {
+            { onZoom?.invoke(warning) }
          } else null
       )
    }
@@ -253,13 +271,16 @@ private fun NavigationalWarningCard(
 
 @Composable
 private fun NavigationalWarningContent(
-   item: NavigationalWarningListItem,
+   item: NavigationalWarningListItemWithBookmark,
    onShare: () -> Unit,
+   onBookmark: () -> Unit,
    onZoom: (() -> Unit)? = null
 ) {
+   val (warning, bookmark) = item
+
    Column(Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
       CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-         item.issueDate.let { date ->
+         warning.issueDate.let { date ->
             val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.US)
             Text(
                text = dateFormat.format(date),
@@ -271,9 +292,9 @@ private fun NavigationalWarningContent(
          }
       }
 
-      val identifier = "${item.number}/${item.year}"
-      val subregions = item.subregions?.joinToString(",")?.let { "($it)" }
-      val header = listOfNotNull(item.navigationArea.title, identifier, subregions).joinToString(" ")
+      val identifier = "${warning.number}/${warning.year}"
+      val subregions = warning.subregions?.joinToString(",")?.let { "($it)" }
+      val header = listOfNotNull(warning.navigationArea.title, identifier, subregions).joinToString(" ")
       Text(
          text = header,
          style = MaterialTheme.typography.titleLarge,
@@ -283,7 +304,7 @@ private fun NavigationalWarningContent(
       )
 
       CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-         item.text?.let {
+         warning.text?.let {
             Text(
                text = it,
                style = MaterialTheme.typography.bodyMedium,
@@ -294,48 +315,12 @@ private fun NavigationalWarningContent(
          }
       }
 
-      NavigationalWarningFooter(onShare, onZoom)
+      DataSourceFooter(
+         bookmarked = bookmark != null,
+         onShare = onShare,
+         onZoom = onZoom,
+         onBookmark = onBookmark
+      )
    }
 }
 
-@Composable
-private fun NavigationalWarningFooter(
-   onShare: () -> Unit,
-   onZoom: (() -> Unit)? = null
-) {
-   Row(
-      verticalAlignment = Alignment.CenterVertically,
-      horizontalArrangement = Arrangement.End,
-      modifier = Modifier
-         .fillMaxWidth()
-         .padding(top = 8.dp)
-   ) {
-      NavigationalWarningActions(onShare, onZoom)
-   }
-}
-
-@Composable
-private fun NavigationalWarningActions(
-   onShare: () -> Unit,
-   onZoom: (() -> Unit)? = null
-) {
-   Row {
-      IconButton(
-         onClick = { onShare() }
-      ) {
-         Icon(Icons.Default.Share,
-            tint = MaterialTheme.colorScheme.tertiary,
-            contentDescription = "Share Navigational Warning"
-         )
-      }
-
-      onZoom?.let { onClick ->
-         IconButton(onClick = onClick) {
-            Icon(Icons.Default.GpsFixed,
-               tint = MaterialTheme.colorScheme.tertiary,
-               contentDescription = "Zoom to Navigational Warning"
-            )
-         }
-      }
-   }
-}

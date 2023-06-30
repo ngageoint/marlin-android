@@ -78,7 +78,7 @@ fun ModusScreen(
       Modus(
          viewModel.modus,
          onTap = { onAction(ModuAction.Tap(it)) },
-         onZoom = { onAction(Action.Zoom(it.latLng)) },
+         onZoom = { onAction(ModuAction.Zoom(it.latLng)) },
          onShare = { onAction(ModuAction.Share(it)) },
          onBookmark = { (modu, bookmark) ->
             if (bookmark == null) {

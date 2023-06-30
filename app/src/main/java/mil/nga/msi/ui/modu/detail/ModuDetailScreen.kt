@@ -58,7 +58,7 @@ fun ModuDetailScreen(
       ModuDetailContent(
          moduWithBookmark,
          tileProvider = viewModel.tileProvider,
-         onZoom = { onAction(Action.Zoom(it.latLng)) },
+         onZoom = { onAction(ModuAction.Zoom(it.latLng)) },
          onShare = { onAction(ModuAction.Share(it)) },
          onBookmark = { (modu, bookmark) ->
             if (bookmark ==  null) {
@@ -183,10 +183,10 @@ private fun ModuHeader(
             DataSourceFooter(
                latLng = modu.latLng,
                bookmarked = bookmark != null,
-               onZoom,
-               onShare,
-               onBookmark,
-               onCopyLocation
+               onZoom = onZoom,
+               onShare = onShare,
+               onBookmark = onBookmark,
+               onCopyLocation = onCopyLocation
             )
          }
       }

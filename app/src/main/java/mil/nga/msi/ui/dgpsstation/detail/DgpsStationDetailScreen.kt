@@ -57,7 +57,7 @@ fun DgpsStationDetailScreen(
       DgpsStationContent(
          dgpsStationWithBookmark = dgpsStationWithBookmark,
          tileProvider = viewModel.tileProvider,
-         onZoom = { onAction(Action.Zoom(it.latLng)) },
+         onZoom = { onAction(DgpsStationAction.Zoom(it.latLng)) },
          onShare = { onAction(DgpsStationAction.Share(it)) },
          onBookmark = { (dgpsStation, bookmark) ->
             if (bookmark == null) {

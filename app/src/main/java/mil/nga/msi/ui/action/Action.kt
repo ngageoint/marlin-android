@@ -2,13 +2,10 @@ package mil.nga.msi.ui.action
 
 import android.net.Uri
 import androidx.navigation.NavController
-import com.google.android.gms.maps.model.LatLng
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import mil.nga.msi.repository.bookmark.BookmarkKey
 import mil.nga.msi.ui.bookmark.BookmarkRoute
-import mil.nga.msi.ui.map.MapRoute
-import mil.nga.msi.ui.navigation.NavPoint
 import java.lang.UnsupportedOperationException
 
 sealed class Action {
@@ -16,14 +13,6 @@ sealed class Action {
       override fun navigate(navController: NavController) {
          val encoded = Uri.encode(Json.encodeToString(key))
          navController.navigate( "${BookmarkRoute.Notes.name}?bookmark=$encoded")
-      }
-   }
-
-   class Zoom(val latLng: LatLng): Action() {
-      override fun navigate(navController: NavController) {
-         val point = NavPoint(latLng.latitude, latLng.longitude)
-         val encoded = Uri.encode(Json.encodeToString(point))
-         navController.navigate(MapRoute.Map.name + "?point=${encoded}")
       }
    }
 

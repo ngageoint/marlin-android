@@ -80,7 +80,7 @@ fun LightDetailScreen(
       LightDetailContent(
          lightState = lightState,
          tileProvider = viewModel.tileProvider,
-         onZoom = { onAction(Action.Zoom(it.latLng)) },
+         onZoom = { onAction(LightAction.Zoom(it.latLng)) },
          onShare = { onAction(LightAction.Share(it)) },
          onBookmark = { (light, bookmark) ->
             if (bookmark == null) {

@@ -11,7 +11,9 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.navigationwarning.NavigationArea
+import mil.nga.msi.datasource.navigationwarning.NavigationalWarning
 import mil.nga.msi.repository.navigationalwarning.NavigationalWarningKey
+import mil.nga.msi.ui.action.NavigationalWarningAction
 import mil.nga.msi.ui.map.MapPosition
 import mil.nga.msi.ui.map.MapRoute
 import mil.nga.msi.ui.map.cluster.MapAnnotation
@@ -43,8 +45,8 @@ fun NavGraphBuilder.navigationalWarningGraph(
    openNavigationDrawer: () -> Unit,
    share: (Pair<String, String>) -> Unit
 ) {
-   val shareNavigationalWarning: (String) -> Unit = {
-      share(Pair("Share Navigational Warning Information", it))
+   val shareNavigationalWarning: (NavigationalWarning) -> Unit = { warning ->
+      share(Pair("Share Navigational Warning Information", warning.toString()))
    }
 
    navigation(
@@ -102,19 +104,12 @@ fun NavGraphBuilder.navigationalWarningGraph(
             NavigationalWarningsScreen(
                navigationArea,
                close = { navController.popBackStack() },
-               onTap = { key ->
-                  val encoded = Uri.encode(Json.encodeToString(key))
-                  navController.navigate( "${NavigationWarningRoute.Detail.name}?key=$encoded")
-               },
                onAction = { action ->
                   when(action) {
                      is NavigationalWarningAction.Share -> {
-                        shareNavigationalWarning(action.text)
+                        shareNavigationalWarning(action.warning)
                      }
-                     is NavigationalWarningAction.Zoom -> {
-                        val encoded = Uri.encode(Json.encodeToString(Bounds.fromLatLngBounds(action.bounds)))
-                        navController.navigate(MapRoute.Map.name + "?bounds=${encoded}")
-                     }
+                     else -> action.navigate(navController)
                   }
                }
             )
@@ -136,12 +131,9 @@ fun NavGraphBuilder.navigationalWarningGraph(
                onAction = { action ->
                   when(action) {
                      is NavigationalWarningAction.Share -> {
-                        shareNavigationalWarning(action.text)
+                        shareNavigationalWarning(action.warning)
                      }
-                     is NavigationalWarningAction.Zoom -> {
-                        val encoded = Uri.encode(Json.encodeToString(Bounds.fromLatLngBounds(action.bounds)))
-                        navController.navigate(MapRoute.Map.name + "?bounds=${encoded}")
-                     }
+                     else -> action.navigate(navController)
                   }
                }
             )

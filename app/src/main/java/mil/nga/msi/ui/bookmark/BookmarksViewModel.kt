@@ -16,6 +16,8 @@ import mil.nga.msi.repository.dgpsstation.DgpsStationRepository
 import mil.nga.msi.repository.light.LightKey
 import mil.nga.msi.repository.light.LightRepository
 import mil.nga.msi.repository.modu.ModuRepository
+import mil.nga.msi.repository.navigationalwarning.NavigationalWarningKey
+import mil.nga.msi.repository.navigationalwarning.NavigationalWarningRepository
 import javax.inject.Inject
 
 data class ItemWithBookmark(
@@ -30,6 +32,7 @@ class BookmarksViewModel @Inject constructor(
    private val dgpsStationRepository: DgpsStationRepository,
    private val lightRepository: LightRepository,
    private val moduRepository: ModuRepository,
+   private val navigationalWarningRepository: NavigationalWarningRepository
 ): ViewModel() {
    val bookmarks = repository.observeBookmarks().map { bookmarks ->
       bookmarks.mapNotNull { bookmark ->
@@ -54,6 +57,12 @@ class BookmarksViewModel @Inject constructor(
                val key = DgpsStationKey.fromId(bookmark.id)
                dgpsStationRepository.getDgpsStation(key.volumeNumber, key.featureNumber)?.let { dgpsStation ->
                   ItemWithBookmark(dgpsStation, bookmark)
+               }
+            }
+            DataSource.NAVIGATION_WARNING -> {
+               val key = NavigationalWarningKey.fromId(bookmark.id)
+               navigationalWarningRepository.getNavigationalWarning(key)?.let { warning ->
+                  ItemWithBookmark(warning, bookmark)
                }
             }
             else -> null
