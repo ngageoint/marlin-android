@@ -34,6 +34,7 @@ fun DataSourceIcon(
             DataSource.LIGHT -> R.drawable.ic_baseline_lightbulb_24
             DataSource.MODU -> R.drawable.ic_modu_24dp
             DataSource.NAVIGATION_WARNING -> R.drawable.ic_round_warning_24
+            DataSource.PORT -> R.drawable.ic_baseline_anchor_24
             else -> 1
          }
 

@@ -94,7 +94,7 @@ fun AsamsScreen(
 
 @Composable
 private fun Asams(
-   pagingState: Flow<PagingData<AsamListItemState>>,
+   pagingState: Flow<PagingData<AsamListItem>>,
    onTap: (Asam) -> Unit,
    onZoom: (Asam) -> Unit,
    onShare: (Asam) -> Unit,
@@ -112,20 +112,20 @@ private fun Asams(
             count = lazyItems.itemCount,
             key = lazyItems.itemKey {
                when (it) {
-                  is AsamListItemState.AsamItemState -> it.asamWithBookmark.asam.reference
-                  is AsamListItemState.HeaderItemState -> it.header
+                  is AsamListItem.AsamItem -> it.asamWithBookmark.asam.reference
+                  is AsamListItem.HeaderItem -> it.header
                }
             },
             contentType = lazyItems.itemContentType {
                when (it) {
-                  is AsamListItemState.AsamItemState -> "asam"
-                  is AsamListItemState.HeaderItemState -> "header"
+                  is AsamListItem.AsamItem -> "asam"
+                  is AsamListItem.HeaderItem -> "header"
                }
             }
          ) { index ->
             lazyItems[index]?.let { item ->
                when (item) {
-                  is AsamListItemState.AsamItemState -> {
+                  is AsamListItem.AsamItem -> {
                      AsamCard(
                         asamWithBookmark = item.asamWithBookmark,
                         onTap = { onTap(item.asamWithBookmark.asam) },
@@ -135,7 +135,7 @@ private fun Asams(
                         onCopyLocation = onCopyLocation
                      )
                   }
-                  is AsamListItemState.HeaderItemState -> {
+                  is AsamListItem.HeaderItem -> {
                      Text(
                         text = item.header,
                         fontWeight = FontWeight.Medium,

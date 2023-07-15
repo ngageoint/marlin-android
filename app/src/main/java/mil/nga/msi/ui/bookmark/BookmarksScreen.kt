@@ -1,5 +1,7 @@
 package mil.nga.msi.ui.bookmark
 
+import android.location.Location
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -29,6 +31,8 @@ import mil.nga.msi.datasource.modu.Modu
 import mil.nga.msi.datasource.modu.ModuWithBookmark
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarning
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarningWithBookmark
+import mil.nga.msi.datasource.port.Port
+import mil.nga.msi.datasource.port.PortWithBookmark
 import mil.nga.msi.repository.bookmark.BookmarkKey
 import mil.nga.msi.repository.navigationalwarning.NavigationalWarningKey
 import mil.nga.msi.ui.action.Action
@@ -39,12 +43,14 @@ import mil.nga.msi.ui.asam.AsamSummary
 import mil.nga.msi.ui.action.DgpsStationAction
 import mil.nga.msi.ui.action.LightAction
 import mil.nga.msi.ui.action.NavigationalWarningAction
+import mil.nga.msi.ui.action.PortAction
 import mil.nga.msi.ui.datasource.DataSourceFooter
 import mil.nga.msi.ui.dgpsstation.DgpsStationSummary
 import mil.nga.msi.ui.light.LightSummary
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.modu.ModuSummary
 import mil.nga.msi.ui.navigationalwarning.NavigationalWarningSummary
+import mil.nga.msi.ui.port.PortSummary
 
 sealed class BookmarkAction() {
    object Tap: BookmarkAction()
@@ -61,6 +67,9 @@ fun BookmarksScreen(
    viewModel: BookmarksViewModel = hiltViewModel()
 ) {
    val bookmarks by viewModel.bookmarks.observeAsState(emptyList())
+   val location by viewModel.locationProvider.observeAsState()
+
+   Log.i("billy", "bookmarks $bookmarks")
 
    Column(modifier = Modifier.fillMaxSize()) {
       TopBar(
@@ -174,6 +183,10 @@ private fun Bookmark(
       is NavigationalWarning -> {
          val warningWithBookmark = NavigationalWarningWithBookmark(itemWithBookmark.item, itemWithBookmark.bookmark)
          NavigationalWarningBookmark(warningWithBookmark = warningWithBookmark, onAction = onAction)
+      }
+      is Port -> {
+         val portWithBookmark = PortWithBookmark(itemWithBookmark.item, itemWithBookmark.bookmark)
+         PortBookmark(portWithBookmark = portWithBookmark, onAction = onAction)
       }
    }
 }
@@ -300,6 +313,34 @@ private fun Bookmark(
       }
    ) {
       NavigationalWarningSummary(navigationWarningWithBookmark = warningWithBookmark)
+   }
+}
+
+@Composable fun PortBookmark(
+   portWithBookmark: PortWithBookmark,
+   location: Location? = null,
+   onAction: (Action) -> Unit
+) {
+   val (port, bookmark) = portWithBookmark
+
+   BookmarkCard(
+      bookmarked = bookmark != null,
+      dataSource = DataSource.PORT,
+      location = port.latLng,
+      onAction = { action ->
+         when(action) {
+            BookmarkAction.Tap -> onAction(PortAction.Tap(port))
+            BookmarkAction.Zoom -> onAction(PortAction.Zoom(port.latLng))
+            BookmarkAction.Share -> onAction(PortAction.Share(port))
+            BookmarkAction.Bookmark -> onAction(Action.Bookmark(BookmarkKey.fromPort(port)))
+            is BookmarkAction.Location -> onAction(PortAction.Location(action.text))
+         }
+      }
+   ) {
+      PortSummary(
+         portWithBookmark = portWithBookmark,
+         location = location
+      )
    }
 }
 

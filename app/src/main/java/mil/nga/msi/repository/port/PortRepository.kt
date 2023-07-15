@@ -20,7 +20,7 @@ import mil.nga.msi.startup.port.PortInitializer.Companion.FETCH_LATEST_PORTS_TAS
 import javax.inject.Inject
 
 class PortRepository @Inject constructor(
-   private val workManager: WorkManager,
+   workManager: WorkManager,
    private val localDataSource: PortLocalDataSource,
    private val remoteDataSource: PortRemoteDataSource,
    private val notification: MarlinNotification,

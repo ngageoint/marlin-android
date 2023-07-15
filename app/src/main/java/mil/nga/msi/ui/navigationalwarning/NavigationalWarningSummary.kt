@@ -1,5 +1,6 @@
 package mil.nga.msi.ui.navigationalwarning
 
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.LocalContentColor
@@ -53,6 +54,7 @@ fun NavigationalWarningSummary(
          NavigationalWarningProperty(title = "Cancel Date", value = dateFormat.format(date))
       }
 
+      Log.i("billy", "bookmark: $bookmark")
       BookmarkNotes(
          notes = bookmark?.notes,
          modifier = Modifier.padding(top = 16.dp)

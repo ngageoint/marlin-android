@@ -28,9 +28,9 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
-sealed class AsamListItemState {
-   data class AsamItemState(val asamWithBookmark : AsamWithBookmark) : AsamListItemState()
-   data class HeaderItemState(val header : String) : AsamListItemState()
+sealed class AsamListItem {
+   data class AsamItem(val asamWithBookmark : AsamWithBookmark) : AsamListItem()
+   data class HeaderItem(val header : String) : AsamListItem()
 }
 
 @HiltViewModel
@@ -58,9 +58,9 @@ class AsamsViewModel @Inject constructor(
          pagingData
             .map { asam ->
                val bookmark = bookmarkRepository.getBookmark(DataSource.ASAM, asam.reference)
-               AsamListItemState.AsamItemState(AsamWithBookmark(asam, bookmark))
+               AsamListItem.AsamItem(AsamWithBookmark(asam, bookmark))
             }
-            .insertSeparators { item1: AsamListItemState.AsamItemState?, item2: AsamListItemState.AsamItemState? ->
+            .insertSeparators { item1: AsamListItem.AsamItem?, item2: AsamListItem.AsamItem? ->
                val section = sort[DataSource.ASAM]?.section == true
                val primarySortParameter = sort[DataSource.ASAM]?.parameters?.firstOrNull()
 
@@ -81,7 +81,7 @@ class AsamsViewModel @Inject constructor(
       }
    }
 
-   private fun header(sort: SortParameter, item1: AsamListItemState.AsamItemState?, item2: AsamListItemState.AsamItemState?): AsamListItemState.HeaderItemState? {
+   private fun header(sort: SortParameter, item1: AsamListItem.AsamItem?, item2: AsamListItem.AsamItem?): AsamListItem.HeaderItem? {
       return when (sort.parameter.type) {
          FilterParameterType.DATE -> {
             val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy - MM - dd")
@@ -91,9 +91,9 @@ class AsamsViewModel @Inject constructor(
             val date2String = date2?.format(formatter)
 
             if (date1String == null && date2String != null) {
-               AsamListItemState.HeaderItemState(date2String)
+               AsamListItem.HeaderItem(date2String)
             } else if (date1String != null && date2String != null && date1String != date2String) {
-               AsamListItemState.HeaderItemState(date2String)
+               AsamListItem.HeaderItem(date2String)
             } else null
          }
          else -> {
@@ -101,9 +101,9 @@ class AsamsViewModel @Inject constructor(
             val item2String = parameterToName(sort.parameter.parameter, item2?.asamWithBookmark?.asam)
 
             if (item1String == null && item2String != null) {
-               AsamListItemState.HeaderItemState(item2String)
+               AsamListItem.HeaderItem(item2String)
             } else if (item1String != null && item2String != null && item1String != item2String) {
-               AsamListItemState.HeaderItemState(item2String)
+               AsamListItem.HeaderItem(item2String)
             } else null
          }
       }

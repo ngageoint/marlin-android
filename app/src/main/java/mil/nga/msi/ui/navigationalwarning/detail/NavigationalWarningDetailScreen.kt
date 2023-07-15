@@ -178,9 +178,12 @@ private fun NavigationalWarningHeader(
          warning.cancelDate?.let { date ->
             NavigationalWarningProperty(title = "Cancel Date", value = dateFormat.format(date))
          }
-      }
 
-      BookmarkNotes(notes = bookmark?.notes)
+         BookmarkNotes(
+            notes = bookmark?.notes,
+            modifier = Modifier.padding(top = 8.dp)
+         )
+      }
    }
 }
 

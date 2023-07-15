@@ -1,6 +1,5 @@
 package mil.nga.msi.ui.port
 
-import android.net.Uri
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
@@ -9,12 +8,10 @@ import androidx.navigation.navDeepLink
 import androidx.navigation.navigation
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import com.google.accompanist.navigation.material.bottomSheet
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import mil.nga.msi.datasource.DataSource
+import mil.nga.msi.datasource.port.Port
+import mil.nga.msi.ui.action.PortAction
 import mil.nga.msi.ui.filter.FilterScreen
-import mil.nga.msi.ui.map.MapRoute
-import mil.nga.msi.ui.navigation.NavPoint
 import mil.nga.msi.ui.navigation.Route
 import mil.nga.msi.ui.port.detail.PortDetailScreen
 import mil.nga.msi.ui.port.list.PortsScreen
@@ -43,13 +40,8 @@ fun NavGraphBuilder.portGraph(
    share: (Pair<String, String>) -> Unit,
    showSnackbar: (String) -> Unit
 ) {
-   val shareAsam: (String) -> Unit = {
-      share(Pair("Share Port Information", it))
-   }
-
-   val zoomTo: (NavPoint) -> Unit = { point ->
-      val encoded = Uri.encode(Json.encodeToString(point))
-      navController.navigate(MapRoute.Map.name + "?point=${encoded}")
+   val sharePort: (Port) -> Unit = { port ->
+      share(Pair("Share Port Information", port.toString()))
    }
 
    navigation(
@@ -70,14 +62,11 @@ fun NavGraphBuilder.portGraph(
             openSort = {
                navController.navigate(PortRoute.Sort.name)
             },
-            onTap = { portNumber ->
-               navController.navigate("${PortRoute.Detail.name}?portNumber=$portNumber")
-            },
             onAction = { action ->
                when(action) {
-                  is PortAction.Zoom -> zoomTo(action.point)
-                  is PortAction.Share -> shareAsam(action.text)
+                  is PortAction.Share -> sharePort(action.port)
                   is PortAction.Location -> showSnackbar("${action.text} copied to clipboard")
+                  else -> action.navigate(navController)
                }
             }
          )
@@ -91,9 +80,9 @@ fun NavGraphBuilder.portGraph(
                close = { navController.popBackStack() },
                onAction = { action ->
                   when(action) {
-                     is PortAction.Zoom -> zoomTo(action.point)
-                     is PortAction.Share -> shareAsam(action.text)
+                     is PortAction.Share -> sharePort(action.port)
                      is PortAction.Location -> showSnackbar("${action.text} copied to clipboard")
+                     else -> action.navigate(navController)
                   }
                }
             )

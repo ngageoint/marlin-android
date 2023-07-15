@@ -54,6 +54,7 @@ import mil.nga.msi.ui.datasource.DataSourceFooter
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.navigationalwarning.NavigationWarningRoute
 import mil.nga.msi.ui.action.NavigationalWarningAction
+import mil.nga.msi.ui.bookmark.BookmarkNotes
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -314,6 +315,10 @@ private fun NavigationalWarningContent(
             )
          }
       }
+
+      BookmarkNotes(
+         notes = bookmark?.notes
+      )
 
       DataSourceFooter(
          bookmarked = bookmark != null,

@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.bookmark.Bookmark
+import mil.nga.msi.location.LocationPolicy
 import mil.nga.msi.repository.asam.AsamRepository
 import mil.nga.msi.repository.bookmark.BookmarkKey
 import mil.nga.msi.repository.bookmark.BookmarkRepository
@@ -18,6 +19,7 @@ import mil.nga.msi.repository.light.LightRepository
 import mil.nga.msi.repository.modu.ModuRepository
 import mil.nga.msi.repository.navigationalwarning.NavigationalWarningKey
 import mil.nga.msi.repository.navigationalwarning.NavigationalWarningRepository
+import mil.nga.msi.repository.port.PortRepository
 import javax.inject.Inject
 
 data class ItemWithBookmark(
@@ -27,13 +29,17 @@ data class ItemWithBookmark(
 
 @HiltViewModel
 class BookmarksViewModel @Inject constructor(
+   locationPolicy: LocationPolicy,
    private val repository: BookmarkRepository,
    private val asamRepository: AsamRepository,
    private val dgpsStationRepository: DgpsStationRepository,
    private val lightRepository: LightRepository,
    private val moduRepository: ModuRepository,
-   private val navigationalWarningRepository: NavigationalWarningRepository
+   private val navigationalWarningRepository: NavigationalWarningRepository,
+   private val portRepository: PortRepository
 ): ViewModel() {
+   val locationProvider = locationPolicy.bestLocationProvider
+
    val bookmarks = repository.observeBookmarks().map { bookmarks ->
       bookmarks.mapNotNull { bookmark ->
          when(bookmark.dataSource) {
@@ -63,6 +69,13 @@ class BookmarksViewModel @Inject constructor(
                val key = NavigationalWarningKey.fromId(bookmark.id)
                navigationalWarningRepository.getNavigationalWarning(key)?.let { warning ->
                   ItemWithBookmark(warning, bookmark)
+               }
+            }
+            DataSource.PORT -> {
+               bookmark.id.toIntOrNull()?.let { portNumber ->
+                  portRepository.getPort(portNumber)?.let { port ->
+                     ItemWithBookmark(port, bookmark)
+                  }
                }
             }
             else -> null
