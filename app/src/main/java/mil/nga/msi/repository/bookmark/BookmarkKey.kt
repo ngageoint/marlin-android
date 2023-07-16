@@ -11,6 +11,7 @@ import mil.nga.msi.datasource.modu.Modu
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarning
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarningListItem
 import mil.nga.msi.datasource.port.Port
+import mil.nga.msi.datasource.radiobeacon.RadioBeacon
 import mil.nga.msi.repository.dgpsstation.DgpsStationKey
 
 @Serializable
@@ -48,6 +49,10 @@ data class BookmarkKey(
 
       fun fromPort(port: Port, notes: String? = null): BookmarkKey {
          return BookmarkKey(port.portNumber.toString(), DataSource.PORT, notes)
+      }
+
+      fun fromRadioBeacon(beacon: RadioBeacon, notes: String? = null): BookmarkKey {
+         return BookmarkKey(beacon.id, DataSource.RADIO_BEACON, notes)
       }
    }
 }

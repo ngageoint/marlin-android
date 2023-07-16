@@ -1,6 +1,5 @@
 package mil.nga.msi.ui.radiobeacon.list
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -8,31 +7,27 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.PagingData
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
-import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.launch
-import mil.nga.msi.coordinate.DMS
 import mil.nga.msi.datasource.radiobeacon.RadioBeacon
-import mil.nga.msi.repository.radiobeacon.RadioBeaconKey
-import mil.nga.msi.ui.coordinate.CoordinateTextButton
+import mil.nga.msi.datasource.radiobeacon.RadioBeaconWithBookmark
+import mil.nga.msi.repository.bookmark.BookmarkKey
+import mil.nga.msi.ui.action.Action
+import mil.nga.msi.ui.action.AsamAction
 import mil.nga.msi.ui.main.TopBar
-import mil.nga.msi.ui.navigation.NavPoint
-import mil.nga.msi.ui.radiobeacon.RadioBeaconAction
+import mil.nga.msi.ui.action.RadioBeaconAction
+import mil.nga.msi.ui.datasource.DataSourceFooter
 import mil.nga.msi.ui.radiobeacon.RadioBeaconRoute
+import mil.nga.msi.ui.radiobeacon.RadioBeaconSummary
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,11 +35,9 @@ fun RadioBeaconsScreen(
    openDrawer: () -> Unit,
    openFilter: () -> Unit,
    openSort: () -> Unit,
-   onTap: (RadioBeaconKey) -> Unit,
-   onAction: (RadioBeaconAction) -> Unit,
+   onAction: (Action) -> Unit,
    viewModel: RadioBeaconsViewModel = hiltViewModel()
 ) {
-   val scope = rememberCoroutineScope()
    val filters by viewModel.radioBeaconFilters.observeAsState(emptyList())
 
    Column(modifier = Modifier.fillMaxSize()) {
@@ -84,16 +77,17 @@ fun RadioBeaconsScreen(
 
       RadioBeacons(
          pagingState = viewModel.radioBeacons,
-         onTap = { onTap(RadioBeaconKey.fromRadioBeacon(it)) },
-         onCopyLocation = { onAction(RadioBeaconAction.Location(it)) },
-         onZoom = { onAction(RadioBeaconAction.Zoom(it)) },
-         onShare = { radioBeacon ->
-            scope.launch {
-               viewModel.getRadioBeacon(radioBeacon.volumeNumber, radioBeacon.featureNumber)?.let {
-                  onAction(RadioBeaconAction.Share(it.toString()))
-               }
+         onTap = { onAction(RadioBeaconAction.Tap(it)) },
+         onZoom = { onAction(RadioBeaconAction.Zoom(it.latLng)) },
+         onShare = { onAction(RadioBeaconAction.Share(it)) },
+         onBookmark = { (beacon, bookmark) ->
+            if (bookmark == null) {
+               onAction(Action.Bookmark(BookmarkKey.fromRadioBeacon(beacon)))
+            } else {
+               viewModel.deleteBookmark(bookmark)
             }
-         }
+         },
+         onCopyLocation = { onAction(AsamAction.Location(it)) }
       )
    }
 }
@@ -102,8 +96,9 @@ fun RadioBeaconsScreen(
 private fun RadioBeacons(
    pagingState: Flow<PagingData<RadioBeaconListItem>>,
    onTap: (RadioBeacon) -> Unit,
-   onZoom: (NavPoint) -> Unit,
+   onZoom: (RadioBeacon) -> Unit,
    onShare: (RadioBeacon) -> Unit,
+   onBookmark: (RadioBeaconWithBookmark) -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
    val lazyItems = pagingState.collectAsLazyPagingItems()
@@ -118,7 +113,7 @@ private fun RadioBeacons(
             count = lazyItems.itemCount,
             key = lazyItems.itemKey {
                when (it) {
-                  is RadioBeaconListItem.RadioBeaconItem -> it.radioBeacon.id
+                  is RadioBeaconListItem.RadioBeaconItem -> it.radioBeaconWithBookmark.radioBeacon.id
                   is RadioBeaconListItem.HeaderItem -> it.header
                }
             },
@@ -142,18 +137,12 @@ private fun RadioBeacons(
 
                   is RadioBeaconListItem.RadioBeaconItem -> {
                      RadioBeaconCard(
-                        beacon = item.radioBeacon,
-                        onTap = onTap,
-                        onCopyLocation = { onCopyLocation(it) },
-                        onZoom = {
-                           onZoom(
-                              NavPoint(
-                                 item.radioBeacon.latitude,
-                                 item.radioBeacon.longitude
-                              )
-                           )
-                        },
-                        onShare = onShare
+                        beaconWithBookmark = item.radioBeaconWithBookmark,
+                        onTap = { onTap(item.radioBeaconWithBookmark.radioBeacon) },
+                        onZoom = { onZoom(item.radioBeaconWithBookmark.radioBeacon) },
+                        onShare = { onShare(item.radioBeaconWithBookmark.radioBeacon) },
+                        onBookmark = { onBookmark(item.radioBeaconWithBookmark) },
+                        onCopyLocation = { onCopyLocation(it) }
                      )
                   }
                }
@@ -165,22 +154,24 @@ private fun RadioBeacons(
 
 @Composable
 private fun RadioBeaconCard(
-   beacon: RadioBeacon,
-   onTap: (RadioBeacon) -> Unit,
-   onShare: (RadioBeacon) -> Unit,
+   beaconWithBookmark: RadioBeaconWithBookmark,
+   onTap: () -> Unit,
+   onShare: () -> Unit,
    onZoom: () -> Unit,
+   onBookmark: () -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
    Card(
       Modifier
          .fillMaxWidth()
          .padding(bottom = 8.dp)
-         .clickable { onTap(beacon) }
+         .clickable { onTap() }
    ) {
       RadioBeaconContent(
-         beacon,
-         onShare = { onShare(beacon) },
+         beaconWithBookmark,
+         onShare = { onShare() },
          onZoom,
+         onBookmark,
          onCopyLocation
       )
    }
@@ -188,138 +179,24 @@ private fun RadioBeaconCard(
 
 @Composable
 private fun RadioBeaconContent(
-   beacon: RadioBeacon,
+   beaconWithBookmark: RadioBeaconWithBookmark,
    onShare: () -> Unit,
    onZoom: () -> Unit,
+   onBookmark: () -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
+   val (beacon, bookmark) = beaconWithBookmark
+
    Column(Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
-      CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-         Text(
-            text = "${beacon.featureNumber} ${beacon.volumeNumber}",
-            fontWeight = FontWeight.SemiBold,
-            style = MaterialTheme.typography.labelSmall,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-         )
-      }
+      RadioBeaconSummary(beaconWithBookmark = beaconWithBookmark)
 
-      beacon.name?.let { name ->
-         Text(
-            text = name,
-            style = MaterialTheme.typography.titleLarge,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.padding(top = 16.dp)
-         )
-      }
-
-      beacon.morseCode()?.let { code ->
-         Text(
-            text = beacon.morseLetter(),
-            style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier.padding(top = 4.dp)
-         )
-
-         MorseCode(text = code, modifier = Modifier.padding(top = 4.dp))
-      }
-
-      beacon.expandedCharacteristicWithoutCode()?.let {
-         Text(
-            text = it,
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(top = 0.dp)
-         )
-      }
-
-      CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-         beacon.stationRemark?.let { stationRemark ->
-            Text(
-               text = stationRemark,
-               style = MaterialTheme.typography.bodyMedium,
-               modifier = Modifier.padding(top = 8.dp)
-            )
-         }
-      }
-
-      RadioBeaconFooter(
-         beacon = beacon,
-         onShare = onShare,
+      DataSourceFooter(
+         latLng = beacon.latLng,
+         bookmarked = bookmark != null,
          onZoom = onZoom,
+         onShare = onShare,
+         onBookmark = onBookmark,
          onCopyLocation = onCopyLocation
       )
-   }
-}
-
-@Composable
-private fun MorseCode(
-   text: String,
-   modifier: Modifier = Modifier,
-) {
-   Row(modifier = modifier) {
-      text.split(" ").forEach { letter ->
-         if (letter == "-" || letter == "•") {
-            Box(
-               modifier = Modifier
-                  .padding(end = 8.dp)
-                  .height(5.dp)
-                  .width(if (letter == "-") 24.dp else 8.dp)
-                  .background(MaterialTheme.colorScheme.onSurface)
-            )
-         }
-      }
-   }
-}
-
-@Composable
-private fun RadioBeaconFooter(
-   beacon: RadioBeacon,
-   onShare: () -> Unit,
-   onZoom: () -> Unit,
-   onCopyLocation: (String) -> Unit
-) {
-   Row(
-      verticalAlignment = Alignment.CenterVertically,
-      horizontalArrangement = Arrangement.SpaceBetween,
-      modifier = Modifier
-         .fillMaxWidth()
-         .padding(top = 8.dp)
-   ) {
-      RadioBeaconLocation(beacon.latLng, onCopyLocation)
-      RadioBeaconActions(onShare, onZoom)
-   }
-}
-
-@Composable
-private fun RadioBeaconLocation(
-   latLng: LatLng,
-   onCopyLocation: (String) -> Unit
-) {
-   CoordinateTextButton(
-      latLng = latLng,
-      onCopiedToClipboard = { onCopyLocation(it) }
-   )
-}
-
-@Composable
-private fun RadioBeaconActions(
-   onShare: () -> Unit,
-   onZoom: () -> Unit
-) {
-   Row {
-      IconButton(
-         onClick = { onShare() }
-      ) {
-         Icon(Icons.Default.Share,
-            tint = MaterialTheme.colorScheme.tertiary,
-            contentDescription = "Share Radio Beacon"
-         )
-      }
-      IconButton(onClick = { onZoom() }) {
-         Icon(Icons.Default.GpsFixed,
-            tint = MaterialTheme.colorScheme.tertiary,
-            contentDescription = "Zoom to Radio Beacon"
-         )
-      }
    }
 }

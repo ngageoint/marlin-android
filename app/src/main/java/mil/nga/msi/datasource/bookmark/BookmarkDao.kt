@@ -25,5 +25,5 @@ interface BookmarkDao {
    fun observeBookmark(datasource: DataSource, id: String): Flow<Bookmark>
 
    @Query("SELECT * from bookmarks WHERE data_source = :datasource AND id = :id ORDER BY timestamp")
-   suspend fun getBookmark(datasource: DataSource, id: String): Bookmark
+   suspend fun getBookmark(datasource: DataSource, id: String): Bookmark?
 }

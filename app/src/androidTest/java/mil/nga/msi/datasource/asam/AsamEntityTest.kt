@@ -11,7 +11,6 @@ import mil.nga.msi.datasource.MsiDatabase
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -122,42 +121,5 @@ class AsamEntityTest {
         assertEquals(read.size, 2)
         assertAsamsEqual(insert[0], read[0])
         assertAsamsEqual(insert[1], read[1])
-    }
-
-    @Test
-    fun should_add_bookmark() = runTest {
-        val reference = "1"
-        dao.insert(listOf(Asam(reference, Date(), 1.0, 1.0)))
-
-        val date = Date()
-        val notes = "notes"
-        dao.setBookmark(reference, true, date, notes)
-        val asam = dao.getAsam(reference)
-
-        assertEquals(true, asam?.bookmarked)
-        assertEquals(notes, asam?.bookmarkNotes)
-        assertEquals(date, asam?.bookmarkDate)
-        assertEquals(reference, asam?.bookmarkId)
-    }
-
-    @Test
-    fun should_remove_bookmark() = runTest {
-        val reference = "1"
-        dao.insert(
-            listOf(
-                Asam(reference, Date(), 1.0, 1.0).apply {
-                    bookmarked = true
-                    bookmarkNotes = "notes"
-                    bookmarkDate = Date()
-                }
-            )
-        )
-
-        dao.setBookmark(reference, false)
-        val asam = dao.getAsam(reference)
-
-        assertEquals(false, asam?.bookmarked)
-        assertNull(asam?.bookmarkNotes)
-        assertNull(asam?.bookmarkDate)
     }
 }

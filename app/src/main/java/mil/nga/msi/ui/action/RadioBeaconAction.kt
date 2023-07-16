@@ -5,15 +5,18 @@ import androidx.navigation.NavController
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import mil.nga.msi.datasource.asam.Asam
-import mil.nga.msi.ui.asam.AsamRoute
+import mil.nga.msi.datasource.radiobeacon.RadioBeacon
+import mil.nga.msi.repository.radiobeacon.RadioBeaconKey
 import mil.nga.msi.ui.map.MapRoute
 import mil.nga.msi.ui.navigation.NavPoint
+import mil.nga.msi.ui.radiobeacon.RadioBeaconRoute
 
-sealed class AsamAction(): Action() {
-   class Tap(private val asam: Asam): AsamAction() {
+sealed class RadioBeaconAction(): Action() {
+   class Tap(private val radioBeacon: RadioBeacon): RadioBeaconAction() {
       override fun navigate(navController: NavController) {
-         navController.navigate("${AsamRoute.Detail.name}?reference=${asam.reference}")
+         val key = RadioBeaconKey.fromRadioBeacon(radioBeacon)
+         val encoded = Uri.encode(Json.encodeToString(key))
+         navController.navigate( "${RadioBeaconRoute.Detail.name}?key=$encoded")
       }
    }
 
@@ -25,7 +28,6 @@ sealed class AsamAction(): Action() {
       }
    }
 
-   class Share(val asam: Asam): AsamAction()
-   class Location(val text: String): AsamAction()
+   class Share(val radioBeacon: RadioBeacon): RadioBeaconAction()
+   class Location(val text: String): RadioBeaconAction()
 }
-

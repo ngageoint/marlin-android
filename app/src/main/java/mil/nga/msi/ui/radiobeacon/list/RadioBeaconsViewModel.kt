@@ -1,31 +1,32 @@
 package mil.nga.msi.ui.radiobeacon.list
 
-import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asFlow
 import androidx.lifecycle.asLiveData
-import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import androidx.paging.insertSeparators
-import androidx.paging.liveData
 import androidx.paging.map
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import mil.nga.msi.datasource.DataSource
+import mil.nga.msi.datasource.bookmark.Bookmark
 import mil.nga.msi.datasource.radiobeacon.RadioBeacon
-import mil.nga.msi.filter.Filter
+import mil.nga.msi.datasource.radiobeacon.RadioBeaconWithBookmark
+import mil.nga.msi.repository.bookmark.BookmarkRepository
 import mil.nga.msi.repository.preferences.FilterRepository
 import mil.nga.msi.repository.preferences.SortRepository
 import mil.nga.msi.repository.radiobeacon.RadioBeaconRepository
-import mil.nga.msi.sort.Sort
 import mil.nga.msi.sort.SortParameter
 import javax.inject.Inject
 
 sealed class RadioBeaconListItem {
-   class RadioBeaconItem(val radioBeacon: RadioBeacon) : RadioBeaconListItem()
+   class RadioBeaconItem(val radioBeaconWithBookmark: RadioBeaconWithBookmark) : RadioBeaconListItem()
    class HeaderItem(val header : String) : RadioBeaconListItem()
 }
 
@@ -33,52 +34,53 @@ sealed class RadioBeaconListItem {
 class RadioBeaconsViewModel @Inject constructor(
    filterRepository: FilterRepository,
    sortRepository: SortRepository,
+   private val bookmarkRepository: BookmarkRepository,
    private val beaconRepository: RadioBeaconRepository
 ): ViewModel() {
 
-   private val queryParameters = MediatorLiveData<Pair<List<Filter>, Sort?>>().apply {
-      addSource(filterRepository.filters.asLiveData()) { entry ->
-         val filters = entry[DataSource.RADIO_BEACON] ?: emptyList()
-         value = Pair(filters, value?.second)
-      }
-
-      addSource(sortRepository.sort.asLiveData()) { entry ->
-         val filters = value?.first ?: emptyList()
-         value = Pair(filters, entry[DataSource.RADIO_BEACON])
-      }
-   }
-
-   val radioBeacons = queryParameters.switchMap { pair ->
-      val filters = pair.first
-      val sort = pair.second
+   @OptIn(ExperimentalCoroutinesApi::class)
+   val radioBeacons = combine(
+      sortRepository.sort,
+      filterRepository.filters,
+      bookmarkRepository.observeBookmarks(DataSource.RADIO_BEACON)
+   ) { sort, filters, _ ->
+      sort to filters
+   }.flatMapLatest { (sort, filters) ->
       Pager(PagingConfig(pageSize = 20), null) {
-         beaconRepository.observeRadioBeaconListItems(filters, sort?.parameters ?: emptyList())
-      }.liveData
-   }.asFlow().map { pagingData ->
-      pagingData
-         .map { RadioBeaconListItem.RadioBeaconItem(it) }
-         .insertSeparators { item1: RadioBeaconListItem.RadioBeaconItem?, item2: RadioBeaconListItem.RadioBeaconItem? ->
-            val section = queryParameters.value?.second?.section ?: false
-            val primarySortParameter = queryParameters.value?.second?.parameters?.firstOrNull()
+         beaconRepository.observeRadioBeaconListItems(
+            sort = sort[DataSource.RADIO_BEACON]?.parameters ?: emptyList(),
+            filters = filters[DataSource.RADIO_BEACON] ?: emptyList()
+         )
+      }.flow.map { pagingData ->
+         pagingData
+            .map { beacon ->
+               val bookmark = bookmarkRepository.getBookmark(DataSource.RADIO_BEACON, beacon.id)
+               RadioBeaconListItem.RadioBeaconItem(RadioBeaconWithBookmark(beacon, bookmark))
+            }
+            .insertSeparators { item1: RadioBeaconListItem.RadioBeaconItem?, item2: RadioBeaconListItem.RadioBeaconItem? ->
+               val section = sort[DataSource.RADIO_BEACON]?.section == true
+               val primarySortParameter = sort[DataSource.RADIO_BEACON]?.parameters?.firstOrNull()
 
-            if (section && primarySortParameter != null) {
-               header(primarySortParameter, item1, item2)
-            } else null
-         }
+               if (section && primarySortParameter != null) {
+                  header(primarySortParameter, item1, item2)
+               } else null
+            }
+      }
    }.cachedIn(viewModelScope)
 
    val radioBeaconFilters = filterRepository.filters.map { entry ->
       entry[DataSource.RADIO_BEACON] ?: emptyList()
    }.asLiveData()
 
-   suspend fun getRadioBeacon(
-      volumeNumber: String,
-      featureNumber: String
-   ): RadioBeacon? = beaconRepository.getRadioBeacon(volumeNumber, featureNumber)
+   fun deleteBookmark(bookmark: Bookmark) {
+      viewModelScope.launch {
+         bookmarkRepository.delete(bookmark)
+      }
+   }
 
    private fun header(sort: SortParameter, item1: RadioBeaconListItem.RadioBeaconItem?, item2: RadioBeaconListItem.RadioBeaconItem?): RadioBeaconListItem.HeaderItem? {
-      val item1String = parameterToName(sort.parameter.parameter, item1?.radioBeacon)
-      val item2String = parameterToName(sort.parameter.parameter, item2?.radioBeacon)
+      val item1String = parameterToName(sort.parameter.parameter, item1?.radioBeaconWithBookmark?.radioBeacon)
+      val item2String = parameterToName(sort.parameter.parameter, item2?.radioBeaconWithBookmark?.radioBeacon)
 
       return if (item1String == null && item2String != null) {
          RadioBeaconListItem.HeaderItem(item2String)

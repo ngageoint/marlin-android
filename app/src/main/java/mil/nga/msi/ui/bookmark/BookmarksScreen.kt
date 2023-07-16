@@ -1,7 +1,6 @@
 package mil.nga.msi.ui.bookmark
 
 import android.location.Location
-import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -33,6 +32,8 @@ import mil.nga.msi.datasource.navigationwarning.NavigationalWarning
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarningWithBookmark
 import mil.nga.msi.datasource.port.Port
 import mil.nga.msi.datasource.port.PortWithBookmark
+import mil.nga.msi.datasource.radiobeacon.RadioBeacon
+import mil.nga.msi.datasource.radiobeacon.RadioBeaconWithBookmark
 import mil.nga.msi.repository.bookmark.BookmarkKey
 import mil.nga.msi.repository.navigationalwarning.NavigationalWarningKey
 import mil.nga.msi.ui.action.Action
@@ -44,6 +45,7 @@ import mil.nga.msi.ui.action.DgpsStationAction
 import mil.nga.msi.ui.action.LightAction
 import mil.nga.msi.ui.action.NavigationalWarningAction
 import mil.nga.msi.ui.action.PortAction
+import mil.nga.msi.ui.action.RadioBeaconAction
 import mil.nga.msi.ui.datasource.DataSourceFooter
 import mil.nga.msi.ui.dgpsstation.DgpsStationSummary
 import mil.nga.msi.ui.light.LightSummary
@@ -51,6 +53,7 @@ import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.modu.ModuSummary
 import mil.nga.msi.ui.navigationalwarning.NavigationalWarningSummary
 import mil.nga.msi.ui.port.PortSummary
+import mil.nga.msi.ui.radiobeacon.RadioBeaconSummary
 
 sealed class BookmarkAction() {
    object Tap: BookmarkAction()
@@ -67,9 +70,6 @@ fun BookmarksScreen(
    viewModel: BookmarksViewModel = hiltViewModel()
 ) {
    val bookmarks by viewModel.bookmarks.observeAsState(emptyList())
-   val location by viewModel.locationProvider.observeAsState()
-
-   Log.i("billy", "bookmarks $bookmarks")
 
    Column(modifier = Modifier.fillMaxSize()) {
       TopBar(
@@ -187,6 +187,10 @@ private fun Bookmark(
       is Port -> {
          val portWithBookmark = PortWithBookmark(itemWithBookmark.item, itemWithBookmark.bookmark)
          PortBookmark(portWithBookmark = portWithBookmark, onAction = onAction)
+      }
+      is RadioBeacon -> {
+         val beaconWithBookmark = RadioBeaconWithBookmark(itemWithBookmark.item, itemWithBookmark.bookmark)
+         RadioBeaconBookmark(beaconWithBookmark = beaconWithBookmark, onAction = onAction)
       }
    }
 }
@@ -340,6 +344,32 @@ private fun Bookmark(
       PortSummary(
          portWithBookmark = portWithBookmark,
          location = location
+      )
+   }
+}
+
+@Composable fun RadioBeaconBookmark(
+   beaconWithBookmark: RadioBeaconWithBookmark,
+   onAction: (Action) -> Unit
+) {
+   val (beacon, bookmark) = beaconWithBookmark
+
+   BookmarkCard(
+      bookmarked = bookmark != null,
+      dataSource = DataSource.RADIO_BEACON,
+      location = beacon.latLng,
+      onAction = { action ->
+         when(action) {
+            BookmarkAction.Tap -> onAction(RadioBeaconAction.Tap(beacon))
+            BookmarkAction.Zoom -> onAction(RadioBeaconAction.Zoom(beacon.latLng))
+            BookmarkAction.Share -> onAction(RadioBeaconAction.Share(beacon))
+            BookmarkAction.Bookmark -> onAction(Action.Bookmark(BookmarkKey.fromRadioBeacon(beacon)))
+            is BookmarkAction.Location -> onAction(RadioBeaconAction.Location(action.text))
+         }
+      }
+   ) {
+      RadioBeaconSummary(
+         beaconWithBookmark = beaconWithBookmark
       )
    }
 }

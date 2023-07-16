@@ -15,5 +15,4 @@ class BookmarkRepository @Inject constructor(
    fun observeBookmarks() = localDataSource.observeBookmarks()
    fun observeBookmarks(dataSource: DataSource) = localDataSource.observeBookmarks(dataSource)
    fun observeBookmark(dataSource: DataSource, id: String) = localDataSource.observeBookmark(dataSource, id)
-
 }

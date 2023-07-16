@@ -1,6 +1,7 @@
 package mil.nga.msi.repository.radiobeacon
 
 import androidx.sqlite.db.SimpleSQLiteQuery
+import kotlinx.coroutines.flow.Flow
 import mil.nga.msi.datasource.radiobeacon.RadioBeacon
 import mil.nga.msi.datasource.radiobeacon.RadioBeaconDao
 import javax.inject.Inject
@@ -14,15 +15,13 @@ class RadioBeaconLocalDataSource @Inject constructor(
    fun isEmpty() = dao.count() == 0
    suspend fun existingRadioBeacons(ids: List<String>) = dao.getRadioBeacons(ids)
 
-   fun observeRadioBeacon(
-      volumeNumber: String,
-      featureNumber: String
-   ) = dao.observeRadioBeacon(volumeNumber, featureNumber)
+   fun observeRadioBeacon(key: RadioBeaconKey): Flow<RadioBeacon> {
+      return dao.observeRadioBeacon(key.volumeNumber, key.featureNumber)
+   }
 
-   suspend fun getRadioBeacon(
-      volumeNumber: String,
-      featureNumber: String
-   ) = dao.getRadioBeacon(volumeNumber, featureNumber)
+   suspend fun getRadioBeacon(key: RadioBeaconKey): RadioBeacon? {
+      return dao.getRadioBeacon(key.volumeNumber, key.featureNumber)
+   }
 
    fun getRadioBeacons(query: SimpleSQLiteQuery) = dao.getRadioBeacons(query)
 
