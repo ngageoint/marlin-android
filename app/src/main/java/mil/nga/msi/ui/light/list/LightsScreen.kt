@@ -40,7 +40,7 @@ import mil.nga.msi.datasource.light.LightWithBookmark
 import mil.nga.msi.repository.bookmark.BookmarkKey
 import mil.nga.msi.ui.action.Action
 import mil.nga.msi.ui.action.LightAction
-import mil.nga.msi.ui.datasource.DataSourceFooter
+import mil.nga.msi.ui.datasource.DataSourceActions
 import mil.nga.msi.ui.light.LightRoute
 import mil.nga.msi.ui.light.LightSummary
 import mil.nga.msi.ui.main.TopBar
@@ -204,7 +204,7 @@ private fun LightContent(
    Column(Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
       LightSummary(lightWithBookmark = lightWithBookmark)
 
-      DataSourceFooter(
+      DataSourceActions(
          latLng = light.latLng,
          bookmarked = bookmark != null,
          onShare = onShare,

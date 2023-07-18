@@ -11,7 +11,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -27,7 +26,7 @@ import mil.nga.msi.ui.action.Action
 import mil.nga.msi.ui.action.AsamAction
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.action.PortAction
-import mil.nga.msi.ui.datasource.DataSourceFooter
+import mil.nga.msi.ui.datasource.DataSourceActions
 import mil.nga.msi.ui.port.PortRoute
 import mil.nga.msi.ui.port.PortSummary
 
@@ -179,7 +178,7 @@ private fun PortCard(
          modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp)
       )
 
-      DataSourceFooter(
+      DataSourceActions(
          latLng = port.latLng,
          bookmarked = bookmark != null,
          onZoom = onZoom,

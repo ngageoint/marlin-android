@@ -25,6 +25,7 @@ import javax.inject.Inject
 
 data class ItemWithBookmark(
    val item: Any,
+   val dataSource: DataSource,
    val bookmark: Bookmark
 )
 
@@ -45,43 +46,48 @@ class BookmarksViewModel @Inject constructor(
          when(bookmark.dataSource) {
             DataSource.ASAM -> {
                asamRepository.getAsam(bookmark.id)?.let { asam ->
-                  ItemWithBookmark(asam, bookmark)
-               }
-            }
-            DataSource.MODU -> {
-               moduRepository.getModu(bookmark.id)?.let { modu ->
-                  ItemWithBookmark(modu, bookmark)
-               }
-            }
-            DataSource.LIGHT -> {
-               val key = LightKey.fromId(bookmark.id)
-               lightRepository.getLight(key.volumeNumber, key.featureNumber, key.characteristicNumber)?.let { light ->
-                  ItemWithBookmark(light, bookmark)
+                  ItemWithBookmark(asam, DataSource.ASAM, bookmark)
                }
             }
             DataSource.DGPS_STATION -> {
                val key = DgpsStationKey.fromId(bookmark.id)
                dgpsStationRepository.getDgpsStation(key.volumeNumber, key.featureNumber)?.let { dgpsStation ->
-                  ItemWithBookmark(dgpsStation, bookmark)
+                  ItemWithBookmark(dgpsStation, DataSource.DGPS_STATION, bookmark)
                }
             }
+            DataSource.LIGHT -> {
+               val key = LightKey.fromId(bookmark.id)
+               lightRepository.getLight(key.volumeNumber, key.featureNumber, key.characteristicNumber)?.let { light ->
+                  ItemWithBookmark(light, DataSource.LIGHT, bookmark)
+               }
+            }
+            DataSource.MODU -> {
+               moduRepository.getModu(bookmark.id)?.let { modu ->
+                  ItemWithBookmark(modu, DataSource.MODU, bookmark)
+               }
+            }
+
             DataSource.NAVIGATION_WARNING -> {
                val key = NavigationalWarningKey.fromId(bookmark.id)
                navigationalWarningRepository.getNavigationalWarning(key)?.let { warning ->
-                  ItemWithBookmark(warning, bookmark)
+                  ItemWithBookmark(warning, DataSource.NAVIGATION_WARNING, bookmark)
                }
+            }
+            DataSource.NOTICE_TO_MARINERS -> {
+               val noticeNumber = bookmark.id.toInt()
+               ItemWithBookmark(noticeNumber, DataSource.NOTICE_TO_MARINERS, bookmark)
             }
             DataSource.PORT -> {
                bookmark.id.toIntOrNull()?.let { portNumber ->
                   portRepository.getPort(portNumber)?.let { port ->
-                     ItemWithBookmark(port, bookmark)
+                     ItemWithBookmark(port, DataSource.PORT, bookmark)
                   }
                }
             }
             DataSource.RADIO_BEACON -> {
                val key = RadioBeaconKey.fromId(bookmark.id)
                radioBeaconRepository.getRadioBeacon(key)?.let { beacon ->
-                  ItemWithBookmark(beacon, bookmark)
+                  ItemWithBookmark(beacon, DataSource.RADIO_BEACON, bookmark)
                }
             }
             else -> null

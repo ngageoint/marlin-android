@@ -25,7 +25,7 @@ import mil.nga.msi.ui.action.Action
 import mil.nga.msi.ui.action.AsamAction
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.action.RadioBeaconAction
-import mil.nga.msi.ui.datasource.DataSourceFooter
+import mil.nga.msi.ui.datasource.DataSourceActions
 import mil.nga.msi.ui.radiobeacon.RadioBeaconRoute
 import mil.nga.msi.ui.radiobeacon.RadioBeaconSummary
 
@@ -190,7 +190,7 @@ private fun RadioBeaconContent(
    Column(Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
       RadioBeaconSummary(beaconWithBookmark = beaconWithBookmark)
 
-      DataSourceFooter(
+      DataSourceActions(
          latLng = beacon.latLng,
          bookmarked = bookmark != null,
          onZoom = onZoom,

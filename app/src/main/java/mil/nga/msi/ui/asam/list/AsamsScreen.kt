@@ -25,7 +25,7 @@ import mil.nga.msi.ui.action.Action
 import mil.nga.msi.ui.action.AsamAction
 import mil.nga.msi.ui.asam.AsamRoute
 import mil.nga.msi.ui.asam.AsamSummary
-import mil.nga.msi.ui.datasource.DataSourceFooter
+import mil.nga.msi.ui.datasource.DataSourceActions
 import mil.nga.msi.ui.main.TopBar
 import java.util.*
 
@@ -173,7 +173,7 @@ private fun AsamCard(
             modifier = Modifier.padding(bottom = 8.dp)
          )
 
-         DataSourceFooter(
+         DataSourceActions(
             latLng = asam.latLng,
             bookmarked = bookmark != null,
             onZoom = onZoom,

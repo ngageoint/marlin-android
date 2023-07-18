@@ -52,7 +52,7 @@ import mil.nga.msi.ui.action.Action
 import mil.nga.msi.ui.action.AsamAction
 import mil.nga.msi.ui.action.LightAction
 import mil.nga.msi.ui.bookmark.BookmarkNotes
-import mil.nga.msi.ui.datasource.DataSourceFooter
+import mil.nga.msi.ui.datasource.DataSourceActions
 import mil.nga.msi.ui.light.LightRoute
 import mil.nga.msi.ui.light.LightViewModel
 import mil.nga.msi.ui.light.LightState
@@ -201,7 +201,7 @@ private fun LightHeader(
                modifier = Modifier.padding(top = 16.dp)
             )
 
-            DataSourceFooter(
+            DataSourceActions(
                latLng = light.latLng,
                bookmarked = bookmark != null,
                onShare = onShare,

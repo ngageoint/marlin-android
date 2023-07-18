@@ -10,6 +10,7 @@ import mil.nga.msi.datasource.light.Light
 import mil.nga.msi.datasource.modu.Modu
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarning
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarningListItem
+import mil.nga.msi.datasource.noticetomariners.NoticeToMariners
 import mil.nga.msi.datasource.port.Port
 import mil.nga.msi.datasource.radiobeacon.RadioBeacon
 import mil.nga.msi.repository.dgpsstation.DgpsStationKey
@@ -45,6 +46,10 @@ data class BookmarkKey(
 
       fun fromNavigationalWarning(warning: NavigationalWarningListItem, notes: String? = null): BookmarkKey {
          return BookmarkKey(warning.id, DataSource.NAVIGATION_WARNING, notes)
+      }
+
+      fun fromNoticeToMariners(noticeNumber: Int, notes: String? = null): BookmarkKey {
+         return BookmarkKey(noticeNumber.toString(), DataSource.NOTICE_TO_MARINERS, notes)
       }
 
       fun fromPort(port: Port, notes: String? = null): BookmarkKey {

@@ -24,7 +24,7 @@ import mil.nga.msi.repository.bookmark.BookmarkKey
 import mil.nga.msi.ui.action.Action
 import mil.nga.msi.ui.action.AsamAction
 import mil.nga.msi.ui.action.DgpsStationAction
-import mil.nga.msi.ui.datasource.DataSourceFooter
+import mil.nga.msi.ui.datasource.DataSourceActions
 import mil.nga.msi.ui.dgpsstation.DgpsStationRoute
 import mil.nga.msi.ui.dgpsstation.DgpsStationSummary
 import mil.nga.msi.ui.main.TopBar
@@ -173,7 +173,7 @@ private fun DgpsStationCard(
             modifier = Modifier.padding(bottom = 8.dp)
          )
 
-         DataSourceFooter(
+         DataSourceActions(
             latLng = dgpsStation.latLng,
             bookmarked = bookmark != null,
             onShare = { onShare() },

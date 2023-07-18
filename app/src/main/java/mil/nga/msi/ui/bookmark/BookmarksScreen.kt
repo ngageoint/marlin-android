@@ -30,6 +30,8 @@ import mil.nga.msi.datasource.modu.Modu
 import mil.nga.msi.datasource.modu.ModuWithBookmark
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarning
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarningWithBookmark
+import mil.nga.msi.datasource.noticetomariners.NoticeToMariners
+import mil.nga.msi.datasource.noticetomariners.NoticeToMarinersWithBookmark
 import mil.nga.msi.datasource.port.Port
 import mil.nga.msi.datasource.port.PortWithBookmark
 import mil.nga.msi.datasource.radiobeacon.RadioBeacon
@@ -44,9 +46,10 @@ import mil.nga.msi.ui.asam.AsamSummary
 import mil.nga.msi.ui.action.DgpsStationAction
 import mil.nga.msi.ui.action.LightAction
 import mil.nga.msi.ui.action.NavigationalWarningAction
+import mil.nga.msi.ui.action.NoticeToMarinersAction
 import mil.nga.msi.ui.action.PortAction
 import mil.nga.msi.ui.action.RadioBeaconAction
-import mil.nga.msi.ui.datasource.DataSourceFooter
+import mil.nga.msi.ui.datasource.DataSourceActions
 import mil.nga.msi.ui.dgpsstation.DgpsStationSummary
 import mil.nga.msi.ui.light.LightSummary
 import mil.nga.msi.ui.main.TopBar
@@ -163,35 +166,40 @@ private fun Bookmark(
    itemWithBookmark: ItemWithBookmark,
    onAction: (Action) -> Unit
 ) {
-   when (itemWithBookmark.item) {
-      is Asam -> {
-         val asam = AsamWithBookmark(itemWithBookmark.item, itemWithBookmark.bookmark)
+   when (itemWithBookmark.dataSource) {
+      DataSource.ASAM -> {
+         val asam = AsamWithBookmark(itemWithBookmark.item as Asam, itemWithBookmark.bookmark)
          AsamBookmark(asamWithBookmark = asam, onAction = onAction)
       }
-      is DgpsStation -> {
-         val dgpsStation = DgpsStationWithBookmark(itemWithBookmark.item, itemWithBookmark.bookmark)
+      DataSource.DGPS_STATION -> {
+         val dgpsStation = DgpsStationWithBookmark(itemWithBookmark.item as DgpsStation, itemWithBookmark.bookmark)
          DgpsStationBookmark(dgpsStationWithBookmark = dgpsStation, onAction = onAction)
       }
-      is Light -> {
-         val light = LightWithBookmark(itemWithBookmark.item, itemWithBookmark.bookmark)
+      DataSource.LIGHT -> {
+         val light = LightWithBookmark(itemWithBookmark.item as Light, itemWithBookmark.bookmark)
          LightBookmark(lightWithBookmark = light, onAction = onAction)
       }
-      is Modu -> {
-         val modu = ModuWithBookmark(itemWithBookmark.item, itemWithBookmark.bookmark)
+      DataSource.MODU -> {
+         val modu = ModuWithBookmark(itemWithBookmark.item as Modu, itemWithBookmark.bookmark)
          ModuBookmark(moduWithBookmark = modu, onAction = onAction)
       }
-      is NavigationalWarning -> {
-         val warningWithBookmark = NavigationalWarningWithBookmark(itemWithBookmark.item, itemWithBookmark.bookmark)
+      DataSource.NAVIGATION_WARNING -> {
+         val warningWithBookmark = NavigationalWarningWithBookmark(itemWithBookmark.item as NavigationalWarning, itemWithBookmark.bookmark)
          NavigationalWarningBookmark(warningWithBookmark = warningWithBookmark, onAction = onAction)
       }
-      is Port -> {
-         val portWithBookmark = PortWithBookmark(itemWithBookmark.item, itemWithBookmark.bookmark)
+      DataSource.NOTICE_TO_MARINERS -> {
+         val noticeWithBookmark = NoticeToMarinersWithBookmark(itemWithBookmark.item as Int, itemWithBookmark.bookmark)
+         NoticeToMarinersBookmark(noticeWithBookmark = noticeWithBookmark, onAction = onAction)
+      }
+      DataSource.PORT -> {
+         val portWithBookmark = PortWithBookmark(itemWithBookmark.item as Port, itemWithBookmark.bookmark)
          PortBookmark(portWithBookmark = portWithBookmark, onAction = onAction)
       }
-      is RadioBeacon -> {
-         val beaconWithBookmark = RadioBeaconWithBookmark(itemWithBookmark.item, itemWithBookmark.bookmark)
+      DataSource.RADIO_BEACON -> {
+         val beaconWithBookmark = RadioBeaconWithBookmark(itemWithBookmark.item as RadioBeacon, itemWithBookmark.bookmark)
          RadioBeaconBookmark(beaconWithBookmark = beaconWithBookmark, onAction = onAction)
       }
+      else -> { /* Datasource cannot be bookmarked */ }
    }
 }
 
@@ -205,15 +213,11 @@ private fun Bookmark(
       bookmarked = bookmark != null,
       dataSource = DataSource.ASAM,
       location = asam.latLng,
-      onAction = { action ->
-         when(action) {
-            BookmarkAction.Tap -> onAction(AsamAction.Tap(asam))
-            BookmarkAction.Zoom -> onAction(AsamAction.Zoom(asam.latLng))
-            BookmarkAction.Share -> onAction(AsamAction.Share(asam))
-            BookmarkAction.Bookmark -> onAction(Action.Bookmark(BookmarkKey.fromAsam(asam)))
-            is BookmarkAction.Location -> onAction(AsamAction.Location(action.text))
-         }
-      }
+      onTap = { onAction(AsamAction.Tap(asam)) },
+      onZoom = { onAction(AsamAction.Zoom(asam.latLng)) },
+      onShare = { onAction(AsamAction.Share(asam)) },
+      onBookmark = { onAction(Action.Bookmark(BookmarkKey.fromAsam(asam))) },
+      onCopyLocation = { onAction(AsamAction.Location(it)) }
    ) {
       AsamSummary(asamWithBookmark)
    }
@@ -229,15 +233,11 @@ private fun Bookmark(
       bookmarked = bookmark != null,
       dataSource = DataSource.DGPS_STATION,
       location = dgpsStation.latLng,
-      onAction = { action ->
-         when(action) {
-            BookmarkAction.Tap -> onAction(DgpsStationAction.Tap(dgpsStation))
-            BookmarkAction.Zoom -> onAction(DgpsStationAction.Zoom(dgpsStation.latLng))
-            BookmarkAction.Share -> onAction(DgpsStationAction.Share(dgpsStation))
-            BookmarkAction.Bookmark -> onAction(Action.Bookmark(BookmarkKey.fromDgpsStation(dgpsStation)))
-            is BookmarkAction.Location -> onAction(AsamAction.Location(action.text))
-         }
-      }
+      onTap = { onAction(DgpsStationAction.Tap(dgpsStation)) },
+      onZoom = { onAction(DgpsStationAction.Zoom(dgpsStation.latLng)) },
+      onShare = { onAction(DgpsStationAction.Share(dgpsStation)) },
+      onBookmark = { onAction(Action.Bookmark(BookmarkKey.fromDgpsStation(dgpsStation))) },
+      onCopyLocation = { onAction(DgpsStationAction.Location(it)) }
    ) {
       DgpsStationSummary(dgpsStationWithBookmark)
    }
@@ -252,15 +252,11 @@ private fun Bookmark(
       bookmarked = bookmark != null,
       dataSource = DataSource.LIGHT,
       location = light.latLng,
-      onAction = { action ->
-         when(action) {
-            BookmarkAction.Tap -> onAction(LightAction.Tap(light))
-            BookmarkAction.Zoom -> onAction(LightAction.Zoom(light.latLng))
-            BookmarkAction.Share -> onAction(LightAction.Share(light))
-            BookmarkAction.Bookmark -> onAction(Action.Bookmark(BookmarkKey.fromLight(light)))
-            is BookmarkAction.Location -> onAction(LightAction.Location(action.text))
-         }
-      }
+      onTap = { onAction(LightAction.Tap(light)) },
+      onZoom = { onAction(LightAction.Zoom(light.latLng)) },
+      onShare = { onAction(LightAction.Share(light)) },
+      onBookmark = { onAction(Action.Bookmark(BookmarkKey.fromLight(light))) },
+      onCopyLocation = { onAction(LightAction.Location(it)) }
    ) {
       LightSummary(lightWithBookmark = lightWithBookmark)
    }
@@ -276,15 +272,11 @@ private fun Bookmark(
       bookmarked = bookmark != null,
       dataSource = DataSource.MODU,
       location = modu.latLng,
-      onAction = { action ->
-         when(action) {
-            BookmarkAction.Tap -> onAction(ModuAction.Tap(modu))
-            BookmarkAction.Zoom -> onAction(ModuAction.Zoom(modu.latLng))
-            BookmarkAction.Share -> onAction(ModuAction.Share(modu))
-            BookmarkAction.Bookmark -> onAction(Action.Bookmark(BookmarkKey.fromModu(modu)))
-            is BookmarkAction.Location -> onAction(ModuAction.Location(action.text))
-         }
-      }
+      onTap = { onAction(ModuAction.Tap(modu)) },
+      onZoom = { onAction(ModuAction.Zoom(modu.latLng)) },
+      onShare = { onAction(ModuAction.Share(modu)) },
+      onBookmark = { onAction(Action.Bookmark(BookmarkKey.fromModu(modu))) },
+      onCopyLocation = { onAction(ModuAction.Location(it)) }
    ) {
       ModuSummary(moduWithBookmark = moduWithBookmark)
    }
@@ -299,24 +291,55 @@ private fun Bookmark(
    BookmarkCard(
       bookmarked = bookmark != null,
       dataSource = DataSource.NAVIGATION_WARNING,
-      onAction = { action ->
-         when(action) {
-            BookmarkAction.Tap -> {
-               val key = NavigationalWarningKey.fromNavigationWarning(warning)
-               onAction(NavigationalWarningAction.Tap(key))
-            }
-            BookmarkAction.Zoom -> {
-               warning.bounds()?.let {
-                  onAction(NavigationalWarningAction.Zoom(it))
-               }
-            }
-            BookmarkAction.Share -> onAction(NavigationalWarningAction.Share(warning))
-            BookmarkAction.Bookmark -> onAction(Action.Bookmark(BookmarkKey.fromNavigationalWarning(warning)))
-            is BookmarkAction.Location -> onAction(NavigationalWarningAction.Location(action.text))
+      onTap = {
+         val key = NavigationalWarningKey.fromNavigationWarning(warning)
+         onAction(NavigationalWarningAction.Tap(key))
+      },
+      onZoom = {
+         warning.bounds()?.let {
+            onAction(NavigationalWarningAction.Zoom(it))
          }
-      }
+      },
+      onShare = { onAction(NavigationalWarningAction.Share(warning)) },
+      onBookmark = { onAction(Action.Bookmark(BookmarkKey.fromNavigationalWarning(warning))) },
+      onCopyLocation = { onAction(NavigationalWarningAction.Location(it)) }
    ) {
       NavigationalWarningSummary(navigationWarningWithBookmark = warningWithBookmark)
+   }
+}
+
+@Composable fun NoticeToMarinersBookmark(
+   noticeWithBookmark: NoticeToMarinersWithBookmark,
+   onAction: (Action) -> Unit
+) {
+   val (noticeNumber, bookmark) = noticeWithBookmark
+   val (start, end) = NoticeToMariners.span(noticeNumber)
+
+   BookmarkCard(
+      bookmarked = bookmark != null,
+      dataSource = DataSource.NOTICE_TO_MARINERS,
+      onTap = { onAction(NoticeToMarinersAction.Tap(noticeNumber)) },
+      onBookmark = { onAction(Action.Bookmark(BookmarkKey.fromNoticeToMariners(noticeNumber))) },
+   ) {
+      Column {
+         Text(
+            text = noticeNumber.toString(),
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(bottom = 4.dp)
+         )
+
+         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+            Text(
+               text = "$start - $end",
+               style = MaterialTheme.typography.titleSmall
+            )
+         }
+
+         BookmarkNotes(
+            notes = bookmark?.notes,
+            modifier = Modifier.padding(top = 16.dp)
+         )
+      }
    }
 }
 
@@ -331,15 +354,11 @@ private fun Bookmark(
       bookmarked = bookmark != null,
       dataSource = DataSource.PORT,
       location = port.latLng,
-      onAction = { action ->
-         when(action) {
-            BookmarkAction.Tap -> onAction(PortAction.Tap(port))
-            BookmarkAction.Zoom -> onAction(PortAction.Zoom(port.latLng))
-            BookmarkAction.Share -> onAction(PortAction.Share(port))
-            BookmarkAction.Bookmark -> onAction(Action.Bookmark(BookmarkKey.fromPort(port)))
-            is BookmarkAction.Location -> onAction(PortAction.Location(action.text))
-         }
-      }
+      onTap = { onAction(PortAction.Tap(port)) },
+      onZoom = { onAction(PortAction.Zoom(port.latLng)) },
+      onShare = { onAction(PortAction.Share(port)) },
+      onBookmark = { onAction(Action.Bookmark(BookmarkKey.fromPort(port))) },
+      onCopyLocation = { onAction(PortAction.Location(it)) }
    ) {
       PortSummary(
          portWithBookmark = portWithBookmark,
@@ -358,15 +377,11 @@ private fun Bookmark(
       bookmarked = bookmark != null,
       dataSource = DataSource.RADIO_BEACON,
       location = beacon.latLng,
-      onAction = { action ->
-         when(action) {
-            BookmarkAction.Tap -> onAction(RadioBeaconAction.Tap(beacon))
-            BookmarkAction.Zoom -> onAction(RadioBeaconAction.Zoom(beacon.latLng))
-            BookmarkAction.Share -> onAction(RadioBeaconAction.Share(beacon))
-            BookmarkAction.Bookmark -> onAction(Action.Bookmark(BookmarkKey.fromRadioBeacon(beacon)))
-            is BookmarkAction.Location -> onAction(RadioBeaconAction.Location(action.text))
-         }
-      }
+      onTap = { onAction(RadioBeaconAction.Tap(beacon)) },
+      onZoom = { onAction(RadioBeaconAction.Zoom(beacon.latLng)) },
+      onShare = { onAction(RadioBeaconAction.Share(beacon)) },
+      onBookmark = { onAction(Action.Bookmark(BookmarkKey.fromRadioBeacon(beacon))) },
+      onCopyLocation = { onAction(RadioBeaconAction.Location(it)) }
    ) {
       RadioBeaconSummary(
          beaconWithBookmark = beaconWithBookmark
@@ -378,7 +393,11 @@ private fun Bookmark(
    bookmarked: Boolean,
    dataSource: DataSource,
    location: LatLng? = null,
-   onAction: (BookmarkAction) -> Unit,
+   onTap: () -> Unit,
+   onZoom: (() -> Unit)? = null,
+   onShare: (() -> Unit)? = null,
+   onBookmark: (() -> Unit)? = null,
+   onCopyLocation: ((String) -> Unit)? = null,
    summary: @Composable ColumnScope.() -> Unit
 ) {
 
@@ -386,7 +405,7 @@ private fun Bookmark(
       Modifier
          .fillMaxWidth()
          .padding(bottom = 8.dp)
-         .clickable { onAction(BookmarkAction.Tap) }
+         .clickable { onTap() }
    ) {
       Column(Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
          DataSourceIcon(
@@ -396,13 +415,13 @@ private fun Bookmark(
 
          summary()
 
-         DataSourceFooter(
+         DataSourceActions(
             latLng = location,
             bookmarked = bookmarked,
-            onZoom = { onAction(BookmarkAction.Zoom) },
-            onShare = { onAction(BookmarkAction.Share) },
-            onBookmark = { onAction(BookmarkAction.Bookmark) },
-            onCopyLocation = { onAction(BookmarkAction.Location(it)) }
+            onZoom = onZoom,
+            onShare = onShare,
+            onBookmark = onBookmark,
+            onCopyLocation = onCopyLocation
          )
       }
    }

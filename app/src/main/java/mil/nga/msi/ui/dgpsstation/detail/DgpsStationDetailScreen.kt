@@ -32,7 +32,7 @@ import mil.nga.msi.repository.dgpsstation.DgpsStationKey
 import mil.nga.msi.ui.action.Action
 import mil.nga.msi.ui.action.DgpsStationAction
 import mil.nga.msi.ui.bookmark.BookmarkNotes
-import mil.nga.msi.ui.datasource.DataSourceFooter
+import mil.nga.msi.ui.datasource.DataSourceActions
 import mil.nga.msi.ui.dgpsstation.DgpsStationViewModel
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.MapClip
@@ -168,7 +168,7 @@ private fun DgpsStationHeader(
             }
          }
 
-         DataSourceFooter(
+         DataSourceActions(
             latLng = dgpsStation.latLng,
             bookmarked = bookmark != null,
             onZoom = onZoom,

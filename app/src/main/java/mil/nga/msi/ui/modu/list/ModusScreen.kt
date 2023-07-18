@@ -25,7 +25,7 @@ import mil.nga.msi.ui.action.Action
 import mil.nga.msi.ui.action.AsamAction
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.action.ModuAction
-import mil.nga.msi.ui.datasource.DataSourceFooter
+import mil.nga.msi.ui.datasource.DataSourceActions
 import mil.nga.msi.ui.modu.ModuRoute
 import mil.nga.msi.ui.modu.ModuSummary
 import java.util.*
@@ -167,7 +167,7 @@ private fun ModuCard(
          .clickable { onTap() }
    ) {
       ModuSummary(moduWithBookmark = moduWithBookmark)
-      DataSourceFooter(
+      DataSourceActions(
          latLng = modu.latLng,
          bookmarked = bookmark != null,
          onZoom = onZoom,

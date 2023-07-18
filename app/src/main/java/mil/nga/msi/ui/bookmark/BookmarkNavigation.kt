@@ -13,7 +13,13 @@ import com.google.accompanist.navigation.material.ExperimentalMaterialNavigation
 import com.google.accompanist.navigation.material.bottomSheet
 import mil.nga.msi.repository.bookmark.BookmarkKey
 import mil.nga.msi.ui.action.AsamAction
+import mil.nga.msi.ui.action.DgpsStationAction
+import mil.nga.msi.ui.action.LightAction
 import mil.nga.msi.ui.action.ModuAction
+import mil.nga.msi.ui.action.NavigationalWarningAction
+import mil.nga.msi.ui.action.NoticeToMarinersAction
+import mil.nga.msi.ui.action.PortAction
+import mil.nga.msi.ui.action.RadioBeaconAction
 import mil.nga.msi.ui.navigation.NavTypeBookmark
 import mil.nga.msi.ui.navigation.Route
 
@@ -53,10 +59,54 @@ fun NavGraphBuilder.bookmarksGraph(
       }
    }
 
+   val onDgpsStationAction: (DgpsStationAction) -> Unit = { action ->
+      when(action) {
+         is DgpsStationAction.Share -> onShare(action.dgpsStation.toString())
+         is DgpsStationAction.Location -> onShowSnackbar(action.text)
+         else -> { action.navigate(navController) }
+      }
+   }
+
+   val onLightAction: (LightAction) -> Unit = { action ->
+      when(action) {
+         is LightAction.Share -> onShare(action.light.toString())
+         is LightAction.Location -> onShowSnackbar(action.text)
+         else -> { action.navigate(navController) }
+      }
+   }
+
    val onModuAction: (ModuAction) -> Unit = { action ->
       when(action) {
          is ModuAction.Share -> onShare(action.modu.toString())
          is ModuAction.Location -> onShowSnackbar(action.text)
+         else -> { action.navigate(navController) }
+      }
+   }
+
+   val onNavigationalWarningAction: (NavigationalWarningAction) -> Unit = { action ->
+      when(action) {
+         is NavigationalWarningAction.Share -> onShare(action.warning.toString())
+         is NavigationalWarningAction.Location -> onShowSnackbar(action.text)
+         else -> { action.navigate(navController) }
+      }
+   }
+
+   val onNoticeToMarinersAction: (NoticeToMarinersAction) -> Unit = { action ->
+      action.navigate(navController)
+   }
+
+   val onPortAction: (PortAction) -> Unit = { action ->
+      when(action) {
+         is PortAction.Share -> onShare(action.port.toString())
+         is PortAction.Location -> onShowSnackbar(action.text)
+         else -> { action.navigate(navController) }
+      }
+   }
+
+   val onRadioBeaconAction: (RadioBeaconAction) -> Unit = { action ->
+      when(action) {
+         is RadioBeaconAction.Share -> onShare(action.radioBeacon.toString())
+         is RadioBeaconAction.Location -> onShowSnackbar(action.text)
          else -> { action.navigate(navController) }
       }
    }
@@ -76,7 +126,13 @@ fun NavGraphBuilder.bookmarksGraph(
             onAction = { action ->
                when(action) {
                   is AsamAction -> onAsamAction(action)
+                  is DgpsStationAction -> onDgpsStationAction(action)
+                  is LightAction -> onLightAction(action)
                   is ModuAction -> onModuAction(action)
+                  is NavigationalWarningAction -> onNavigationalWarningAction(action)
+                  is NoticeToMarinersAction -> onNoticeToMarinersAction(action)
+                  is PortAction -> onPortAction(action)
+                  is RadioBeaconAction -> onRadioBeaconAction(action)
                   else -> {}
                }
             }

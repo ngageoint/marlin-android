@@ -19,14 +19,14 @@ import com.google.android.gms.maps.model.LatLng
 import mil.nga.msi.ui.coordinate.CoordinateTextButton
 
 @Composable
-fun DataSourceFooter(
+fun DataSourceActions(
    bookmarked: Boolean,
-   onShare: () -> Unit,
-   onBookmark: () -> Unit,
    modifier: Modifier = Modifier,
    latLng: LatLng? = null,
+   onZoom: (() -> Unit)? = null,
+   onShare: (() -> Unit)? = null,
+   onBookmark: (() -> Unit)? = null,
    onCopyLocation: ((String) -> Unit)? = null,
-   onZoom: (() -> Unit)? = null
 ) {
    Column(modifier = modifier) {
       Row(
@@ -64,27 +64,32 @@ private fun Location(
 @Composable
 private fun Actions(
    bookmarked: Boolean,
-   onShare: () -> Unit,
-   onBookmark: () -> Unit,
-   onZoom: (() -> Unit)? = null
+   onZoom: (() -> Unit)? = null,
+   onShare: (() -> Unit)? = null,
+   onBookmark: (() -> Unit)? = null,
 ) {
    Row(
       horizontalArrangement = Arrangement.End,
       modifier = Modifier.fillMaxWidth()
    ) {
-      IconButton(onClick = { onBookmark() }) {
-         Icon(
-            imageVector = if (bookmarked) Icons.Default.Bookmark else Icons.Outlined.BookmarkBorder,
-            tint = MaterialTheme.colorScheme.tertiary,
-            contentDescription = "Bookmark ASAM"
-         )
+      if (onBookmark != null) {
+         IconButton(onClick = { onBookmark() }) {
+            Icon(
+               imageVector = if (bookmarked) Icons.Default.Bookmark else Icons.Outlined.BookmarkBorder,
+               tint = MaterialTheme.colorScheme.tertiary,
+               contentDescription = "Bookmark Data Source"
+            )
+         }
       }
-      IconButton(onClick = { onShare() }) {
-         Icon(
-            Icons.Default.Share,
-            tint = MaterialTheme.colorScheme.tertiary,
-            contentDescription = "Share ASAM"
-         )
+
+      if (onShare != null) {
+         IconButton(onClick = { onShare() }) {
+            Icon(
+               Icons.Default.Share,
+               tint = MaterialTheme.colorScheme.tertiary,
+               contentDescription = "Share Data Source"
+            )
+         }
       }
 
       if (onZoom != null) {
@@ -92,7 +97,7 @@ private fun Actions(
             Icon(
                Icons.Default.GpsFixed,
                tint = MaterialTheme.colorScheme.tertiary,
-               contentDescription = "Zoom to ASAM"
+               contentDescription = "Zoom to Data Source"
             )
          }
       }

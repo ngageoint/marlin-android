@@ -50,7 +50,7 @@ import mil.nga.msi.datasource.navigationwarning.NavigationalWarningListItemWithB
 import mil.nga.msi.repository.bookmark.BookmarkKey
 import mil.nga.msi.repository.navigationalwarning.NavigationalWarningKey
 import mil.nga.msi.ui.action.Action
-import mil.nga.msi.ui.datasource.DataSourceFooter
+import mil.nga.msi.ui.datasource.DataSourceActions
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.navigationalwarning.NavigationWarningRoute
 import mil.nga.msi.ui.action.NavigationalWarningAction
@@ -320,7 +320,7 @@ private fun NavigationalWarningContent(
          notes = bookmark?.notes
       )
 
-      DataSourceFooter(
+      DataSourceActions(
          bookmarked = bookmark != null,
          onShare = onShare,
          onZoom = onZoom,

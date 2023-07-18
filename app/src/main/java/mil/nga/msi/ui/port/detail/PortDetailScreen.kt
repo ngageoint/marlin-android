@@ -34,7 +34,7 @@ import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.MapClip
 import mil.nga.msi.ui.action.PortAction
 import mil.nga.msi.ui.bookmark.BookmarkNotes
-import mil.nga.msi.ui.datasource.DataSourceFooter
+import mil.nga.msi.ui.datasource.DataSourceActions
 import mil.nga.msi.ui.port.PortViewModel
 import mil.nga.msi.ui.theme.onSurfaceDisabled
 
@@ -190,7 +190,7 @@ private fun PortHeader(
                modifier = Modifier.padding(horizontal = 16.dp)
             )
 
-            DataSourceFooter(
+            DataSourceActions(
                latLng = port.latLng,
                bookmarked = bookmark != null,
                onZoom = onZoom,

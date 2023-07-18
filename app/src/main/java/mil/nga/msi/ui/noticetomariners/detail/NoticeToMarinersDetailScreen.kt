@@ -15,9 +15,13 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
@@ -45,6 +49,7 @@ import kotlinx.coroutines.launch
 import mil.nga.msi.datasource.noticetomariners.NoticeToMariners
 import mil.nga.msi.datasource.noticetomariners.NoticeToMarinersGraphics
 import mil.nga.msi.repository.noticetomariners.NoticeToMarinersGraphic
+import mil.nga.msi.ui.bookmark.BookmarkNotes
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.noticetomariners.NoticeToMarinersRoute
 import mil.nga.msi.ui.theme.onSurfaceDisabled
@@ -58,6 +63,7 @@ fun NoticeToMarinersDetailScreen(
    noticeNumber: Int?,
    close: () -> Unit,
    onGraphicTap: (NoticeToMarinersGraphic) -> Unit,
+   onBookmark: (Int) -> Unit,
    viewModel: NoticeToMarinersDetailViewModel = hiltViewModel()
 ) {
    val scope = rememberCoroutineScope()
@@ -73,7 +79,7 @@ fun NoticeToMarinersDetailScreen(
 
    LaunchedEffect(noticeToMariners) {
       noticeToMariners?.let {
-         available = it.publication.associate { publication ->
+         available = it.publications.associate { publication ->
             publication.notice.odsEntryId to (publication.uri != null)
          }
       }
@@ -135,6 +141,13 @@ fun NoticeToMarinersDetailScreen(
                            this[notice.odsEntryId] = false
                         }
                      }
+                  },
+                  onBookmark = { state ->
+                     if (state.bookmark == null) {
+                        onBookmark(state.noticeNumber)
+                     } else {
+                        viewModel.deleteBookmark(state.bookmark)
+                     }
                   }
                )
             }
@@ -150,6 +163,7 @@ private fun NoticeToMariners(
    downloading: Map<Int, Boolean>,
    onView: (NoticeToMariners) -> Unit,
    onDelete: (NoticeToMariners) -> Unit,
+   onBookmark: (NoticeToMarinersState) -> Unit,
    onGraphicTap: (NoticeToMarinersGraphic) -> Unit
 ) {
    val scrollState = rememberScrollState()
@@ -157,9 +171,14 @@ private fun NoticeToMariners(
    Column(
       Modifier
          .fillMaxWidth()
-         .padding(16.dp)
+         .padding(horizontal = 8.dp, vertical = 16.dp)
          .verticalScroll(scrollState)
    ) {
+      NoticeToMarinersHeader(
+         state = noticeToMariners,
+         onBookmark = onBookmark
+      )
+
       NoticeToMarinersCharts(graphics = noticeToMariners?.graphics ?: emptyList()) {
          onGraphicTap(it)
       }
@@ -181,6 +200,65 @@ private fun NoticeToMariners(
       )
    }
 }
+@Composable
+private fun NoticeToMarinersHeader(
+   state: NoticeToMarinersState?,
+   onBookmark: (NoticeToMarinersState) -> Unit
+) {
+   state?.publications?.firstOrNull()?.notice?.let { notice ->
+      CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+         Text(
+            text = "NOTICE",
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(bottom = 9.dp)
+         )
+      }
+
+      Card {
+         Column(
+            Modifier.padding(16.dp)
+         ) {
+            Row (Modifier.fillMaxWidth()) {
+               Column(
+                  Modifier
+                     .fillMaxWidth()
+                     .weight(1f)
+               ) {
+                  CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+                     Text(
+                        text = notice.noticeNumber.toString(),
+                        style = MaterialTheme.typography.labelSmall,
+                        modifier = Modifier.padding(bottom = 4.dp)
+                     )
+                  }
+
+                  CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+                     val (start, end) = notice.span()
+                     Text(
+                        text = "$start - $end",
+                        style = MaterialTheme.typography.bodySmall
+                     )
+                  }
+               }
+
+               IconButton(onClick = { onBookmark(state) }) {
+                  Icon(
+                     imageVector = if (state.bookmark != null) Icons.Default.Bookmark else Icons.Outlined.BookmarkBorder,
+                     tint = MaterialTheme.colorScheme.tertiary,
+                     contentDescription = "Bookmark Notice to Mariners"
+                  )
+               }
+            }
+
+
+            BookmarkNotes(
+               notes = state.bookmark?.notes,
+               modifier = Modifier.padding(top = 16.dp)
+            )
+         }
+      }
+   }
+}
 
 @Composable
 private fun NoticeToMarinersCharts(
@@ -194,26 +272,28 @@ private fun NoticeToMarinersCharts(
             Text(
                text = entry.key.uppercase(Locale.getDefault()),
                style = MaterialTheme.typography.titleMedium,
-               modifier = Modifier.padding(top = 8.dp)
+               modifier = Modifier.padding(vertical = 8.dp)
             )
          }
 
-         entry.value.windowed(3, 3, true).forEach { window ->
-            Column(Modifier.fillMaxWidth()) {
-               Row {
-                  Box(Modifier.weight(.33f)) {
-                     window.getOrNull(0)?.let { graphic ->
-                        NoticeToMarinersChart(graphic) { onTap(it) }
+         Card {
+            entry.value.windowed(3, 3, true).forEach { window ->
+               Column(Modifier.fillMaxWidth()) {
+                  Row {
+                     Box(Modifier.weight(.33f)) {
+                        window.getOrNull(0)?.let { graphic ->
+                           NoticeToMarinersChart(graphic) { onTap(it) }
+                        }
                      }
-                  }
-                  Box(Modifier.weight(.33f)) {
-                     window.getOrNull(1)?.let { graphic ->
-                        NoticeToMarinersChart(graphic) { onTap(it) }
+                     Box(Modifier.weight(.33f)) {
+                        window.getOrNull(1)?.let { graphic ->
+                           NoticeToMarinersChart(graphic) { onTap(it) }
+                        }
                      }
-                  }
-                  Box(Modifier.weight(.33f)) {
-                     window.getOrNull(2)?.let { graphic ->
-                        NoticeToMarinersChart(graphic) { onTap(it) }
+                     Box(Modifier.weight(.33f)) {
+                        window.getOrNull(2)?.let { graphic ->
+                           NoticeToMarinersChart(graphic) { onTap(it) }
+                        }
                      }
                   }
                }
@@ -272,7 +352,7 @@ private fun NoticeToMarinersPublications(
       .withZone(ZoneId.systemDefault())
 
    Column {
-      state?.publication?.forEach { publication ->
+      state?.publications?.forEach { publication ->
          Card(
             modifier = Modifier.padding(vertical = 8.dp)
          ) {

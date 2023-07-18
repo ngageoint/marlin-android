@@ -39,7 +39,7 @@ import mil.nga.msi.ui.map.MapShape
 import mil.nga.msi.ui.navigationalwarning.MapAnnotations
 import mil.nga.msi.ui.action.NavigationalWarningAction
 import mil.nga.msi.ui.bookmark.BookmarkNotes
-import mil.nga.msi.ui.datasource.DataSourceFooter
+import mil.nga.msi.ui.datasource.DataSourceActions
 import mil.nga.msi.ui.navigationalwarning.NavigationalWarningState
 import mil.nga.msi.ui.navigationalwarning.NavigationalWarningViewModel
 import java.text.SimpleDateFormat
@@ -113,7 +113,7 @@ private fun NavigationalWarningDetailContent(
                   state = state
                )
 
-               DataSourceFooter(
+               DataSourceActions(
                   bookmarked = bookmark != null,
                   onShare = { onShare(warning) },
                   onBookmark = { onBookmark(state.warningWithBookmark) },
