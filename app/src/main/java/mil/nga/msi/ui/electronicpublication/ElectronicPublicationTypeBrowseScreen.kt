@@ -1,10 +1,6 @@
-@file:OptIn(ExperimentalFoundationApi::class)
-
 package mil.nga.msi.ui.electronicpublication
 
-import android.content.Context
 import android.content.Intent
-import android.text.format.Formatter.formatShortFileSize
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -21,45 +17,40 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.intl.Locale
-import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mil.nga.msi.datasource.electronicpublication.ElectronicPublication
+import mil.nga.msi.datasource.electronicpublication.ElectronicPublicationWithBookmark
 import mil.nga.msi.ui.main.TopBar
 import java.time.Instant
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
 
-interface PublicationActions {
-    fun onDownloadClick(ePub: ElectronicPublication)
-    fun onCancelDownloadClick(ePub: ElectronicPublication)
-    fun onViewClick(ePub: ElectronicPublication)
-    fun onDeleteClick(ePub: ElectronicPublication)
+sealed class PublicationAction {
+    class Download(val publication: ElectronicPublication): PublicationAction()
+    class CancelDownload(val publication: ElectronicPublication): PublicationAction()
+    class View(val publication: ElectronicPublication): PublicationAction()
+    class Delete(val publication: ElectronicPublication): PublicationAction()
+    class Bookmark(val publicationWithBookmark: ElectronicPublicationWithBookmark): PublicationAction()
 }
 
 @Composable
-fun ElectronicPublicationTypeBrowseRoute(
-    onBackToRoot: () -> Unit,
+fun ElectronicPublicationTypeBrowseScreen(
+    onBack: () -> Unit,
+    onBookmark: (ElectronicPublication) -> Unit,
     viewModel: ElectronicPublicationTypeBrowseViewModel = hiltViewModel()
 ) {
     val currentNodeState by viewModel.currentNodeState.collectAsStateWithLifecycle()
     val currentNodeLinks by viewModel.currentNodeLinksState.collectAsStateWithLifecycle()
     val onBackClick = {
         when (currentNodeState.parent) {
-            null -> onBackToRoot()
+            null -> onBack()
             else -> viewModel.backToParent()
         }
     }
     // TODO: how will this work when time zone changes, or when offline?
-    val formatDateTime = formatDateTimeFunction()
-    val formatByteCount = formatByteCountFunction(LocalContext.current)
     val context = LocalContext.current
     BackHandler(onBack = onBackClick)
     ElectronicPublicationTypeBrowseScreen(
@@ -67,18 +58,26 @@ fun ElectronicPublicationTypeBrowseRoute(
         currentNodeLinks = currentNodeLinks,
         onLinkClick = { link -> if (link is PublicationFolderLink) viewModel.onFolderLinkClick(link) },
         onBackClick = onBackClick,
-        formatDateTime = formatDateTime,
-        formatByteCount = formatByteCount,
-        publicationActions = object : PublicationActions {
-            override fun onDownloadClick(ePub: ElectronicPublication) = viewModel.onDownloadClick(ePub)
-            override fun onCancelDownloadClick(ePub: ElectronicPublication) = viewModel.onCancelDownloadClick(ePub)
-            override fun onDeleteClick(ePub: ElectronicPublication) = viewModel.onDeleteClick(ePub)
-            override fun onViewClick(ePub: ElectronicPublication) {
-                val ePubUri = viewModel.uriToSharePublication(ePub)
-                val viewEPub = Intent(Intent.ACTION_VIEW)
-                    .setDataAndType(ePubUri, ePub.downloadMediaType)
-                    .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                context.startActivity(viewEPub)
+        onAction = { action ->
+            when (action) {
+                is PublicationAction.View -> {
+                    val ePubUri = viewModel.publicationShareUri(action.publication)
+                    val viewEPub = Intent(Intent.ACTION_VIEW)
+                        .setDataAndType(ePubUri, action.publication.downloadMediaType)
+                        .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    context.startActivity(viewEPub)
+                }
+
+                is PublicationAction.Download -> viewModel.download(action.publication)
+                is PublicationAction.CancelDownload -> viewModel.cancelDownload(action.publication)
+                is PublicationAction.Delete -> viewModel.delete(action.publication)
+                is PublicationAction.Bookmark -> {
+                    if (action.publicationWithBookmark.bookmark == null) {
+                        onBookmark(action.publicationWithBookmark.electronicPublication)
+                    } else {
+                        viewModel.deleteBookmark(action.publicationWithBookmark.bookmark)
+                    }
+                }
             }
         }
     )
@@ -90,9 +89,7 @@ fun ElectronicPublicationTypeBrowseScreen(
     currentNodeLinks: PublicationBrowsingLinksArrangement,
     onLinkClick: (PublicationBrowsingLink) -> Unit,
     onBackClick: () -> Unit,
-    publicationActions: PublicationActions,
-    formatDateTime: (Instant?) -> String?,
-    formatByteCount: (Long?) -> String?,
+    onAction: (PublicationAction) -> Unit
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
         TopBar(
@@ -105,17 +102,13 @@ fun ElectronicPublicationTypeBrowseScreen(
                 is Publications -> {
                     PublicationList(
                         publicationLinks = currentNodeLinks,
-                        formatDateTime = formatDateTime,
-                        formatByteCount = formatByteCount,
-                        actions = publicationActions
+                        onAction = onAction
                     )
                 }
                 is PublicationSections -> {
                     PublicationSectionsList(
                         sections = currentNodeLinks.sections,
-                        formatDateTime = formatDateTime,
-                        formatByteCount = formatByteCount,
-                        actions = publicationActions
+                        onAction = onAction
                     )
                 }
                 is PublicationFolders -> {
@@ -129,12 +122,11 @@ fun ElectronicPublicationTypeBrowseScreen(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun PublicationSectionsList(
     sections: List<PublicationSection>,
-    formatDateTime: (Instant?) -> String?,
-    formatByteCount: (Long?) -> String?,
-    actions: PublicationActions,
+    onAction: (PublicationAction) -> Unit
 ) {
     val state = rememberLazyListState()
     LazyColumn(state = state) {
@@ -145,7 +137,6 @@ fun PublicationSectionsList(
                         Text(
                             style = MaterialTheme.typography.titleSmall,
                             modifier = Modifier
-//                                .background(MaterialTheme.colorScheme.screenBackground)
                                 .padding(6.dp)
                                 .fillMaxWidth(),
                             text = section.title,
@@ -155,10 +146,8 @@ fun PublicationSectionsList(
             }
             items(section.publications) { pubLink ->
                 PublicationListItem(
-                    ePub = pubLink.publication,
-                    formatDateTime = formatDateTime,
-                    formatByteCount = formatByteCount,
-                    actions = actions,
+                    publicationWithBookmark = pubLink.publicationWithBookmark,
+                    onAction = onAction,
                 )
                 if (pubLink != section.publications.last()) {
                     Divider(
@@ -177,204 +166,33 @@ fun PublicationSectionsList(
 
 @Composable
 fun PublicationListItem(
-    ePub: ElectronicPublication,
-    formatDateTime: (Instant?) -> String?, formatByteCount: (Long?) -> String?,
-    actions: PublicationActions) {
-
-    Column(modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, top = 16.dp)) {
-        Text(
-            style = MaterialTheme.typography.titleMedium,
-            text = ePub.sectionDisplayName ?: ""
-        )
-        CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-            Text(
-                style = MaterialTheme.typography.bodyMedium,
-                text = "${ePub.fileExtension?.toUpperCase(Locale.current) ?: "Unknown file type"} - ${formatByteCount(ePub.fileSize) ?: "Unknown size"}"
-            )
-            Text(
-                style = MaterialTheme.typography.bodySmall,
-                text = ePub.uploadTime?.let { "Uploaded ${formatDateTime(ePub.uploadTime)}" } ?: "Unknown upload time"
-            )
-        }
-        Row(modifier = Modifier.fillMaxWidth(),
-            Arrangement.End
-        ) {
-            if (ePub.isDownloaded) {
-                TextButton(
-                    onClick = { actions.onViewClick(ePub) },
-                    colors = ButtonDefaults.textButtonColors(
-                        contentColor = MaterialTheme.colorScheme.tertiary
-                    )
-                ) {
-                    Text("View", style = MaterialTheme.typography.labelLarge)
-                }
-                TextButton(
-                    onClick = { actions.onDeleteClick(ePub) },
-                    colors = ButtonDefaults.textButtonColors(
-                        contentColor = MaterialTheme.colorScheme.tertiary
-                    )
-                ) {
-                    Text("Delete", style = MaterialTheme.typography.labelLarge)
-                }
-            } else if (ePub.isDownloading) {
-                val progress = ePub.fileSize?.let {
-                    ePub.downloadedBytes.toDouble() / ePub.fileSize
-                } ?: -1.0
-                if (progress > -1) {
-                    LinearProgressIndicator(
-                        progress = progress.toFloat(),
-                        modifier = Modifier.align(Alignment.CenterVertically)
-                    )
-                } else {
-                    LinearProgressIndicator(
-                        modifier = Modifier.align(Alignment.CenterVertically)
-                    )
-                }
-                TextButton(
-                    onClick = { actions.onCancelDownloadClick(ePub) },
-                    colors = ButtonDefaults.textButtonColors(
-                        contentColor = MaterialTheme.colorScheme.tertiary
-                    )
-                ) {
-                    Text("Cancel", style = MaterialTheme.typography.labelLarge)
-                }
-            } else {
-                TextButton(
-                    onClick = { actions.onDownloadClick(ePub) },
-                    colors = ButtonDefaults.textButtonColors(
-                        contentColor = MaterialTheme.colorScheme.tertiary
-                    )
-                ) {
-                    Text("Download", style = MaterialTheme.typography.labelLarge)
-                }
-            }
-        }
+    publicationWithBookmark: ElectronicPublicationWithBookmark,
+    onAction: (PublicationAction) -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 16.dp, end = 16.dp, top = 16.dp)
+    ) {
+        ElectronicPublicationSummary(publicationWithBookmark = publicationWithBookmark)
+        ElectronicPublicationFooter(publicationWithBookmark = publicationWithBookmark, onAction = onAction)
     }
-}
-
-@Preview(name = "Publication List Item")
-@Composable
-fun PreviewPublicationListItem() {
-    PublicationListItem(
-        ePub = ElectronicPublication(
-            s3Key = "pub1",
-            sectionDisplayName = "Publication 1",
-            fullFilename = "pub1.pdf",
-            fileExtension = "pdf",
-            fileSize = 13_003_246,
-            uploadTime = Instant.parse("2022-12-25T12:25:00.0Z")
-        ),
-        formatDateTime = { DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.MEDIUM).withZone(ZoneId.of("UTC")).format(it) },
-        formatByteCount = { "${it ?: "Unknown size"}" },
-        actions = object : PublicationActions {
-            override fun onDownloadClick(ePub: ElectronicPublication) {}
-            override fun onCancelDownloadClick(ePub: ElectronicPublication) {}
-            override fun onViewClick(ePub: ElectronicPublication) {}
-            override fun onDeleteClick(ePub: ElectronicPublication) {}
-        }
-    )
-}
-
-@Preview(name = "Publication List Item Downloading Percent Progress")
-@Composable
-fun PreviewPublicationListItemDownloadingPercentProgress() {
-    PublicationListItem(
-        ePub = ElectronicPublication(
-            s3Key = "pub1",
-            sectionDisplayName = "Publication 1",
-            fullFilename = "pub1.pdf",
-            fileExtension = "pdf",
-            fileSize = 13_003_246,
-            uploadTime = Instant.parse("2022-12-25T12:25:00.0Z"),
-            isDownloading = true,
-            downloadedBytes = 3_456_678,
-        ),
-        formatDateTime = { DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.MEDIUM).withZone(ZoneId.of("UTC")).format(it) },
-        formatByteCount = { "${it ?: "Unknown size"}" },
-        actions = object : PublicationActions {
-            override fun onDownloadClick(ePub: ElectronicPublication) {}
-            override fun onCancelDownloadClick(ePub: ElectronicPublication) {}
-            override fun onViewClick(ePub: ElectronicPublication) {}
-            override fun onDeleteClick(ePub: ElectronicPublication) {}
-        }
-    )
-}
-
-@Preview(name = "Publication List Item Downloading Unknown Progress")
-@Composable
-fun PreviewPublicationListItemDownloadingUnknownProgress() {
-    PublicationListItem(
-        ePub = ElectronicPublication(
-            s3Key = "pub1",
-            sectionDisplayName = "Publication 1",
-            fullFilename = "pub1.pdf",
-            fileExtension = "pdf",
-            uploadTime = Instant.parse("2022-12-25T12:25:00.0Z"),
-            isDownloading = true,
-            downloadedBytes = 3_456_678,
-        ),
-        formatDateTime = { DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.MEDIUM).withZone(ZoneId.of("UTC")).format(it) },
-        formatByteCount = { "${it ?: "Unknown size"}" },
-        actions = object : PublicationActions {
-            override fun onDownloadClick(ePub: ElectronicPublication) {}
-            override fun onCancelDownloadClick(ePub: ElectronicPublication) {}
-            override fun onViewClick(ePub: ElectronicPublication) {}
-            override fun onDeleteClick(ePub: ElectronicPublication) {}
-        }
-    )
-}
-
-@Preview(name = "Publication Sections")
-@Composable
-fun PreviewPublicationSectionsList() {
-    PublicationSectionsList(
-        sections = listOf(
-            PublicationSection(
-                title = "Complete Volumes",
-                publications = listOf(
-                    PublicationLink(ElectronicPublication(
-                        s3Key = "pub1", sectionDisplayName = "Publication 1", fullFilename = "pub1.pdf", fileSize = 11_224, uploadTime = Instant.parse("2022-12-25T12:25:00.0Z"))),
-                )
-            ),
-            PublicationSection(
-                title = "Single Chapters",
-                publications = listOf(
-                    PublicationLink(ElectronicPublication(
-                        s3Key = "pub1.1", sectionDisplayName = "Section 1.1", fullFilename = "pub1.1.pdf", fileSize = 23_456, uploadTime = Instant.parse("2022-12-25T12:25:00.0Z"))),
-                    PublicationLink(ElectronicPublication(
-                        s3Key = "pub1.2", sectionDisplayName = "Section 1.2", fullFilename = "pub1.2.pdf", fileSize = 98_321, uploadTime = Instant.parse("2022-12-25T12:25:00.0Z"), isDownloaded = true)),
-                )
-            )
-        ),
-        formatDateTime = { it?.toString() ?: "Unknown upload time" },
-        formatByteCount = { "$it bytes" },
-        actions = object : PublicationActions {
-            override fun onDownloadClick(ePub: ElectronicPublication) {}
-            override fun onCancelDownloadClick(ePub: ElectronicPublication) {}
-            override fun onViewClick(ePub: ElectronicPublication) {}
-            override fun onDeleteClick(ePub: ElectronicPublication) {}
-        }
-    )
 }
 
 @Composable
 fun PublicationList(
     publicationLinks: Publications,
-    formatDateTime: (Instant?) -> String?,
-    formatByteCount: (Long?) -> String?,
-    actions: PublicationActions,
+    onAction: (PublicationAction) -> Unit
 ) {
     Surface(Modifier.fillMaxSize()) {
         LazyColumn {
-            publicationLinks.publications.forEachIndexed { pos, pubLink ->
+            publicationLinks.publications.forEachIndexed { index, pubLink ->
                 item {
                     PublicationListItem(
-                        ePub = pubLink.publication,
-                        formatDateTime = formatDateTime,
-                        formatByteCount = formatByteCount,
-                        actions = actions,
+                        publicationWithBookmark = pubLink.publicationWithBookmark,
+                        onAction = onAction
                     )
-                    if (pos < publicationLinks.publications.size - 1) {
+                    if (index < publicationLinks.publications.size - 1) {
                         Divider(
                             modifier = Modifier
                                 .padding(start = 16.dp)
@@ -383,9 +201,7 @@ fun PublicationList(
                     }
                 }
             }
-            item {
-                Divider()
-            }
+            item { Divider() }
         }
     }
 }
@@ -427,12 +243,111 @@ fun PublicationFolderList(
     }
 }
 
-fun formatByteCountFunction(context: Context): (Long?) -> String? {
-    // TODO: should be localized string resource
-    return { count: Long? -> count?.let { formatShortFileSize(context, it) } }
+@Preview(name = "Publication List Item")
+@Composable
+fun PreviewPublicationListItem() {
+    PublicationListItem(
+        publicationWithBookmark = ElectronicPublicationWithBookmark(
+            ElectronicPublication(
+                s3Key = "pub1",
+                sectionDisplayName = "Publication 1",
+                fullFilename = "pub1.pdf",
+                fileExtension = "pdf",
+                fileSize = 13_003_246,
+                uploadTime = Instant.parse("2022-12-25T12:25:00.0Z")
+            )
+        ),
+        onAction = {}
+    )
 }
 
-fun formatDateTimeFunction(): (Instant?) -> String? {
-    val formatter = DateTimeFormatter.ofPattern("d MMM yyyy HH:mm z").withZone(ZoneId.systemDefault())
-    return { dateTime: Instant? -> dateTime?.let { formatter.format(it) } }
+@Preview(name = "Publication List Item Downloading Percent Progress")
+@Composable
+fun PreviewPublicationListItemDownloadingPercentProgress() {
+    PublicationListItem(
+        publicationWithBookmark = ElectronicPublicationWithBookmark(
+            ElectronicPublication(
+                s3Key = "pub1",
+                sectionDisplayName = "Publication 1",
+                fullFilename = "pub1.pdf",
+                fileExtension = "pdf",
+                fileSize = 13_003_246,
+                uploadTime = Instant.parse("2022-12-25T12:25:00.0Z"),
+                isDownloading = true,
+                downloadedBytes = 3_456_678,
+            )
+        ),
+        onAction = {}
+    )
+}
+
+@Preview(name = "Publication List Item Downloading Unknown Progress")
+@Composable
+fun PreviewPublicationListItemDownloadingUnknownProgress() {
+    PublicationListItem(
+        publicationWithBookmark = ElectronicPublicationWithBookmark(
+            ElectronicPublication(
+                s3Key = "pub1",
+                sectionDisplayName = "Publication 1",
+                fullFilename = "pub1.pdf",
+                fileExtension = "pdf",
+                uploadTime = Instant.parse("2022-12-25T12:25:00.0Z"),
+                isDownloading = true,
+                downloadedBytes = 3_456_678,
+            )
+        ),
+        onAction = {}
+    )
+}
+
+@Preview(name = "Publication Sections")
+@Composable
+fun PreviewPublicationSectionsList() {
+    PublicationSectionsList(
+        sections = listOf(
+            PublicationSection(
+                title = "Complete Volumes",
+                publications = listOf(
+                    PublicationLink(
+                        ElectronicPublicationWithBookmark(
+                            ElectronicPublication(
+                                s3Key = "pub1",
+                                sectionDisplayName = "Publication 1",
+                                fullFilename = "pub1.pdf",
+                                fileSize = 11_224,
+                                uploadTime = Instant.parse("2022-12-25T12:25:00.0Z")
+                            )
+                        )
+                    )
+                )
+            ),
+            PublicationSection(
+                title = "Single Chapters",
+                publications = listOf(
+                    PublicationLink(
+                        ElectronicPublicationWithBookmark(
+                            ElectronicPublication(
+                                s3Key = "pub1.1",
+                                sectionDisplayName = "Section 1.1",
+                                fullFilename = "pub1.1.pdf",
+                                fileSize = 23_456,
+                                uploadTime = Instant.parse("2022-12-25T12:25:00.0Z")
+                            )
+                        )
+                    ),
+                    PublicationLink(
+                        ElectronicPublicationWithBookmark(
+                            ElectronicPublication(
+                                s3Key = "pub1.2",
+                                sectionDisplayName = "Section 1.2",
+                                fullFilename = "pub1.2.pdf",
+                                fileSize = 98_321,
+                                uploadTime = Instant.parse("2022-12-25T12:25:00.0Z"), isDownloaded = true)
+                        )
+                    )
+                )
+            )
+        ),
+        onAction = {}
+    )
 }

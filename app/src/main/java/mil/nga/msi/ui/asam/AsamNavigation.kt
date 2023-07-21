@@ -77,7 +77,7 @@ fun NavGraphBuilder.asamGraph(
          backstackEntry.arguments?.getString("reference")?.let { reference ->
             AsamDetailScreen(
                reference,
-               close = { navController.popBackStack() },
+               onBack = { navController.popBackStack() },
                onAction = { action ->
                   when(action) {
                      is AsamAction.Share -> shareAsam(action.asam)

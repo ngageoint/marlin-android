@@ -22,7 +22,7 @@ import mil.nga.msi.ui.main.TopBar
 @Composable
 fun ElectronicPublicationsScreen(
     openDrawer: () -> Unit,
-    onPubTypeClick: (ElectronicPublicationType) -> Unit,
+    onPubTypeTap: (ElectronicPublicationType) -> Unit,
     viewModel: ElectronicPublicationsViewModel = hiltViewModel()
 ) {
     val pubTypes by viewModel.publicationTypes.collectAsStateWithLifecycle(initialValue = emptyList())
@@ -32,13 +32,13 @@ fun ElectronicPublicationsScreen(
             navigationIcon = Icons.Filled.Menu,
             onNavigationClicked = { openDrawer() },
         )
-        ElectronicPublicationTypeList(pubTypes = pubTypes, onPubTypeClick = onPubTypeClick)
+        ElectronicPublicationTypeList(pubTypes = pubTypes, onPubTypeTap = onPubTypeTap)
     }
 }
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun ElectronicPublicationTypeList(pubTypes: List<PublicationTypeListItem>, onPubTypeClick: (ElectronicPublicationType) -> Unit) {
+fun ElectronicPublicationTypeList(pubTypes: List<PublicationTypeListItem>, onPubTypeTap: (ElectronicPublicationType) -> Unit) {
     Surface {
         LazyColumn {
             pubTypes.forEach {
@@ -63,7 +63,7 @@ fun ElectronicPublicationTypeList(pubTypes: List<PublicationTypeListItem>, onPub
                             }
                         },
                         modifier = Modifier
-                            .clickable(onClick = { onPubTypeClick(it.pubType) })
+                            .clickable(onClick = { onPubTypeTap(it.pubType) })
                             .padding(bottom = 8.dp)
                     )
                     Divider(Modifier.padding(start = 16.dp))
@@ -78,6 +78,6 @@ fun ElectronicPublicationTypeList(pubTypes: List<PublicationTypeListItem>, onPub
 @Composable
 @Preview
 fun PreviewElectronicPublicationTypeList() {
-    ElectronicPublicationTypeList(onPubTypeClick = {},
+    ElectronicPublicationTypeList(onPubTypeTap = {},
         pubTypes = ElectronicPublicationType.values().map { PublicationTypeListItem(it, 2 * it.typeId) })
 }

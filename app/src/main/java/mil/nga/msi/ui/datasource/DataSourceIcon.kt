@@ -31,6 +31,7 @@ fun DataSourceIcon(
          val imageResourceId = when(dataSource) {
             DataSource.ASAM -> R.drawable.ic_asam_24dp
             DataSource.DGPS_STATION -> R.drawable.ic_dgps_icon_24
+            DataSource.ELECTRONIC_PUBLICATION -> R.drawable.ic_description_24dp
             DataSource.LIGHT -> R.drawable.ic_baseline_lightbulb_24
             DataSource.MODU -> R.drawable.ic_modu_24dp
             DataSource.NAVIGATION_WARNING -> R.drawable.ic_round_warning_24

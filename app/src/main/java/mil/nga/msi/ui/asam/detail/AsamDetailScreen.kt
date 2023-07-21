@@ -40,7 +40,7 @@ import java.util.Locale
 @Composable
 fun AsamDetailScreen(
    reference: String,
-   close: () -> Unit,
+   onBack: () -> Unit,
    onAction: (Action) -> Unit,
    viewModel: AsamViewModel = hiltViewModel()
 ) {
@@ -51,7 +51,7 @@ fun AsamDetailScreen(
       TopBar(
          title = "ASAM",
          navigationIcon = Icons.Default.ArrowBack,
-         onNavigationClicked = { close() }
+         onNavigationClicked = { onBack() }
       )
 
       AsamDetailContent(

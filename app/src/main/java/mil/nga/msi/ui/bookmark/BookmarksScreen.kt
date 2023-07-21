@@ -24,6 +24,8 @@ import mil.nga.msi.datasource.asam.Asam
 import mil.nga.msi.datasource.asam.AsamWithBookmark
 import mil.nga.msi.datasource.dgpsstation.DgpsStation
 import mil.nga.msi.datasource.dgpsstation.DgpsStationWithBookmark
+import mil.nga.msi.datasource.electronicpublication.ElectronicPublication
+import mil.nga.msi.datasource.electronicpublication.ElectronicPublicationWithBookmark
 import mil.nga.msi.datasource.light.Light
 import mil.nga.msi.datasource.light.LightWithBookmark
 import mil.nga.msi.datasource.modu.Modu
@@ -44,6 +46,7 @@ import mil.nga.msi.ui.action.ModuAction
 import mil.nga.msi.ui.datasource.DataSourceIcon
 import mil.nga.msi.ui.asam.AsamSummary
 import mil.nga.msi.ui.action.DgpsStationAction
+import mil.nga.msi.ui.action.ElectronicPublicationAction
 import mil.nga.msi.ui.action.LightAction
 import mil.nga.msi.ui.action.NavigationalWarningAction
 import mil.nga.msi.ui.action.NoticeToMarinersAction
@@ -51,6 +54,7 @@ import mil.nga.msi.ui.action.PortAction
 import mil.nga.msi.ui.action.RadioBeaconAction
 import mil.nga.msi.ui.datasource.DataSourceActions
 import mil.nga.msi.ui.dgpsstation.DgpsStationSummary
+import mil.nga.msi.ui.electronicpublication.ElectronicPublicationSummary
 import mil.nga.msi.ui.light.LightSummary
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.modu.ModuSummary
@@ -175,6 +179,10 @@ private fun Bookmark(
          val dgpsStation = DgpsStationWithBookmark(itemWithBookmark.item as DgpsStation, itemWithBookmark.bookmark)
          DgpsStationBookmark(dgpsStationWithBookmark = dgpsStation, onAction = onAction)
       }
+      DataSource.ELECTRONIC_PUBLICATION -> {
+         val publicationWithBookmark = ElectronicPublicationWithBookmark(itemWithBookmark.item as ElectronicPublication, itemWithBookmark.bookmark)
+         ElectronicPublicationBookmark(electronicPublicationWithBookmark = publicationWithBookmark, onAction = onAction)
+      }
       DataSource.LIGHT -> {
          val light = LightWithBookmark(itemWithBookmark.item as Light, itemWithBookmark.bookmark)
          LightBookmark(lightWithBookmark = light, onAction = onAction)
@@ -242,6 +250,25 @@ private fun Bookmark(
       DgpsStationSummary(dgpsStationWithBookmark)
    }
 }
+
+@Composable fun ElectronicPublicationBookmark(
+   electronicPublicationWithBookmark: ElectronicPublicationWithBookmark,
+   onAction: (Action) -> Unit
+) {
+   val (publication, bookmark) = electronicPublicationWithBookmark
+
+   BookmarkCard(
+      bookmarked = bookmark != null,
+      dataSource = DataSource.ELECTRONIC_PUBLICATION,
+      onTap = { onAction(ElectronicPublicationAction.Tap(publication)) },
+      onBookmark = { onAction(Action.Bookmark(BookmarkKey(publication.s3Key, DataSource.ELECTRONIC_PUBLICATION))) }
+   ) {
+      ElectronicPublicationSummary(
+         publicationWithBookmark = electronicPublicationWithBookmark
+      )
+   }
+}
+
 @Composable fun LightBookmark(
    lightWithBookmark: LightWithBookmark,
    onAction: (Action) -> Unit

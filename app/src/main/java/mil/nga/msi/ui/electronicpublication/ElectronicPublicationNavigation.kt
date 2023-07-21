@@ -1,5 +1,6 @@
 package mil.nga.msi.ui.electronicpublication
 
+import android.net.Uri
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
@@ -7,8 +8,13 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.electronicpublication.ElectronicPublicationType
+import mil.nga.msi.repository.bookmark.BookmarkKey
+import mil.nga.msi.ui.asam.AsamRoute
+import mil.nga.msi.ui.bookmark.BookmarkRoute
 import mil.nga.msi.ui.navigation.Route
 
 sealed class ElectronicPublicationRoute(
@@ -17,8 +23,9 @@ sealed class ElectronicPublicationRoute(
     override val shortTitle: String,
 ): Route {
     override val color: Color = DataSource.ELECTRONIC_PUBLICATION.color
-    object Main: ElectronicPublicationRoute("epubs", "Electronic Publications", "E-Pubs")
-    object List: ElectronicPublicationRoute("epubs/types", "Electronic Publications", "E-Pubs")
+    object Main: ElectronicPublicationRoute("electronicPublications", "Electronic Publications", "E-Pubs")
+    object List: ElectronicPublicationRoute("electronicPublication/types", "Electronic Publications", "E-Pubs")
+    object Detail: ElectronicPublicationRoute("electronicPublication/detail", "Electronic Publications", "E-Pubs")
 }
 
 fun routeForPubType(pubType: ElectronicPublicationType): String {
@@ -42,7 +49,7 @@ fun NavGraphBuilder.electronicPublicationGraph(
             bottomBarVisibility(true)
             ElectronicPublicationsScreen(
                 openDrawer = openNavigationDrawer,
-                onPubTypeClick = { pubType ->
+                onPubTypeTap = { pubType ->
                     navController.navigate(routeForPubType(pubType))
                 }
             )
@@ -53,8 +60,32 @@ fun NavGraphBuilder.electronicPublicationGraph(
             arguments = listOf(navArgument("pubType") { type = NavType.IntType })
         ) {
             bottomBarVisibility(true)
-            ElectronicPublicationTypeBrowseRoute(
-                onBackToRoot = { navController.popBackStack() },
+            ElectronicPublicationTypeBrowseScreen(
+                onBack = { navController.popBackStack() },
+                onBookmark = { publication ->
+                    val key = BookmarkKey(publication.s3Key, DataSource.ELECTRONIC_PUBLICATION)
+                    val encoded = Uri.encode(Json.encodeToString(key))
+                    navController.navigate( "${BookmarkRoute.Notes.name}?bookmark=$encoded")
+                }
+            )
+        }
+
+        composable(
+            route = "${ElectronicPublicationRoute.Detail.name}?s3Key={s3Key}"
+        ) { backstackEntry ->
+            bottomBarVisibility(false)
+
+            val s3Key = backstackEntry.arguments?.getString("s3Key")
+            requireNotNull(s3Key) { "'s3Key' argument is required" }
+
+            ElectronicPublicationDetailScreen(
+                s3Key = Uri.decode(s3Key),
+                onBack = { navController.popBackStack() },
+                onBookmark = { publication ->
+                    val key = BookmarkKey(publication.s3Key, DataSource.ELECTRONIC_PUBLICATION)
+                    val encoded = Uri.encode(Json.encodeToString(key))
+                    navController.navigate( "${BookmarkRoute.Notes.name}?bookmark=$encoded")
+                }
             )
         }
     }

@@ -14,6 +14,7 @@ import com.google.accompanist.navigation.material.bottomSheet
 import mil.nga.msi.repository.bookmark.BookmarkKey
 import mil.nga.msi.ui.action.AsamAction
 import mil.nga.msi.ui.action.DgpsStationAction
+import mil.nga.msi.ui.action.ElectronicPublicationAction
 import mil.nga.msi.ui.action.LightAction
 import mil.nga.msi.ui.action.ModuAction
 import mil.nga.msi.ui.action.NavigationalWarningAction
@@ -44,7 +45,7 @@ fun NavGraphBuilder.bookmarksGraph(
 ) {
 
    val onShare: (String) -> Unit = {
-      share(Pair("Share MODU Information", it))
+      share(Pair("Share Data Source Information", it))
    }
 
    val onShowSnackbar: (String) -> Unit = {
@@ -65,6 +66,10 @@ fun NavGraphBuilder.bookmarksGraph(
          is DgpsStationAction.Location -> onShowSnackbar(action.text)
          else -> { action.navigate(navController) }
       }
+   }
+
+   val onElectronicPublicationAction: (ElectronicPublicationAction) -> Unit = { action ->
+      action.navigate(navController)
    }
 
    val onLightAction: (LightAction) -> Unit = { action ->
@@ -127,6 +132,7 @@ fun NavGraphBuilder.bookmarksGraph(
                when(action) {
                   is AsamAction -> onAsamAction(action)
                   is DgpsStationAction -> onDgpsStationAction(action)
+                  is ElectronicPublicationAction -> onElectronicPublicationAction(action)
                   is LightAction -> onLightAction(action)
                   is ModuAction -> onModuAction(action)
                   is NavigationalWarningAction -> onNavigationalWarningAction(action)

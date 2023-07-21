@@ -13,6 +13,7 @@ import mil.nga.msi.repository.bookmark.BookmarkKey
 import mil.nga.msi.repository.bookmark.BookmarkRepository
 import mil.nga.msi.repository.dgpsstation.DgpsStationKey
 import mil.nga.msi.repository.dgpsstation.DgpsStationRepository
+import mil.nga.msi.repository.electronicpublication.ElectronicPublicationRepository
 import mil.nga.msi.repository.light.LightKey
 import mil.nga.msi.repository.light.LightRepository
 import mil.nga.msi.repository.modu.ModuRepository
@@ -33,6 +34,7 @@ data class ItemWithBookmark(
 class BookmarksViewModel @Inject constructor(
    private val repository: BookmarkRepository,
    private val asamRepository: AsamRepository,
+   private val electronicPublicationRepository: ElectronicPublicationRepository,
    private val dgpsStationRepository: DgpsStationRepository,
    private val lightRepository: LightRepository,
    private val moduRepository: ModuRepository,
@@ -53,6 +55,11 @@ class BookmarksViewModel @Inject constructor(
                val key = DgpsStationKey.fromId(bookmark.id)
                dgpsStationRepository.getDgpsStation(key.volumeNumber, key.featureNumber)?.let { dgpsStation ->
                   ItemWithBookmark(dgpsStation, DataSource.DGPS_STATION, bookmark)
+               }
+            }
+            DataSource.ELECTRONIC_PUBLICATION -> {
+               electronicPublicationRepository.getElectronicPublication(s3Key = bookmark.id)?.let { publication ->
+                  ItemWithBookmark(publication, DataSource.ELECTRONIC_PUBLICATION, bookmark)
                }
             }
             DataSource.LIGHT -> {
