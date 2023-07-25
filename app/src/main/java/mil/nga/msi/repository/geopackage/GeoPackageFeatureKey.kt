@@ -3,13 +3,14 @@ package mil.nga.msi.repository.geopackage
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
+import mil.nga.msi.geopackage.GeoPackageFeature
 
 @Serializable
 @Parcelize
 data class GeoPackageFeatureKey(
    val layerId: Long,
    val table: String,
-   val featureId: Long
+   val featureId: Long,
 ): Parcelable {
 
    fun id(): String {

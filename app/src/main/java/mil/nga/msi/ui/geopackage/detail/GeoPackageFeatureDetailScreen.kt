@@ -5,10 +5,8 @@ import android.graphics.BitmapFactory
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,13 +19,11 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.AttachFile
-import androidx.compose.material.icons.filled.GpsFixed
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -44,23 +40,24 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.TileProvider
+import mil.nga.msi.datasource.DataSource
+import mil.nga.msi.geopackage.GeoPackageFeature
+import mil.nga.msi.geopackage.GeoPackageFeatureAttribute
+import mil.nga.msi.geopackage.GeoPackageFeatureProperty
+import mil.nga.msi.geopackage.GeoPackageMediaProperty
+import mil.nga.msi.repository.bookmark.BookmarkKey
 import mil.nga.msi.repository.geopackage.GeoPackageFeatureKey
 import mil.nga.msi.repository.geopackage.GeoPackageMediaKey
-import mil.nga.msi.ui.geopackage.Feature
-import mil.nga.msi.ui.geopackage.FeatureAttribute
-import mil.nga.msi.ui.geopackage.FeatureProperty
-import mil.nga.msi.ui.geopackage.GeoPackageFeatureAction
+import mil.nga.msi.ui.action.Action
+import mil.nga.msi.ui.action.GeoPackageFeatureAction
 import mil.nga.msi.ui.geopackage.GeoPackageViewModel
-import mil.nga.msi.ui.geopackage.MediaProperty
-import mil.nga.msi.ui.coordinate.CoordinateTextButton
+import mil.nga.msi.ui.datasource.DataSourceActions
+import mil.nga.msi.ui.geopackage.GeoPackageFeatureSummary
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.MapClip
-import mil.nga.msi.ui.navigation.NavPoint
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -69,14 +66,14 @@ import java.util.Locale
 fun GeoPackageFeatureDetailScreen(
    key: GeoPackageFeatureKey,
    close: () -> Unit,
-   onAction: (GeoPackageFeatureAction) -> Unit,
+   onAction: (Action) -> Unit,
    viewModel: GeoPackageViewModel = hiltViewModel()
 ) {
    val tileProvider by viewModel.tileProvider.observeAsState()
    val featureState by viewModel.feature.observeAsState()
 
    LaunchedEffect(key) {
-      viewModel.setFeature(key.layerId, key.table, key.featureId)
+      viewModel.setGeoPackageFeatureKey(key)
    }
 
    Column {
@@ -89,16 +86,28 @@ fun GeoPackageFeatureDetailScreen(
       FeatureDetailContent(
          feature = featureState,
          tileProvider = tileProvider,
-         onAction = onAction
+         onZoom = { featureState?.latLng?.let{ onAction(GeoPackageFeatureAction.Zoom(it)) } },
+         onBookmark = { feature ->
+            if (feature.bookmark == null) {
+               onAction(Action.Bookmark(BookmarkKey(key.id(), DataSource.GEOPACKAGE)))
+            } else {
+               viewModel.deleteBookmark(feature.bookmark)
+            }
+         },
+         onCopyLocation = { onAction(GeoPackageFeatureAction.Location(it)) },
+         onMedia = { onAction(GeoPackageFeatureAction.Media(it)) }
       )
    }
 }
 
 @Composable
 private fun FeatureDetailContent(
-   feature: Feature?,
+   feature: GeoPackageFeature?,
    tileProvider: TileProvider?,
-   onAction: (GeoPackageFeatureAction) -> Unit
+   onZoom: () -> Unit,
+   onBookmark: (GeoPackageFeature) -> Unit,
+   onCopyLocation: (String) -> Unit,
+   onMedia: (GeoPackageMediaKey) -> Unit
 ) {
    if (feature != null) {
       Surface(
@@ -112,12 +121,14 @@ private fun FeatureDetailContent(
             FeatureHeader(
                feature = feature,
                tileProvider = tileProvider,
-               onAction = onAction
+               onZoom = onZoom,
+               onBookmark = { onBookmark(feature) },
+               onCopyLocation = onCopyLocation
             )
 
             FeatureDetails(
                feature = feature,
-               onMedia = onAction
+               onMedia = onMedia
             )
          }
       }
@@ -126,9 +137,11 @@ private fun FeatureDetailContent(
 
 @Composable
 private fun FeatureHeader(
-   feature: Feature,
+   feature: GeoPackageFeature,
    tileProvider: TileProvider?,
-   onAction: (GeoPackageFeatureAction) -> Unit
+   onZoom: () -> Unit,
+   onBookmark: () -> Unit,
+   onCopyLocation: (String) -> Unit
 ) {
    Card(
       modifier = Modifier.padding(bottom = 16.dp)
@@ -141,78 +154,18 @@ private fun FeatureHeader(
       }
 
       Column(Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
-         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-            Text(
-               text = feature.name,
-               fontWeight = FontWeight.SemiBold,
-               style = MaterialTheme.typography.labelSmall,
-               maxLines = 1,
-               overflow = TextOverflow.Ellipsis
-            )
-         }
-
-         Text(
-            text = feature.table,
-            style = MaterialTheme.typography.titleLarge,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.padding(top = 16.dp, bottom = 0.dp)
+         GeoPackageFeatureSummary(
+            name = feature.name,
+            table = feature.table,
+            bookmark = feature.bookmark
          )
 
-         FeatureFooter(
+         DataSourceActions(
             latLng = feature.latLng,
-            onAction = onAction,
-         )
-      }
-   }
-}
-
-@Composable
-private fun FeatureFooter(
-   latLng: LatLng?,
-   onAction: (GeoPackageFeatureAction) -> Unit
-) {
-   Row(
-      verticalAlignment = Alignment.CenterVertically,
-      horizontalArrangement = Arrangement.SpaceBetween,
-      modifier = Modifier.fillMaxWidth()
-   ) {
-      latLng?.let {
-         FeatureLocation(
-            latLng = latLng,
-            onCopyLocation = {
-               onAction(GeoPackageFeatureAction.Location(it))
-            }
-         )
-         FeatureActions(
-            onZoom = {
-               onAction(GeoPackageFeatureAction.Zoom(NavPoint(it.latitude, it.longitude)))
-            }
-         )
-      }
-   }
-}
-
-@Composable
-private fun FeatureLocation(
-   latLng: LatLng,
-   onCopyLocation: (String) -> Unit,
-) {
-   CoordinateTextButton(
-      latLng = latLng,
-      onCopiedToClipboard = { onCopyLocation(it) }
-   )
-}
-
-@Composable
-private fun FeatureActions(
-   onZoom: () -> Unit
-) {
-   Row {
-      IconButton(onClick = { onZoom() }) {
-         Icon(Icons.Default.GpsFixed,
-            tint = MaterialTheme.colorScheme.tertiary,
-            contentDescription = "Zoom to GeoPackage Feature"
+            bookmarked = feature.bookmark != null,
+            onZoom = onZoom,
+            onBookmark = onBookmark,
+            onCopyLocation = onCopyLocation
          )
       }
    }
@@ -220,8 +173,8 @@ private fun FeatureActions(
 
 @Composable
 fun FeatureDetails(
-   feature: Feature?,
-   onMedia: (GeoPackageFeatureAction.Media) -> Unit
+   feature: GeoPackageFeature?,
+   onMedia: (GeoPackageMediaKey) -> Unit
 ) {
    if (feature != null) {
       Column {
@@ -237,7 +190,7 @@ fun FeatureDetails(
 
             GeoPackageProperties(feature.properties) { property ->
                val key = GeoPackageMediaKey(feature.id, property.mediaTable, property.mediaId)
-               onMedia(GeoPackageFeatureAction.Media(key))
+               onMedia(key)
             }
          }
 
@@ -258,7 +211,7 @@ fun FeatureDetails(
 
             GeoPackageAttributes(feature.attributes) { property ->
                val key = GeoPackageMediaKey(feature.id, property.mediaTable, property.mediaId)
-               onMedia(GeoPackageFeatureAction.Media(key))
+               onMedia(key)
             }
          }
       }
@@ -267,8 +220,8 @@ fun FeatureDetails(
 
 @Composable
 fun GeoPackageProperties(
-   properties: List<FeatureProperty>,
-   onClick: ((MediaProperty) -> Unit)? = null
+   properties: List<GeoPackageFeatureProperty>,
+   onClick: ((GeoPackageMediaProperty) -> Unit)? = null
 ) {
    Card(Modifier.fillMaxWidth()) {
       Column(Modifier.padding(16.dp)) {
@@ -286,13 +239,14 @@ fun GeoPackageProperties(
                   }
 
                   when {
-                     property is MediaProperty -> {
+                     property is GeoPackageMediaProperty -> {
                         GeoPackageMedia(property) {
                            onClick?.invoke(property)
                         }
                      }
                      property.value is Boolean -> {
-                        val text = if (property.value.toString().toInt() == 1) "true" else "false"
+                        val value = (property.value as? Boolean) == true
+                        val text = if (value) "true" else "false"
                         GeoPackageAttributeText(text)
                      }
                      property.value is Date -> {
@@ -315,8 +269,8 @@ fun GeoPackageProperties(
 
 @Composable
 private fun GeoPackageAttributes(
-   attributes: List<FeatureAttribute>,
-   onClick: ((MediaProperty) -> Unit)? = null
+   attributes: List<GeoPackageFeatureAttribute>,
+   onClick: ((GeoPackageMediaProperty) -> Unit)? = null
 ) {
    attributes.forEach { attribute ->
       Column {
@@ -337,7 +291,7 @@ private fun GeoPackageAttributeText(value: String) {
 
 @Composable
 private fun GeoPackageMedia(
-   property: MediaProperty,
+   property: GeoPackageMediaProperty,
    onClick: (() -> Unit)? = null
 ) {
    when {

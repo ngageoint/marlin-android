@@ -13,6 +13,7 @@ class LayerLocalDataSource @Inject constructor(
    suspend fun getLayer(id: Long) = dao.getLayer(id)
    suspend fun enableLayer(layer: Layer, enabled: Boolean) = dao.enable(layer.id, enabled)
 
+   fun observeLayer(id: Long) = dao.observeLayer(id)
    fun observeLayers() = dao.observeLayers()
    fun observeVisibleLayers() = dao.observeVisibleLayers()
 }

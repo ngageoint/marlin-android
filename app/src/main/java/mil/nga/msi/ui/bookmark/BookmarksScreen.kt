@@ -38,7 +38,9 @@ import mil.nga.msi.datasource.port.Port
 import mil.nga.msi.datasource.port.PortWithBookmark
 import mil.nga.msi.datasource.radiobeacon.RadioBeacon
 import mil.nga.msi.datasource.radiobeacon.RadioBeaconWithBookmark
+import mil.nga.msi.geopackage.GeoPackageFeature
 import mil.nga.msi.repository.bookmark.BookmarkKey
+import mil.nga.msi.repository.geopackage.GeoPackageFeatureKey
 import mil.nga.msi.repository.navigationalwarning.NavigationalWarningKey
 import mil.nga.msi.ui.action.Action
 import mil.nga.msi.ui.action.AsamAction
@@ -47,6 +49,7 @@ import mil.nga.msi.ui.datasource.DataSourceIcon
 import mil.nga.msi.ui.asam.AsamSummary
 import mil.nga.msi.ui.action.DgpsStationAction
 import mil.nga.msi.ui.action.ElectronicPublicationAction
+import mil.nga.msi.ui.action.GeoPackageFeatureAction
 import mil.nga.msi.ui.action.LightAction
 import mil.nga.msi.ui.action.NavigationalWarningAction
 import mil.nga.msi.ui.action.NoticeToMarinersAction
@@ -61,6 +64,7 @@ import mil.nga.msi.ui.modu.ModuSummary
 import mil.nga.msi.ui.navigationalwarning.NavigationalWarningSummary
 import mil.nga.msi.ui.port.PortSummary
 import mil.nga.msi.ui.radiobeacon.RadioBeaconSummary
+import mil.nga.msi.ui.geopackage.GeoPackageFeatureSummary
 
 sealed class BookmarkAction() {
    object Tap: BookmarkAction()
@@ -183,6 +187,19 @@ private fun Bookmark(
          val publicationWithBookmark = ElectronicPublicationWithBookmark(itemWithBookmark.item as ElectronicPublication, itemWithBookmark.bookmark)
          ElectronicPublicationBookmark(electronicPublicationWithBookmark = publicationWithBookmark, onAction = onAction)
       }
+      DataSource.GEOPACKAGE -> {
+         val pair = itemWithBookmark.item as Pair<*, *>
+         val key = pair.first as GeoPackageFeatureKey
+         val feature = pair.second as GeoPackageFeature
+         val featureWithBookmark = feature.copy(bookmark = itemWithBookmark.bookmark)
+         GeoPackageFeatureBookmark(
+            feature = featureWithBookmark,
+            onTap = { onAction(GeoPackageFeatureAction.Tap(key)) },
+            onZoom = { onAction(GeoPackageFeatureAction.Zoom(it)) },
+            onBookmark = { onAction(Action.Bookmark(BookmarkKey(key.id(), DataSource.GEOPACKAGE))) },
+            onCopyLocation = { onAction(GeoPackageFeatureAction.Location(it)) }
+         )
+      }
       DataSource.LIGHT -> {
          val light = LightWithBookmark(itemWithBookmark.item as Light, itemWithBookmark.bookmark)
          LightBookmark(lightWithBookmark = light, onAction = onAction)
@@ -265,6 +282,35 @@ private fun Bookmark(
    ) {
       ElectronicPublicationSummary(
          publicationWithBookmark = electronicPublicationWithBookmark
+      )
+   }
+}
+
+
+@Composable fun GeoPackageFeatureBookmark(
+   feature: GeoPackageFeature,
+   onTap: () -> Unit,
+   onZoom: (LatLng) -> Unit,
+   onBookmark: () -> Unit,
+   onCopyLocation: (String) -> Unit
+) {
+   BookmarkCard(
+      bookmarked = feature.bookmark != null,
+      dataSource = DataSource.GEOPACKAGE,
+      location = feature.latLng,
+      onTap = onTap,
+      onZoom = if (feature.latLng !=  null) {
+         { onZoom(feature.latLng) }
+      } else {
+        null
+      },
+      onBookmark = onBookmark,
+      onCopyLocation = onCopyLocation
+   ) {
+      GeoPackageFeatureSummary(
+         name = feature.name,
+         table = feature.table,
+         bookmark = feature.bookmark
       )
    }
 }

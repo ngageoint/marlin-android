@@ -15,6 +15,7 @@ import mil.nga.msi.repository.bookmark.BookmarkKey
 import mil.nga.msi.ui.action.AsamAction
 import mil.nga.msi.ui.action.DgpsStationAction
 import mil.nga.msi.ui.action.ElectronicPublicationAction
+import mil.nga.msi.ui.action.GeoPackageFeatureAction
 import mil.nga.msi.ui.action.LightAction
 import mil.nga.msi.ui.action.ModuAction
 import mil.nga.msi.ui.action.NavigationalWarningAction
@@ -70,6 +71,13 @@ fun NavGraphBuilder.bookmarksGraph(
 
    val onElectronicPublicationAction: (ElectronicPublicationAction) -> Unit = { action ->
       action.navigate(navController)
+   }
+
+   val onGeoPackageFeatureAction: (GeoPackageFeatureAction) -> Unit = { action ->
+      when(action) {
+         is GeoPackageFeatureAction.Location -> onShowSnackbar(action.text)
+         else -> { action.navigate(navController) }
+      }
    }
 
    val onLightAction: (LightAction) -> Unit = { action ->
@@ -133,6 +141,7 @@ fun NavGraphBuilder.bookmarksGraph(
                   is AsamAction -> onAsamAction(action)
                   is DgpsStationAction -> onDgpsStationAction(action)
                   is ElectronicPublicationAction -> onElectronicPublicationAction(action)
+                  is GeoPackageFeatureAction -> onGeoPackageFeatureAction(action)
                   is LightAction -> onLightAction(action)
                   is ModuAction -> onModuAction(action)
                   is NavigationalWarningAction -> onNavigationalWarningAction(action)

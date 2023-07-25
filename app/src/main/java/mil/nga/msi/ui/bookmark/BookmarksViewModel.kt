@@ -6,14 +6,19 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import mil.nga.geopackage.GeoPackage
+import mil.nga.geopackage.GeoPackageManager
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.bookmark.Bookmark
+import mil.nga.msi.geopackage.getFeature
 import mil.nga.msi.repository.asam.AsamRepository
 import mil.nga.msi.repository.bookmark.BookmarkKey
 import mil.nga.msi.repository.bookmark.BookmarkRepository
 import mil.nga.msi.repository.dgpsstation.DgpsStationKey
 import mil.nga.msi.repository.dgpsstation.DgpsStationRepository
 import mil.nga.msi.repository.electronicpublication.ElectronicPublicationRepository
+import mil.nga.msi.repository.geopackage.GeoPackageFeatureKey
+import mil.nga.msi.repository.layer.LayerRepository
 import mil.nga.msi.repository.light.LightKey
 import mil.nga.msi.repository.light.LightRepository
 import mil.nga.msi.repository.modu.ModuRepository
@@ -36,11 +41,13 @@ class BookmarksViewModel @Inject constructor(
    private val asamRepository: AsamRepository,
    private val electronicPublicationRepository: ElectronicPublicationRepository,
    private val dgpsStationRepository: DgpsStationRepository,
+   private val layerRepository: LayerRepository,
    private val lightRepository: LightRepository,
    private val moduRepository: ModuRepository,
    private val navigationalWarningRepository: NavigationalWarningRepository,
    private val portRepository: PortRepository,
-   private val radioBeaconRepository: RadioBeaconRepository
+   private val radioBeaconRepository: RadioBeaconRepository,
+   private val geoPackageManager: GeoPackageManager
 ): ViewModel() {
 
    val bookmarks = repository.observeBookmarks().map { bookmarks ->
@@ -55,6 +62,15 @@ class BookmarksViewModel @Inject constructor(
                val key = DgpsStationKey.fromId(bookmark.id)
                dgpsStationRepository.getDgpsStation(key.volumeNumber, key.featureNumber)?.let { dgpsStation ->
                   ItemWithBookmark(dgpsStation, DataSource.DGPS_STATION, bookmark)
+               }
+            }
+            DataSource.GEOPACKAGE -> {
+               val key = GeoPackageFeatureKey.fromId(bookmark.id)
+               layerRepository.getLayer(key.layerId)?.let { layer ->
+                  val geoPackage = geoPackageManager.openExternal(layer.filePath)
+                  geoPackage.getFeature(layer.id, layer.name, key.table, key.featureId)?.let { geoPackage ->
+                     ItemWithBookmark(key to geoPackage, DataSource.GEOPACKAGE, bookmark)
+                  }
                }
             }
             DataSource.ELECTRONIC_PUBLICATION -> {
