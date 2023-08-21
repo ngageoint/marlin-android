@@ -113,4 +113,8 @@ class UserPreferencesRepository @Inject constructor(
          builder.build()
       }
    }
+
+   companion object {
+      const val MAX_TABS = 4
+   }
 }

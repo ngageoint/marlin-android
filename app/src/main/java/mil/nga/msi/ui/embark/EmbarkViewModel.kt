@@ -9,6 +9,7 @@ import kotlinx.coroutines.launch
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.repository.preferences.EmbarkRepository
 import mil.nga.msi.repository.preferences.UserPreferencesRepository
+import mil.nga.msi.repository.preferences.UserPreferencesRepository.Companion.MAX_TABS
 import javax.inject.Inject
 
 @HiltViewModel
@@ -65,7 +66,7 @@ class EmbarkViewModel @Inject constructor(
             selected.remove(dataSource)
             nonSelected.add(dataSource)
          } else if (nonSelected.contains(dataSource)) {
-            if (selected.size >= 4) {
+            if (selected.size >= MAX_TABS) {
                selected.removeLastOrNull()?.let { removed ->
                   nonSelected.add(removed)
                }

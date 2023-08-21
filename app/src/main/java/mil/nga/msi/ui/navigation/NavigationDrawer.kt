@@ -30,14 +30,13 @@ import androidx.core.graphics.drawable.toBitmap
 import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.launch
 import mil.nga.msi.datasource.DataSource
+import mil.nga.msi.repository.preferences.UserPreferencesRepository.Companion.MAX_TABS
 import mil.nga.msi.ui.about.AboutRoute
 import mil.nga.msi.ui.drag.DraggableItem
 import mil.nga.msi.ui.drag.dragContainer
 import mil.nga.msi.ui.drag.rememberDragDropState
 import mil.nga.msi.ui.report.ReportRoute
 import mil.nga.msi.ui.theme.screenBackground
-
-private const val MAX_TABS = 3
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
