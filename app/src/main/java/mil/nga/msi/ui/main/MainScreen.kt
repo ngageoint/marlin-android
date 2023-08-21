@@ -1,5 +1,6 @@
 package mil.nga.msi.ui.main
 
+import android.R.attr.maxLines
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -171,7 +172,13 @@ fun MainScreen(
                                  contentDescription = tabRoute.title
                               )
                            },
-                           label = { Text(tabRoute.shortTitle) },
+                           label = {
+                              Text(
+                                 text = tabRoute.shortTitle,
+                                 maxLines = 1,
+                                 overflow = TextOverflow.Ellipsis
+                              )
+                           },
                            selectedContentColor = MaterialTheme.colorScheme.tertiary,
                            unselectedContentColor = MaterialTheme.colorScheme.onSurface.copy(
                               alpha = ContentAlpha.disabled
