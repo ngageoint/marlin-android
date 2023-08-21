@@ -65,11 +65,15 @@ class DataStoreModule {
                   )
                )
                .addAllTabs(
-                  listOf(DataSource.ASAM, DataSource.MODU, DataSource.NAVIGATION_WARNING).map { it.name }
+                  listOf(
+                     DataSource.ASAM,
+                     DataSource.MODU,
+                     DataSource.NAVIGATION_WARNING,
+                     DataSource.LIGHT
+                  ).map { it.name }
                )
                .addAllNonTabs(
                   listOf(
-                     DataSource.LIGHT,
                      DataSource.PORT,
                      DataSource.RADIO_BEACON,
                      DataSource.DGPS_STATION,
