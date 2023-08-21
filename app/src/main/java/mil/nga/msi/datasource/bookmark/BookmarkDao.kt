@@ -15,7 +15,7 @@ interface BookmarkDao {
    @Delete
    suspend fun delete(bookmark: Bookmark)
 
-   @Query("SELECT * from bookmarks ORDER BY timestamp")
+   @Query("SELECT * from bookmarks ORDER BY timestamp DESC")
    fun observeBookmarks(): Flow<List<Bookmark>>
 
    @Query("SELECT * from bookmarks WHERE data_source = :datasource ORDER BY timestamp")
