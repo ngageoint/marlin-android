@@ -1,7 +1,6 @@
 package mil.nga.msi.di
 
 import android.content.Context
-import android.util.Log
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
@@ -24,11 +23,7 @@ interface AppInitializer {
    companion object {
       // Resolve the InitializerEntryPoint from a context
       fun resolve(context: Context): AppInitializer {
-         Log.i("Billy", "app initializer resolve context $context")
-
          val appContext = context.applicationContext ?: throw IllegalStateException()
-         Log.i("Billy", "app initializer resolve app context $appContext")
-
          return EntryPointAccessors.fromApplication(
             appContext,
             AppInitializer::class.java

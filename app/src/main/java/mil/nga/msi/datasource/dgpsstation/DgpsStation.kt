@@ -4,7 +4,6 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import com.google.android.gms.maps.model.LatLng
-import mil.nga.msi.coordinate.DMS
 
 @Entity(
    tableName = "dgps_stations",

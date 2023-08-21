@@ -1,9 +1,13 @@
 package mil.nga.msi.datasource.electronicpublication
 
+import android.content.Context
+import android.text.format.Formatter
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 enum class ElectronicPublicationType(
     /**
@@ -126,6 +130,10 @@ data class ElectronicPublication(
     override fun toString(): String {
         return "${this::class.simpleName}:$s3Key"
     }
+
+    companion object {
+        val DATE_TIME_FORMATTER: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMM yyyy HH:mm z").withZone(ZoneId.systemDefault())
+    }
 }
 
 data class ElectronicPublicationListItem(
@@ -135,7 +143,4 @@ data class ElectronicPublicationListItem(
     val pubTypeId: Int = ElectronicPublicationType.Unknown.typeId,
     @ColumnInfo(name = "full_filename")
     val fullFilename: String?,
-) {
-    @Transient
-    val pubType: ElectronicPublicationType = ElectronicPublicationType.fromTypeCode(pubTypeId)
-}
+)

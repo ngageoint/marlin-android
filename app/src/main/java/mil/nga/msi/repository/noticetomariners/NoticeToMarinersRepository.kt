@@ -22,14 +22,16 @@ class NoticeToMarinersRepository @Inject constructor(
    private val notification: MarlinNotification,
    private val userPreferencesRepository: UserPreferencesRepository
 ) {
-   suspend fun getNoticeToMariners(noticeNumber: Int) = localDataSource.getNoticeToMariners(noticeNumber)
-
-   suspend fun observeNoticeToMarinersGraphics(noticeNumber: Int): List<NoticeToMarinersGraphics> {
-      return remoteDataSource.fetchNoticeToMarinersGraphics(noticeNumber)
-   }
+   fun observeNoticeToMariners(noticeNumber: Int) = localDataSource.observeNoticeToMariners(noticeNumber)
 
    fun observeNoticeToMarinersListItems(): Flow<List<NoticeToMariners>> {
       return localDataSource.observeNoticeToMarinersListItems()
+   }
+
+   suspend fun getNoticeToMariners(noticeNumber: Int) = localDataSource.getNoticeToMariners(noticeNumber)
+
+   suspend fun getNoticeToMarinersGraphics(noticeNumber: Int): List<NoticeToMarinersGraphics> {
+      return remoteDataSource.fetchNoticeToMarinersGraphics(noticeNumber)
    }
 
    suspend fun fetchNoticeToMariners(refresh: Boolean = false): List<NoticeToMariners> {

@@ -1,0 +1,1852 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 7,
+    "identityHash": "69592395c20ac6c98d0e31ddaf4915ee",
+    "entities": [
+      {
+        "tableName": "asams",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`reference` TEXT NOT NULL, `date` INTEGER NOT NULL, `latitude` REAL NOT NULL, `longitude` REAL NOT NULL, `position` TEXT, `navigation_area` TEXT, `subregion` TEXT, `description` TEXT, `hostility` TEXT, `victim` TEXT, PRIMARY KEY(`reference`))",
+        "fields": [
+          {
+            "fieldPath": "reference",
+            "columnName": "reference",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "date",
+            "columnName": "date",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "latitude",
+            "columnName": "latitude",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "longitude",
+            "columnName": "longitude",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "position",
+            "columnName": "position",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "navigationArea",
+            "columnName": "navigation_area",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "subregion",
+            "columnName": "subregion",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "description",
+            "columnName": "description",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "hostility",
+            "columnName": "hostility",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "victim",
+            "columnName": "victim",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "reference"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "dgps_stations",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `volume_number` TEXT NOT NULL, `feature_number` REAL NOT NULL, `notice_week` TEXT NOT NULL, `notice_year` TEXT NOT NULL, `latitude` REAL NOT NULL, `longitude` REAL NOT NULL, `aid_type` TEXT, `geopolitical_heading` TEXT, `region_heading` TEXT, `preceding_note` TEXT, `name` TEXT, `position` TEXT, `station_id` TEXT, `range` INTEGER, `frequency` REAL, `transfer_rate` INTEGER, `remarks` TEXT, `post_note` TEXT, `notice_number` INTEGER, `remove_from_list` TEXT, `delete_flag` TEXT, `section_header` TEXT NOT NULL, PRIMARY KEY(`volume_number`, `feature_number`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "volumeNumber",
+            "columnName": "volume_number",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "featureNumber",
+            "columnName": "feature_number",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "noticeWeek",
+            "columnName": "notice_week",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "noticeYear",
+            "columnName": "notice_year",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "latitude",
+            "columnName": "latitude",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "longitude",
+            "columnName": "longitude",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "aidType",
+            "columnName": "aid_type",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "geopoliticalHeading",
+            "columnName": "geopolitical_heading",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "regionHeading",
+            "columnName": "region_heading",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "precedingNote",
+            "columnName": "preceding_note",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "position",
+            "columnName": "position",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "stationId",
+            "columnName": "station_id",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "range",
+            "columnName": "range",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "frequency",
+            "columnName": "frequency",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "transferRate",
+            "columnName": "transfer_rate",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "remarks",
+            "columnName": "remarks",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "postNote",
+            "columnName": "post_note",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "noticeNumber",
+            "columnName": "notice_number",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "removeFromList",
+            "columnName": "remove_from_list",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "deleteFlag",
+            "columnName": "delete_flag",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "sectionHeader",
+            "columnName": "section_header",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "volume_number",
+            "feature_number"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_dgps_stations_id",
+            "unique": true,
+            "columnNames": [
+              "id"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_dgps_stations_id` ON `${TABLE_NAME}` (`id`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "epubs",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`s3_key` TEXT NOT NULL, `content_id` INTEGER, `downloaded_bytes` INTEGER NOT NULL, `download_media_type` TEXT, `file_ext` TEXT, `file_name_base` TEXT, `file_size` INTEGER, `full_filename` TEXT, `full_pub_flag` INTEGER, `internal_path` TEXT, `is_downloaded` INTEGER NOT NULL, `is_downloading` INTEGER NOT NULL, `local_download_id` INTEGER, `local_download_rel_path` TEXT, `ods_entry_id` INTEGER, `pub_download_display_name` TEXT, `pub_download_id` INTEGER, `pub_download_order` INTEGER, `pubsec_id` INTEGER, `pubsec_last_modified` INTEGER, `pub_type_id` INTEGER NOT NULL, `section_display_name` TEXT, `section_last_modified` INTEGER, `section_name` TEXT, `section_order` INTEGER, `upload_time` INTEGER, PRIMARY KEY(`s3_key`))",
+        "fields": [
+          {
+            "fieldPath": "s3Key",
+            "columnName": "s3_key",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "contentId",
+            "columnName": "content_id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "downloadedBytes",
+            "columnName": "downloaded_bytes",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "downloadMediaType",
+            "columnName": "download_media_type",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "fileExtension",
+            "columnName": "file_ext",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "filenameBase",
+            "columnName": "file_name_base",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "fileSize",
+            "columnName": "file_size",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "fullFilename",
+            "columnName": "full_filename",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "fullPubFlag",
+            "columnName": "full_pub_flag",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "internalPath",
+            "columnName": "internal_path",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "isDownloaded",
+            "columnName": "is_downloaded",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isDownloading",
+            "columnName": "is_downloading",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "localDownloadId",
+            "columnName": "local_download_id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "localDownloadRelPath",
+            "columnName": "local_download_rel_path",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "odsEntryId",
+            "columnName": "ods_entry_id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "pubDownloadDisplayName",
+            "columnName": "pub_download_display_name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "pubDownloadId",
+            "columnName": "pub_download_id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "pubDownloadOrder",
+            "columnName": "pub_download_order",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "pubsecId",
+            "columnName": "pubsec_id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "pubsecLastModified",
+            "columnName": "pubsec_last_modified",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "pubTypeId",
+            "columnName": "pub_type_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sectionDisplayName",
+            "columnName": "section_display_name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "sectionLastModified",
+            "columnName": "section_last_modified",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "sectionName",
+            "columnName": "section_name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "sectionOrder",
+            "columnName": "section_order",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "uploadTime",
+            "columnName": "upload_time",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "s3_key"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "layers",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `type` TEXT NOT NULL, `url` TEXT NOT NULL, `name` TEXT NOT NULL, `visible` INTEGER NOT NULL, `min_zoom` INTEGER, `max_zoom` INTEGER, `file_path` TEXT, `tables` TEXT, `refresh_rate` INTEGER, `minLatitude` REAL, `minLongitude` REAL, `maxLatitude` REAL, `maxLongitude` REAL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "url",
+            "columnName": "url",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "visible",
+            "columnName": "visible",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "minZoom",
+            "columnName": "min_zoom",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "maxZoom",
+            "columnName": "max_zoom",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "filePath",
+            "columnName": "file_path",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "tables",
+            "columnName": "tables",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "refreshRate",
+            "columnName": "refresh_rate",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "boundingBox.minLatitude",
+            "columnName": "minLatitude",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "boundingBox.minLongitude",
+            "columnName": "minLongitude",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "boundingBox.maxLatitude",
+            "columnName": "maxLatitude",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "boundingBox.maxLongitude",
+            "columnName": "maxLongitude",
+            "affinity": "REAL",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "lights",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `volume_number` TEXT NOT NULL, `feature_number` TEXT NOT NULL, `characteristic_number` INTEGER NOT NULL, `notice_week` TEXT NOT NULL, `notice_year` TEXT NOT NULL, `latitude` REAL NOT NULL, `longitude` REAL NOT NULL, `international_feature` TEXT, `aid_type` TEXT, `geopolitical_heading` TEXT, `region_heading` TEXT, `subregion_heading` TEXT, `local_heading` TEXT, `preceding_note` TEXT, `name` TEXT, `position` TEXT, `characteristic` TEXT, `height_feet` REAL, `height_meters` REAL, `range` TEXT, `structure` TEXT, `remarks` TEXT, `post_note` TEXT, `notice_number` INTEGER, `remove_from_list` TEXT, `delete_flag` TEXT, `section_header` TEXT NOT NULL, PRIMARY KEY(`volume_number`, `feature_number`, `characteristic_number`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "volumeNumber",
+            "columnName": "volume_number",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "featureNumber",
+            "columnName": "feature_number",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "characteristicNumber",
+            "columnName": "characteristic_number",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "noticeWeek",
+            "columnName": "notice_week",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "noticeYear",
+            "columnName": "notice_year",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "latitude",
+            "columnName": "latitude",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "longitude",
+            "columnName": "longitude",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "internationalFeature",
+            "columnName": "international_feature",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "aidType",
+            "columnName": "aid_type",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "geopoliticalHeading",
+            "columnName": "geopolitical_heading",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "regionHeading",
+            "columnName": "region_heading",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "subregionHeading",
+            "columnName": "subregion_heading",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "localHeading",
+            "columnName": "local_heading",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "precedingNote",
+            "columnName": "preceding_note",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "position",
+            "columnName": "position",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "characteristic",
+            "columnName": "characteristic",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "heightFeet",
+            "columnName": "height_feet",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "heightMeters",
+            "columnName": "height_meters",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "range",
+            "columnName": "range",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "structure",
+            "columnName": "structure",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "remarks",
+            "columnName": "remarks",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "postNote",
+            "columnName": "post_note",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "noticeNumber",
+            "columnName": "notice_number",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "removeFromList",
+            "columnName": "remove_from_list",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "deleteFlag",
+            "columnName": "delete_flag",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "sectionHeader",
+            "columnName": "section_header",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "volume_number",
+            "feature_number",
+            "characteristic_number"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_lights_id",
+            "unique": true,
+            "columnNames": [
+              "id"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_lights_id` ON `${TABLE_NAME}` (`id`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "notice_to_mariners",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`ods_entry_id` INTEGER NOT NULL, `ods_key` TEXT NOT NULL, `notice_number` INTEGER NOT NULL, `filename` TEXT NOT NULL, `ods_content_id` TEXT, `publication_id` INTEGER, `title` TEXT, `section_order` INTEGER, `limited_dist` INTEGER, `internal_path` TEXT, `file_size` INTEGER, `is_full_publication` INTEGER, `upload_time` INTEGER, `last_modified` INTEGER, PRIMARY KEY(`ods_entry_id`))",
+        "fields": [
+          {
+            "fieldPath": "odsEntryId",
+            "columnName": "ods_entry_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "odsKey",
+            "columnName": "ods_key",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "noticeNumber",
+            "columnName": "notice_number",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "filename",
+            "columnName": "filename",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "odsContentId",
+            "columnName": "ods_content_id",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "publicationId",
+            "columnName": "publication_id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "sectionOrder",
+            "columnName": "section_order",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "limitedDist",
+            "columnName": "limited_dist",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "internalPath",
+            "columnName": "internal_path",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "fileSize",
+            "columnName": "file_size",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "isFullPublication",
+            "columnName": "is_full_publication",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "uploadTime",
+            "columnName": "upload_time",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "lastModified",
+            "columnName": "last_modified",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "ods_entry_id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "modus",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `date` INTEGER NOT NULL, `latitude` REAL NOT NULL, `longitude` REAL NOT NULL, `rig_status` TEXT, `special_status` TEXT, `distance` REAL, `position` TEXT, `navigation_area` TEXT, `region` TEXT, `subregion` TEXT, PRIMARY KEY(`name`))",
+        "fields": [
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "date",
+            "columnName": "date",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "latitude",
+            "columnName": "latitude",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "longitude",
+            "columnName": "longitude",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "rigStatus",
+            "columnName": "rig_status",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "specialStatus",
+            "columnName": "special_status",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "distance",
+            "columnName": "distance",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "position",
+            "columnName": "position",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "navigationArea",
+            "columnName": "navigation_area",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "region",
+            "columnName": "region",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "subregion",
+            "columnName": "subregion",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "name"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "navigational_warnings",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `number` INTEGER NOT NULL, `year` INTEGER NOT NULL, `navigation_area` TEXT NOT NULL, `issue_date` INTEGER NOT NULL, `subregions` TEXT, `text` TEXT, `status` TEXT, `authority` TEXT, `cancel_number` INTEGER, `cancelDate` INTEGER, `cancel_navigation_area` TEXT, `cancel_year` INTEGER, `geoJson` TEXT, `min_latitude` REAL, `min_longitude` REAL, `max_latitude` REAL, `max_longitude` REAL, PRIMARY KEY(`number`, `year`, `navigation_area`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "number",
+            "columnName": "number",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "year",
+            "columnName": "year",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "navigationArea",
+            "columnName": "navigation_area",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "issueDate",
+            "columnName": "issue_date",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "subregions",
+            "columnName": "subregions",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "text",
+            "columnName": "text",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "status",
+            "columnName": "status",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "authority",
+            "columnName": "authority",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "cancelNumber",
+            "columnName": "cancel_number",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "cancelDate",
+            "columnName": "cancelDate",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "cancelNavigationArea",
+            "columnName": "cancel_navigation_area",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "cancelYear",
+            "columnName": "cancel_year",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "geoJson",
+            "columnName": "geoJson",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "minLatitude",
+            "columnName": "min_latitude",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "minLongitude",
+            "columnName": "min_longitude",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "maxLatitude",
+            "columnName": "max_latitude",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "maxLongitude",
+            "columnName": "max_longitude",
+            "affinity": "REAL",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "number",
+            "year",
+            "navigation_area"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_navigational_warnings_id",
+            "unique": true,
+            "columnNames": [
+              "id"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_navigational_warnings_id` ON `${TABLE_NAME}` (`id`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "ports",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`port_number` INTEGER NOT NULL, `port_name` TEXT NOT NULL, `latitude` REAL NOT NULL, `longitude` REAL NOT NULL, `region_number` INTEGER, `region_name` TEXT, `country_code` TEXT, `country_name` TEXT, `publication_number` TEXT, `chart_number` TEXT, `navigation_area` TEXT, `harbor_size` TEXT, `harbor_type` TEXT, `shelter` TEXT, `entrance_restriction_tide` TEXT, `entrance_restriction_swell` TEXT, `entrance_restriction_ice` TEXT, `entrance_restriction_other` TEXT, `overhead_limits` TEXT, `channel_depth` INTEGER, `anchorage_depth` INTEGER, `cargo_pier_depth` INTEGER, `oil_terminal_depth` INTEGER, `tide` INTEGER, `max_vessel_length` INTEGER, `max_vessel_beam` INTEGER, `max_vessel_draft` INTEGER, `good_holding_ground` TEXT, `turning_area` TEXT, `first_port_of_entry` TEXT, `us_representative` TEXT, `pilotage_compulsory` TEXT, `pilotage_available` TEXT, `pilotage_local_assist` TEXT, `pilotage_advisable` TEXT, `tugs_salvage` TEXT, `tugs_assist` TEXT, `quarantine_pratique` TEXT, `quarantine_other` TEXT, `communications_telephone` TEXT, `communications_telegraph` TEXT, `communications_radio` TEXT, `communications_radio_telephone` TEXT, `communications_air` TEXT, `communications_rail` TEXT, `medical_facilities` TEXT, `garbage_disposal` TEXT, `degauss` TEXT, `dirty_ballast` TEXT, `cranes_fixed` TEXT, `cranes_mobile` TEXT, `cranes_floating` TEXT, `cranes_container` TEXT, `lifts_100` TEXT, `lifts_50` TEXT, `lifts_25` TEXT, `lifts_0` TEXT, `services_longshore` TEXT, `services_electrical` TEXT, `services_steam` TEXT, `services_navigational_equipment` TEXT, `services_electrical_repair` TEXT, `services_ice_breaking` TEXT, `services_diving` TEXT, `supplies_provisions` TEXT, `supplies_water` TEXT, `supplies_fuel` TEXT, `supplies_diesel` TEXT, `supplies_deck` TEXT, `supplies_engine` TEXT, `supplies_aviation_fuel` TEXT, `repair_code` TEXT, `dry_dock` TEXT, `railway` TEXT, `quarantine_sanitation` TEXT, `harbor_use` TEXT, `ukc_management_system` TEXT, `port_security` TEXT, `eta_message` TEXT, `search_and_rescue` TEXT, `traffic_separation_scheme` TEXT, `vessel_traffic_service` TEXT, `chemical_holding_tank_disposal` TEXT, `global_id` TEXT, `facilities_roro` TEXT, `facilities_solid_bulk` TEXT, `facilities_container` TEXT, `facilities_break_bulk` TEXT, `facilities_oil_terminal` TEXT, `facilities_long_terminal` TEXT, `facilities_other` TEXT, `facilities_dangerous_cargo` TEXT, `facilities_liquid_bulk` TEXT, `facilities_wharves` TEXT, `facilities_anchor` TEXT, `facilities_med_moor` TEXT, `facilities_beach_moor` TEXT, `facilities_ice_moor` TEXT, `unlo_code` TEXT, `dnc` TEXT, `s_121_water_body` TEXT, `s_57_enc` TEXT, `s_101_enc` TEXT, `dod_water_body` TEXT, `alternate_name` TEXT, `entrance_width` INTEGER, `liquified_natural_gas_terminal_depth` INTEGER, `offshore_max_vessel_length` INTEGER, `offshore_max_vessel_beam` INTEGER, `offshore_max_vessel_draft` INTEGER, PRIMARY KEY(`port_number`))",
+        "fields": [
+          {
+            "fieldPath": "portNumber",
+            "columnName": "port_number",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "portName",
+            "columnName": "port_name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "latitude",
+            "columnName": "latitude",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "longitude",
+            "columnName": "longitude",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "regionNumber",
+            "columnName": "region_number",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "regionName",
+            "columnName": "region_name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "countryCode",
+            "columnName": "country_code",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "countryName",
+            "columnName": "country_name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "publicationNumber",
+            "columnName": "publication_number",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "chartNumber",
+            "columnName": "chart_number",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "navigationArea",
+            "columnName": "navigation_area",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "harborSize",
+            "columnName": "harbor_size",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "harborType",
+            "columnName": "harbor_type",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "shelter",
+            "columnName": "shelter",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "entranceRestrictionTide",
+            "columnName": "entrance_restriction_tide",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "entranceRestrictionSwell",
+            "columnName": "entrance_restriction_swell",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "entranceRestrictionIce",
+            "columnName": "entrance_restriction_ice",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "entranceRestrictionOther",
+            "columnName": "entrance_restriction_other",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "overheadLimits",
+            "columnName": "overhead_limits",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "channelDepth",
+            "columnName": "channel_depth",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "anchorageDepth",
+            "columnName": "anchorage_depth",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "cargoPierDepth",
+            "columnName": "cargo_pier_depth",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "oilTerminalDepth",
+            "columnName": "oil_terminal_depth",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "tide",
+            "columnName": "tide",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "maxVesselLength",
+            "columnName": "max_vessel_length",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "maxVesselBeam",
+            "columnName": "max_vessel_beam",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "maxVesselDraft",
+            "columnName": "max_vessel_draft",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "goodHoldingGround",
+            "columnName": "good_holding_ground",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "turningArea",
+            "columnName": "turning_area",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "firstPortOfEntry",
+            "columnName": "first_port_of_entry",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "usRepresentative",
+            "columnName": "us_representative",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "pilotageCompulsory",
+            "columnName": "pilotage_compulsory",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "pilotageAvailable",
+            "columnName": "pilotage_available",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "pilotageLocalAssist",
+            "columnName": "pilotage_local_assist",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "pilotageAdvisable",
+            "columnName": "pilotage_advisable",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "tugsSalvage",
+            "columnName": "tugs_salvage",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "tugsAssist",
+            "columnName": "tugs_assist",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "quarantinePratique",
+            "columnName": "quarantine_pratique",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "quarantineOther",
+            "columnName": "quarantine_other",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "communicationsTelephone",
+            "columnName": "communications_telephone",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "communicationsTelegraph",
+            "columnName": "communications_telegraph",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "communicationsRadio",
+            "columnName": "communications_radio",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "communicationsRadioTelephone",
+            "columnName": "communications_radio_telephone",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "communicationsAir",
+            "columnName": "communications_air",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "communicationsRail",
+            "columnName": "communications_rail",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "medicalFacilities",
+            "columnName": "medical_facilities",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "garbageDisposal",
+            "columnName": "garbage_disposal",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "degauss",
+            "columnName": "degauss",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "dirtyBallast",
+            "columnName": "dirty_ballast",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "cranesFixed",
+            "columnName": "cranes_fixed",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "cranesMobile",
+            "columnName": "cranes_mobile",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "cranesFloating",
+            "columnName": "cranes_floating",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "cranesContainer",
+            "columnName": "cranes_container",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "lifts100",
+            "columnName": "lifts_100",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "lifts50",
+            "columnName": "lifts_50",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "lifts25",
+            "columnName": "lifts_25",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "lifts0",
+            "columnName": "lifts_0",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "servicesLongshore",
+            "columnName": "services_longshore",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "servicesElectrical",
+            "columnName": "services_electrical",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "servicesSteam",
+            "columnName": "services_steam",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "servicesNavigationalEquipment",
+            "columnName": "services_navigational_equipment",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "servicesElectricalRepair",
+            "columnName": "services_electrical_repair",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "servicesIceBreaking",
+            "columnName": "services_ice_breaking",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "servicesDiving",
+            "columnName": "services_diving",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "suppliesProvisions",
+            "columnName": "supplies_provisions",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "suppliesWater",
+            "columnName": "supplies_water",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "suppliesFuel",
+            "columnName": "supplies_fuel",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "suppliesDiesel",
+            "columnName": "supplies_diesel",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "suppliesDeck",
+            "columnName": "supplies_deck",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "suppliesEngine",
+            "columnName": "supplies_engine",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "suppliesAviationFuel",
+            "columnName": "supplies_aviation_fuel",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "repairCode",
+            "columnName": "repair_code",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "dryDock",
+            "columnName": "dry_dock",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "railway",
+            "columnName": "railway",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "quarantineSanitation",
+            "columnName": "quarantine_sanitation",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "harborUse",
+            "columnName": "harbor_use",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "ukcManagementSystem",
+            "columnName": "ukc_management_system",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "portSecurity",
+            "columnName": "port_security",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "etaMessage",
+            "columnName": "eta_message",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "searchAndRescue",
+            "columnName": "search_and_rescue",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "trafficSeparationScheme",
+            "columnName": "traffic_separation_scheme",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "vesselTrafficService",
+            "columnName": "vessel_traffic_service",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "chemicalHoldingTankDisposal",
+            "columnName": "chemical_holding_tank_disposal",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "globalId",
+            "columnName": "global_id",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "facilitiesRoro",
+            "columnName": "facilities_roro",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "facilitiesSolidBulk",
+            "columnName": "facilities_solid_bulk",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "facilitiesContainer",
+            "columnName": "facilities_container",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "facilitiesBreakBulk",
+            "columnName": "facilities_break_bulk",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "facilitiesOilTerminal",
+            "columnName": "facilities_oil_terminal",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "facilitiesLongTerminal",
+            "columnName": "facilities_long_terminal",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "facilitiesOther",
+            "columnName": "facilities_other",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "facilitiesDangerousCargo",
+            "columnName": "facilities_dangerous_cargo",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "facilitiesLiquidBulk",
+            "columnName": "facilities_liquid_bulk",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "facilitiesWharves",
+            "columnName": "facilities_wharves",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "facilitiesAnchor",
+            "columnName": "facilities_anchor",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "facilitiesMedMoor",
+            "columnName": "facilities_med_moor",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "facilitiesBeachMoor",
+            "columnName": "facilities_beach_moor",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "facilitiesIceMoor",
+            "columnName": "facilities_ice_moor",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "unloCode",
+            "columnName": "unlo_code",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "dnc",
+            "columnName": "dnc",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "s121WaterBody",
+            "columnName": "s_121_water_body",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "s57Enc",
+            "columnName": "s_57_enc",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "s101Enc",
+            "columnName": "s_101_enc",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "dodWaterBody",
+            "columnName": "dod_water_body",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "alternateName",
+            "columnName": "alternate_name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "entranceWidth",
+            "columnName": "entrance_width",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "liquifiedNaturalGasTerminalDepth",
+            "columnName": "liquified_natural_gas_terminal_depth",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "offshoreMaxVesselLength",
+            "columnName": "offshore_max_vessel_length",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "offshoreMaxVesselBeam",
+            "columnName": "offshore_max_vessel_beam",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "offshoreMaxVesselDraft",
+            "columnName": "offshore_max_vessel_draft",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "port_number"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "radio_beacons",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `volume_number` TEXT NOT NULL, `feature_number` TEXT NOT NULL, `notice_week` TEXT NOT NULL, `notice_year` TEXT NOT NULL, `latitude` REAL NOT NULL, `longitude` REAL NOT NULL, `aid_type` TEXT, `geopolitical_heading` TEXT, `region_heading` TEXT, `preceding_note` TEXT, `name` TEXT, `position` TEXT, `characteristic` TEXT, `range` TEXT, `sequence_text` TEXT, `frequency` TEXT, `station_remark` TEXT, `post_note` TEXT, `notice_number` TEXT, `remove_from_list` TEXT, `delete_flag` TEXT, `section_header` TEXT NOT NULL, PRIMARY KEY(`volume_number`, `feature_number`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "volumeNumber",
+            "columnName": "volume_number",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "featureNumber",
+            "columnName": "feature_number",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "noticeWeek",
+            "columnName": "notice_week",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "noticeYear",
+            "columnName": "notice_year",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "latitude",
+            "columnName": "latitude",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "longitude",
+            "columnName": "longitude",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "aidType",
+            "columnName": "aid_type",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "geopoliticalHeading",
+            "columnName": "geopolitical_heading",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "regionHeading",
+            "columnName": "region_heading",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "precedingNote",
+            "columnName": "preceding_note",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "position",
+            "columnName": "position",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "characteristic",
+            "columnName": "characteristic",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "range",
+            "columnName": "range",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "sequenceText",
+            "columnName": "sequence_text",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "frequency",
+            "columnName": "frequency",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "stationRemark",
+            "columnName": "station_remark",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "postNote",
+            "columnName": "post_note",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "noticeNumber",
+            "columnName": "notice_number",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "removeFromList",
+            "columnName": "remove_from_list",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "deleteFlag",
+            "columnName": "delete_flag",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "sectionHeader",
+            "columnName": "section_header",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "volume_number",
+            "feature_number"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '69592395c20ac6c98d0e31ddaf4915ee')"
+    ]
+  }
+}

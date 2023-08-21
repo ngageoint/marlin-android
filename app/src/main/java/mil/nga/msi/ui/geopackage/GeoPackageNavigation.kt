@@ -12,6 +12,7 @@ import kotlinx.serialization.json.Json
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.repository.geopackage.GeoPackageFeatureKey
 import mil.nga.msi.repository.geopackage.GeoPackageMediaKey
+import mil.nga.msi.ui.action.GeoPackageFeatureAction
 import mil.nga.msi.ui.geopackage.detail.GeoPackageFeatureDetailScreen
 import mil.nga.msi.ui.geopackage.media.GeoPackageMediaScreen
 import mil.nga.msi.ui.geopackage.sheet.GeoPackageFeatureSheetScreen
@@ -34,11 +35,6 @@ fun NavGraphBuilder.geopackageGraph(
    navController: NavController,
    showSnackbar: (String) -> Unit
 ) {
-   val zoomTo: (NavPoint) -> Unit = { point ->
-      val encoded = Uri.encode(Json.encodeToString(point))
-      navController.navigate(MapRoute.Map.name + "?point=${encoded}")
-   }
-
    composable(
       route = "${GeoPackageRoute.Detail.name}?key={key}",
       arguments = listOf(navArgument("key") { type = NavType.GeoPackageFeature })
@@ -53,16 +49,8 @@ fun NavGraphBuilder.geopackageGraph(
             },
             onAction = { action ->
                when(action) {
-                  is GeoPackageFeatureAction.Zoom -> {
-                     zoomTo(action.point)
-                  }
-                  is GeoPackageFeatureAction.Location -> {
-                     showSnackbar("${action.text} copied to clipboard")
-                  }
-                  is GeoPackageFeatureAction.Media -> {
-                     val encoded = Uri.encode(Json.encodeToString(action.key))
-                     navController.navigate( "${GeoPackageRoute.Media.name}?key=$encoded")
-                  }
+                  is GeoPackageFeatureAction.Location -> showSnackbar("${action.text} copied to clipboard")
+                  else -> action.navigate(navController)
                }
             }
          )

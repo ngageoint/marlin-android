@@ -13,7 +13,9 @@ import androidx.navigation.navigation
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import mil.nga.msi.datasource.DataSource
+import mil.nga.msi.repository.bookmark.BookmarkKey
 import mil.nga.msi.repository.noticetomariners.NoticeToMarinersGraphic
+import mil.nga.msi.ui.bookmark.BookmarkRoute
 import mil.nga.msi.ui.navigation.NavTypeNoticeToMarinersGraphic
 import mil.nga.msi.ui.navigation.Route
 import mil.nga.msi.ui.noticetomariners.all.NoticeToMarinersAllScreen
@@ -99,6 +101,11 @@ fun NavGraphBuilder.noticeToMarinersGraph(
             close = { navController.popBackStack() },
             onTap = {
                navController.navigate("${NoticeToMarinersRoute.Detail.name}?noticeNumber=${it}")
+            },
+            onBookmark = { noticeNumber ->
+               val key = BookmarkKey(noticeNumber.toString(), DataSource.NOTICE_TO_MARINERS)
+               val encoded = Uri.encode(Json.encodeToString(key))
+               navController.navigate( "${BookmarkRoute.Notes.name}?bookmark=$encoded")
             }
          )
       }
@@ -113,6 +120,11 @@ fun NavGraphBuilder.noticeToMarinersGraph(
                onGraphicTap = { graphic ->
                   val encoded = Uri.encode(Json.encodeToString(graphic))
                   navController.navigate( "${NoticeToMarinersRoute.Graphic.name}?graphic=$encoded")
+               },
+               onBookmark = {
+                  val key = BookmarkKey(it.toString(), DataSource.NOTICE_TO_MARINERS)
+                  val encoded = Uri.encode(Json.encodeToString(key))
+                  navController.navigate( "${BookmarkRoute.Notes.name}?bookmark=$encoded")
                }
             )
          }

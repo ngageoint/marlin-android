@@ -12,6 +12,10 @@ import com.google.accompanist.navigation.material.bottomSheet
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import mil.nga.msi.datasource.DataSource
+import mil.nga.msi.datasource.modu.Modu
+import mil.nga.msi.ui.action.Action
+import mil.nga.msi.ui.action.ModuAction
+import mil.nga.msi.ui.bookmark.BookmarkRoute
 import mil.nga.msi.ui.filter.FilterScreen
 import mil.nga.msi.ui.map.MapRoute
 import mil.nga.msi.ui.modu.detail.ModuDetailScreen
@@ -43,13 +47,8 @@ fun NavGraphBuilder.moduGraph(
    share: (Pair<String, String>) -> Unit,
    showSnackbar: (String) -> Unit
 ) {
-   val shareModu: (String) -> Unit = {
-      share(Pair("Share MODU Information", it))
-   }
-
-   val zoomTo: (NavPoint) -> Unit = { point ->
-      val encoded = Uri.encode(Json.encodeToString(point))
-      navController.navigate(MapRoute.Map.name + "?point=${encoded}")
+   val shareModu: (Modu) -> Unit = { modu ->
+      share(Pair("Share MODU Information", modu.toString()))
    }
 
    navigation(
@@ -70,14 +69,11 @@ fun NavGraphBuilder.moduGraph(
             openSort = {
                navController.navigate(ModuRoute.Sort.name)
             },
-            onTap = { name ->
-               navController.navigate( "${ModuRoute.Detail.name}?name=$name")
-            },
             onAction = { action ->
                when(action) {
-                  is ModuAction.Zoom -> zoomTo(action.point)
-                  is ModuAction.Share -> shareModu(action.text)
+                  is ModuAction.Share -> shareModu(action.modu)
                   is ModuAction.Location -> showSnackbar("${action.text} copied to clipboard")
+                  else -> action.navigate(navController)
                }
             }
          )
@@ -89,11 +85,11 @@ fun NavGraphBuilder.moduGraph(
             ModuDetailScreen(
                name,
                close = { navController.popBackStack() },
-               onAction = { action ->
+               onAction = { action: Action ->
                   when(action) {
-                     is ModuAction.Zoom -> zoomTo(action.point)
-                     is ModuAction.Share -> shareModu(action.text)
+                     is ModuAction.Share -> shareModu(action.modu)
                      is ModuAction.Location -> showSnackbar("${action.text} copied to clipboard")
+                     else -> action.navigate(navController)
                   }
                }
             )

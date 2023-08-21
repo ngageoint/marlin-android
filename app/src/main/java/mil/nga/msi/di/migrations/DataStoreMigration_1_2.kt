@@ -8,9 +8,14 @@ import mil.nga.msi.type.UserPreferences
 val dataStoreMigration_1_2 = object : DataMigration<UserPreferences> {
    override suspend fun migrate(currentData: UserPreferences): UserPreferences {
       // Add Notice To Mariners data source
+      val nonTabs = currentData.nonTabsList.toMutableSet().apply {
+         add(DataSource.NOTICE_TO_MARINERS.name)
+      }.toList()
+
       return currentData
          .toBuilder()
-         .addNonTabs(DataSource.NOTICE_TO_MARINERS.name)
+         .clearNonTabs()
+         .addAllNonTabs(nonTabs)
          .setVersion(2)
          .build()
    }

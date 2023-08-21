@@ -5,6 +5,7 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import mil.nga.msi.datasource.asam.Asam
 import mil.nga.msi.datasource.asam.AsamDao
+import mil.nga.msi.datasource.bookmark.Bookmark
 import mil.nga.msi.datasource.dgpsstation.DgpsStation
 import mil.nga.msi.datasource.dgpsstation.DgpsStationDao
 import mil.nga.msi.datasource.electronicpublication.ElectronicPublication
@@ -46,7 +47,7 @@ import mil.nga.msi.datasource.radiobeacon.RadioBeaconDao
 abstract class MsiDatabase : RoomDatabase() {
 
    companion object {
-      const val VERSION = 6
+      const val VERSION = 7
    }
 
    abstract fun asamDao(): AsamDao

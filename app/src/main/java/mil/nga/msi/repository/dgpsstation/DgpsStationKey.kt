@@ -4,7 +4,6 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 import mil.nga.msi.datasource.dgpsstation.DgpsStation
-import mil.nga.msi.datasource.dgpsstation.DgpsStationListItem
 
 @Serializable
 @Parcelize
@@ -25,10 +24,6 @@ data class DgpsStationKey(
 
       fun fromDgpsStation(dgpsStation: DgpsStation): DgpsStationKey {
          return DgpsStationKey(dgpsStation.volumeNumber, dgpsStation.featureNumber)
-      }
-
-      fun fromDgpsStation(item: DgpsStationListItem): DgpsStationKey {
-         return DgpsStationKey(item.volumeNumber, item.featureNumber.toFloat())
       }
    }
 }

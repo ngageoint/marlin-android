@@ -23,6 +23,9 @@ interface LayerDao {
    @Query("SELECT * FROM layers WHERE id = :id")
    suspend fun getLayer(id: Long): Layer?
 
+   @Query("SELECT * FROM layers WHERE id = :id")
+   fun observeLayer(id: Long): Flow<Layer>
+
    @Query("SELECT * FROM layers")
    fun observeLayers(): Flow<List<Layer>>
 

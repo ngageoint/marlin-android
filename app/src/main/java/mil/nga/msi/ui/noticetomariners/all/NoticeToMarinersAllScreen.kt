@@ -8,6 +8,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -17,20 +19,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import mil.nga.msi.datasource.noticetomariners.NoticeToMariners
+import mil.nga.msi.ui.bookmark.BookmarkNotes
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.noticetomariners.NoticeToMarinersRoute
 import mil.nga.msi.ui.theme.onSurfaceDisabled
 import mil.nga.msi.ui.theme.screenBackground
-import java.text.SimpleDateFormat
 import java.util.*
 
 @Composable
 fun NoticeToMarinersAllScreen(
    onTap: (Int) -> Unit,
+   onBookmark: (Int) -> Unit,
    close: () -> Unit,
    viewModel: NoticeToMarinersAllViewModel = hiltViewModel()
 ) {
-   val notices by viewModel.noticeToMariners.observeAsState(emptyMap())
+   val notices by viewModel.notices.observeAsState(emptyMap())
 
    Column {
       TopBar(
@@ -40,9 +44,17 @@ fun NoticeToMarinersAllScreen(
       )
 
       Surface(Modifier.fillMaxSize()) {
-         NoticeToMarinersItems(notices) {
-            onTap(it)
-         }
+         NoticeToMarinersItems(
+            notices,
+            onTap = onTap,
+            onBookmark = { (noticeNumber, bookmark) ->
+               if (bookmark == null) {
+                  onBookmark(noticeNumber)
+               } else {
+                  viewModel.deleteBookmark(bookmark)
+               }
+            }
+         )
       }
    }
 }
@@ -50,8 +62,9 @@ fun NoticeToMarinersAllScreen(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun NoticeToMarinersItems(
-   notices: Map<String, List<Int>>,
+   notices: Map<String, List<NoticeToMarinersWithBookmark>>,
    onTap: (Int) -> Unit,
+   onBookmark: (NoticeToMarinersWithBookmark) -> Unit
 ) {
    LazyColumn {
       notices.forEach { (year, notices) ->
@@ -59,15 +72,19 @@ private fun NoticeToMarinersItems(
             NoticeHeader(year = year)
          }
 
-         items(notices) { item ->
+         items(notices) { noticeWithBookmark ->
             NoticeToMarinersItem(
-               noticeNumber = item,
-               onTap = { onTap(item) }
+               noticeToMarinersWithBookmark = noticeWithBookmark,
+               onTap = { onTap(noticeWithBookmark.noticeNumber) },
+               onBookmark = { onBookmark(noticeWithBookmark) }
             )
+
+            Divider(Modifier.padding(horizontal = 16.dp))
          }
       }
    }
 }
+
 
 @Composable
 private fun NoticeHeader(
@@ -92,24 +109,19 @@ private fun NoticeHeader(
    }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun NoticeToMarinersItem(
-   noticeNumber: Int,
-   onTap: (Int) -> Unit,
+   noticeToMarinersWithBookmark: NoticeToMarinersWithBookmark,
+   onTap: () -> Unit,
+   onBookmark: () -> Unit,
 ) {
-   val calendar = Calendar.getInstance()
-   calendar.set(Calendar.YEAR, noticeNumber.toString().take(4).toInt())
-   calendar.set(Calendar.WEEK_OF_YEAR, noticeNumber.toString().takeLast(2).toInt())
-   while (calendar.get(Calendar.DAY_OF_WEEK) != Calendar.SATURDAY) {
-      calendar.add(Calendar.DAY_OF_WEEK, 1)
-   }
-
-   val start = SimpleDateFormat("MMMM d",Locale.getDefault()).format(calendar.time)
-   calendar.add(Calendar.DAY_OF_WEEK, 6)
-   val end = SimpleDateFormat("MMMM d",Locale.getDefault()).format(calendar.time)
+   val (noticeNumber, bookmark) = noticeToMarinersWithBookmark
+   val (start, end) = NoticeToMariners.span(noticeNumber)
 
    ListItem(
+      modifier = Modifier
+         .fillMaxWidth()
+         .clickable { onTap() },
       headlineContent = {
          Text(
             text = noticeNumber.toString(),
@@ -118,17 +130,29 @@ private fun NoticeToMarinersItem(
          )
       },
       supportingContent = {
-         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-            Text(
-               text = "$start - $end",
-               style = MaterialTheme.typography.titleSmall
+         Column {
+            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+               Text(
+                  text = "$start - $end",
+                  style = MaterialTheme.typography.titleSmall
+               )
+            }
+
+            BookmarkNotes(
+               notes = bookmark?.notes,
+               modifier = Modifier.padding(top = 16.dp)
             )
          }
-      },
-      modifier = Modifier
-         .fillMaxWidth()
-         .clickable { onTap(noticeNumber) }
-   )
 
-   Divider(Modifier.padding(start = 16.dp))
+      },
+      trailingContent = {
+         IconButton(onClick = { onBookmark() }) {
+            Icon(
+               imageVector = if (bookmark != null) Icons.Default.Bookmark else Icons.Outlined.BookmarkBorder,
+               tint = MaterialTheme.colorScheme.tertiary,
+               contentDescription = "Bookmark Notice To Mariners"
+            )
+         }
+      }
+   )
 }

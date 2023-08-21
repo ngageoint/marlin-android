@@ -9,11 +9,13 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ElectronicPublicationsViewModel @Inject constructor(
-    private val repository: ElectronicPublicationRepository
+    repository: ElectronicPublicationRepository
 ) : ViewModel() {
 
     val publicationTypes = repository.observeFileCountsByType().map {
-        it.map { PublicationTypeListItem(it.key, it.value) } .sortedBy { it.pubType.toString() }
+        it.map { (pubType, count) ->
+            PublicationTypeListItem(pubType, count)
+        }.sortedBy { item -> item.pubType.toString() }
     }
 }
 

@@ -16,25 +16,29 @@ import java.io.File
 import javax.inject.Inject
 
 class ElectronicPublicationRepository @Inject constructor(
-    private val localData: ElectronicPublicationLocalDataSource,
+    private val localDataSource: ElectronicPublicationLocalDataSource,
     private val downloadManager: DownloadManager,
     private val context: Application,
 ) {
+    suspend fun getElectronicPublication(s3Key: String) = localDataSource.getElectronicPublication(s3Key)
+
     /**
      * Query for publications of the given type.  The results are in ascending order by
      * [ElectronicPublication.pubDownloadOrder], [ElectronicPublication.sectionOrder],
      * [ElectronicPublication.s3Key] for consistency.
      */
-    fun observeElectronicPublicationsOfType(pubType: ElectronicPublicationType): Flow<List<ElectronicPublication>> {
-        return localData.observePublicationsOfType(pubType)
+    fun observeElectronicPublicationsOfType(publicationType: ElectronicPublicationType): Flow<List<ElectronicPublication>> {
+        return localDataSource.observePublicationsOfType(publicationType)
     }
 
-    fun observeFileCountsByType(): Flow<Map<ElectronicPublicationType, Int>> = localData.observeFileCountsByType()
+    fun observeElectronicPublication(s3Key: String) = localDataSource.observeElectronicPublication(s3Key)
 
-    suspend fun download(ePub: ElectronicPublication) {
-        localData.beginDownloading(ePub) { preDownloadEPub ->
-            val downloadUrl = "https://msi.nga.mil/api/publications/download?type=download&key=${ePub.s3Key}"
-            val destRelPath = "electronic_publications/${ePub.pubTypeId}/${ePub.fullFilename ?: "${ePub.s3Key}.${ePub.fileExtension ?: "data"}"}"
+    fun observeFileCountsByType(): Flow<Map<ElectronicPublicationType, Int>> = localDataSource.observeFileCountsByType()
+
+    suspend fun download(publication: ElectronicPublication) {
+        localDataSource.beginDownloading(publication) { preDownloadEPub ->
+            val downloadUrl = "https://msi.nga.mil/api/publications/download?type=download&key=${publication.s3Key}"
+            val destRelPath = "electronic_publications/${publication.pubTypeId}/${publication.fullFilename ?: "${publication.s3Key}.${publication.fileExtension ?: "data"}"}"
             val request = DownloadManager.Request(downloadUrl.toUri()).setDestinationInExternalFilesDir(context, Environment.DIRECTORY_DOCUMENTS, destRelPath)
             val downloadId = downloadManager.enqueue(request)
             preDownloadEPub.copy(localDownloadId = downloadId, localDownloadRelPath = destRelPath)
@@ -43,7 +47,7 @@ class ElectronicPublicationRepository @Inject constructor(
 
     suspend fun removeDownload(publication: ElectronicPublication) {
         publication.localDownloadId?.let { downloadId ->
-            localData.updateToRemoveDownload(publication) { downloadManager.remove(downloadId) }
+            localDataSource.updateToRemoveDownload(publication) { downloadManager.remove(downloadId) }
         }
     }
 
@@ -55,7 +59,7 @@ class ElectronicPublicationRepository @Inject constructor(
      * receive the updates.
      */
     suspend fun updateDownloadProgress() {
-        localData.updateDownloadProgress() { downloadingEPubs ->
+        localDataSource.updateDownloadProgress() { downloadingEPubs ->
             val ePubsByDownloadId = downloadingEPubs.associateBy { it.localDownloadId }
             val downloadIds = downloadingEPubs.map { it.localDownloadId!! }
             val downloadIdsArray = LongArray(downloadIds.size)
@@ -108,9 +112,9 @@ class ElectronicPublicationRepository @Inject constructor(
         }
     }
 
-    fun getContentUriToSharePublication(ePub: ElectronicPublication): Uri? {
+    fun getContentUriToSharePublication(publication: ElectronicPublication): Uri? {
         val extDirPath = context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)
-        return ePub.localDownloadRelPath?.let { path ->
+        return publication.localDownloadRelPath?.let { path ->
             FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", File(extDirPath, path))
         }
     }

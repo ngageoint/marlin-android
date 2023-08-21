@@ -1,34 +1,33 @@
 package mil.nga.msi.ui.port.list
 
-import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asFlow
 import androidx.lifecycle.asLiveData
-import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
-import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.insertSeparators
-import androidx.paging.liveData
 import androidx.paging.map
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import mil.nga.msi.datasource.DataSource
+import mil.nga.msi.datasource.bookmark.Bookmark
 import mil.nga.msi.datasource.port.Port
-import mil.nga.msi.filter.Filter
+import mil.nga.msi.datasource.port.PortWithBookmark
 import mil.nga.msi.location.LocationPolicy
+import mil.nga.msi.repository.bookmark.BookmarkRepository
 import mil.nga.msi.repository.port.PortRepository
 import mil.nga.msi.repository.preferences.FilterRepository
 import mil.nga.msi.repository.preferences.SortRepository
-import mil.nga.msi.sort.Sort
 import mil.nga.msi.sort.SortParameter
 import javax.inject.Inject
 
 sealed class PortListItem {
-   class PortItem(val port: Port) : PortListItem()
+   class PortItem(val portWithBookmark: PortWithBookmark) : PortListItem()
    class HeaderItem(val header: String) : PortListItem()
 }
 
@@ -37,50 +36,54 @@ class PortsViewModel @Inject constructor(
    locationPolicy: LocationPolicy,
    filterRepository: FilterRepository,
    sortRepository: SortRepository,
-   private val portRepository: PortRepository
+   private val portRepository: PortRepository,
+   private val bookmarkRepository: BookmarkRepository
 ): ViewModel() {
    val locationProvider = locationPolicy.bestLocationProvider
 
-   private val queryParameters = MediatorLiveData<Pair<List<Filter>, Sort?>>().apply {
-      addSource(filterRepository.filters.asLiveData()) { entry ->
-         val filters = entry[DataSource.PORT] ?: emptyList()
-         value = Pair(filters, value?.second)
-      }
-
-      addSource(sortRepository.sort.asLiveData()) { entry ->
-         val filters = value?.first ?: emptyList()
-         value = Pair(filters, entry[DataSource.PORT])
-      }
-   }
-
-   val ports: Flow<PagingData<PortListItem>> = queryParameters.switchMap { pair ->
-      val filters = pair.first
-      val sort = pair.second
+   @OptIn(ExperimentalCoroutinesApi::class)
+   val ports = combine(
+      sortRepository.sort,
+      filterRepository.filters,
+      bookmarkRepository.observeBookmarks(DataSource.PORT)
+   ) { sort, filters, _ ->
+      sort to filters
+   }.flatMapLatest { (sort, filters) ->
       Pager(PagingConfig(pageSize = 20), null) {
-         portRepository.observePortListItems(filters, sort?.parameters ?: emptyList())
-      }.liveData
-   }.asFlow().map { pagingData ->
-      pagingData
-         .map { PortListItem.PortItem(it) }
-         .insertSeparators { item1: PortListItem.PortItem?, item2: PortListItem.PortItem? ->
-            val section = queryParameters.value?.second?.section ?: false
-            val primarySortParameter = queryParameters.value?.second?.parameters?.firstOrNull()
+         portRepository.observePortListItems(
+            sort = sort[DataSource.PORT]?.parameters ?: emptyList(),
+            filters = filters[DataSource.PORT] ?: emptyList()
+         )
+      }.flow.map { pagingData ->
+         pagingData
+            .map { port ->
+               val bookmark = bookmarkRepository.getBookmark(DataSource.PORT, port.portNumber.toString())
+               PortListItem.PortItem(PortWithBookmark(port, bookmark))
+            }
+            .insertSeparators { item1: PortListItem.PortItem?, item2: PortListItem.PortItem? ->
+               val section = sort[DataSource.PORT]?.section == true
+               val primarySortParameter = sort[DataSource.PORT]?.parameters?.firstOrNull()
 
-            if (section && primarySortParameter != null) {
-               header(primarySortParameter, item1, item2)
-            } else null
-         }
+               if (section && primarySortParameter != null) {
+                  header(primarySortParameter, item1, item2)
+               } else null
+            }
+      }
    }.cachedIn(viewModelScope)
 
    val portFilters = filterRepository.filters.map { entry ->
       entry[DataSource.PORT] ?: emptyList()
    }.asLiveData()
 
-   suspend fun getPort(portNumber: Int) = portRepository.getPort(portNumber)
+   fun deleteBookmark(bookmark: Bookmark) {
+      viewModelScope.launch {
+         bookmarkRepository.delete(bookmark)
+      }
+   }
 
    private fun header(sort: SortParameter, item1: PortListItem.PortItem?, item2: PortListItem.PortItem?): PortListItem.HeaderItem? {
-      val item1String = parameterToName(sort.parameter.parameter, item1?.port)
-      val item2String = parameterToName(sort.parameter.parameter, item2?.port)
+      val item1String = parameterToName(sort.parameter.parameter, item1?.portWithBookmark?.port)
+      val item2String = parameterToName(sort.parameter.parameter, item2?.portWithBookmark?.port)
 
       return if (item1String == null && item2String != null) {
          PortListItem.HeaderItem(item2String)

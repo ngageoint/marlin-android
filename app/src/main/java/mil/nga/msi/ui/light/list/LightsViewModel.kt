@@ -1,83 +1,84 @@
 package mil.nga.msi.ui.light.list
 
-import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asFlow
 import androidx.lifecycle.asLiveData
-import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import androidx.paging.insertSeparators
-import androidx.paging.liveData
 import androidx.paging.map
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mil.nga.msi.datasource.DataSource
+import mil.nga.msi.datasource.bookmark.Bookmark
 import mil.nga.msi.datasource.light.Light
-import mil.nga.msi.filter.Filter
+import mil.nga.msi.datasource.light.LightWithBookmark
+import mil.nga.msi.repository.bookmark.BookmarkRepository
 import mil.nga.msi.repository.light.LightRepository
 import mil.nga.msi.repository.preferences.FilterRepository
 import mil.nga.msi.repository.preferences.SortRepository
-import mil.nga.msi.sort.Sort
 import mil.nga.msi.sort.SortParameter
 import javax.inject.Inject
 
 sealed class LightListItem {
-   class LightItem(val light : Light) : LightListItem()
-   class HeaderItem(val header : String) : LightListItem()
+   class LightItem(val lightWithBookmark: LightWithBookmark) : LightListItem()
+   class HeaderItem(val header: String) : LightListItem()
 }
 
 @HiltViewModel
 class LightsViewModel @Inject constructor(
    private val lightRepository: LightRepository,
+   val bookmarkRepository: BookmarkRepository,
    filterRepository: FilterRepository,
    sortRepository: SortRepository
 ): ViewModel() {
-   private val queryParameters = MediatorLiveData<Pair<List<Filter>, Sort?>>().apply {
-      addSource(filterRepository.filters.asLiveData()) { entry ->
-         val filters = entry[DataSource.LIGHT] ?: emptyList()
-         value = Pair(filters, value?.second)
-      }
 
-      addSource(sortRepository.sort.asLiveData()) { entry ->
-         val filters = value?.first ?: emptyList()
-         value = Pair(filters, entry[DataSource.LIGHT])
-      }
-   }
-
-   val lights = queryParameters.switchMap { pair ->
-      val filters = pair.first
-      val sort = pair.second
+   @OptIn(ExperimentalCoroutinesApi::class)
+   val lights = combine(
+      sortRepository.sort,
+      filterRepository.filters,
+      bookmarkRepository.observeBookmarks(DataSource.LIGHT)
+   ) { sort, filters, _ ->
+      sort to filters
+   }.flatMapLatest { (sort, filters) ->
       Pager(PagingConfig(pageSize = 20), null) {
-         lightRepository.observeLightListItems(filters, sort?.parameters ?: emptyList())
-      }.liveData
-   }.asFlow().map { pagingData ->
-      pagingData
-         .map { LightListItem.LightItem(it) }
-         .insertSeparators { item1: LightListItem.LightItem?, item2: LightListItem.LightItem? ->
-            val section = queryParameters.value?.second?.section ?: false
-            val primarySortParameter = queryParameters.value?.second?.parameters?.firstOrNull()
+         lightRepository.observeLightListItems(
+            sort = sort[DataSource.LIGHT]?.parameters ?: emptyList(),
+            filters = filters[DataSource.LIGHT] ?: emptyList()
+         )
+      }.flow.map { pagingData ->
+         pagingData
+            .map { light ->
+               val bookmark = bookmarkRepository.getBookmark(DataSource.LIGHT, light.id)
+               LightListItem.LightItem(LightWithBookmark(light, bookmark))
+            }
+            .insertSeparators { item1: LightListItem.LightItem?, item2: LightListItem.LightItem? ->
+               val section = sort[DataSource.LIGHT]?.section == true
+               val primarySortParameter = sort[DataSource.LIGHT]?.parameters?.firstOrNull()
 
-            if (section && primarySortParameter != null) {
-               header(primarySortParameter, item1, item2)
-            } else null
-         }
+               if (section && primarySortParameter != null) {
+                  header(primarySortParameter, item1, item2)
+               } else null
+            }
+      }
    }.cachedIn(viewModelScope)
 
    val lightFilters = filterRepository.filters.map { entry ->
       entry[DataSource.LIGHT] ?: emptyList()
    }.asLiveData()
 
-   suspend fun getLight(
-      volumeNumber: String,
-      featureNumber: String,
-      characteristicNumber: Int
-   ): Light? = lightRepository.getLight(volumeNumber, featureNumber, characteristicNumber)
-
+   fun deleteBookmark(bookmark: Bookmark) {
+      viewModelScope.launch {
+         bookmarkRepository.delete(bookmark)
+      }
+   }
 
    suspend fun getLights(
       minLatitude: Double,
@@ -89,8 +90,8 @@ class LightsViewModel @Inject constructor(
    }
 
    private fun header(sort: SortParameter, item1: LightListItem.LightItem?, item2: LightListItem.LightItem?): LightListItem.HeaderItem? {
-      val item1String = parameterToName(sort.parameter.parameter, item1?.light)
-      val item2String = parameterToName(sort.parameter.parameter, item2?.light)
+      val item1String = parameterToName(sort.parameter.parameter, item1?.lightWithBookmark?.light)
+      val item2String = parameterToName(sort.parameter.parameter, item2?.lightWithBookmark?.light)
 
       return if (item1String == null && item2String != null) {
          LightListItem.HeaderItem(item2String)

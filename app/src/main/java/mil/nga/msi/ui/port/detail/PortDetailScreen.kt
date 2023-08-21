@@ -1,7 +1,6 @@
 package mil.nga.msi.ui.port.detail
 
 import android.location.Location
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -11,11 +10,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.GpsFixed
-import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Card
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -24,7 +19,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -32,12 +26,15 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.TileProvider
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.port.Port
-import mil.nga.msi.ui.coordinate.CoordinateTextButton
+import mil.nga.msi.datasource.port.PortWithBookmark
+import mil.nga.msi.repository.bookmark.BookmarkKey
+import mil.nga.msi.ui.action.Action
 import mil.nga.msi.ui.location.generalDirection
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.MapClip
-import mil.nga.msi.ui.navigation.NavPoint
-import mil.nga.msi.ui.port.PortAction
+import mil.nga.msi.ui.action.PortAction
+import mil.nga.msi.ui.bookmark.BookmarkNotes
+import mil.nga.msi.ui.datasource.DataSourceActions
 import mil.nga.msi.ui.port.PortViewModel
 import mil.nga.msi.ui.theme.onSurfaceDisabled
 
@@ -51,11 +48,12 @@ fun Int.asNonZeroOrNull(): Int? {
 fun PortDetailScreen(
    portNumber: Int,
    close: () -> Unit,
-   onAction: (PortAction) -> Unit,
+   onAction: (Action) -> Unit,
    viewModel: PortViewModel = hiltViewModel()
 ) {
    val location by viewModel.locationProvider.observeAsState()
-   val port by viewModel.getPort(portNumber).observeAsState()
+   val portWithBookmark by viewModel.portWithBookmark.observeAsState()
+   viewModel.setPortNumber(portNumber)
 
    Column {
       TopBar(
@@ -65,11 +63,18 @@ fun PortDetailScreen(
       )
 
       PortDetailContent(
-         port = port,
+         portWithBookmark = portWithBookmark,
          tileProvider = viewModel.tileProvider,
          location = location,
-         onZoom = { onAction(PortAction.Zoom(it)) },
-         onShare = { onAction(PortAction.Share(port.toString())) },
+         onZoom = { onAction(PortAction.Zoom(it.latLng)) },
+         onShare = { onAction(PortAction.Share(it)) },
+         onBookmark = { (port, bookmark) ->
+            if (bookmark == null) {
+               onAction(Action.Bookmark(BookmarkKey.fromPort(port)))
+            } else {
+               viewModel.deleteBookmark(bookmark)
+            }
+         },
          onCopyLocation = { onAction(PortAction.Location(it)) }
       )
    }
@@ -77,14 +82,15 @@ fun PortDetailScreen(
 
 @Composable
 private fun PortDetailContent(
-   port: Port?,
+   portWithBookmark: PortWithBookmark?,
    tileProvider: TileProvider,
    location: Location?,
-   onZoom: (NavPoint) -> Unit,
-   onShare: () -> Unit,
+   onZoom: (Port) -> Unit,
+   onShare: (Port) -> Unit,
+   onBookmark: (PortWithBookmark) -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
-   if (port != null) {
+   if (portWithBookmark != null) {
       Surface(
          modifier = Modifier.fillMaxHeight()
       ) {
@@ -95,14 +101,15 @@ private fun PortDetailContent(
                .verticalScroll(rememberScrollState())
          ) {
             PortHeader(
-               port = port,
+               portWithBookmark = portWithBookmark,
                tileProvider = tileProvider,
                location = location,
-               onZoom = onZoom,
-               onShare = onShare,
+               onZoom = { onZoom(portWithBookmark.port) },
+               onShare = { onShare(portWithBookmark.port) },
+               onBookmark = { onBookmark(portWithBookmark) },
                onCopyLocation = onCopyLocation
             )
-            PortInformation(port)
+            PortInformation(portWithBookmark.port)
          }
       }
    }
@@ -110,13 +117,16 @@ private fun PortDetailContent(
 
 @Composable
 private fun PortHeader(
-   port: Port,
+   portWithBookmark: PortWithBookmark,
    tileProvider: TileProvider,
    location: Location?,
-   onZoom: (NavPoint) -> Unit,
+   onZoom: () -> Unit,
    onShare: () -> Unit,
+   onBookmark: () -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
+   val (port, bookmark) = portWithBookmark
+
    Card {
       Column {
          Surface(
@@ -175,62 +185,21 @@ private fun PortHeader(
                }
             }
 
-            PortFooter(
-               port = port,
+            BookmarkNotes(
+               notes = bookmark?.notes,
+               modifier = Modifier.padding(horizontal = 16.dp)
+            )
+
+            DataSourceActions(
+               latLng = port.latLng,
+               bookmarked = bookmark != null,
+               onZoom = onZoom,
                onShare = onShare,
-               onZoom = { onZoom(NavPoint(port.latitude, port.longitude)) },
-               onCopyLocation = onCopyLocation
+               onBookmark = onBookmark,
+               onCopyLocation = onCopyLocation,
+               modifier = Modifier.padding(start = 8.dp, end = 8.dp, bottom = 8.dp)
             )
          }
-      }
-   }
-}
-
-@Composable
-private fun PortFooter(
-   port: Port,
-   onZoom: () -> Unit,
-   onShare: () -> Unit,
-   onCopyLocation: (String) -> Unit
-) {
-   Row(
-      verticalAlignment = Alignment.CenterVertically,
-      horizontalArrangement = Arrangement.SpaceBetween,
-      modifier = Modifier.fillMaxWidth()
-   ) {
-      PortLocation(port.latLng, onCopyLocation)
-      PortActions(onZoom, onShare)
-   }
-}
-
-@Composable
-private fun PortLocation(
-   latLng: LatLng,
-   onCopyLocation: (String) -> Unit
-) {
-   CoordinateTextButton(
-      latLng = latLng,
-      onCopiedToClipboard = { onCopyLocation(it) }
-   )
-}
-
-@Composable
-private fun PortActions(
-   onZoom: () -> Unit,
-   onShare: () -> Unit
-) {
-   Row {
-      IconButton(onClick = { onShare() }) {
-         Icon(Icons.Default.Share,
-            tint = MaterialTheme.colorScheme.tertiary,
-            contentDescription = "Share Port"
-         )
-      }
-      IconButton(onClick = { onZoom() }) {
-         Icon(Icons.Default.GpsFixed,
-            tint = MaterialTheme.colorScheme.tertiary,
-            contentDescription = "Zoom to Port"
-         )
       }
    }
 }

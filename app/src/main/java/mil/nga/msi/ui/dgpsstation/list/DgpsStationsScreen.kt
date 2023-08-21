@@ -7,31 +7,27 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.PagingData
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
-import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.launch
-import mil.nga.msi.coordinate.DMS
 import mil.nga.msi.datasource.dgpsstation.DgpsStation
-import mil.nga.msi.repository.dgpsstation.DgpsStationKey
-import mil.nga.msi.ui.dgpsstation.DgpsStationAction
+import mil.nga.msi.datasource.dgpsstation.DgpsStationWithBookmark
+import mil.nga.msi.repository.bookmark.BookmarkKey
+import mil.nga.msi.ui.action.Action
+import mil.nga.msi.ui.action.AsamAction
+import mil.nga.msi.ui.action.DgpsStationAction
+import mil.nga.msi.ui.datasource.DataSourceActions
 import mil.nga.msi.ui.dgpsstation.DgpsStationRoute
-import mil.nga.msi.ui.coordinate.CoordinateTextButton
+import mil.nga.msi.ui.dgpsstation.DgpsStationSummary
 import mil.nga.msi.ui.main.TopBar
-import mil.nga.msi.ui.navigation.NavPoint
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -39,11 +35,9 @@ fun DgpsStationsScreen(
    openDrawer: () -> Unit,
    openFilter: () -> Unit,
    openSort: () -> Unit,
-   onTap: (DgpsStationKey) -> Unit,
-   onAction: (DgpsStationAction) -> Unit,
+   onAction: (Action) -> Unit,
    viewModel: DgpsStationsViewModel = hiltViewModel()
 ) {
-   val scope = rememberCoroutineScope()
    val filters by viewModel.dgpsStationFilters.observeAsState(emptyList())
 
    Column(modifier = Modifier.fillMaxSize()) {
@@ -83,16 +77,17 @@ fun DgpsStationsScreen(
 
       DgpsStations(
          pagingState = viewModel.dgpsStations,
-         onTap = { onTap(DgpsStationKey.fromDgpsStation(it)) },
-         onCopyLocation = { onAction(DgpsStationAction.Location(it)) },
-         onZoom = { onAction(DgpsStationAction.Zoom(it)) },
-         onShare = { dgpsStation ->
-            scope.launch {
-               viewModel.getDgpsStation(dgpsStation.volumeNumber, dgpsStation.featureNumber)?.let {
-                  onAction(DgpsStationAction.Share(it.toString()))
-               }
+         onTap = { onAction(DgpsStationAction.Tap(it)) },
+         onZoom = { onAction(DgpsStationAction.Zoom(it.latLng)) },
+         onShare = { onAction(DgpsStationAction.Share(it)) },
+         onBookmark = { (dgpsStation, bookmark) ->
+            if (bookmark == null) {
+               onAction(Action.Bookmark(BookmarkKey.fromDgpsStation(dgpsStation)))
+            } else {
+               viewModel.deleteBookmark(bookmark)
             }
-         }
+         },
+         onCopyLocation = { onAction(AsamAction.Location(it)) }
       )
    }
 }
@@ -101,8 +96,9 @@ fun DgpsStationsScreen(
 private fun DgpsStations(
    pagingState: Flow<PagingData<DgpsStationListItem>>,
    onTap: (DgpsStation) -> Unit,
-   onZoom: (NavPoint) -> Unit,
+   onZoom: (DgpsStation) -> Unit,
    onShare: (DgpsStation) -> Unit,
+   onBookmark: (DgpsStationWithBookmark) -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
    val lazyItems = pagingState.collectAsLazyPagingItems()
@@ -116,7 +112,7 @@ private fun DgpsStations(
             count = lazyItems.itemCount,
             key = lazyItems.itemKey {
                when (it) {
-                  is DgpsStationListItem.DgpsStationItem -> it.dgpsStation.id
+                  is DgpsStationListItem.DgpsStationItem -> it.dgpsStationWithBookmark.dgpsStation.id
                   is DgpsStationListItem.HeaderItem -> it.header
                }
             },
@@ -139,11 +135,12 @@ private fun DgpsStations(
                   }
                   is DgpsStationListItem.DgpsStationItem -> {
                      DgpsStationCard(
-                        dgpsStation = item.dgpsStation,
-                        onTap = onTap,
-                        onCopyLocation = { onCopyLocation(it) },
-                        onZoom = { onZoom(NavPoint(item.dgpsStation.latitude, item.dgpsStation.longitude)) },
-                        onShare = onShare
+                        dgpsStationWithBookmark = item.dgpsStationWithBookmark,
+                        onTap = { onTap(item.dgpsStationWithBookmark.dgpsStation) },
+                        onZoom = { onZoom(item.dgpsStationWithBookmark.dgpsStation) },
+                        onShare = { onShare(item.dgpsStationWithBookmark.dgpsStation) },
+                        onBookmark = { onBookmark(item.dgpsStationWithBookmark) },
+                        onCopyLocation = onCopyLocation
                      )
                   }
                }
@@ -155,120 +152,34 @@ private fun DgpsStations(
 
 @Composable
 private fun DgpsStationCard(
-   dgpsStation: DgpsStation,
-   onTap: (DgpsStation) -> Unit,
-   onShare: (DgpsStation) -> Unit,
+   dgpsStationWithBookmark: DgpsStationWithBookmark,
+   onTap: () -> Unit,
    onZoom: () -> Unit,
+   onShare: () -> Unit,
+   onBookmark: () -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
+   val (dgpsStation, bookmark) = dgpsStationWithBookmark
+
    Card(
       Modifier
          .fillMaxWidth()
          .padding(bottom = 8.dp)
-         .clickable { onTap(dgpsStation) }
+         .clickable { onTap() }
    ) {
-      DgpsStationContent(
-         dgpsStation,
-         onShare = { onShare(dgpsStation) },
-         onZoom,
-         onCopyLocation
-      )
-   }
-}
-
-@Composable
-private fun DgpsStationContent(
-   dgpsStation: DgpsStation,
-   onShare: () -> Unit,
-   onZoom: () -> Unit,
-   onCopyLocation: (String) -> Unit
-) {
-   Column(Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
-      CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-         Text(
-            text = "${dgpsStation.featureNumber} ${dgpsStation.volumeNumber}",
-            fontWeight = FontWeight.SemiBold,
-            style = MaterialTheme.typography.labelSmall,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
+      Column(Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
+         DgpsStationSummary(
+            dgpsStationWithBookmark,
+            modifier = Modifier.padding(bottom = 8.dp)
          )
-      }
 
-      dgpsStation.name?.let { name ->
-         Text(
-            text = name,
-            style = MaterialTheme.typography.titleLarge,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.padding(top = 16.dp)
-         )
-      }
-
-      CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-         dgpsStation.remarks?.let { remarks ->
-            Text(
-               text = remarks,
-               style = MaterialTheme.typography.bodyMedium,
-               modifier = Modifier.padding(top = 8.dp)
-            )
-         }
-      }
-
-      DgpsStationFooter(
-         dgpsStation = dgpsStation,
-         onShare = onShare,
-         onZoom = onZoom,
-         onCopyLocation = onCopyLocation
-      )
-   }
-}
-
-@Composable
-private fun DgpsStationFooter(
-   dgpsStation: DgpsStation,
-   onShare: () -> Unit,
-   onZoom: () -> Unit,
-   onCopyLocation: (String) -> Unit
-) {
-   Row(
-      verticalAlignment = Alignment.CenterVertically,
-      horizontalArrangement = Arrangement.SpaceBetween,
-      modifier = Modifier
-         .fillMaxWidth()
-         .padding(top = 8.dp)
-   ) {
-      DgpsStationLocation(dgpsStation.latLng, onCopyLocation)
-      DgpsStationActions(onShare, onZoom)
-   }
-}
-
-@Composable
-private fun DgpsStationLocation(
-   latLng: LatLng,
-   onCopyLocation: (String) -> Unit
-) {
-   CoordinateTextButton(
-      latLng = latLng,
-      onCopiedToClipboard = { onCopyLocation(it) }
-   )
-}
-
-@Composable
-private fun DgpsStationActions(
-   onShare: () -> Unit,
-   onZoom: () -> Unit
-) {
-   Row {
-      IconButton(onClick = { onShare() }) {
-         Icon(Icons.Default.Share,
-            tint = MaterialTheme.colorScheme.tertiary,
-            contentDescription = "Share DGPS Station"
-         )
-      }
-      IconButton(onClick = { onZoom() }) {
-         Icon(Icons.Default.GpsFixed,
-            tint = MaterialTheme.colorScheme.tertiary,
-            contentDescription = "Zoom to DGPS Station"
+         DataSourceActions(
+            latLng = dgpsStation.latLng,
+            bookmarked = bookmark != null,
+            onShare = { onShare() },
+            onZoom = { onZoom() },
+            onBookmark = { onBookmark() },
+            onCopyLocation = onCopyLocation
          )
       }
    }

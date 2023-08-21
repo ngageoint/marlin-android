@@ -27,9 +27,9 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import mil.nga.msi.geopackage.GeoPackageMediaProperty
 import mil.nga.msi.repository.geopackage.GeoPackageMediaKey
 import mil.nga.msi.ui.geopackage.GeoPackageViewModel
-import mil.nga.msi.ui.geopackage.MediaProperty
 import mil.nga.msi.ui.main.TopBar
 
 @Composable
@@ -61,7 +61,7 @@ fun GeoPackageMediaScreen(
 
 @Composable
 private fun GeoPackageMedia(
-   media: MediaProperty
+   media: GeoPackageMediaProperty
 ) {
    when {
       media.contentType.contains("image/") -> {

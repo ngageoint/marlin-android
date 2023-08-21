@@ -1,8 +1,6 @@
 package mil.nga.msi.ui.modu.detail
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -10,11 +8,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.GpsFixed
-import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Card
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -23,7 +17,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -33,12 +26,14 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.TileProvider
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.modu.Modu
-import mil.nga.msi.ui.coordinate.CoordinateTextButton
+import mil.nga.msi.datasource.modu.ModuWithBookmark
+import mil.nga.msi.repository.bookmark.BookmarkKey
+import mil.nga.msi.ui.action.Action
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.MapClip
-import mil.nga.msi.ui.modu.ModuAction
+import mil.nga.msi.ui.action.ModuAction
+import mil.nga.msi.ui.datasource.DataSourceActions
 import mil.nga.msi.ui.modu.ModuViewModel
-import mil.nga.msi.ui.navigation.NavPoint
 import mil.nga.msi.ui.theme.onSurfaceDisabled
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -47,10 +42,11 @@ import java.util.Locale
 fun ModuDetailScreen(
    name: String,
    close: () -> Unit,
-   onAction: (ModuAction) -> Unit,
+   onAction: (Action) -> Unit,
    viewModel: ModuViewModel = hiltViewModel()
 ) {
-   val modu by viewModel.getModu(name).observeAsState()
+   viewModel.setName(name)
+   val moduWithBookmark by viewModel.moduWithBookmark.observeAsState()
 
    Column {
       TopBar(
@@ -60,10 +56,17 @@ fun ModuDetailScreen(
       )
 
       ModuDetailContent(
-         modu = modu,
+         moduWithBookmark,
          tileProvider = viewModel.tileProvider,
-         onZoom = { modu?.let { onAction(ModuAction.Zoom(NavPoint(it.latitude, it.latitude))) } },
-         onShare = { onAction(ModuAction.Share(modu.toString())) },
+         onZoom = { onAction(ModuAction.Zoom(it.latLng)) },
+         onShare = { onAction(ModuAction.Share(it)) },
+         onBookmark = { (modu, bookmark) ->
+            if (bookmark ==  null) {
+               onAction(Action.Bookmark(BookmarkKey.fromModu(modu)))
+            } else {
+               viewModel.deleteBookmark(bookmark)
+            }
+         },
          onCopyLocation = { onAction(ModuAction.Location(it)) }
       )
    }
@@ -71,13 +74,14 @@ fun ModuDetailScreen(
 
 @Composable
 private fun ModuDetailContent(
-   modu: Modu?,
+   moduWithBookmark: ModuWithBookmark?,
    tileProvider: TileProvider,
-   onZoom: () -> Unit,
-   onShare: () -> Unit,
+   onZoom: (Modu) -> Unit,
+   onShare: (Modu) -> Unit,
+   onBookmark: (ModuWithBookmark) -> Unit,
    onCopyLocation: (String) -> Unit,
 ) {
-   if (modu != null) {
+   if (moduWithBookmark != null) {
       Surface(
          modifier = Modifier.fillMaxHeight()
       ) {
@@ -86,8 +90,15 @@ private fun ModuDetailContent(
                .padding(all = 8.dp)
                .verticalScroll(rememberScrollState())
          ) {
-            ModuHeader(modu, tileProvider, onZoom, onShare, onCopyLocation)
-            ModuInformation(modu)
+            ModuHeader(
+               moduWithBookmark,
+               tileProvider = tileProvider,
+               onZoom = { onZoom(moduWithBookmark.modu) },
+               onShare = { onShare(moduWithBookmark.modu) },
+               onBookmark = { onBookmark(moduWithBookmark) },
+               onCopyLocation
+            )
+            ModuInformation(moduWithBookmark.modu)
          }
       }
    }
@@ -95,12 +106,15 @@ private fun ModuDetailContent(
 
 @Composable
 private fun ModuHeader(
-   modu: Modu,
+   moduWithBookmark: ModuWithBookmark,
    tileProvider: TileProvider,
    onZoom: () -> Unit,
    onShare: () -> Unit,
+   onBookmark: () -> Unit,
    onCopyLocation: (String) -> Unit,
 ) {
+   val (modu, bookmark) = moduWithBookmark
+
    Card(
       modifier = Modifier.padding(bottom = 16.dp)
    ) {
@@ -136,57 +150,45 @@ private fun ModuHeader(
                }
             }
 
-            ModuFooter(modu, onZoom, onShare, onCopyLocation)
+            modu.rigStatus?.let {
+               Text(
+                  text = it.name,
+                  style = MaterialTheme.typography.bodyLarge,
+                  modifier = Modifier.padding(top = 8.dp)
+               )
+            }
+
+            modu.specialStatus?.let {
+               Text(
+                  text = it,
+                  style = MaterialTheme.typography.bodyMedium,
+                  modifier = Modifier.padding(top = 8.dp)
+               )
+            }
+
+            bookmark?.notes?.let { notes ->
+               Text(
+                  text = "Bookmark Notes",
+                  style = MaterialTheme.typography.titleMedium,
+                  fontWeight = FontWeight.Medium,
+                  modifier = Modifier.padding(top = 16.dp, bottom = 4.dp)
+               )
+
+               Text(
+                  text = notes,
+                  style = MaterialTheme.typography.bodyMedium
+               )
+            }
+
+            DataSourceActions(
+               latLng = modu.latLng,
+               bookmarked = bookmark != null,
+               onZoom = onZoom,
+               onShare = onShare,
+               onBookmark = onBookmark,
+               onCopyLocation = onCopyLocation
+            )
          }
-      }
-   }
-}
-
-@Composable
-private fun ModuFooter(
-   modu: Modu,
-   onZoom: () -> Unit,
-   onShare: () -> Unit,
-   onCopyLocation: (String) -> Unit,
-) {
-   Row(
-      verticalAlignment = Alignment.CenterVertically,
-      horizontalArrangement = Arrangement.SpaceBetween,
-      modifier = Modifier.fillMaxWidth()
-   ) {
-      ModuLocation(modu.latLng, onCopyLocation)
-      ModuActions(onZoom, onShare)
-   }
-}
-
-@Composable
-private fun ModuLocation(
-   latLng: LatLng,
-   onCopyLocation: (String) -> Unit,
-) {
-   CoordinateTextButton(
-      latLng = latLng,
-      onCopiedToClipboard = { onCopyLocation(it) }
-   )
-}
-
-@Composable
-private fun ModuActions(
-   onZoom: () -> Unit,
-   onShare: () -> Unit
-) {
-   Row {
-      IconButton(onClick = { onShare() }) {
-         Icon(Icons.Default.Share,
-            tint = MaterialTheme.colorScheme.tertiary,
-            contentDescription = "Share MODU"
-         )
-      }
-      IconButton(onClick = { onZoom() }) {
-         Icon(Icons.Default.GpsFixed,
-            tint = MaterialTheme.colorScheme.tertiary,
-            contentDescription = "Zoom to MODU"
-         )
       }
    }
 }
@@ -210,8 +212,6 @@ private fun ModuInformation(
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
       ) {
-         ModuProperty(title = "Rig Status", value = modu.rigStatus.toString())
-         ModuProperty(title = "Special Status", value = modu.specialStatus)
          ModuProperty(title = "Distance", value = modu.distance?.toString())
          ModuProperty(title = "Position", value = modu.position)
          ModuProperty(title = "Navigation Area", value = modu.navigationArea)

@@ -5,12 +5,17 @@ import mil.nga.msi.datasource.electronicpublication.ElectronicPublicationDao
 import mil.nga.msi.datasource.electronicpublication.ElectronicPublicationType
 import javax.inject.Inject
 
-class ElectronicPublicationLocalDataSource @Inject constructor(private val dao: ElectronicPublicationDao) {
+class ElectronicPublicationLocalDataSource @Inject constructor(
+    private val dao: ElectronicPublicationDao
+) {
 
     suspend fun count(): Int = dao.count()
     suspend fun isEmpty(): Boolean = count() == 0
     suspend fun insert(allThese: List<ElectronicPublication>) = dao.insert(allThese)
     suspend fun update(ePub: ElectronicPublication) = dao.update(ePub)
+
+    suspend fun getElectronicPublication(s3Key: String) = dao.getElectronicPublication(s3Key)
+
     /**
      * Mark the given publication as downloading in the local data store, begin the download by
      * executing the given lambda, then update the publication record again with the result from
@@ -26,4 +31,5 @@ class ElectronicPublicationLocalDataSource @Inject constructor(private val dao: 
     suspend fun updateToRemoveDownload(ePub: ElectronicPublication, removeDownloadedFile: suspend () -> Unit) = dao.updateToRemoveDownload(ePub, removeDownloadedFile)
     fun observeFileCountsByType() = dao.observeFileCountsByType()
     fun observePublicationsOfType(pubType: ElectronicPublicationType) = dao.observeElectronicPublicationsOfType(pubType.typeId)
+    fun observeElectronicPublication(s3Key: String) = dao.observeElectronicPublication(s3Key)
 }

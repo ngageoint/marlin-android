@@ -8,31 +8,27 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.PagingData
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
-import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.launch
-import mil.nga.msi.coordinate.DMS
 import mil.nga.msi.datasource.port.Port
-import mil.nga.msi.ui.coordinate.CoordinateTextButton
-import mil.nga.msi.ui.location.generalDirection
+import mil.nga.msi.datasource.port.PortWithBookmark
+import mil.nga.msi.repository.bookmark.BookmarkKey
+import mil.nga.msi.ui.action.Action
+import mil.nga.msi.ui.action.AsamAction
 import mil.nga.msi.ui.main.TopBar
-import mil.nga.msi.ui.navigation.NavPoint
-import mil.nga.msi.ui.port.PortAction
+import mil.nga.msi.ui.action.PortAction
+import mil.nga.msi.ui.datasource.DataSourceActions
 import mil.nga.msi.ui.port.PortRoute
+import mil.nga.msi.ui.port.PortSummary
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,11 +36,9 @@ fun PortsScreen(
    openDrawer: () -> Unit,
    openFilter: () -> Unit,
    openSort: () -> Unit,
-   onTap: (Int) -> Unit,
-   onAction: (PortAction) -> Unit,
+   onAction: (Action) -> Unit,
    viewModel: PortsViewModel = hiltViewModel()
 ) {
-   val scope = rememberCoroutineScope()
    val location by viewModel.locationProvider.observeAsState()
    val filters by viewModel.portFilters.observeAsState(emptyList())
 
@@ -86,16 +80,17 @@ fun PortsScreen(
       Ports(
          pagingState = viewModel.ports,
          location = location,
-         onTap = onTap,
-         onCopyLocation = { onAction(PortAction.Location(it)) },
-         onZoom = { onAction(PortAction.Zoom(it)) },
-         onShare = { portNumber ->
-            scope.launch {
-               viewModel.getPort(portNumber)?.let { port ->
-                  onAction(PortAction.Share(port.toString()))
-               }
+         onTap = { onAction(PortAction.Tap(it)) },
+         onZoom = { onAction(PortAction.Zoom(it.latLng)) },
+         onShare = { onAction(PortAction.Share(it)) },
+         onBookmark = { (port, bookmark) ->
+            if (bookmark == null) {
+               onAction(Action.Bookmark(BookmarkKey.fromPort(port)))
+            } else {
+               viewModel.deleteBookmark(bookmark)
             }
-         }
+         },
+         onCopyLocation = { onAction(AsamAction.Location(it)) }
       )
    }
 }
@@ -104,9 +99,10 @@ fun PortsScreen(
 private fun Ports(
    pagingState: Flow<PagingData<PortListItem>>,
    location: Location?,
-   onTap: (Int) -> Unit,
-   onZoom: (NavPoint) -> Unit,
-   onShare: (Int) -> Unit,
+   onTap: (Port) -> Unit,
+   onZoom: (Port) -> Unit,
+   onShare: (Port) -> Unit,
+   onBookmark: (PortWithBookmark) -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
    val lazyItems = pagingState.collectAsLazyPagingItems()
@@ -119,7 +115,7 @@ private fun Ports(
             count = lazyItems.itemCount,
             key = lazyItems.itemKey {
                when (it) {
-                  is PortListItem.PortItem -> it.port.portNumber
+                  is PortListItem.PortItem -> it.portWithBookmark.port.portNumber
                   is PortListItem.HeaderItem -> it.header
                }
             },
@@ -134,12 +130,13 @@ private fun Ports(
                when (item) {
                   is PortListItem.PortItem -> {
                      PortCard(
-                        port = item.port,
+                        portWithBookmark = item.portWithBookmark,
                         location = location,
-                        onTap = onTap,
-                        onCopyLocation = { onCopyLocation(it) },
-                        onZoom = { onZoom(NavPoint(item.port.latitude, item.port.longitude)) },
-                        onShare = { onShare(item.port.portNumber) }
+                        onTap = { onTap(item.portWithBookmark.port) },
+                        onZoom = { onZoom(item.portWithBookmark.port) },
+                        onShare = { onShare(item.portWithBookmark.port) },
+                        onBookmark = { onBookmark(item.portWithBookmark) },
+                        onCopyLocation = onCopyLocation
                      )
                   }
                   is PortListItem.HeaderItem -> {
@@ -159,135 +156,35 @@ private fun Ports(
 
 @Composable
 private fun PortCard(
-   port: Port,
+   portWithBookmark: PortWithBookmark,
    location: Location?,
-   onTap: (Int) -> Unit,
+   onTap: () -> Unit,
    onShare: () -> Unit,
    onZoom: () -> Unit,
+   onBookmark: () -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
+   val (port, bookmark) = portWithBookmark
+
    Card(
       Modifier
          .fillMaxWidth()
          .padding(bottom = 8.dp)
-         .clickable { onTap(port.portNumber) }
+         .clickable { onTap() }
    ) {
-      PortContent(port, location, onShare, onZoom, onCopyLocation)
-   }
-}
+      PortSummary(
+         portWithBookmark = portWithBookmark,
+         location = location,
+         modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp)
+      )
 
-@Composable
-private fun PortContent(
-   port: Port,
-   location: Location?,
-   onShare: () -> Unit,
-   onZoom: () -> Unit,
-   onCopyLocation: (String) -> Unit
-) {
-   Column {
-      Row(
-         Modifier.padding(vertical = 8.dp, horizontal = 16.dp)
-      ) {
-         Column(
-            Modifier.weight(1f)
-         ) {
-            Text(
-               text = port.portName,
-               style = MaterialTheme.typography.titleLarge,
-               maxLines = 1,
-               overflow = TextOverflow.Ellipsis
-            )
-
-            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-               port.alternateName?.let {
-                  Text(
-                     text = it,
-                     style = MaterialTheme.typography.bodyMedium,
-                     modifier = Modifier.padding(top = 4.dp)
-                  )
-               }
-            }
-         }
-
-         location?.let { location ->
-            Row {
-               val portLocation = Location("port").apply {
-                  latitude = port.latitude
-                  longitude = port.longitude
-               }
-
-               val distance = location.distanceTo(portLocation) / 1000
-               val direction = location.generalDirection(portLocation)
-               val nmi = distance * 0.539957
-               CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-                  Text(
-                     text = "${String.format("%.2f", nmi)}, $direction",
-                     style = MaterialTheme.typography.bodyMedium,
-                     modifier = Modifier.padding(top = 4.dp)
-                  )
-               }
-            }
-         }
-      }
-
-      PortFooter(
-         port = port,
-         onShare = onShare,
+      DataSourceActions(
+         latLng = port.latLng,
+         bookmarked = bookmark != null,
          onZoom = onZoom,
+         onShare = onShare,
+         onBookmark = onBookmark,
          onCopyLocation = onCopyLocation
       )
-   }
-}
-
-@Composable
-private fun PortFooter(
-   port: Port,
-   onShare: () -> Unit,
-   onZoom: () -> Unit,
-   onCopyLocation: (String) -> Unit
-) {
-   Row(
-      verticalAlignment = Alignment.CenterVertically,
-      horizontalArrangement = Arrangement.SpaceBetween,
-      modifier = Modifier
-         .fillMaxWidth()
-         .padding(top = 8.dp)
-   ) {
-      PortLocation(port.latLng, onCopyLocation)
-      PortActions(onShare, onZoom)
-   }
-}
-
-@Composable
-private fun PortLocation(
-   latLng: LatLng,
-   onCopyLocation: (String) -> Unit
-) {
-   CoordinateTextButton(
-      latLng = latLng,
-      onCopiedToClipboard = { onCopyLocation(it) }
-   )
-}
-
-@Composable
-private fun PortActions(
-   onShare: () -> Unit,
-   onZoom: () -> Unit
-) {
-   Row {
-      IconButton(
-         onClick = { onShare() }
-      ) {
-         Icon(Icons.Default.Share,
-            tint = MaterialTheme.colorScheme.tertiary,
-            contentDescription = "Share Port"
-         )
-      }
-      IconButton(onClick = { onZoom() }) {
-         Icon(Icons.Default.GpsFixed,
-            tint = MaterialTheme.colorScheme.tertiary,
-            contentDescription = "Zoom to Port"
-         )
-      }
    }
 }

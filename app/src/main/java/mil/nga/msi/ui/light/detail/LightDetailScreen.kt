@@ -18,11 +18,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.GpsFixed
-import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Card
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -49,24 +45,30 @@ import com.google.android.gms.maps.model.TileProvider
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.light.Light
 import mil.nga.msi.datasource.light.LightSector
+import mil.nga.msi.datasource.light.LightWithBookmark
+import mil.nga.msi.repository.bookmark.BookmarkKey
 import mil.nga.msi.repository.light.LightKey
-import mil.nga.msi.ui.light.LightAction
+import mil.nga.msi.ui.action.Action
+import mil.nga.msi.ui.action.AsamAction
+import mil.nga.msi.ui.action.LightAction
+import mil.nga.msi.ui.bookmark.BookmarkNotes
+import mil.nga.msi.ui.datasource.DataSourceActions
 import mil.nga.msi.ui.light.LightRoute
 import mil.nga.msi.ui.light.LightViewModel
-import mil.nga.msi.ui.coordinate.CoordinateTextButton
+import mil.nga.msi.ui.light.LightState
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.MapClip
-import mil.nga.msi.ui.navigation.NavPoint
 import mil.nga.msi.ui.theme.onSurfaceDisabled
 
 @Composable
 fun LightDetailScreen(
    key: LightKey,
    close: () -> Unit,
-   onAction: (LightAction) -> Unit,
+   onAction: (Action) -> Unit,
    viewModel: LightViewModel = hiltViewModel()
 ) {
-   val lights by viewModel.getLight(key.volumeNumber, key.featureNumber).observeAsState(emptyList())
+   viewModel.setLightKey(key)
+   val lightState by viewModel.lightState.observeAsState()
 
    Column {
       TopBar(
@@ -76,24 +78,34 @@ fun LightDetailScreen(
       )
 
       LightDetailContent(
-         lights = lights,
+         lightState = lightState,
          tileProvider = viewModel.tileProvider,
-         onZoom = { onAction(LightAction.Zoom(it)) },
-         onShare = { onAction(LightAction.Share(it.toString())) },
-         onCopyLocation = { onAction(LightAction.Location(it)) }
+         onZoom = { onAction(LightAction.Zoom(it.latLng)) },
+         onShare = { onAction(LightAction.Share(it)) },
+         onBookmark = { (light, bookmark) ->
+            if (bookmark == null) {
+               onAction(Action.Bookmark(BookmarkKey.fromLight(light)))
+            } else {
+               viewModel.deleteBookmark(bookmark)
+            }
+         },
+         onCopyLocation = { onAction(AsamAction.Location(it)) }
       )
    }
 }
 
 @Composable
 private fun LightDetailContent(
-   lights: List<Light>,
+   lightState: LightState?,
    tileProvider: TileProvider,
-   onZoom: (NavPoint) -> Unit,
+   onZoom: (Light) -> Unit,
    onShare: (Light) -> Unit,
+   onBookmark: (LightWithBookmark) -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
-   if (lights.isNotEmpty()) {
+   if (lightState != null) {
+      val (lightWithBookmark, characteristics) = lightState
+
       Surface(
          modifier = Modifier.fillMaxHeight()
       ) {
@@ -102,8 +114,15 @@ private fun LightDetailContent(
                .padding(all = 8.dp)
                .verticalScroll(rememberScrollState())
          ) {
-            LightHeader(lights.first(), tileProvider, onZoom, onShare, onCopyLocation)
-            LightCharacteristics(lights.drop(0))
+            LightHeader(
+               lightWithBookmark,
+               tileProvider,
+               onZoom = { onZoom(lightWithBookmark.light) },
+               onShare = { onShare(lightWithBookmark.light) },
+               onBookmark = { onBookmark(lightWithBookmark) },
+               onCopyLocation
+            )
+            LightCharacteristics(characteristics)
          }
       }
    }
@@ -111,12 +130,15 @@ private fun LightDetailContent(
 
 @Composable
 private fun LightHeader(
-   light: Light,
+   lightWithBookmark: LightWithBookmark,
    lightTileProvider: TileProvider,
-   onZoom: (NavPoint) -> Unit,
-   onShare: (Light) -> Unit,
+   onZoom: () -> Unit,
+   onShare: () -> Unit,
+   onBookmark: () -> Unit,
    onCopyLocation: (String) -> Unit
 ) {
+   val (light, bookmark) = lightWithBookmark
+
    Card {
       Column {
          light.name?.let { name ->
@@ -174,71 +196,30 @@ private fun LightHeader(
                }
             }
 
-            LightFooter(
-               light,
-               onZoom = { onZoom(NavPoint(light.latitude, light.longitude))},
-               onShare = { onShare(light) },
-               onCopyLocation)
+            BookmarkNotes(
+               notes = bookmark?.notes,
+               modifier = Modifier.padding(top = 16.dp)
+            )
+
+            DataSourceActions(
+               latLng = light.latLng,
+               bookmarked = bookmark != null,
+               onShare = onShare,
+               onZoom = onZoom,
+               onBookmark = onBookmark,
+               onCopyLocation =  onCopyLocation,
+               modifier = Modifier.padding(top = 8.dp)
+            )
          }
       }
    }
 }
 
 @Composable
-private fun LightFooter(
-   light: Light,
-   onZoom: () -> Unit,
-   onShare: () -> Unit,
-   onCopyLocation: (String) -> Unit
-) {
-   Row(
-      verticalAlignment = Alignment.CenterVertically,
-      horizontalArrangement = Arrangement.SpaceBetween,
-      modifier = Modifier.fillMaxWidth()
-   ) {
-      LightLocation(light.latLng, onCopyLocation)
-      LightActions(onZoom, onShare)
-   }
-}
-
-@Composable
-private fun LightLocation(
-   latLng: LatLng,
-   onCopyLocation: (String) -> Unit
-) {
-   CoordinateTextButton(
-      latLng = latLng,
-      onCopiedToClipboard = { onCopyLocation(it) }
-   )
-}
-
-@Composable
-private fun LightActions(
-   onZoom: () -> Unit,
-   onShare: () -> Unit
-) {
-   Row {
-      IconButton(onClick = { onShare() }) {
-         Icon(Icons.Default.Share,
-            tint = MaterialTheme.colorScheme.tertiary,
-            contentDescription = "Share ASAM"
-         )
-      }
-      IconButton(onClick = { onZoom() }) {
-         Icon(Icons.Default.GpsFixed,
-            tint = MaterialTheme.colorScheme.tertiary,
-            contentDescription = "Zoom to ASAM"
-         )
-      }
-   }
-}
-
-
-@Composable
 private fun LightCharacteristics(
-   lights: List<Light>
+   characteristics: List<Light>
 ) {
-   if (lights.isNotEmpty()) {
+   if (characteristics.isNotEmpty()) {
       CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceDisabled) {
          Text(
             text = "CHARACTERISTICS",
@@ -248,7 +229,7 @@ private fun LightCharacteristics(
       }
    }
 
-   lights.forEach { light ->
+   characteristics.forEach { light ->
       if (light.isRacon()) {
          RaconDetail(light)
       } else {

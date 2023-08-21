@@ -29,10 +29,15 @@ interface ElectronicPublicationDao {
 
     @Query("select * from epubs order by s3_key asc")
     suspend fun readElectronicPublications(): List<ElectronicPublication>
+
     @Query("select * from epubs where s3_key = :s3Key")
     suspend fun findById(s3Key: String): ElectronicPublication?
+
     @Query("select * from epubs where is_downloading order by s3_key asc")
     suspend fun findDownloadingElectronicPublications(): List<ElectronicPublication>
+
+    @Query("select * from epubs where s3_key = :s3Key")
+    suspend fun getElectronicPublication(s3Key: String): ElectronicPublication?
 
     @Query("select * from epubs order by s3_key asc")
     @RewriteQueriesToDropUnusedColumns
@@ -40,6 +45,9 @@ interface ElectronicPublicationDao {
 
     @Query("select * from epubs where pub_type_id = :typeId order by pub_download_order asc, section_order asc, s3_key asc")
     fun observeElectronicPublicationsOfType(typeId: Int): Flow<List<ElectronicPublication>>
+
+    @Query("select * from epubs where s3_key = :s3Key")
+    fun observeElectronicPublication(s3Key: String): Flow<ElectronicPublication>
 
     @Transaction
     suspend fun beginDownloading(ePub: ElectronicPublication, beginDownload: suspend (ElectronicPublication) -> ElectronicPublication) {

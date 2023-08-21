@@ -21,7 +21,7 @@ import mil.nga.msi.startup.radiobeacon.RadioBeaconInitializer.Companion.FETCH_LA
 import javax.inject.Inject
 
 class RadioBeaconRepository @Inject constructor(
-   private val workManager: WorkManager,
+   workManager: WorkManager,
    private val localDataSource: RadioBeaconLocalDataSource,
    private val remoteDataSource: RadioBeaconRemoteDataSource,
    private val notification: MarlinNotification,
@@ -47,15 +47,8 @@ class RadioBeaconRepository @Inject constructor(
       return localDataSource.observeRadioBeaconListItems(query)
    }
 
-   fun observeRadioBeacon(
-      volumeNumber: String,
-      featureNumber: String,
-   ) = localDataSource.observeRadioBeacon(volumeNumber, featureNumber)
-
-   suspend fun getRadioBeacon(
-      volumeNumber: String,
-      featureNumber: String
-   ) = localDataSource.getRadioBeacon(volumeNumber, featureNumber)
+   fun observeRadioBeacon(key: RadioBeaconKey) = localDataSource.observeRadioBeacon(key)
+   suspend fun getRadioBeacon(key: RadioBeaconKey) = localDataSource.getRadioBeacon(key)
 
    fun getRadioBeacons(filters: List<Filter>): List<RadioBeacon> {
       val query = QueryBuilder("radio_beacons", filters).buildQuery()

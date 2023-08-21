@@ -13,6 +13,7 @@ class NoticeToMarinersLocalDataSource @Inject constructor(
    private val dao: NoticeToMarinersDao
 ) {
    fun observeNoticeToMarinersListItems() = dao.getNoticeToMarinersListItems()
+   fun observeNoticeToMariners(noticeNumber: Int) = dao.observeNoticeToMariners(noticeNumber)
 
    fun isEmpty() = dao.count() == 0
 

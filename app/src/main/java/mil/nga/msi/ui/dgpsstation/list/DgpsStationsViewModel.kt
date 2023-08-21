@@ -1,31 +1,32 @@
 package mil.nga.msi.ui.dgpsstation.list
 
-import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asFlow
 import androidx.lifecycle.asLiveData
-import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import androidx.paging.insertSeparators
-import androidx.paging.liveData
 import androidx.paging.map
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import mil.nga.msi.datasource.DataSource
+import mil.nga.msi.datasource.bookmark.Bookmark
 import mil.nga.msi.datasource.dgpsstation.DgpsStation
-import mil.nga.msi.filter.Filter
+import mil.nga.msi.datasource.dgpsstation.DgpsStationWithBookmark
+import mil.nga.msi.repository.bookmark.BookmarkRepository
 import mil.nga.msi.repository.dgpsstation.DgpsStationRepository
 import mil.nga.msi.repository.preferences.FilterRepository
 import mil.nga.msi.repository.preferences.SortRepository
-import mil.nga.msi.sort.Sort
 import mil.nga.msi.sort.SortParameter
 import javax.inject.Inject
 
 sealed class DgpsStationListItem {
-   class DgpsStationItem(val dgpsStation: DgpsStation) : DgpsStationListItem()
+   class DgpsStationItem(val dgpsStationWithBookmark: DgpsStationWithBookmark) : DgpsStationListItem()
    class HeaderItem(val header : String) : DgpsStationListItem()
 }
 
@@ -33,52 +34,53 @@ sealed class DgpsStationListItem {
 class DgpsStationsViewModel @Inject constructor(
    filterRepository: FilterRepository,
    sortRepository: SortRepository,
-   private val dgpsStationRepository: DgpsStationRepository
+   private val dgpsStationRepository: DgpsStationRepository,
+   private val bookmarkRepository: BookmarkRepository
 ): ViewModel() {
 
-   private val queryParameters = MediatorLiveData<Pair<List<Filter>, Sort?>>().apply {
-      addSource(filterRepository.filters.asLiveData()) { entry ->
-         val filters = entry[DataSource.DGPS_STATION] ?: emptyList()
-         value = Pair(filters, value?.second)
-      }
-
-      addSource(sortRepository.sort.asLiveData()) { entry ->
-         val filters = value?.first ?: emptyList()
-         value = Pair(filters, entry[DataSource.DGPS_STATION])
-      }
-   }
-
-   val dgpsStations = queryParameters.switchMap { pair ->
-      val filters = pair.first
-      val sort = pair.second
+   @OptIn(ExperimentalCoroutinesApi::class)
+   val dgpsStations = combine(
+      sortRepository.sort,
+      filterRepository.filters,
+      bookmarkRepository.observeBookmarks(DataSource.DGPS_STATION)
+   ) { sort, filters, _ ->
+      sort to filters
+   }.flatMapLatest { (sort, filters) ->
       Pager(PagingConfig(pageSize = 20), null) {
-         dgpsStationRepository.observeDgpsStationListItems(filters, sort?.parameters ?: emptyList())
-      }.liveData
-   }.asFlow().map { pagingData ->
-      pagingData
-         .map { DgpsStationListItem.DgpsStationItem(it) }
-         .insertSeparators { item1: DgpsStationListItem.DgpsStationItem?, item2: DgpsStationListItem.DgpsStationItem? ->
-            val section = queryParameters.value?.second?.section ?: false
-            val primarySortParameter = queryParameters.value?.second?.parameters?.firstOrNull()
+         dgpsStationRepository.observeDgpsStationListItems(
+            sort = sort[DataSource.DGPS_STATION]?.parameters ?: emptyList(),
+            filters = filters[DataSource.DGPS_STATION] ?: emptyList()
+         )
+      }.flow.map { pagingData ->
+         pagingData
+            .map { dgpsStation ->
+               val bookmark = bookmarkRepository.getBookmark(DataSource.DGPS_STATION, dgpsStation.id)
+               DgpsStationListItem.DgpsStationItem(DgpsStationWithBookmark(dgpsStation, bookmark))
+            }
+            .insertSeparators { item1: DgpsStationListItem.DgpsStationItem?, item2: DgpsStationListItem.DgpsStationItem? ->
+               val section = sort[DataSource.DGPS_STATION]?.section == true
+               val primarySortParameter = sort[DataSource.DGPS_STATION]?.parameters?.firstOrNull()
 
-            if (section && primarySortParameter != null) {
-               header(primarySortParameter, item1, item2)
-            } else null
-         }
+               if (section && primarySortParameter != null) {
+                  header(primarySortParameter, item1, item2)
+               } else null
+            }
+      }
    }.cachedIn(viewModelScope)
 
    val dgpsStationFilters = filterRepository.filters.map { entry ->
       entry[DataSource.DGPS_STATION] ?: emptyList()
    }.asLiveData()
 
-   suspend fun getDgpsStation(
-      volumeNumber: String,
-      featureNumber: Float
-   ): DgpsStation? = dgpsStationRepository.getDgpsStation(volumeNumber, featureNumber)
+   fun deleteBookmark(bookmark: Bookmark) {
+      viewModelScope.launch {
+         bookmarkRepository.delete(bookmark)
+      }
+   }
 
    private fun header(sort: SortParameter, item1: DgpsStationListItem.DgpsStationItem?, item2: DgpsStationListItem.DgpsStationItem?): DgpsStationListItem.HeaderItem? {
-      val item1String = parameterToName(sort.parameter.parameter, item1?.dgpsStation)
-      val item2String = parameterToName(sort.parameter.parameter, item2?.dgpsStation)
+      val item1String = parameterToName(sort.parameter.parameter, item1?.dgpsStationWithBookmark?.dgpsStation)
+      val item2String = parameterToName(sort.parameter.parameter, item2?.dgpsStationWithBookmark?.dgpsStation)
 
       return if (item1String == null && item2String != null) {
          DgpsStationListItem.HeaderItem(item2String)

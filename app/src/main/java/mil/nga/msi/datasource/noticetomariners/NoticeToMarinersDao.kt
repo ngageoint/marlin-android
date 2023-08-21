@@ -34,6 +34,9 @@ interface NoticeToMarinersDao {
    @Query("SELECT * FROM notice_to_mariners WHERE notice_number = :noticeNumber")
    suspend fun getNoticeToMariners(noticeNumber: Int): List<NoticeToMariners>
 
+   @Query("SELECT * FROM notice_to_mariners WHERE notice_number = :noticeNumber")
+   fun observeNoticeToMariners(noticeNumber: Int): Flow<List<NoticeToMariners>>
+
    @Query("SELECT * FROM notice_to_mariners ORDER BY notice_number DESC")
    fun getNoticeToMarinersListItems(): Flow<List<NoticeToMariners>>
 }

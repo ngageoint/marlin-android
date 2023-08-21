@@ -37,7 +37,7 @@ import mil.nga.msi.ui.drag.rememberDragDropState
 import mil.nga.msi.ui.report.ReportRoute
 import mil.nga.msi.ui.theme.screenBackground
 
-private const val MAX_TABS = 4
+private const val MAX_TABS = 3
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable

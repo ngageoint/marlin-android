@@ -7,7 +7,10 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import java.nio.file.Path
 import java.nio.file.Paths
+import java.text.SimpleDateFormat
 import java.time.Instant
+import java.util.Calendar
+import java.util.Locale
 
 @Entity(tableName = "notice_to_mariners")
 data class NoticeToMariners(
@@ -54,6 +57,10 @@ data class NoticeToMariners(
    @ColumnInfo(name = "last_modified")
    var lastModified: Instant? = null
 
+   fun span(): Pair<String, String> {
+      return span(noticeNumber)
+   }
+
    override fun toString(): String {
       return "Notice To Mariners\n\n" +
               "  ods Entry Id: $odsEntryId\n" +
@@ -79,6 +86,21 @@ data class NoticeToMariners(
 
       fun externalFilesPath(context: Context, filename: String): Path {
          return Paths.get(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)?.absolutePath, "notice_to_mariners", "publications", filename)
+      }
+
+      fun span(noticeNumber: Int): Pair<String, String> {
+         val calendar = Calendar.getInstance()
+         calendar.set(Calendar.YEAR, noticeNumber.toString().take(4).toInt())
+         calendar.set(Calendar.WEEK_OF_YEAR, noticeNumber.toString().takeLast(2).toInt())
+         while (calendar.get(Calendar.DAY_OF_WEEK) != Calendar.SATURDAY) {
+            calendar.add(Calendar.DAY_OF_WEEK, 1)
+         }
+
+         val start = SimpleDateFormat("MMMM d", Locale.getDefault()).format(calendar.time)
+         calendar.add(Calendar.DAY_OF_WEEK, 6)
+         val end = SimpleDateFormat("MMMM d", Locale.getDefault()).format(calendar.time)
+
+         return start to end
       }
    }
 }

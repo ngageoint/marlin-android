@@ -28,7 +28,7 @@ interface ModuDao {
    fun getModus(query: SupportSQLiteQuery): List<Modu>
 
    @Query("SELECT * FROM modus WHERE name = :name")
-   fun observeModu(name: String): LiveData<Modu>
+   fun observeModu(name: String): Flow<Modu>
 
    @Query("SELECT * FROM modus")
    suspend fun getModus(): List<Modu>

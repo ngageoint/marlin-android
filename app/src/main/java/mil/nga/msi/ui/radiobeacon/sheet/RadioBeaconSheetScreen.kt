@@ -1,35 +1,20 @@
 package mil.nga.msi.ui.radiobeacon.sheet
 
-import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.material3.LocalContentColor
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import mil.nga.msi.R
 import mil.nga.msi.datasource.DataSource
-import mil.nga.msi.datasource.radiobeacon.RadioBeacon
+import mil.nga.msi.datasource.radiobeacon.RadioBeaconWithBookmark
 import mil.nga.msi.repository.radiobeacon.RadioBeaconKey
+import mil.nga.msi.ui.datasource.DataSourceIcon
+import mil.nga.msi.ui.radiobeacon.RadioBeaconSummary
 import mil.nga.msi.ui.radiobeacon.RadioBeaconViewModel
 
 @Composable
@@ -39,10 +24,11 @@ fun RadioBeaconSheetScreen(
    onDetails: (() -> Unit)? = null,
    viewModel: RadioBeaconViewModel = hiltViewModel()
 ) {
-   val beacon by viewModel.getRadioBeacon(key.volumeNumber, key.featureNumber).observeAsState()
+   viewModel.setRadioBeaconKey(key)
+   val beaconWithBookmark by viewModel.radioBeaconWithBookmark.observeAsState()
 
    Column(modifier = modifier) {
-      RadioBeaconContent(beacon = beacon) {
+      RadioBeaconContent(beaconWithBookmark) {
          onDetails?.invoke()
       }
    }
@@ -50,113 +36,26 @@ fun RadioBeaconSheetScreen(
 
 @Composable
 private fun RadioBeaconContent(
-   beacon: RadioBeacon?,
+   beaconWithBookmark: RadioBeaconWithBookmark?,
    onDetails: () -> Unit,
 ) {
-   Column(modifier = Modifier.padding(vertical = 8.dp)) {
-      Box(
-         contentAlignment = Alignment.Center,
-         modifier = Modifier
-            .padding(horizontal = 16.dp)
-            .size(48.dp)
-      ) {
-         Canvas(modifier = Modifier.fillMaxSize(), onDraw = {
-            drawCircle(color = DataSource.RADIO_BEACON.color)
-         })
+   Column(Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
+      DataSourceIcon(
+         dataSource = DataSource.RADIO_BEACON,
+         modifier = Modifier.padding(bottom = 16.dp)
+      )
 
-         Image(
-            painter = painterResource(id = R.drawable.ic_baseline_settings_input_antenna_24),
-            modifier = Modifier.size(24.dp),
-            contentDescription = "Radio Beacon icon",
+      beaconWithBookmark?.let {
+         RadioBeaconSummary(
+            beaconWithBookmark = it,
+            modifier = Modifier.padding(bottom = 16.dp)
          )
-      }
-
-      Column(Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
-         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-            Text(
-               text = "${beacon?.featureNumber.orEmpty()} ${beacon?.volumeNumber.orEmpty()}",
-               fontWeight = FontWeight.SemiBold,
-               style = MaterialTheme.typography.labelSmall,
-               maxLines = 1,
-               overflow = TextOverflow.Ellipsis
-            )
-         }
-
-         beacon?.name?.let { name ->
-            Text(
-               text = name,
-               style = MaterialTheme.typography.titleLarge,
-               maxLines = 1,
-               overflow = TextOverflow.Ellipsis,
-               modifier = Modifier.padding(top = 16.dp, bottom = 0.dp)
-            )
-         }
-
-         beacon?.sectionHeader?.let { sectionHeader ->
-            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-               Text(
-                  text = sectionHeader,
-                  style = MaterialTheme.typography.bodyMedium
-               )
-            }
-         }
-
-         beacon?.morseCode()?.let { code ->
-            Text(
-               text = beacon.morseLetter(),
-               style = MaterialTheme.typography.titleLarge,
-               modifier = Modifier.padding(top = 4.dp)
-            )
-
-            MorseCode(
-               text = code,
-               modifier = Modifier.padding(top = 4.dp)
-            )
-         }
-
-         beacon?.expandedCharacteristicWithoutCode()?.let {
-            Text(
-               text = it,
-               style = MaterialTheme.typography.bodyMedium,
-               modifier = Modifier.padding(top = 0.dp)
-            )
-         }
-
-         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-            beacon?.stationRemark?.let { stationRemark ->
-               Text(
-                  text = stationRemark,
-                  style = MaterialTheme.typography.bodyMedium,
-                  modifier = Modifier.padding(top = 8.dp)
-               )
-            }
-         }
       }
 
       TextButton(
          onClick = { onDetails() }
       ) {
          Text("MORE DETAILS")
-      }
-   }
-}
-
-@Composable
-private fun MorseCode(
-   text: String,
-   modifier: Modifier = Modifier,
-) {
-   Row(modifier = modifier) {
-      text.split(" ").forEach { letter ->
-         if (letter == "-" || letter == "•") {
-            Box(
-               modifier = Modifier
-                  .padding(end = 8.dp)
-                  .height(5.dp)
-                  .width(if (letter == "-") 24.dp else 8.dp)
-                  .background(MaterialTheme.colorScheme.onSurface)
-            )
-         }
       }
    }
 }

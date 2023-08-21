@@ -10,10 +10,10 @@ import com.google.accompanist.navigation.material.bottomSheet
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import mil.nga.msi.datasource.DataSource
+import mil.nga.msi.datasource.radiobeacon.RadioBeacon
 import mil.nga.msi.repository.radiobeacon.RadioBeaconKey
+import mil.nga.msi.ui.action.RadioBeaconAction
 import mil.nga.msi.ui.filter.FilterScreen
-import mil.nga.msi.ui.map.MapRoute
-import mil.nga.msi.ui.navigation.NavPoint
 import mil.nga.msi.ui.navigation.RadioBeacon
 import mil.nga.msi.ui.navigation.Route
 import mil.nga.msi.ui.radiobeacon.detail.RadioBeaconDetailScreen
@@ -43,13 +43,8 @@ fun NavGraphBuilder.radioBeaconGraph(
    share: (Pair<String, String>) -> Unit,
    showSnackbar: (String) -> Unit
 ) {
-   val shareLight: (String) -> Unit = {
-      share(Pair("Share Radio Beacon Information", it))
-   }
-
-   val zoomTo: (NavPoint) -> Unit = { point ->
-      val encoded = Uri.encode(Json.encodeToString(point))
-      navController.navigate(MapRoute.Map.name + "?point=${encoded}")
+   val shareBeacon: (RadioBeacon) -> Unit = { beacon ->
+      share(Pair("Share Radio Beacon Information", beacon.toString()))
    }
 
    navigation(
@@ -70,15 +65,11 @@ fun NavGraphBuilder.radioBeaconGraph(
             openSort = {
                navController.navigate(RadioBeaconRoute.Sort.name)
             },
-            onTap = { key ->
-               val encoded = Uri.encode(Json.encodeToString(key))
-               navController.navigate( "${RadioBeaconRoute.Detail.name}?key=$encoded")
-            },
             onAction = { action ->
-               when(action) {
-                  is RadioBeaconAction.Zoom -> zoomTo(action.point)
-                  is RadioBeaconAction.Share -> shareLight(action.text)
+               when (action) {
+                  is RadioBeaconAction.Share -> shareBeacon(action.radioBeacon)
                   is RadioBeaconAction.Location -> showSnackbar("${action.text} copied to clipboard")
+                  else -> action.navigate(navController)
                }
             }
          )
@@ -97,10 +88,10 @@ fun NavGraphBuilder.radioBeaconGraph(
                key,
                close = { navController.popBackStack() },
                onAction = { action ->
-                  when(action) {
-                     is RadioBeaconAction.Zoom -> zoomTo(action.point)
-                     is RadioBeaconAction.Share -> shareLight(action.text)
+                  when (action) {
+                     is RadioBeaconAction.Share -> shareBeacon(action.radioBeacon)
                      is RadioBeaconAction.Location -> showSnackbar("${action.text} copied to clipboard")
+                     else -> action.navigate(navController)
                   }
                }
             )

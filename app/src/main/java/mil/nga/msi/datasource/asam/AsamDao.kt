@@ -1,6 +1,5 @@
 package mil.nga.msi.datasource.asam
 
-import androidx.lifecycle.LiveData
 import androidx.paging.PagingSource
 import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteQuery
@@ -25,7 +24,7 @@ interface AsamDao {
    fun observeAsams(): PagingSource<Int, AsamListItem>
 
    @Query("SELECT * FROM asams WHERE reference = :reference")
-   fun observeAsam(reference: String): LiveData<Asam>
+   fun observeAsam(reference: String): Flow<Asam>
 
    @Query("SELECT * FROM asams")
    suspend fun getAsams(): List<Asam>
