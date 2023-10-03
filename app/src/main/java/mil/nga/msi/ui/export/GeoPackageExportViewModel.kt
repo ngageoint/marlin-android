@@ -17,6 +17,8 @@ import mil.nga.msi.filter.Filter
 import mil.nga.msi.geopackage.export.AsamFeature
 import mil.nga.msi.geopackage.export.Export
 import mil.nga.msi.geopackage.export.ExportStatus
+import mil.nga.msi.geopackage.export.Feature
+import mil.nga.msi.geopackage.export.ModuFeature
 import mil.nga.msi.repository.asam.AsamRepository
 import mil.nga.msi.repository.dgpsstation.DgpsStationRepository
 import mil.nga.msi.repository.light.LightRepository
@@ -103,19 +105,26 @@ class GeoPackageExportViewModel @Inject constructor(
    suspend fun createGeoPackage() = withContext(Dispatchers.IO) {
       _exportStatus.postValue(ExportState.Creating(emptyMap()))
 
-      val asams = asamRepository.getAsams(
-         filters = filters.value?.get(DataSource.ASAM) ?: emptyList()
-      ).map { AsamFeature(it) }
+
+      val items = mutableMapOf<DataSource, List<Feature>>().apply() {
+         val asams = asamRepository.getAsams(
+            filters = filters.value?.get(DataSource.ASAM) ?: emptyList()
+         ).map { AsamFeature(it) }
+         this[DataSource.ASAM] = asams
+
+         val modus = moduRepository.getModus(
+            filters = filters.value?.get(DataSource.MODU) ?: emptyList()
+         ).map { ModuFeature(it) }
+         this[DataSource.MODU] = modus
+
+      }
 
       Export(application, geoPackageManager).export(
-         mapOf(DataSource.ASAM to asams),
+         items,
          onStatus = { exportStatus ->
             viewModelScope.launch(Dispatchers.Main) {
                _exportStatus.value = ExportState.Creating(exportStatus.toMap().toMutableMap())
             }
-//            exportStatus.forEach { (dataSource, status) ->
-//               Log.i("Billy", "Data source export ${dataSource.label} complete ${status.complete}")
-//            }
          }
       )?.let { geoPackage ->
          FileProvider.getUriForFile(application, "${application.packageName}.fileprovider", geoPackage)

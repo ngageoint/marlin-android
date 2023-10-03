@@ -207,12 +207,11 @@ fun NavGraphBuilder.homeGraph(
    exportGraph(
       navController = navController,
       share = { uri ->
-         share(Intent.createChooser(Intent().apply {
-            action = Intent.ACTION_SEND
+         share(Intent.createChooser(Intent(Intent.ACTION_SEND).apply {
             putExtra(Intent.EXTRA_STREAM, uri)
             type = "application/octet-stream"
-            clipData = ClipData.newPlainText("Label", "Text")
-            flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+//            clipData = ClipData.newPlainText("Label", "Text")
+//            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
          }, null))
       },
       bottomBarVisibility = { bottomBarVisibility(it) }

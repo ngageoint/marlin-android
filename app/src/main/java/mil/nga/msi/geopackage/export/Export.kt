@@ -11,7 +11,6 @@ import mil.nga.color.Color
 import mil.nga.geopackage.BoundingBox
 import mil.nga.geopackage.GeoPackage
 import mil.nga.geopackage.GeoPackageManager
-import mil.nga.geopackage.db.GeoPackageDataType
 import mil.nga.geopackage.db.TableColumnKey
 import mil.nga.geopackage.extension.nga.style.FeatureStyleExtension
 import mil.nga.geopackage.extension.nga.style.FeatureTableStyles
@@ -25,9 +24,6 @@ import mil.nga.geopackage.features.user.FeatureTable
 import mil.nga.geopackage.features.user.FeatureTableMetadata
 import mil.nga.geopackage.geom.GeoPackageGeometryData
 import mil.nga.msi.datasource.DataSource
-import mil.nga.msi.datasource.filter.AsamFilter
-import mil.nga.msi.filter.FilterParameterType
-import mil.nga.msi.ui.map.cluster.MapAnnotation
 import mil.nga.proj.ProjectionConstants
 import mil.nga.sf.GeometryType
 import java.io.ByteArrayOutputStream
@@ -61,8 +57,10 @@ class Export @Inject constructor(
          // TODO handle errors
          create()?.let { geoPackage ->
             items.forEach { (dataSource, features) ->
-               val tableName = tableNames[dataSource]!!
-               val table = createTable(tableName, geoPackage)
+               val table = createTable(
+                  definition = DataSourceDefinition.fromDataSource(dataSource),
+                  geoPackage = geoPackage
+               )
                val tableStyles = FeatureTableStyles(geoPackage, table)
                val styles = createStyles(tableStyles)
 
@@ -92,13 +90,13 @@ class Export @Inject constructor(
    }
 
    private fun createTable(
-      table: String,
+      definition: DataSourceDefinition,
       geoPackage: GeoPackage
    ): FeatureTable {
       val srs = geoPackage.spatialReferenceSystemDao.getOrCreateCode(ProjectionConstants.AUTHORITY_EPSG, ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM_GEOGRAPHICAL_3D.toLong())
 
       val geometryColumns = GeometryColumns()
-      geometryColumns.tableName = table
+      geometryColumns.tableName = definition.tableName
       geometryColumns.columnName = "geometry"
       geometryColumns.setGeometryType(GeometryType.GEOMETRY)
       geometryColumns.z = 0
@@ -108,13 +106,12 @@ class Export @Inject constructor(
       val columns = mutableListOf<FeatureColumn>()
       val dataColumns = mutableListOf<DataColumns>()
 
-      // TODO needs to be data source dependent
-      AsamFilter.parameters.forEach { parameter ->
+      definition.columns.forEach { column ->
          columns.add(
             FeatureColumn.createColumn(
-               parameter.parameter,
-               geopackageDataType(parameter.type)
-             )
+               column.name,
+               column.type
+            )
          )
       }
 
@@ -124,11 +121,12 @@ class Export @Inject constructor(
       val featureTable = geoPackage.createFeatureTable(featureTableMetadata)
 
       // TODO needs to be data source dependent
-      AsamFilter.parameters.forEach { parameter ->
+
+      definition.columns.forEach { column ->
          dataColumns.add(DataColumns().apply {
-            id = TableColumnKey(table, parameter.parameter)
-            name = parameter.title
-            title = parameter.title
+            id = TableColumnKey(definition.tableName, column.name)
+            name = column.name
+            title = column.title
             contents = geoPackage.getFeatureDao(featureTable).contents
          })
       }
@@ -152,7 +150,7 @@ class Export @Inject constructor(
 
       val featureTableStyles = FeatureTableStyles(geoPackage, featureTable)
       val tableStyleDefault = styleDao.newRow()
-      tableStyleDefault.setName("$table Style")
+      tableStyleDefault.setName("${definition.tableName} Style")
       tableStyleDefault.setColor(Color(color.red, color.green, color.blue))
       tableStyleDefault.setFillColor(Color(color.red, color.green, color.blue))
       tableStyleDefault.opacity = color.alpha.toDouble()
@@ -160,7 +158,7 @@ class Export @Inject constructor(
       tableStyleDefault.setWidth(2.0)
       featureTableStyles.setTableStyleDefault(tableStyleDefault)
 
-      val bitmap = ContextCompat.getDrawable(application, MapAnnotation.Type.ASAM.icon)?.toBitmap()!!
+      val bitmap = ContextCompat.getDrawable(application, definition.icon)?.toBitmap()!!
 
       val stream = ByteArrayOutputStream()
       bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
@@ -206,30 +204,14 @@ class Export @Inject constructor(
       val row = featureDao.newRow()
       row.geometry = GeoPackageGeometryData(feature.geometry)
 
-      feature.properties.forEach { (columnName, value) ->
+      feature.values.forEach { (columnName, value) ->
          row.setValue(columnName, value)
       }
 
       featureDao.create(row)
    }
 
-   private fun geopackageDataType(parameterType: FilterParameterType): GeoPackageDataType {
-      return when (parameterType) {
-         FilterParameterType.STRING -> GeoPackageDataType.TEXT
-         FilterParameterType.DATE -> GeoPackageDataType.DATE
-         FilterParameterType.FLOAT -> GeoPackageDataType.FLOAT
-         FilterParameterType.INT -> GeoPackageDataType.INT
-         FilterParameterType.DOUBLE -> GeoPackageDataType.DOUBLE
-         FilterParameterType.LOCATION -> GeoPackageDataType.TEXT
-         FilterParameterType.ENUMERATION -> GeoPackageDataType.TEXT
-      }
-   }
-
    companion object {
       val dateFormat = SimpleDateFormat("yMMddHHmmss", Locale.US)
-
-      private val tableNames = mapOf(
-         DataSource.ASAM to "asam"
-      )
    }
 }

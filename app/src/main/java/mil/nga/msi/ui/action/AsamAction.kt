@@ -13,12 +13,6 @@ import mil.nga.msi.ui.map.MapRoute
 import mil.nga.msi.ui.navigation.NavPoint
 
 sealed class AsamAction(): Action() {
-   class Export(): AsamAction() {
-      override fun navigate(navController: NavController) {
-         navController.navigate("${ExportRoute.Export.name}?dataSource=${DataSource.ASAM}")
-      }
-   }
-
    class Tap(private val asam: Asam): AsamAction() {
       override fun navigate(navController: NavController) {
          navController.navigate("${AsamRoute.Detail.name}?reference=${asam.reference}")

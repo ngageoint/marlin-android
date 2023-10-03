@@ -20,6 +20,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
 import kotlinx.coroutines.flow.Flow
+import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.asam.Asam
 import mil.nga.msi.datasource.asam.AsamWithBookmark
 import mil.nga.msi.repository.bookmark.BookmarkKey
@@ -100,7 +101,7 @@ fun AsamsScreen(
          ) {
             FloatingActionButton(
                containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-               onClick = { onAction(AsamAction.Export()) }
+               onClick = { onAction(Action.Export(DataSource.ASAM)) }
             ) {
                Icon(Icons.Outlined.Download,
                   contentDescription = "Export ASAMs as GeoPackage"
