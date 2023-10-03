@@ -5,12 +5,20 @@ import androidx.navigation.NavController
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.asam.Asam
 import mil.nga.msi.ui.asam.AsamRoute
+import mil.nga.msi.ui.export.ExportRoute
 import mil.nga.msi.ui.map.MapRoute
 import mil.nga.msi.ui.navigation.NavPoint
 
 sealed class AsamAction(): Action() {
+   class Export(): AsamAction() {
+      override fun navigate(navController: NavController) {
+         navController.navigate("${ExportRoute.Export.name}?dataSource=${DataSource.ASAM}")
+      }
+   }
+
    class Tap(private val asam: Asam): AsamAction() {
       override fun navigate(navController: NavController) {
          navController.navigate("${AsamRoute.Detail.name}?reference=${asam.reference}")

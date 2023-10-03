@@ -754,7 +754,7 @@ private fun Search(
 @Composable
 private fun DataSources(
    mapped: Map<DataSource, Boolean>,
-   onDataSourceToggle: (DataSource) -> Unit,
+   onDataSourceToggle: (DataSource) -> Unit
 ) {
    if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT) {
       Column(

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <paths>
+    <cache-path name="geopackage_export" path="exports"/>
     <external-files-path name="notice_to_mariners_publications" path="Documents/notice_to_mariners/publications"/>
     <external-files-path name="electronic_publications" path="Documents/electronic_publications"/>
 </paths>

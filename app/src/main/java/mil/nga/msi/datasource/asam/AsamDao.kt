@@ -19,6 +19,10 @@ interface AsamDao {
    @Query("SELECT COUNT(*) from asams")
    fun count(): Int
 
+   @RawQuery
+   @RewriteQueriesToDropUnusedColumns
+   suspend fun count(query: SupportSQLiteQuery): Int
+
    @Query("SELECT * FROM asams")
    @RewriteQueriesToDropUnusedColumns
    fun observeAsams(): PagingSource<Int, AsamListItem>

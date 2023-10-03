@@ -1,6 +1,7 @@
 package mil.nga.msi.datasource.navigationwarning
 
 import androidx.room.*
+import androidx.sqlite.db.SupportSQLiteQuery
 import kotlinx.coroutines.flow.Flow
 import java.util.*
 
@@ -17,6 +18,10 @@ interface NavigationalWarningDao {
 
    @Query("SELECT COUNT(*) from navigational_warnings")
    fun count(): Int
+
+   @RawQuery
+   @RewriteQueriesToDropUnusedColumns
+   suspend fun count(query: SupportSQLiteQuery): Int
 
    @Query("SELECT * FROM navigational_warnings WHERE number = :number AND year = :year AND navigation_area = :navigationArea")
    fun observeNavigationalWarning(number: Int, year: Int, navigationArea: NavigationArea): Flow<NavigationalWarning?>

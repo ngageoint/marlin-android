@@ -66,7 +66,9 @@ fun NavGraphBuilder.asamGraph(
                when(action) {
                   is AsamAction.Share -> shareAsam(action.asam)
                   is AsamAction.Location -> showSnackbar("${action.text} copied to clipboard")
-                  else -> action.navigate(navController)
+                  else -> {
+                     action.navigate(navController)
+                  }
                }
             }
          )

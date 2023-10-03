@@ -5,10 +5,12 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -75,20 +77,37 @@ fun AsamsScreen(
          }
       )
 
-      Asams(
-         pagingState = viewModel.asams,
-         onTap = { onAction(AsamAction.Tap(it)) },
-         onZoom = { onAction(AsamAction.Zoom(it.latLng)) },
-         onShare = { onAction(AsamAction.Share(it)) },
-         onBookmark = { (asam, bookmark) ->
-            if (bookmark == null) {
-               onAction(Action.Bookmark(BookmarkKey.fromAsam(asam)))
-            } else {
-               viewModel.deleteBookmark(bookmark)
+      Box(Modifier.fillMaxWidth()) {
+         Asams(
+            pagingState = viewModel.asams,
+            onTap = { onAction(AsamAction.Tap(it)) },
+            onZoom = { onAction(AsamAction.Zoom(it.latLng)) },
+            onShare = { onAction(AsamAction.Share(it)) },
+            onBookmark = { (asam, bookmark) ->
+               if (bookmark == null) {
+                  onAction(Action.Bookmark(BookmarkKey.fromAsam(asam)))
+               } else {
+                  viewModel.deleteBookmark(bookmark)
+               }
+            },
+            onCopyLocation = { onAction(AsamAction.Location(it)) }
+         )
+
+         Box(
+            Modifier
+               .align(Alignment.BottomEnd)
+               .padding(16.dp)
+         ) {
+            FloatingActionButton(
+               containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+               onClick = { onAction(AsamAction.Export()) }
+            ) {
+               Icon(Icons.Outlined.Download,
+                  contentDescription = "Export ASAMs as GeoPackage"
+               )
             }
-         },
-         onCopyLocation = { onAction(AsamAction.Location(it)) }
-      )
+         }
+      }
    }
 }
 

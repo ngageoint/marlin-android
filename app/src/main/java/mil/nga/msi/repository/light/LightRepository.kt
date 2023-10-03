@@ -21,7 +21,7 @@ import mil.nga.msi.startup.light.LightInitializer.Companion.FETCH_LATEST_LIGHTS_
 import javax.inject.Inject
 
 class LightRepository @Inject constructor(
-   private val workManager: WorkManager,
+   workManager: WorkManager,
    private val localDataSource: LightLocalDataSource,
    private val remoteDataSource: LightRemoteDataSource,
    private val notification: MarlinNotification,
@@ -71,6 +71,14 @@ class LightRepository @Inject constructor(
       maxLongitude: Double,
       characteristicNumber: Int
    ) = localDataSource.getLights(minLatitude, maxLatitude, minLongitude, maxLongitude, characteristicNumber)
+
+   suspend fun count(filters: List<Filter>): Int {
+      val query = QueryBuilder(
+         table = "lights",
+         filters = filters,
+      ).buildQuery(count = true)
+      return localDataSource.count(query)
+   }
 
    suspend fun fetchLights(refresh: Boolean = false): List<Light> {
       if (refresh) {

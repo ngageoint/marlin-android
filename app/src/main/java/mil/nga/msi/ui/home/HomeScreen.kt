@@ -1,8 +1,11 @@
 package mil.nga.msi.ui.home
 
+import android.content.ClipData
+import android.content.ClipDescription
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.runtime.LaunchedEffect
+import androidx.core.app.ShareCompat
 import androidx.core.os.BundleCompat
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
@@ -17,6 +20,7 @@ import mil.nga.msi.ui.dgpsstation.dgpsStationGraph
 import mil.nga.msi.ui.electronicpublication.electronicPublicationGraph
 import mil.nga.msi.ui.embark.EmbarkRoute
 import mil.nga.msi.ui.embark.embarkGraph
+import mil.nga.msi.ui.export.exportGraph
 import mil.nga.msi.ui.geopackage.geopackageGraph
 import mil.nga.msi.ui.light.lightGraph
 import mil.nga.msi.ui.main.SnackbarState
@@ -37,11 +41,23 @@ fun NavGraphBuilder.homeGraph(
    navController: NavController,
    embark: Boolean,
    bottomBarVisibility: (Boolean) -> Unit,
-   share: (Pair<String, String>) -> Unit,
+   share: (Intent) -> Unit,
    showSnackbar: (SnackbarState) -> Unit,
    openNavigationDrawer: () -> Unit,
    annotationProvider: AnnotationProvider
 ) {
+
+   val shareDataSource: (Pair<String, String>) -> Unit = { (title, text) ->
+      val shareIntent = Intent.createChooser(Intent().apply {
+         action = Intent.ACTION_SEND
+         putExtra(Intent.EXTRA_TITLE, title)
+         putExtra(Intent.EXTRA_TEXT, text)
+         type = "text/*"
+      }, title)
+
+      share(shareIntent)
+   }
+
    composable("main") {
       LaunchedEffect(embark) {
          if (embark) {
@@ -118,48 +134,48 @@ fun NavGraphBuilder.homeGraph(
    asamGraph(
       navController = navController,
       bottomBarVisibility = { bottomBarVisibility(it) },
-      share = { share(it) },
+      share = { shareDataSource(it) },
       showSnackbar = { showSnackbar(SnackbarState(message = it)) },
       openNavigationDrawer = openNavigationDrawer
    )
    moduGraph(
       navController = navController,
       bottomBarVisibility = { bottomBarVisibility(it) },
-      share = { share(it) },
+      share = { shareDataSource(it) },
       showSnackbar = { showSnackbar(SnackbarState(message = it)) },
       openNavigationDrawer = openNavigationDrawer
    )
    navigationalWarningGraph(
       navController = navController,
       bottomBarVisibility = { bottomBarVisibility(it) },
-      share = { share(it) },
+      share = { shareDataSource(it) },
       openNavigationDrawer = openNavigationDrawer
    )
    lightGraph(
       navController = navController,
       bottomBarVisibility = { bottomBarVisibility(it) },
-      share = { share(it) },
+      share = { shareDataSource(it) },
       showSnackbar = { showSnackbar(SnackbarState(message = it)) },
       openNavigationDrawer = openNavigationDrawer
    )
    portGraph(
       navController = navController,
       bottomBarVisibility = { bottomBarVisibility(it) },
-      share = { share(it) },
+      share = { shareDataSource(it) },
       showSnackbar = { showSnackbar(SnackbarState(message = it)) },
       openNavigationDrawer = openNavigationDrawer
    )
    radioBeaconGraph(
       navController = navController,
       bottomBarVisibility = { bottomBarVisibility(it) },
-      share = { share(it) },
+      share = { shareDataSource(it) },
       showSnackbar = { showSnackbar(SnackbarState(message = it)) },
       openNavigationDrawer = openNavigationDrawer
    )
    dgpsStationGraph(
       navController = navController,
       bottomBarVisibility = { bottomBarVisibility(it) },
-      share = { share(it) },
+      share = { shareDataSource(it) },
       showSnackbar = { showSnackbar(SnackbarState(message = it)) },
       openNavigationDrawer = openNavigationDrawer
    )
@@ -184,9 +200,22 @@ fun NavGraphBuilder.homeGraph(
    bookmarksGraph(
       navController = navController,
       bottomBarVisibility = { bottomBarVisibility(it) },
-      share = { share(it) },
+      share = { shareDataSource(it) },
       showSnackbar = { showSnackbar(SnackbarState(message = it)) },
       openNavigationDrawer = openNavigationDrawer
+   )
+   exportGraph(
+      navController = navController,
+      share = { uri ->
+         share(Intent.createChooser(Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_STREAM, uri)
+            type = "application/octet-stream"
+            clipData = ClipData.newPlainText("Label", "Text")
+            flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+         }, null))
+      },
+      bottomBarVisibility = { bottomBarVisibility(it) }
    )
    settingsGraph(
       navController = navController,

@@ -1,6 +1,5 @@
 package mil.nga.msi.ui.main
 
-import android.R.attr.maxLines
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -40,6 +39,7 @@ import mil.nga.msi.ui.map.MapRoute
 import mil.nga.msi.ui.navigation.NavigationDrawer
 import mil.nga.msi.ui.navigation.mainRouteFor
 
+
 data class SnackbarState(
    val message: String,
    val actionLabel: String? = null,
@@ -77,16 +77,7 @@ fun MainScreen(
       scope.launch { scaffoldState.drawerState.open() }
    }
 
-   val share: (Pair<String, String>) -> Unit = { pair ->
-      val shareIntent = Intent.createChooser(Intent().apply {
-         action = Intent.ACTION_SEND
-         putExtra(Intent.EXTRA_TITLE, pair.first)
-         putExtra(Intent.EXTRA_TEXT, pair.second)
-         type = "text/*"
-      }, pair.first)
-
-      context.startActivity(shareIntent)
-   }
+   val share: (Intent) -> Unit = { context.startActivity(it) }
 
    val showSnackbar: (SnackbarState) -> Unit = { state ->
       scope.launch {
