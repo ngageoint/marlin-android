@@ -1,7 +1,6 @@
 package mil.nga.msi.ui.export
 
 import android.net.Uri
-import android.util.Log
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -19,7 +18,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ErrorOutline
+import androidx.compose.material.icons.filled.SentimentDissatisfied
+import androidx.compose.material.icons.filled.SentimentVeryDissatisfied
 import androidx.compose.material.icons.outlined.Download
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExtendedFloatingActionButton
@@ -30,12 +33,16 @@ import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -64,9 +71,22 @@ fun GeoPackageExportScreen(
    val filters by viewModel.filters.observeAsState(emptyMap())
    val dataSources by viewModel.dataSources.observeAsState(emptySet())
    val exportState by viewModel.exportState.observeAsState(ExportState.None)
+   var showErrorDialog by remember { mutableStateOf(false) }
 
    LaunchedEffect(dataSource) {
       dataSource?.let { viewModel.toggleDataSource(it) }
+   }
+
+   if (showErrorDialog) {
+      ExportErrorDialog() {
+         showErrorDialog = false
+      }
+   }
+   
+   LaunchedEffect(exportState) {
+      if (exportState is ExportState.Error) {
+         showErrorDialog = true
+      }
    }
 
    Column {
@@ -303,4 +323,31 @@ private fun DataSourceFilter(
          Divider(modifier = Modifier.fillMaxWidth())
       }
    }
+}
+
+@Composable
+fun ExportErrorDialog(
+   onDismiss: () -> Unit
+) {
+   AlertDialog(
+      icon = {
+         Icon(
+            imageVector = Icons.Default.SentimentVeryDissatisfied,
+            contentDescription = "Error Icon",
+            modifier = Modifier.size(72.dp)
+         )
+      },
+      title = {
+         Text(text = "Export Error")
+      },
+      text = {
+         Text(text = "We apologize, it looks like we were unable to export Marlin data for the selected data sources. Please try again later or reach out if this issue persists.")
+      },
+      onDismissRequest = { onDismiss() },
+      confirmButton = {
+         TextButton(onClick = { onDismiss() }) {
+            Text("OK")
+         }
+      }
+   )
 }

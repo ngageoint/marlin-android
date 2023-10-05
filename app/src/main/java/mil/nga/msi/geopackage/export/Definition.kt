@@ -32,6 +32,7 @@ interface DataSourceDefinition {
             DataSource.ASAM -> AsamDefinition()
             DataSource.MODU -> ModuDefinition()
             DataSource.PORT -> PortDefinition()
+            DataSource.RADIO_BEACON -> RadioBeaconDefinition()
             else -> throw UnsupportedOperationException()
          }
       }

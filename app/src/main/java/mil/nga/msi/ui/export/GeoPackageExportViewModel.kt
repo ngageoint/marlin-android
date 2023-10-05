@@ -19,6 +19,7 @@ import mil.nga.msi.geopackage.export.Export
 import mil.nga.msi.geopackage.export.ExportStatus
 import mil.nga.msi.geopackage.export.ModuFeature
 import mil.nga.msi.geopackage.export.PortFeature
+import mil.nga.msi.geopackage.export.RadioBeaconFeature
 import mil.nga.msi.repository.asam.AsamRepository
 import mil.nga.msi.repository.dgpsstation.DgpsStationRepository
 import mil.nga.msi.repository.light.LightRepository
@@ -123,6 +124,11 @@ class GeoPackageExportViewModel @Inject constructor(
                   filters = filters.value?.get(dataSource) ?: emptyList()
                ).map { PortFeature(it) }
             }
+            DataSource.RADIO_BEACON -> {
+               dataSource to radioBeaconRepository.getRadioBeacons(
+                  filters = filters.value?.get(dataSource) ?: emptyList()
+               ).map { RadioBeaconFeature(it) }
+            }
             else -> null
          }
       }?.toMap()?.let { items ->
@@ -130,11 +136,11 @@ class GeoPackageExportViewModel @Inject constructor(
             items,
             onStatus = { exportStatus ->
                viewModelScope.launch(Dispatchers.Main) {
-                  _exportStatus.value = ExportState.Creating(exportStatus.toMap().toMutableMap())
+                  _exportStatus.postValue(ExportState.Creating(exportStatus.toMap().toMutableMap()))
                }
             },
             onError = {
-               _exportStatus.value = ExportState.Error
+               _exportStatus.postValue(ExportState.Error)
             }
          )?.let { geoPackage ->
             FileProvider.getUriForFile(application, "${application.packageName}.fileprovider", geoPackage)

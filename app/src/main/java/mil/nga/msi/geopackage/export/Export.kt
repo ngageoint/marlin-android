@@ -26,7 +26,6 @@ import mil.nga.geopackage.features.user.FeatureTable
 import mil.nga.geopackage.features.user.FeatureTableMetadata
 import mil.nga.geopackage.geom.GeoPackageGeometryData
 import mil.nga.msi.datasource.DataSource
-import mil.nga.msi.location.LocationProvider
 import mil.nga.proj.ProjectionConstants
 import mil.nga.sf.GeometryType
 import java.io.ByteArrayOutputStream
@@ -37,7 +36,6 @@ import java.util.Date
 import java.util.Locale
 import javax.inject.Inject
 import kotlin.io.path.createDirectories
-
 
 data class ExportStatus(
    val total: Int,
