@@ -15,6 +15,7 @@ import mil.nga.geopackage.GeoPackageManager
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.filter.Filter
 import mil.nga.msi.geopackage.export.AsamFeature
+import mil.nga.msi.geopackage.export.DgpsStationFeature
 import mil.nga.msi.geopackage.export.Export
 import mil.nga.msi.geopackage.export.ExportStatus
 import mil.nga.msi.geopackage.export.ModuFeature
@@ -113,6 +114,11 @@ class GeoPackageExportViewModel @Inject constructor(
                dataSource to asamRepository.getAsams(
                   filters = filters.value?.get(dataSource) ?: emptyList()
                ).map { AsamFeature(it) }
+            }
+            DataSource.DGPS_STATION -> {
+               dataSource to dgpsStationRepository.getDgpsStations(
+                  filters = filters.value?.get(dataSource) ?: emptyList()
+               ).map { DgpsStationFeature(it) }
             }
             DataSource.MODU -> {
                dataSource to moduRepository.getModus(

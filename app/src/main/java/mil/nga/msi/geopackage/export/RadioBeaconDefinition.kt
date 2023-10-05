@@ -7,7 +7,7 @@ import mil.nga.msi.ui.map.cluster.MapAnnotation
 import mil.nga.sf.Point
 
 class RadioBeaconDefinition() : DataSourceDefinition {
-   override val tableName = "radiobeacons"
+   override val tableName = "radio_beacons"
    override val icon = MapAnnotation.Type.RADIO_BEACON.icon
    override val columns: List<FeatureColumn> = listOf(
       FeatureColumn("name", "Name", GeoPackageDataType.TEXT),

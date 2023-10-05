@@ -30,6 +30,7 @@ interface DataSourceDefinition {
       fun fromDataSource(dataSource: DataSource): DataSourceDefinition {
          return when (dataSource) {
             DataSource.ASAM -> AsamDefinition()
+            DataSource.DGPS_STATION -> DgpsStationDefinition()
             DataSource.MODU -> ModuDefinition()
             DataSource.PORT -> PortDefinition()
             DataSource.RADIO_BEACON -> RadioBeaconDefinition()
