@@ -19,11 +19,14 @@ import mil.nga.geopackage.extension.nga.style.StyleRow
 import mil.nga.geopackage.extension.schema.SchemaExtension
 import mil.nga.geopackage.extension.schema.columns.DataColumns
 import mil.nga.geopackage.features.columns.GeometryColumns
+import mil.nga.geopackage.features.index.FeatureIndexManager
+import mil.nga.geopackage.features.index.FeatureIndexType
 import mil.nga.geopackage.features.user.FeatureColumn
 import mil.nga.geopackage.features.user.FeatureTable
 import mil.nga.geopackage.features.user.FeatureTableMetadata
 import mil.nga.geopackage.geom.GeoPackageGeometryData
 import mil.nga.msi.datasource.DataSource
+import mil.nga.msi.location.LocationProvider
 import mil.nga.proj.ProjectionConstants
 import mil.nga.sf.GeometryType
 import java.io.ByteArrayOutputStream
@@ -34,6 +37,7 @@ import java.util.Date
 import java.util.Locale
 import javax.inject.Inject
 import kotlin.io.path.createDirectories
+
 
 data class ExportStatus(
    val total: Int,
@@ -47,7 +51,8 @@ class Export @Inject constructor(
 
    suspend fun export(
       items: Map<DataSource, List<Feature>>,
-      onStatus: (Map<DataSource, ExportStatus>) -> Unit
+      onStatus: (Map<DataSource, ExportStatus>) -> Unit,
+      onError: () -> Unit
    ) = withContext(Dispatchers.IO) {
       val status = items.map { (dataSource, features) ->
          dataSource to ExportStatus(features.size, 0)
@@ -68,12 +73,17 @@ class Export @Inject constructor(
                   status[dataSource] = ExportStatus(features.size, complete)
                   onStatus(status)
                }
+
+               FeatureIndexManager(application, geoPackage, geoPackage.getFeatureDao(table)).apply {
+                  indexLocation = FeatureIndexType.GEOPACKAGE
+               }.index()
             }
 
             File(geoPackage.path)
          }
       } catch(e: Exception) {
-         Log.e("Billy", "nope", e)
+         Log.e(LOG_NAME, "Error creating GeoPackage", e)
+         onError()
          null
       }
    }
@@ -212,6 +222,7 @@ class Export @Inject constructor(
    }
 
    companion object {
-      val dateFormat = SimpleDateFormat("yMMddHHmmss", Locale.US)
+      private val LOG_NAME = Export::class.java.simpleName
+      private val dateFormat = SimpleDateFormat("yMMddHHmmss", Locale.US)
    }
 }

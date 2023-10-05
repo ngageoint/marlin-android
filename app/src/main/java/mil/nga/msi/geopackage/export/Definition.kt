@@ -31,6 +31,7 @@ interface DataSourceDefinition {
          return when (dataSource) {
             DataSource.ASAM -> AsamDefinition()
             DataSource.MODU -> ModuDefinition()
+            DataSource.PORT -> PortDefinition()
             else -> throw UnsupportedOperationException()
          }
       }
