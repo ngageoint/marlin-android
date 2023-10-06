@@ -17,7 +17,6 @@ class AboutViewModel @Inject constructor(
 
    fun setDeveloperMode() {
       viewModelScope.launch {
-         Log.i("Billy", "set developer mode on mock repo")
          userPreferencesRepository.setDeveloperMode()
       }
    }

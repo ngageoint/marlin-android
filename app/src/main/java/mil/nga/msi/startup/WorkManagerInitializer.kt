@@ -15,9 +15,7 @@ class WorkManagerInitializer : Initializer<WorkManager> {
 
    override fun create(context: Context): WorkManager {
       // Inject Hilt dependencies
-      Log.i("Billy", "work manager factory create")
       val initializer = AppInitializer.resolve(context)
-      Log.i("Billy", "work manager initializer $initializer")
       initializer.inject(this)
 
       val configuration = Configuration.Builder()

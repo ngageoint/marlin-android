@@ -55,9 +55,6 @@ data class LocationWithType(
          }
          "Polygon" -> {
             val points = location.mapNotNull { asPoint(it) }
-            if (points.size < 3) {
-               Log.i("Billy", "Parsed navigation warning polygon with ${points.size} points")
-            }
             Feature(Polygon(listOf(LineString(points))))
          }
          else -> null
@@ -106,21 +103,7 @@ data class MappedLocation(
    val chart: String? = null
 ) {
    fun featureCollection(): FeatureCollection? {
-      val features = location.mapNotNull {
-         val feature = it.asFeature()
-
-         feature?.let {
-            if (it.geometryType == GeometryType.POLYGON) {
-               val polygon = it.geometry as Polygon
-               if (polygon.coordinates[0].size < 4) {
-                  Log.i("Billy", "not a polygon for location $location")
-               }
-            }
-         }
-
-         feature
-      }
-
+      val features = location.mapNotNull { it.asFeature() }
       return if (features.isNotEmpty()) {
          FeatureCollection(features)
       } else null
