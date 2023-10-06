@@ -1,6 +1,8 @@
 package mil.nga.msi.geopackage.export
 
+import androidx.compose.ui.graphics.Color
 import mil.nga.geopackage.db.GeoPackageDataType
+import mil.nga.geopackage.extension.nga.style.StyleRow
 import mil.nga.msi.datasource.DataSource
 import mil.nga.sf.Geometry
 import java.lang.UnsupportedOperationException
@@ -11,7 +13,7 @@ data class FeatureData(
 )
 
 interface Feature {
-   val geometry: Geometry
+   val geometry: Geometry?
    val values: List<FeatureData>
 }
 
@@ -24,7 +26,9 @@ data class FeatureColumn(
 interface DataSourceDefinition {
    val tableName: String
    val icon: Int
+   val color: Color
    val columns: List<FeatureColumn>
+   val styles: List<StyleRow>
 
    companion object {
       fun fromDataSource(dataSource: DataSource): DataSourceDefinition {
@@ -32,6 +36,7 @@ interface DataSourceDefinition {
             DataSource.ASAM -> AsamDefinition()
             DataSource.DGPS_STATION -> DgpsStationDefinition()
             DataSource.MODU -> ModuDefinition()
+            DataSource.NAVIGATION_WARNING -> NavigationalWarningDefinition()
             DataSource.PORT -> PortDefinition()
             DataSource.RADIO_BEACON -> RadioBeaconDefinition()
             else -> throw UnsupportedOperationException()

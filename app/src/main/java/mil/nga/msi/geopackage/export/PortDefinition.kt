@@ -1,7 +1,9 @@
 package mil.nga.msi.geopackage.export
 
 import mil.nga.geopackage.db.GeoPackageDataType
+import mil.nga.geopackage.extension.nga.style.StyleRow
 import mil.nga.mgrs.MGRS
+import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.port.Port
 import mil.nga.msi.ui.map.cluster.MapAnnotation
 import mil.nga.msi.ui.port.detail.asNonZeroOrNull
@@ -10,6 +12,8 @@ import mil.nga.sf.Point
 class PortDefinition() : DataSourceDefinition {
    override val tableName = "ports"
    override val icon = MapAnnotation.Type.PORT.icon
+   override val color = DataSource.PORT.color
+   override val styles = emptyList<StyleRow>()
    override val columns: List<FeatureColumn> = listOf(
       FeatureColumn("number", "World Port Index Number", GeoPackageDataType.INT),
       FeatureColumn("name", "Main Port Name", GeoPackageDataType.TEXT),

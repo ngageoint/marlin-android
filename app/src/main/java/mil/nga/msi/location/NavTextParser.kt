@@ -1,10 +1,12 @@
 package mil.nga.msi.location
 
+import android.util.Log
 import mil.nga.msi.coordinate.DMS
 import mil.nga.msi.coordinate.WGS84
 import mil.nga.msi.nlp.NumberNormalizer
 import mil.nga.sf.geojson.Feature
 import mil.nga.sf.geojson.FeatureCollection
+import mil.nga.sf.geojson.GeometryType
 import mil.nga.sf.geojson.LineString
 import mil.nga.sf.geojson.Point
 import mil.nga.sf.geojson.Polygon
@@ -53,6 +55,9 @@ data class LocationWithType(
          }
          "Polygon" -> {
             val points = location.mapNotNull { asPoint(it) }
+            if (points.size < 3) {
+               Log.i("Billy", "Parsed navigation warning polygon with ${points.size} points")
+            }
             Feature(Polygon(listOf(LineString(points))))
          }
          else -> null
@@ -101,7 +106,21 @@ data class MappedLocation(
    val chart: String? = null
 ) {
    fun featureCollection(): FeatureCollection? {
-      val features = location.mapNotNull {  it.asFeature() }
+      val features = location.mapNotNull {
+         val feature = it.asFeature()
+
+         feature?.let {
+            if (it.geometryType == GeometryType.POLYGON) {
+               val polygon = it.geometry as Polygon
+               if (polygon.coordinates[0].size < 4) {
+                  Log.i("Billy", "not a polygon for location $location")
+               }
+            }
+         }
+
+         feature
+      }
+
       return if (features.isNotEmpty()) {
          FeatureCollection(features)
       } else null
@@ -200,7 +219,7 @@ class NavTextParser {
          currentLocationType = "Circle"
       } else if (line.contains("TRACKLINE")) {
          currentLocationType = "LineString"
-      } else if (line.contains("POSITION")) {
+      } else if (line.contains("POSITION") || line.contains("VICINITY")) {
          currentLocationType = "Point"
       }
    }

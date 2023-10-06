@@ -139,29 +139,23 @@ class Export @Inject constructor(
          })
       }
 
-      // create the data columns extension for human readable column names
+      // Create the data columns extension for human readable column names
       SchemaExtension(geoPackage).createDataColumnsTable()
       SchemaExtension.getDataColumnsDao(geoPackage)?.let { dao ->
          dataColumns.forEach { dao.create(it) }
       }
 
-      // add the icon
       val style = FeatureStyleExtension(geoPackage)
       style.createStyleTable()
       style.createIconTable()
 
-      val styleDao = style.styleDao
-      val iconDao = style.iconDao
-
-      // TODO needs to be data source dependent
-      val color = DataSource.ASAM.color
-
       val featureTableStyles = FeatureTableStyles(geoPackage, featureTable)
+      val styleDao = style.styleDao
       val tableStyleDefault = styleDao.newRow()
       tableStyleDefault.setName("${definition.tableName} Style")
-      tableStyleDefault.setColor(Color(color.red, color.green, color.blue))
-      tableStyleDefault.setFillColor(Color(color.red, color.green, color.blue))
-      tableStyleDefault.opacity = color.alpha.toDouble()
+      tableStyleDefault.setColor(Color(definition.color.red, definition.color.green, definition.color.blue))
+      tableStyleDefault.setFillColor(Color(definition.color.red, definition.color.green, definition.color.blue))
+      tableStyleDefault.opacity = definition.color.alpha.toDouble()
       tableStyleDefault.setFillOpacity(0.3)
       tableStyleDefault.setWidth(2.0)
       featureTableStyles.setTableStyleDefault(tableStyleDefault)
@@ -172,6 +166,7 @@ class Export @Inject constructor(
       bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
       val imageData = stream.toByteArray()
 
+      val iconDao = style.iconDao
       val iconStyleDefault: IconRow = iconDao.newRow()
       iconStyleDefault.isTableIcon = true
       iconStyleDefault.name = "Icon"

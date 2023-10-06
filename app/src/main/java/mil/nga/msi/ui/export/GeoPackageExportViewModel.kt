@@ -19,6 +19,7 @@ import mil.nga.msi.geopackage.export.DgpsStationFeature
 import mil.nga.msi.geopackage.export.Export
 import mil.nga.msi.geopackage.export.ExportStatus
 import mil.nga.msi.geopackage.export.ModuFeature
+import mil.nga.msi.geopackage.export.NavigationalWarningFeature
 import mil.nga.msi.geopackage.export.PortFeature
 import mil.nga.msi.geopackage.export.RadioBeaconFeature
 import mil.nga.msi.repository.asam.AsamRepository
@@ -119,6 +120,10 @@ class GeoPackageExportViewModel @Inject constructor(
                dataSource to dgpsStationRepository.getDgpsStations(
                   filters = filters.value?.get(dataSource) ?: emptyList()
                ).map { DgpsStationFeature(it) }
+            }
+            DataSource.NAVIGATION_WARNING -> {
+               dataSource to navigationalWarningRepository.getNavigationalWarnings()
+                  .map { NavigationalWarningFeature(it) }
             }
             DataSource.MODU -> {
                dataSource to moduRepository.getModus(

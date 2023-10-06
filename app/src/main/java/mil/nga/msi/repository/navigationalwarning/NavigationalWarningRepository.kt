@@ -22,6 +22,7 @@ class NavigationalWarningRepository @Inject constructor(
    private val userPreferencesRepository: UserPreferencesRepository
 ) {
    fun getNavigationalWarningsByArea(navigationArea: NavigationArea?) = localDataSource.observeNavigationalWarningsByArea(navigationArea)
+
    fun getNavigationalWarningsByNavigationArea(
       hydroarc: Date,
       hydrolant: Date,
@@ -30,6 +31,9 @@ class NavigationalWarningRepository @Inject constructor(
       navareaXII: Date,
       special: Date
    )  = localDataSource.observeNavigationalWarningsByNavigationArea(hydroarc, hydrolant, hydropac, navareaIV, navareaXII, special)
+
+   suspend fun getNavigationalWarnings() = localDataSource.getNavigationalWarnings()
+
    fun getNavigationalWarnings(
       minLatitude: Double,
       minLongitude: Double,

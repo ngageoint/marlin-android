@@ -1,7 +1,9 @@
 package mil.nga.msi.geopackage.export
 
 import mil.nga.geopackage.db.GeoPackageDataType
+import mil.nga.geopackage.extension.nga.style.StyleRow
 import mil.nga.mgrs.MGRS
+import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.dgpsstation.DgpsStation
 import mil.nga.msi.ui.map.cluster.MapAnnotation
 import mil.nga.sf.Point
@@ -9,6 +11,8 @@ import mil.nga.sf.Point
 class DgpsStationDefinition() : DataSourceDefinition {
    override val tableName = "dgps_stations"
    override val icon = MapAnnotation.Type.DGPS_STATION.icon
+   override val color = DataSource.DGPS_STATION.color
+   override val styles = emptyList<StyleRow>()
    override val columns: List<FeatureColumn> = listOf(
       FeatureColumn("name", "Name", GeoPackageDataType.TEXT),
       FeatureColumn("latitude", "Latitude", GeoPackageDataType.DOUBLE),
@@ -38,7 +42,7 @@ class DgpsStationFeature(
    dgpsStation: DgpsStation
 ) : Feature {
    override val geometry = Point(dgpsStation.longitude, dgpsStation.latitude)
-   
+
    override val values = listOf(
       FeatureData("name", dgpsStation.name),
       FeatureData("latitude", dgpsStation.latitude),
