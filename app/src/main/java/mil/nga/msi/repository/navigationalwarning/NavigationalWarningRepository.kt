@@ -5,6 +5,7 @@ import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import mil.nga.msi.MarlinNotification
 import mil.nga.msi.datasource.DataSource
+import mil.nga.msi.datasource.asam.Asam
 import mil.nga.msi.datasource.filter.QueryBuilder
 import mil.nga.msi.datasource.navigationwarning.NavigationArea
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarning
@@ -33,6 +34,14 @@ class NavigationalWarningRepository @Inject constructor(
    )  = localDataSource.observeNavigationalWarningsByNavigationArea(hydroarc, hydrolant, hydropac, navareaIV, navareaXII, special)
 
    suspend fun getNavigationalWarnings() = localDataSource.getNavigationalWarnings()
+
+   fun getNavigationalWarnings(filters: List<Filter>): List<NavigationalWarning> {
+      val query = QueryBuilder(
+         table = "navigational_warnings",
+         filters = filters
+      ).buildQuery()
+      return localDataSource.getNavigationalWarnings(query)
+   }
 
    fun getNavigationalWarnings(
       minLatitude: Double,

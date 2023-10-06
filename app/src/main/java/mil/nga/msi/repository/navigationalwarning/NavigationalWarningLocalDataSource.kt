@@ -41,6 +41,8 @@ class NavigationalWarningLocalDataSource @Inject constructor(
 
    suspend fun getNavigationalWarning(key: NavigationalWarningKey) = dao.getNavigationalWarning(key.number, key.year, key.navigationArea)
    suspend fun getNavigationalWarnings() = dao.getNavigationalWarnings()
+   fun getNavigationalWarnings(query: SimpleSQLiteQuery) = dao.getNavigationalWarnings(query)
+
    fun getNavigationalWarnings(
       minLatitude: Double,
       minLongitude: Double,

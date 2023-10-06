@@ -29,6 +29,7 @@ import mil.nga.msi.ui.action.AsamAction
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.action.RadioBeaconAction
 import mil.nga.msi.ui.datasource.DataSourceActions
+import mil.nga.msi.ui.export.ExportDataSource
 import mil.nga.msi.ui.radiobeacon.RadioBeaconRoute
 import mil.nga.msi.ui.radiobeacon.RadioBeaconSummary
 
@@ -101,7 +102,7 @@ fun RadioBeaconsScreen(
          ) {
             FloatingActionButton(
                containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-               onClick = { onAction(Action.Export(DataSource.RADIO_BEACON)) }
+               onClick = { onAction(Action.Export(ExportDataSource.RadioBeacon)) }
             ) {
                Icon(Icons.Outlined.Download,
                   contentDescription = "Export radio beacons as GeoPackage"

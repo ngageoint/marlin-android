@@ -3,6 +3,7 @@ package mil.nga.msi.datasource.navigationwarning
 import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteQuery
 import kotlinx.coroutines.flow.Flow
+import mil.nga.msi.datasource.asam.Asam
 import java.util.*
 
 @Dao
@@ -53,6 +54,10 @@ interface NavigationalWarningDao {
 
    @Query("SELECT * FROM navigational_warnings WHERE id IN (:ids)")
    suspend fun getNavigationalWarnings(ids: List<String>): List<NavigationalWarning>
+
+   @RawQuery(observedEntities = [NavigationalWarning::class])
+   @RewriteQueriesToDropUnusedColumns
+   fun getNavigationalWarnings(query: SupportSQLiteQuery): List<NavigationalWarning>
 
    @Query("SELECT * FROM navigational_warnings WHERE navigation_area = :navigationArea ORDER BY issue_date DESC")
    @RewriteQueriesToDropUnusedColumns

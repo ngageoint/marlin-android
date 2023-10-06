@@ -10,6 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Fullscreen
 import androidx.compose.material.icons.filled.FullscreenExit
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.LocationSearching
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -58,6 +59,7 @@ import mil.nga.msi.ui.map.cluster.ClusterItem
 fun NavigationalWarningGroupScreen(
    position: MapPosition?,
    openDrawer: () -> Unit,
+   onExport: () -> Unit,
    onGroupTap: (NavigationArea) -> Unit,
    onNavigationWarningsTap: (List<NavigationalWarningKey>) -> Unit,
    viewModel: NavigationalWarningAreasViewModel = hiltViewModel()
@@ -88,72 +90,89 @@ fun NavigationalWarningGroupScreen(
          onNavigationClicked = { openDrawer() }
       )
 
-      Surface(
-         color = MaterialTheme.colorScheme.surfaceVariant,
-         modifier = Modifier.fillMaxHeight()
-      ) {
-         Column {
-            Box(Modifier.animateContentSize()) {
-               NavigationAreaMap(
-                  height = if (fullScreenMap) screenHeight * 1f else screenHeight * .33f,
-                  fullScreenMap = fullScreenMap,
-                  mapPosition = mapPosition,
-                  onZoom = {
-                     location?.let {
-                        mapPosition = MapPosition(
-                           location = MapLocation.newBuilder()
-                              .setLatitude(it.latitude)
-                              .setLongitude(it.longitude)
-                              .setZoom(17.0)
-                              .build()
-                        )
+      Box(Modifier.fillMaxWidth()) {
+         Surface(
+            color = MaterialTheme.colorScheme.surfaceVariant,
+            modifier = Modifier.fillMaxHeight()
+         ) {
+            Column {
+               Box(Modifier.animateContentSize()) {
+                  NavigationAreaMap(
+                     height = if (fullScreenMap) screenHeight * 1f else screenHeight * .33f,
+                     fullScreenMap = fullScreenMap,
+                     mapPosition = mapPosition,
+                     onZoom = {
+                        location?.let {
+                           mapPosition = MapPosition(
+                              location = MapLocation.newBuilder()
+                                 .setLatitude(it.latitude)
+                                 .setLongitude(it.longitude)
+                                 .setZoom(17.0)
+                                 .build()
+                           )
+                        }
+                     },
+                     onMapFullScreen = { fullScreenMap = it },
+                     onNavigationWarningsTap = { keys -> onNavigationWarningsTap(keys) },
+                     onMapPositionChanged = { mapPosition = it },
+                     location = location,
+                     annotations = annotations,
+                     locationPermissionState = locationPermissionState,
+                     naturalEarthTileProvider = viewModel.naturalEarthTileProvider,
+                     navigationAreaTileProvider = viewModel.navigationAreaTileProvider
+                  )
+               }
+
+               val navigationArea = location?.let { getNavigationArea(LocalContext.current, it) }
+               val sortedAreas = warningsByArea.sortedWith { a, b ->
+                  when {
+                     a.navigationArea == navigationArea -> -1
+                     a.navigationArea.title > b.navigationArea.title -> 1
+                     a.navigationArea.title < b.navigationArea.title -> -1
+                     else -> 0
+                  }
+               }.toMutableList()
+
+               Column(Modifier.verticalScroll(scrollState)) {
+                  sortedAreas.forEach { group ->
+                     NavigationalWarnings(
+                        title = group.navigationArea.title,
+                        color = group.navigationArea.color,
+                        active = "Active ${group.total}",
+                        unread = group.unread
+                     ) {
+                        onGroupTap(group.navigationArea)
                      }
-                  },
-                  onMapFullScreen = { fullScreenMap = it },
-                  onNavigationWarningsTap = { keys -> onNavigationWarningsTap(keys) },
-                  onMapPositionChanged = { mapPosition = it },
-                  location = location,
-                  annotations = annotations,
-                  locationPermissionState = locationPermissionState,
-                  naturalEarthTileProvider = viewModel.naturalEarthTileProvider,
-                  navigationAreaTileProvider = viewModel.navigationAreaTileProvider
-               )
+
+                     Divider()
+                  }
+
+                  if (unparsedWarnings.isNotEmpty()) {
+                     NavigationalWarnings(
+                        title = NavigationArea.UNPARSED.title,
+                        color = NavigationArea.UNPARSED.color,
+                        active = "${unparsedWarnings.size}",
+                        unread = 0
+                     ) {
+                        onGroupTap(NavigationArea.UNPARSED)
+                     }
+                  }
+               }
             }
+         }
 
-            val navigationArea = location?.let { getNavigationArea(LocalContext.current, it) }
-            val sortedAreas = warningsByArea.sortedWith { a, b ->
-               when {
-                  a.navigationArea == navigationArea -> -1
-                  a.navigationArea.title > b.navigationArea.title -> 1
-                  a.navigationArea.title < b.navigationArea.title -> -1
-                  else -> 0
-               }
-            }.toMutableList()
-
-            Column(Modifier.verticalScroll(scrollState)) {
-               sortedAreas.forEach { group ->
-                  NavigationalWarnings(
-                     title = group.navigationArea.title,
-                     color = group.navigationArea.color,
-                     active = "Active ${group.total}",
-                     unread = group.unread
-                  ) {
-                     onGroupTap(group.navigationArea)
-                  }
-
-                  Divider()
-               }
-
-               if (unparsedWarnings.isNotEmpty()) {
-                  NavigationalWarnings(
-                     title = NavigationArea.UNPARSED.title,
-                     color = NavigationArea.UNPARSED.color,
-                     active = "${unparsedWarnings.size}",
-                     unread = 0
-                  ) {
-                     onGroupTap(NavigationArea.UNPARSED)
-                  }
-               }
+         Box(
+            Modifier
+               .align(Alignment.BottomEnd)
+               .padding(16.dp)
+         ) {
+            FloatingActionButton(
+               containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+               onClick = { onExport() }
+            ) {
+               Icon(Icons.Outlined.Download,
+                  contentDescription = "Export digital GPS stations as GeoPackage"
+               )
             }
          }
       }

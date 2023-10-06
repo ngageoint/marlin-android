@@ -58,6 +58,7 @@ import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.navigationalwarning.NavigationWarningRoute
 import mil.nga.msi.ui.action.NavigationalWarningAction
 import mil.nga.msi.ui.bookmark.BookmarkNotes
+import mil.nga.msi.ui.export.ExportDataSource
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -124,7 +125,7 @@ fun NavigationalWarningsScreen(
             ) {
                FloatingActionButton(
                   containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                  onClick = { onAction(Action.Export(DataSource.NAVIGATION_WARNING)) }
+                  onClick = { onAction(Action.Export(ExportDataSource.NavigationalWarning(navigationArea = navigationArea))) }
                ) {
                   Icon(Icons.Outlined.Download,
                      contentDescription = "Export digital GPS stations as GeoPackage"

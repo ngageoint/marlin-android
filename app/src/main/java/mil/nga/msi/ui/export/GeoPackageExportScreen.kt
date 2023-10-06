@@ -18,8 +18,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.ErrorOutline
-import androidx.compose.material.icons.filled.SentimentDissatisfied
 import androidx.compose.material.icons.filled.SentimentVeryDissatisfied
 import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material3.AlertDialog
@@ -61,7 +59,7 @@ import mil.nga.msi.ui.theme.onSurfaceDisabled
 
 @Composable
 fun GeoPackageExportScreen(
-   dataSource: DataSource?,
+   dataSource: ExportDataSource?,
    close: () -> Unit,
    onExport: (Uri) -> Unit,
    viewModel: GeoPackageExportViewModel = hiltViewModel()
@@ -74,7 +72,7 @@ fun GeoPackageExportScreen(
    var showErrorDialog by remember { mutableStateOf(false) }
 
    LaunchedEffect(dataSource) {
-      dataSource?.let { viewModel.toggleDataSource(it) }
+      dataSource?.let { viewModel.setExport(it) }
    }
 
    if (showErrorDialog) {
@@ -313,7 +311,6 @@ private fun DataSourceFilter(
          }
 
          exportStatus?.let { (total, complete) ->
-//            Log.i("Billy", "UI Data source export complete ${complete / total.toFloat()}")
             LinearProgressIndicator(
                modifier = Modifier.fillMaxWidth(),
                progress = complete / total.toFloat()

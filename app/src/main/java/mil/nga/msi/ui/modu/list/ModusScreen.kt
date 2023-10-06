@@ -29,6 +29,7 @@ import mil.nga.msi.ui.action.AsamAction
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.action.ModuAction
 import mil.nga.msi.ui.datasource.DataSourceActions
+import mil.nga.msi.ui.export.ExportDataSource
 import mil.nga.msi.ui.modu.ModuRoute
 import mil.nga.msi.ui.modu.ModuSummary
 import java.util.*
@@ -102,7 +103,7 @@ fun ModusScreen(
          ) {
             FloatingActionButton(
                containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-               onClick = { onAction(Action.Export(DataSource.MODU)) }
+               onClick = { onAction(Action.Export(ExportDataSource.Modu)) }
             ) {
                Icon(Icons.Outlined.Download,
                   contentDescription = "Export MODUs as GeoPackage"

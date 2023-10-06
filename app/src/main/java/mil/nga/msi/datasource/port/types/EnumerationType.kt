@@ -1,5 +1,7 @@
 package mil.nga.msi.datasource.port.types
 
+import mil.nga.msi.datasource.navigationwarning.NavigationArea
+
 interface EnumerationType {
    val name: String
    val title: String
@@ -12,6 +14,7 @@ interface EnumerationType {
       private const val SHELTER_TYPE_NAME = "SHELTER"
       private const val SIZE_TYPE_NAME = "SIZE"
       private const val UNDERKEEL_CLEARANCE_TYPE_NAME = "UNDERKEEL_CLEARANCE"
+      private const val NAVIGATION_AREA_TYPE_NAME = "NAVIGATION_AREA"
 
       fun fromString(valueString: String?): EnumerationType? {
          val values = valueString?.split(",")
@@ -26,6 +29,7 @@ interface EnumerationType {
             SHELTER_TYPE_NAME -> Shelter.fromValue(value)
             SIZE_TYPE_NAME -> Size.fromValue(value)
             UNDERKEEL_CLEARANCE_TYPE_NAME -> UnderkeelClearance.fromValue(value)
+            NAVIGATION_AREA_TYPE_NAME -> NavigationArea.fromValue(value)
             else -> null
          }
       }
@@ -39,6 +43,7 @@ interface EnumerationType {
             is Shelter -> "${SHELTER_TYPE_NAME},${type.name}"
             is Size -> "${SIZE_TYPE_NAME},${type.name}"
             is UnderkeelClearance -> "${UNDERKEEL_CLEARANCE_TYPE_NAME},${type.name}"
+            is NavigationArea -> "${NAVIGATION_AREA_TYPE_NAME},${type.name}"
             else -> null
          }
       }

@@ -30,6 +30,7 @@ import mil.nga.msi.ui.action.AsamAction
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.action.PortAction
 import mil.nga.msi.ui.datasource.DataSourceActions
+import mil.nga.msi.ui.export.ExportDataSource
 import mil.nga.msi.ui.port.PortRoute
 import mil.nga.msi.ui.port.PortSummary
 
@@ -104,7 +105,7 @@ fun PortsScreen(
          ) {
             FloatingActionButton(
                containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-               onClick = { onAction(Action.Export(DataSource.PORT)) }
+               onClick = { onAction(Action.Export(ExportDataSource.Port)) }
             ) {
                Icon(Icons.Outlined.Download,
                   contentDescription = "Export ports as GeoPackage"

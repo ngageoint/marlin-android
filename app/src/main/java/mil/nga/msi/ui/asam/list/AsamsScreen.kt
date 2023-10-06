@@ -29,6 +29,7 @@ import mil.nga.msi.ui.action.AsamAction
 import mil.nga.msi.ui.asam.AsamRoute
 import mil.nga.msi.ui.asam.AsamSummary
 import mil.nga.msi.ui.datasource.DataSourceActions
+import mil.nga.msi.ui.export.ExportDataSource
 import mil.nga.msi.ui.main.TopBar
 import java.util.*
 
@@ -101,7 +102,7 @@ fun AsamsScreen(
          ) {
             FloatingActionButton(
                containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-               onClick = { onAction(Action.Export(DataSource.ASAM)) }
+               onClick = { onAction(Action.Export(ExportDataSource.Asam)) }
             ) {
                Icon(Icons.Outlined.Download,
                   contentDescription = "Export ASAMs as GeoPackage"

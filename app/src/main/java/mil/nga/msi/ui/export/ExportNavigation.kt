@@ -2,11 +2,15 @@ package mil.nga.msi.ui.export
 
 import android.net.Uri
 import androidx.compose.ui.graphics.Color
+import androidx.core.os.BundleCompat
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavType
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import mil.nga.msi.datasource.DataSource
+import mil.nga.msi.ui.navigation.NavTypeDataSource
 import mil.nga.msi.ui.navigation.Route
 
 sealed class ExportRoute(
@@ -28,11 +32,14 @@ fun NavGraphBuilder.exportGraph(
       route = ExportRoute.Main.name,
       startDestination = ExportRoute.Export.name
    ) {
-      composable("${ExportRoute.Export.name}?dataSource={dataSource}") { backstackEntry ->
+      composable(
+         route = "${ExportRoute.Export.name}?dataSource={dataSource}",
+         arguments = listOf(navArgument("dataSource") { type = NavType.NavTypeDataSource })
+      ) { backstackEntry ->
          bottomBarVisibility(true)
 
-         val dataSource = backstackEntry.arguments?.getString("dataSource")?.let { dataSource ->
-            try { DataSource.valueOf(dataSource) } catch(_: Exception) { null }
+         val dataSource = backstackEntry.arguments?.let { bundle ->
+            BundleCompat.getParcelable(bundle, "dataSource", ExportDataSource::class.java)
          }
 
          GeoPackageExportScreen(

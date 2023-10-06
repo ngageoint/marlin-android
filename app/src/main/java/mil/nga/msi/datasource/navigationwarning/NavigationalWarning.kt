@@ -6,6 +6,8 @@ import androidx.room.Entity
 import androidx.room.Index
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
+import mil.nga.msi.datasource.port.types.Decision
+import mil.nga.msi.datasource.port.types.EnumerationType
 import mil.nga.sf.geojson.Feature
 import mil.nga.sf.geojson.FeatureConverter
 import java.text.SimpleDateFormat
@@ -14,9 +16,9 @@ import java.util.Locale
 
 enum class NavigationArea(
    val code: String,
-   val title: String,
+   override val title: String,
    val color: Color
-) {
+): EnumerationType {
    HYDROARC("C", "HYDROARC", Color(0xFF77DFFC)),
    HYDROLANT("A", "HYDROLANT", Color(0xFF7C91F2)),
    HYDROPAC("P", "HYDROPAC", Color(0xFFF5F481)),
@@ -28,6 +30,14 @@ enum class NavigationArea(
    companion object {
       fun fromCode(code: String): NavigationArea? {
          return values().find { it.code == code }
+      }
+
+      fun fromValue(value: String?): NavigationArea? {
+         return  try {
+            NavigationArea.valueOf(value!!)
+         } catch (e: Exception) {
+            null
+         }
       }
    }
 }

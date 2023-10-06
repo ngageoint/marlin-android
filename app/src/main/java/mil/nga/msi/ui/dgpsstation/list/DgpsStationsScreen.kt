@@ -30,6 +30,7 @@ import mil.nga.msi.ui.action.DgpsStationAction
 import mil.nga.msi.ui.datasource.DataSourceActions
 import mil.nga.msi.ui.dgpsstation.DgpsStationRoute
 import mil.nga.msi.ui.dgpsstation.DgpsStationSummary
+import mil.nga.msi.ui.export.ExportDataSource
 import mil.nga.msi.ui.main.TopBar
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -101,7 +102,7 @@ fun DgpsStationsScreen(
          ) {
             FloatingActionButton(
                containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-               onClick = { onAction(Action.Export(DataSource.DGPS_STATION)) }
+               onClick = { onAction(Action.Export(ExportDataSource.DgpsStation)) }
             ) {
                Icon(Icons.Outlined.Download,
                   contentDescription = "Export digital GPS stations as GeoPackage"

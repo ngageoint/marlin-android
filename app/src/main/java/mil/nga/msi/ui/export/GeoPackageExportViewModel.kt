@@ -13,7 +13,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mil.nga.geopackage.GeoPackageManager
 import mil.nga.msi.datasource.DataSource
+import mil.nga.msi.datasource.navigationwarning.NavigationArea
+import mil.nga.msi.filter.ComparatorType
 import mil.nga.msi.filter.Filter
+import mil.nga.msi.filter.FilterParameter
+import mil.nga.msi.filter.FilterParameterType
 import mil.nga.msi.geopackage.export.AsamFeature
 import mil.nga.msi.geopackage.export.DgpsStationFeature
 import mil.nga.msi.geopackage.export.Export
@@ -72,6 +76,30 @@ class GeoPackageExportViewModel @Inject constructor(
       }
    }
 
+   fun setExport(export: ExportDataSource) {
+      viewModelScope.launch {
+         toggleDataSource(export.dataSource)
+
+         if (export is ExportDataSource.NavigationalWarning && export.navigationArea != null) {
+            val filter = Filter(
+               parameter = FilterParameter(
+                  title = "Navigation Area",
+                  parameter = "navigation_area",
+                  type = FilterParameterType.ENUMERATION,
+                  enumerationValues = NavigationArea.values().toList()
+               ),
+               comparator = ComparatorType.EQUALS,
+               value = export.navigationArea
+            )
+            val filters = _filters.value?.toMutableMap() ?: mutableMapOf()
+            val dataSourceFilters = filters[DataSource.NAVIGATION_WARNING]?.toMutableList() ?: mutableListOf()
+            dataSourceFilters.add(filter)
+            filters[DataSource.NAVIGATION_WARNING] = dataSourceFilters
+            _filters.value = filters
+         }
+      }
+   }
+
    fun toggleDataSource(dataSource: DataSource) {
       viewModelScope.launch {
          val dataSources = _dataSources.value?.toMutableSet() ?: mutableSetOf()
@@ -122,8 +150,9 @@ class GeoPackageExportViewModel @Inject constructor(
                ).map { DgpsStationFeature(it) }
             }
             DataSource.NAVIGATION_WARNING -> {
-               dataSource to navigationalWarningRepository.getNavigationalWarnings()
-                  .map { NavigationalWarningFeature(it) }
+               dataSource to navigationalWarningRepository.getNavigationalWarnings(
+                  filters = filters.value?.get(dataSource) ?: emptyList()
+               ).map { NavigationalWarningFeature(it) }
             }
             DataSource.MODU -> {
                dataSource to moduRepository.getModus(
