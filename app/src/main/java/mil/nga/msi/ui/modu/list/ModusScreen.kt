@@ -188,14 +188,16 @@ private fun ModuCard(
          .padding(bottom = 8.dp)
          .clickable { onTap() }
    ) {
-      ModuSummary(moduWithBookmark = moduWithBookmark)
-      DataSourceActions(
-         latLng = modu.latLng,
-         bookmarked = bookmark != null,
-         onZoom = onZoom,
-         onShare = onShare,
-         onBookmark = onBookmark,
-         onCopyLocation = onCopyLocation
-      )
+      Column(Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
+         ModuSummary(moduWithBookmark = moduWithBookmark)
+         DataSourceActions(
+            latLng = modu.latLng,
+            bookmarked = bookmark != null,
+            onZoom = onZoom,
+            onShare = onShare,
+            onBookmark = onBookmark,
+            onCopyLocation = onCopyLocation
+         )
+      }
    }
 }
