@@ -50,20 +50,34 @@ class Export @Inject constructor(
       onStatus: (Map<DataSource, ExportStatus>) -> Unit,
       onError: () -> Unit
    ) = withContext(Dispatchers.IO) {
+      Log.i("Billy", "geopackage export $items")
+
       val status = items.map { (dataSource, features) ->
          dataSource to ExportStatus(features.size, 0)
       }.toMap().toMutableMap()
 
       try {
+         Log.i("Billy", "create geopackage")
+
          create()?.let { geoPackage ->
+            Log.i("Billy", "created geopackage")
+
             items.forEach { (dataSource, features) ->
                val definition =  DataSourceDefinition.fromDataSource(dataSource)
+               Log.i("Billy", "create table")
+
                val table = createTable(
                   definition = definition,
                   geoPackage = geoPackage
                )
+               Log.i("Billy", "created table")
+
                val tableStyles = FeatureTableStyles(geoPackage, table)
                val styleRows = definition.getStyles(tableStyles)
+
+               Log.i("Billy", "created styles")
+
+               Log.i("Billy", "Starting features")
 
                features.forEachIndexed { index, feature ->
                   feature.createFeature(geoPackage, table, styleRows)

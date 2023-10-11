@@ -1,6 +1,8 @@
 package mil.nga.msi.ui.export
 
 import android.app.Application
+import android.net.Uri
+import android.util.Log
 import androidx.core.content.FileProvider
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -42,7 +44,7 @@ sealed class ExportState {
    object None: ExportState()
    object Error: ExportState()
    data class Creating(val status: Map<DataSource, ExportStatus>): ExportState()
-   data class Complete(val status: Map<DataSource, ExportStatus>): ExportState()
+   data class Complete(val uri: Uri, val status: Map<DataSource, ExportStatus>): ExportState()
 }
 
 @HiltViewModel
@@ -191,7 +193,9 @@ class GeoPackageExportViewModel @Inject constructor(
                _exportStatus.postValue(ExportState.Error)
             }
          )?.let { geoPackage ->
-            FileProvider.getUriForFile(application, "${application.packageName}.fileprovider", geoPackage)
+            val uri = FileProvider.getUriForFile(application, "${application.packageName}.fileprovider", geoPackage)
+            _exportStatus.postValue(ExportState.Complete(uri, emptyMap()))
+            uri
          }
       }
    }

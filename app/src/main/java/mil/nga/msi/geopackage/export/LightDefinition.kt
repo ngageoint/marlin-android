@@ -118,6 +118,9 @@ class LightDefinition() : DataSourceDefinition {
    }
 }
 
+var transform: Light.() -> Unit = { println("Hello $this") }
+
+
 class LightFeature(
    private val light: Light
 ) : Feature {
@@ -132,6 +135,10 @@ class LightFeature(
             collection
          } else Point(light.longitude, light.latitude)
       }
+
+   fun foo() {
+      transform(this.light)
+   }
 
    override val values = listOf(
       FeatureData("name", light.name),

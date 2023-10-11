@@ -2,6 +2,7 @@ package mil.nga.msi.ui.export
 
 import android.net.Uri
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -20,6 +21,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.SentimentVeryDissatisfied
 import androidx.compose.material.icons.outlined.Download
+import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
@@ -107,7 +109,7 @@ fun GeoPackageExportScreen(
                   }
                )
 
-               CommonFilters()
+               CommonFilters(exportState = exportState)
                DataSourceFilters(
                   dataSources = dataSources,
                   counts = counts,
@@ -120,22 +122,15 @@ fun GeoPackageExportScreen(
                   .align(Alignment.BottomEnd)
                   .padding(16.dp)
             ) {
-
-               ExtendedFloatingActionButton(
-                  containerColor = MaterialTheme.colorScheme.primary,
-                  onClick = {
+               ExportActionButton(
+                  exportState = exportState,
+                  onShare = { onExport(it) },
+                  onCreate = {
                      scope.launch {
                         viewModel.createGeoPackage()?.let { onExport(it) }
                      }
                   }
-               ) {
-                  Icon(
-                     imageVector = Icons.Outlined.Download,
-                     contentDescription = "Export as GeoPacakge"
-                  )
-                  Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-                  Text("Export")
-               }
+               )
             }
          }
       }
@@ -203,14 +198,21 @@ private fun DataSourceItem(
 }
 
 @Composable
-private fun CommonFilters() {
-   Column(Modifier.padding(top = 16.dp)) {
-      CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-         Text(
-            text = "COMMON FILTERS",
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(top = 24.dp, bottom = 16.dp, start = 8.dp)
-         )
+private fun CommonFilters(
+   exportState: ExportState
+) {
+   Column(
+      Modifier
+         .padding(top = 16.dp)
+         .animateContentSize()) {
+      if (exportState is ExportState.None) {
+         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+            Text(
+               text = "COMMON FILTERS",
+               style = MaterialTheme.typography.titleMedium,
+               modifier = Modifier.padding(top = 24.dp, bottom = 16.dp, start = 8.dp)
+            )
+         }
       }
    }
 }
@@ -224,7 +226,7 @@ private fun DataSourceFilters(
    Column {
       CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
          Text(
-            text = "DATA SOURCE FILTERS",
+            text = if (exportState is ExportState.Creating) "EXPORT STATUS" else "DATA SOURCE FILTERS",
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(top = 24.dp, bottom = 16.dp, start = 8.dp)
          )
@@ -345,4 +347,51 @@ fun ExportErrorDialog(
          }
       }
    )
+}
+
+@Composable
+fun ExportActionButton(
+   exportState: ExportState,
+   onCreate: () -> Unit,
+   onShare: (Uri) -> Unit
+) {
+   val scope = rememberCoroutineScope()
+
+   when (exportState) {
+      is ExportState.Complete -> {
+         ExtendedFloatingActionButton(
+            containerColor = MaterialTheme.colorScheme.primary,
+            onClick = {
+               scope.launch {
+                  onShare(exportState.uri)
+               }
+            }
+         ) {
+            Icon(
+               imageVector = Icons.Outlined.Share,
+               contentDescription = "Share GeoPackage"
+            )
+            Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+            Text("Share")
+         }
+      }
+      is ExportState.None, is ExportState.Error -> {
+         ExtendedFloatingActionButton(
+            containerColor = MaterialTheme.colorScheme.primary,
+            onClick = {
+               scope.launch {
+                  onCreate()
+               }
+            }
+         ) {
+            Icon(
+               imageVector = Icons.Outlined.Download,
+               contentDescription = "Export as GeoPackage"
+            )
+            Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+            Text("Export")
+         }
+      }
+      else -> {}
+   }
 }
