@@ -57,27 +57,16 @@ class Export @Inject constructor(
       }.toMap().toMutableMap()
 
       try {
-         Log.i("Billy", "create geopackage")
-
          create()?.let { geoPackage ->
-            Log.i("Billy", "created geopackage")
-
             items.forEach { (dataSource, features) ->
                val definition =  DataSourceDefinition.fromDataSource(dataSource)
-               Log.i("Billy", "create table")
-
                val table = createTable(
                   definition = definition,
                   geoPackage = geoPackage
                )
-               Log.i("Billy", "created table")
 
                val tableStyles = FeatureTableStyles(geoPackage, table)
                val styleRows = definition.getStyles(tableStyles)
-
-               Log.i("Billy", "created styles")
-
-               Log.i("Billy", "Starting features")
 
                features.forEachIndexed { index, feature ->
                   feature.createFeature(geoPackage, table, styleRows)
