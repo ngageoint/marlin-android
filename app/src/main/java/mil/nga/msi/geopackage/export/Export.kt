@@ -15,7 +15,6 @@ import mil.nga.geopackage.db.TableColumnKey
 import mil.nga.geopackage.extension.nga.style.FeatureStyleExtension
 import mil.nga.geopackage.extension.nga.style.FeatureTableStyles
 import mil.nga.geopackage.extension.nga.style.IconRow
-import mil.nga.geopackage.extension.nga.style.StyleRow
 import mil.nga.geopackage.extension.schema.SchemaExtension
 import mil.nga.geopackage.extension.schema.columns.DataColumns
 import mil.nga.geopackage.features.columns.GeometryColumns
@@ -24,7 +23,6 @@ import mil.nga.geopackage.features.index.FeatureIndexType
 import mil.nga.geopackage.features.user.FeatureColumn
 import mil.nga.geopackage.features.user.FeatureTable
 import mil.nga.geopackage.features.user.FeatureTableMetadata
-import mil.nga.geopackage.geom.GeoPackageGeometryData
 import mil.nga.msi.datasource.DataSource
 import mil.nga.proj.ProjectionConstants
 import mil.nga.sf.GeometryType
@@ -57,18 +55,19 @@ class Export @Inject constructor(
       }.toMap().toMutableMap()
 
       try {
-         // TODO handle errors
          create()?.let { geoPackage ->
             items.forEach { (dataSource, features) ->
+               val definition =  DataSourceDefinition.fromDataSource(dataSource)
                val table = createTable(
-                  definition = DataSourceDefinition.fromDataSource(dataSource),
+                  definition = definition,
                   geoPackage = geoPackage
                )
                val tableStyles = FeatureTableStyles(geoPackage, table)
-               val styles = createStyles(tableStyles)
+               val styleRows = definition.getStyles(tableStyles)
 
-               createFeatures(geoPackage, table, styles, features) { complete ->
-                  status[dataSource] = ExportStatus(features.size, complete)
+               features.forEachIndexed { index, feature ->
+                  feature.createFeature(geoPackage, table, styleRows)
+                  status[dataSource] = ExportStatus(features.size, index + 1)
                   onStatus(status)
                }
 
@@ -117,7 +116,7 @@ class Export @Inject constructor(
       definition.columns.forEach { column ->
          columns.add(
             FeatureColumn.createColumn(
-               column.name,
+               column.key,
                column.type
             )
          )
@@ -128,12 +127,10 @@ class Export @Inject constructor(
       val featureTableMetadata = FeatureTableMetadata(geometryColumns, "object_id", true, columns, boundingBox)
       val featureTable = geoPackage.createFeatureTable(featureTableMetadata)
 
-      // TODO needs to be data source dependent
-
       definition.columns.forEach { column ->
          dataColumns.add(DataColumns().apply {
-            id = TableColumnKey(definition.tableName, column.name)
-            name = column.name
+            id = TableColumnKey(definition.tableName, column.key)
+            name = column.key
             title = column.title
             contents = geoPackage.getFeatureDao(featureTable).contents
          })
@@ -177,41 +174,6 @@ class Export @Inject constructor(
       featureTableStyles.setTableIconDefault(iconStyleDefault)
 
       return featureTable
-   }
-
-   private fun createStyles(
-      tableStyles: FeatureTableStyles
-   ): List<StyleRow> {
-      return emptyList()
-   }
-
-   private fun createFeatures(
-      geoPackage: GeoPackage,
-      table: FeatureTable,
-      styles: List<StyleRow>,
-      features: List<Feature>,
-      onStatus: (Int) -> Unit
-   ) {
-      features.forEachIndexed { index, feature ->
-         createFeature(geoPackage, table, feature)
-         onStatus(index + 1)
-      }
-   }
-
-   private fun createFeature(
-      geoPackage: GeoPackage,
-      table: FeatureTable,
-      feature: Feature
-   ) {
-      val featureDao = geoPackage.getFeatureDao(table)
-      val row = featureDao.newRow()
-      row.geometry = GeoPackageGeometryData(feature.geometry)
-
-      feature.values.forEach { (columnName, value) ->
-         row.setValue(columnName, value)
-      }
-
-      featureDao.create(row)
    }
 
    companion object {

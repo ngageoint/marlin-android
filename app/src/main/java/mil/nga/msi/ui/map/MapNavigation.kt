@@ -19,8 +19,10 @@ import mil.nga.msi.repository.geopackage.GeoPackageFeatureKey
 import mil.nga.msi.repository.light.LightKey
 import mil.nga.msi.repository.navigationalwarning.NavigationalWarningKey
 import mil.nga.msi.repository.radiobeacon.RadioBeaconKey
+import mil.nga.msi.ui.action.Action
 import mil.nga.msi.ui.asam.AsamRoute
 import mil.nga.msi.ui.dgpsstation.DgpsStationRoute
+import mil.nga.msi.ui.export.ExportDataSource
 import mil.nga.msi.ui.geopackage.GeoPackageRoute
 import mil.nga.msi.ui.light.LightRoute
 import mil.nga.msi.ui.map.cluster.MapAnnotation
@@ -142,6 +144,10 @@ fun NavGraphBuilder.mapGraph(
          onAnnotationsClick = { annotations ->
             val encoded = Uri.encode(Json.encodeToString(annotations))
             navController.navigate(MapRoute.PagerSheet.name + "?annotations=${encoded}")
+         },
+         onExport = { dataSources ->
+            val exportDataSources = dataSources.mapNotNull { ExportDataSource.fromDataSource(it) }
+            Action.Export(exportDataSources).navigate(navController)
          },
          onMapSettings = { navController.navigate(MapRoute.Settings.name) },
          openDrawer = { openNavigationDrawer() },

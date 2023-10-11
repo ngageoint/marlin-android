@@ -10,8 +10,8 @@ import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 enum class LightColor(val color: Color) {
-   WHITE(Color(0xDEFFFF00)),
-   YELLOW(Color(0xFFFFFF00)),
+   WHITE(Color(0xFFFFFE00)),
+   YELLOW(Color(0xFFFFFE00)),
    GREEN(Color(0xFF0DE319)),
    RED(Color(0xFFFA0000)),
    BLUE(Color(0xFF0000FF)),
@@ -372,7 +372,7 @@ data class Light(
          "removeFromList: ${removeFromList.orEmpty()}\n" +
          "structure: ${structure.orEmpty()}\n" +
          "subregionHeading: ${subregionHeading.orEmpty()}\n" +
-         "volumeNumber: ${volumeNumber.orEmpty()}"
+         "volumeNumber: ${volumeNumber}"
    }
 
    companion object {

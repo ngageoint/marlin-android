@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.LocationSearching
 import androidx.compose.material.icons.outlined.Map
 import androidx.compose.material.icons.outlined.MyLocation
@@ -55,7 +56,9 @@ import mil.nga.msi.coordinate.CoordinateSystem
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.repository.geocoder.GeocoderState
 import mil.nga.msi.type.MapLocation
+import mil.nga.msi.ui.action.Action
 import mil.nga.msi.ui.coordinate.CoordinateText
+import mil.nga.msi.ui.export.ExportDataSource
 import mil.nga.msi.ui.location.LocationPermission
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.cluster.MapAnnotation
@@ -77,6 +80,7 @@ fun MapScreen(
    onAnnotationClick: (MapAnnotation) -> Unit,
    onAnnotationsClick: (Collection<MapAnnotation>) -> Unit,
    onMapSettings: () -> Unit,
+   onExport: (List<DataSource>) -> Unit,
    openFilter: () -> Unit,
    openDrawer: () -> Unit,
    locationCopy: (String) -> Unit,
@@ -304,31 +308,51 @@ fun MapScreen(
                .align(Alignment.BottomEnd)
                .padding(16.dp)
          ) {
-            Row {
-               if (showScale) {
-                  ScaleBar(
-                     modifier = Modifier.padding(end = 16.dp),
-                     cameraPositionState = cameraPositionState
-                  )
+            Column(
+               verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+               Box {
+                  FloatingActionButton(
+                     containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                     onClick = {
+                        val dataSources = viewModel.mapped.value?.toList()
+                           ?.filter { (_, mapped) -> mapped}
+                           ?.map { (dataSource, _) -> dataSource } ?: emptyList()
+       
+                        onExport(dataSources)
+                     }
+                  ) {
+                     Icon(Icons.Outlined.Download,
+                        contentDescription = "Export Map Features as GeoPackage"
+                     )
+                  }
                }
 
-               if (locationPermissionState.status.isGranted) {
-                  Zoom(located) {
-                     located = true
-                     scope.launch {
-                        destination = MapPosition(
-                           location = MapLocation.newBuilder()
-                              .setLatitude(location?.latitude ?: 0.0)
-                              .setLongitude(location?.longitude ?: 0.0)
-                              .setZoom(17.0)
-                              .build()
-                        )
+               Row {
+                  if (showScale) {
+                     ScaleBar(
+                        modifier = Modifier.padding(end = 16.dp),
+                        cameraPositionState = cameraPositionState
+                     )
+                  }
+
+                  if (locationPermissionState.status.isGranted) {
+                     Zoom(located) {
+                        located = true
+                        scope.launch {
+                           destination = MapPosition(
+                              location = MapLocation.newBuilder()
+                                 .setLatitude(location?.latitude ?: 0.0)
+                                 .setLongitude(location?.longitude ?: 0.0)
+                                 .setZoom(17.0)
+                                 .build()
+                           )
+                        }
                      }
                   }
                }
             }
          }
-
 
          Box(
             modifier = Modifier

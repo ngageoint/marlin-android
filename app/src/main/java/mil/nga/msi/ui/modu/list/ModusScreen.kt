@@ -103,7 +103,7 @@ fun ModusScreen(
          ) {
             FloatingActionButton(
                containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-               onClick = { onAction(Action.Export(ExportDataSource.Modu)) }
+               onClick = { onAction(Action.Export(listOf(ExportDataSource.Modu))) }
             ) {
                Icon(Icons.Outlined.Download,
                   contentDescription = "Export MODUs as GeoPackage"

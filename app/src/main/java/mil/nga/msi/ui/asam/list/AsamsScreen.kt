@@ -102,7 +102,7 @@ fun AsamsScreen(
          ) {
             FloatingActionButton(
                containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-               onClick = { onAction(Action.Export(ExportDataSource.Asam)) }
+               onClick = { onAction(Action.Export(listOf(ExportDataSource.Asam))) }
             ) {
                Icon(Icons.Outlined.Download,
                   contentDescription = "Export ASAMs as GeoPackage"

@@ -78,7 +78,7 @@ fun NavGraphBuilder.navigationalWarningGraph(
             position = mapPosition,
             openDrawer = { openNavigationDrawer() },
             onExport = {
-               Action.Export(ExportDataSource.NavigationalWarning()).navigate(navController)
+               Action.Export(listOf(ExportDataSource.NavigationalWarning())).navigate(navController)
             },
             onGroupTap = { navigationArea ->
                navController.navigate( "${NavigationWarningRoute.List.name}?navigationArea=${navigationArea.code}")

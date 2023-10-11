@@ -7,19 +7,19 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import mil.nga.msi.ui.export.ExportDataSource
 
-val NavType.Companion.NavTypeDataSource: NavType<ExportDataSource?>
+val NavType.Companion.NavTypeDataSources: NavType<List<ExportDataSource>?>
    get() = exportType
 
-   private val exportType = object : NavType<ExportDataSource?>(true) {
-      override fun put(bundle: Bundle, key: String, value: ExportDataSource?) {
-         bundle.putParcelable(key, value)
+   private val exportType = object : NavType<List<ExportDataSource>?>(true) {
+      override fun put(bundle: Bundle, key: String, value: List<ExportDataSource>?) {
+         bundle.putParcelableArray(key, value?.toTypedArray())
       }
 
-      override fun get(bundle: Bundle, key: String): ExportDataSource? {
-         return BundleCompat.getParcelable(bundle, key, ExportDataSource::class.java)
+      override fun get(bundle: Bundle, key: String): List<ExportDataSource>? {
+         return BundleCompat.getParcelableArray(bundle, key, ExportDataSource::class.java)?.map { it as ExportDataSource }?.toList()
       }
 
-      override fun parseValue(value: String): ExportDataSource? {
+      override fun parseValue(value: String): List<ExportDataSource>? {
          return Json.decodeFromString(value)
       }
    }

@@ -15,7 +15,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.SwapVert
+import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material3.Card
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -41,6 +43,7 @@ import mil.nga.msi.repository.bookmark.BookmarkKey
 import mil.nga.msi.ui.action.Action
 import mil.nga.msi.ui.action.LightAction
 import mil.nga.msi.ui.datasource.DataSourceActions
+import mil.nga.msi.ui.export.ExportDataSource
 import mil.nga.msi.ui.light.LightRoute
 import mil.nga.msi.ui.light.LightSummary
 import mil.nga.msi.ui.main.TopBar
@@ -91,20 +94,37 @@ fun LightsScreen(
          }
       )
 
-      Lights(
-         pagingState = viewModel.lights,
-         onTap = { onAction(LightAction.Tap(it)) },
-         onZoom = { onAction(LightAction.Zoom(it.latLng)) },
-         onShare = { onAction(LightAction.Share(it)) },
-         onBookmark = { (light, bookmark) ->
-            if (bookmark == null) {
-               onAction(Action.Bookmark(BookmarkKey.fromLight(light)))
-            } else {
-               viewModel.deleteBookmark(bookmark)
+      Box(Modifier.fillMaxWidth()) {
+         Lights(
+            pagingState = viewModel.lights,
+            onTap = { onAction(LightAction.Tap(it)) },
+            onZoom = { onAction(LightAction.Zoom(it.latLng)) },
+            onShare = { onAction(LightAction.Share(it)) },
+            onBookmark = { (light, bookmark) ->
+               if (bookmark == null) {
+                  onAction(Action.Bookmark(BookmarkKey.fromLight(light)))
+               } else {
+                  viewModel.deleteBookmark(bookmark)
+               }
+            },
+            onCopyLocation = { onAction(LightAction.Location(it)) }
+         )
+
+         Box(
+            Modifier
+               .align(Alignment.BottomEnd)
+               .padding(16.dp)
+         ) {
+            FloatingActionButton(
+               containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+               onClick = { onAction(Action.Export(listOf(ExportDataSource.Light))) }
+            ) {
+               Icon(Icons.Outlined.Download,
+                  contentDescription = "Export ASAMs as GeoPackage"
+               )
             }
-         },
-         onCopyLocation = { onAction(LightAction.Location(it)) }
-      )
+         }
+      }
    }
 }
 

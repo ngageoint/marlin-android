@@ -105,7 +105,7 @@ fun PortsScreen(
          ) {
             FloatingActionButton(
                containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-               onClick = { onAction(Action.Export(ExportDataSource.Port)) }
+               onClick = { onAction(Action.Export(listOf(ExportDataSource.Port))) }
             ) {
                Icon(Icons.Outlined.Download,
                   contentDescription = "Export ports as GeoPackage"

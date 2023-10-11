@@ -10,7 +10,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import mil.nga.msi.datasource.DataSource
-import mil.nga.msi.ui.navigation.NavTypeDataSource
+import mil.nga.msi.ui.navigation.NavTypeDataSources
 import mil.nga.msi.ui.navigation.Route
 
 sealed class ExportRoute(
@@ -33,17 +33,17 @@ fun NavGraphBuilder.exportGraph(
       startDestination = ExportRoute.Export.name
    ) {
       composable(
-         route = "${ExportRoute.Export.name}?dataSource={dataSource}",
-         arguments = listOf(navArgument("dataSource") { type = NavType.NavTypeDataSource })
+         route = "${ExportRoute.Export.name}?dataSources={dataSources}",
+         arguments = listOf(navArgument("dataSources") { type = NavType.NavTypeDataSources })
       ) { backstackEntry ->
          bottomBarVisibility(true)
 
-         val dataSource = backstackEntry.arguments?.let { bundle ->
-            BundleCompat.getParcelable(bundle, "dataSource", ExportDataSource::class.java)
-         }
+         val dataSources = backstackEntry.arguments?.let { bundle ->
+            BundleCompat.getParcelableArray(bundle, "dataSources", ExportDataSource::class.java)?.map { it as ExportDataSource }?.toList()
+         } ?: emptyList()
 
          GeoPackageExportScreen(
-            dataSource = dataSource,
+            exportDataSources = dataSources,
             close = {
                navController.popBackStack()
             },

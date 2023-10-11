@@ -1,6 +1,7 @@
 package mil.nga.msi.geopackage.export
 
 import mil.nga.geopackage.db.GeoPackageDataType
+import mil.nga.geopackage.extension.nga.style.FeatureTableStyles
 import mil.nga.geopackage.extension.nga.style.StyleRow
 import mil.nga.mgrs.MGRS
 import mil.nga.msi.datasource.DataSource
@@ -12,7 +13,7 @@ class RadioBeaconDefinition() : DataSourceDefinition {
    override val tableName = "radio_beacons"
    override val icon = MapAnnotation.Type.RADIO_BEACON.icon
    override val color = DataSource.RADIO_BEACON.color
-   override val styles = emptyList<StyleRow>()
+   override fun getStyles(tableStyles: FeatureTableStyles) = emptyList<StyleRow>()
    override val columns: List<FeatureColumn> = listOf(
       FeatureColumn("name", "Name", GeoPackageDataType.TEXT),
       FeatureColumn("latitude", "Latitude", GeoPackageDataType.DOUBLE),

@@ -59,7 +59,7 @@ import mil.nga.msi.ui.theme.onSurfaceDisabled
 
 @Composable
 fun GeoPackageExportScreen(
-   dataSource: ExportDataSource?,
+   exportDataSources: List<ExportDataSource>,
    close: () -> Unit,
    onExport: (Uri) -> Unit,
    viewModel: GeoPackageExportViewModel = hiltViewModel()
@@ -71,8 +71,8 @@ fun GeoPackageExportScreen(
    val exportState by viewModel.exportState.observeAsState(ExportState.None)
    var showErrorDialog by remember { mutableStateOf(false) }
 
-   LaunchedEffect(dataSource) {
-      dataSource?.let { viewModel.setExport(it) }
+   LaunchedEffect(exportDataSources) {
+      viewModel.setExport(exportDataSources)
    }
 
    if (showErrorDialog) {
@@ -102,7 +102,6 @@ fun GeoPackageExportScreen(
             Column {
                DataSources(
                   dataSources = dataSources,
-                  counts = counts,
                   onDataSourceToggle = {
                      viewModel.toggleDataSource(it)
                   }
@@ -146,7 +145,6 @@ fun GeoPackageExportScreen(
 @Composable
 private fun DataSources(
    dataSources: Set<DataSource>,
-   counts: Map<DataSource, Int>,
    onDataSourceToggle: (DataSource) -> Unit
 ) {
    Column {

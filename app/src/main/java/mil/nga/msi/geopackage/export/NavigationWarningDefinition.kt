@@ -1,6 +1,7 @@
 package mil.nga.msi.geopackage.export
 
 import mil.nga.geopackage.db.GeoPackageDataType
+import mil.nga.geopackage.extension.nga.style.FeatureTableStyles
 import mil.nga.geopackage.extension.nga.style.StyleRow
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarning
@@ -13,6 +14,7 @@ class NavigationalWarningDefinition() : DataSourceDefinition {
    override val tableName = "navigational_warnings"
    override val icon = MapAnnotation.Type.NAVIGATIONAL_WARNING.icon
    override val color = DataSource.NAVIGATION_WARNING.color
+   override fun getStyles(tableStyles: FeatureTableStyles) = emptyList<StyleRow>()
    override val columns: List<FeatureColumn> = listOf(
       FeatureColumn("number", "Number", GeoPackageDataType.INT),
       FeatureColumn("date", "Date", GeoPackageDataType.DATE),
@@ -27,10 +29,6 @@ class NavigationalWarningDefinition() : DataSourceDefinition {
       FeatureColumn("cancelYear", "Cancel Year", GeoPackageDataType.INT),
       FeatureColumn("cancelNavigationArea", "Cancel Navigation Area", GeoPackageDataType.TEXT)
    )
-   override val styles: List<StyleRow>
-      get() {
-         return emptyList()
-      }
 }
 
 class NavigationalWarningFeature(

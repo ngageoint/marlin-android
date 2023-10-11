@@ -125,7 +125,10 @@ fun NavigationalWarningsScreen(
             ) {
                FloatingActionButton(
                   containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                  onClick = { onAction(Action.Export(ExportDataSource.NavigationalWarning(navigationArea = navigationArea))) }
+                  onClick = {
+                     val export = ExportDataSource.NavigationalWarning(navigationArea = navigationArea)
+                     onAction(Action.Export(listOf(export)))
+                  }
                ) {
                   Icon(Icons.Outlined.Download,
                      contentDescription = "Export digital GPS stations as GeoPackage"

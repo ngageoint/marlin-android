@@ -14,10 +14,10 @@ import mil.nga.msi.ui.light.LightRoute
 import java.lang.UnsupportedOperationException
 
 sealed class Action {
-   class Export(val dataSource: ExportDataSource): Action() {
+   class Export(private val dataSources: List<ExportDataSource>): Action() {
       override fun navigate(navController: NavController) {
-         val encoded = Uri.encode(Json.encodeToString(dataSource))
-         navController.navigate("${ExportRoute.Export.name}?dataSource=$encoded")
+         val encoded = Uri.encode(Json.encodeToString(dataSources))
+         navController.navigate("${ExportRoute.Export.name}?dataSources=$encoded")
       }
    }
 

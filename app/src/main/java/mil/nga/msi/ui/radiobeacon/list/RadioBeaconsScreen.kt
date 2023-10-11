@@ -102,7 +102,7 @@ fun RadioBeaconsScreen(
          ) {
             FloatingActionButton(
                containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-               onClick = { onAction(Action.Export(ExportDataSource.RadioBeacon)) }
+               onClick = { onAction(Action.Export(listOf(ExportDataSource.RadioBeacon))) }
             ) {
                Icon(Icons.Outlined.Download,
                   contentDescription = "Export radio beacons as GeoPackage"

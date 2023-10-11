@@ -1,6 +1,7 @@
 package mil.nga.msi.geopackage.export
 
 import mil.nga.geopackage.db.GeoPackageDataType
+import mil.nga.geopackage.extension.nga.style.FeatureTableStyles
 import mil.nga.geopackage.extension.nga.style.StyleRow
 import mil.nga.mgrs.MGRS
 import mil.nga.msi.datasource.DataSource
@@ -12,7 +13,7 @@ class DgpsStationDefinition() : DataSourceDefinition {
    override val tableName = "dgps_stations"
    override val icon = MapAnnotation.Type.DGPS_STATION.icon
    override val color = DataSource.DGPS_STATION.color
-   override val styles = emptyList<StyleRow>()
+   override fun getStyles(tableStyles: FeatureTableStyles) = emptyList<StyleRow>()
    override val columns: List<FeatureColumn> = listOf(
       FeatureColumn("name", "Name", GeoPackageDataType.TEXT),
       FeatureColumn("latitude", "Latitude", GeoPackageDataType.DOUBLE),

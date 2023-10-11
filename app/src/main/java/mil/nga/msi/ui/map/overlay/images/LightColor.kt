@@ -175,7 +175,7 @@ private fun colorImageLarge(
    return bitmap
 }
 
-private fun coordinates(center: LatLng, radiusInMeters: Double): List<LatLng> {
+fun coordinates(center: LatLng, radiusInMeters: Double): List<LatLng> {
    val coordinates = mutableListOf<LatLng>()
    val centerLatitudeRadians = toRadians(center.latitude)
    val centerLongitudeRadians = toRadians(center.longitude)

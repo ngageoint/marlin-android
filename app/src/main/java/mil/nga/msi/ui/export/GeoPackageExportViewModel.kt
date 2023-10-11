@@ -22,6 +22,7 @@ import mil.nga.msi.geopackage.export.AsamFeature
 import mil.nga.msi.geopackage.export.DgpsStationFeature
 import mil.nga.msi.geopackage.export.Export
 import mil.nga.msi.geopackage.export.ExportStatus
+import mil.nga.msi.geopackage.export.LightFeature
 import mil.nga.msi.geopackage.export.ModuFeature
 import mil.nga.msi.geopackage.export.NavigationalWarningFeature
 import mil.nga.msi.geopackage.export.PortFeature
@@ -76,26 +77,28 @@ class GeoPackageExportViewModel @Inject constructor(
       }
    }
 
-   fun setExport(export: ExportDataSource) {
+   fun setExport(export: List<ExportDataSource>) {
       viewModelScope.launch {
-         toggleDataSource(export.dataSource)
+         export.forEach { dataSource ->
+            toggleDataSource(dataSource.dataSource)
 
-         if (export is ExportDataSource.NavigationalWarning && export.navigationArea != null) {
-            val filter = Filter(
-               parameter = FilterParameter(
-                  title = "Navigation Area",
-                  parameter = "navigation_area",
-                  type = FilterParameterType.ENUMERATION,
-                  enumerationValues = NavigationArea.values().toList()
-               ),
-               comparator = ComparatorType.EQUALS,
-               value = export.navigationArea
-            )
-            val filters = _filters.value?.toMutableMap() ?: mutableMapOf()
-            val dataSourceFilters = filters[DataSource.NAVIGATION_WARNING]?.toMutableList() ?: mutableListOf()
-            dataSourceFilters.add(filter)
-            filters[DataSource.NAVIGATION_WARNING] = dataSourceFilters
-            _filters.value = filters
+            if (dataSource is ExportDataSource.NavigationalWarning && dataSource.navigationArea != null) {
+               val filter = Filter(
+                  parameter = FilterParameter(
+                     title = "Navigation Area",
+                     parameter = "navigation_area",
+                     type = FilterParameterType.ENUMERATION,
+                     enumerationValues = NavigationArea.values().toList()
+                  ),
+                  comparator = ComparatorType.EQUALS,
+                  value = dataSource.navigationArea
+               )
+               val filters = _filters.value?.toMutableMap() ?: mutableMapOf()
+               val dataSourceFilters = filters[DataSource.NAVIGATION_WARNING]?.toMutableList() ?: mutableListOf()
+               dataSourceFilters.add(filter)
+               filters[DataSource.NAVIGATION_WARNING] = dataSourceFilters
+               _filters.value = filters
+            }
          }
       }
    }
@@ -116,7 +119,7 @@ class GeoPackageExportViewModel @Inject constructor(
             tabs.indexOf(d1).compareTo(tabs.indexOf(d2))
          }.toSet()
 
-         _dataSources.postValue(sortedDataSources)
+         _dataSources.value = sortedDataSources
 
          _counts.value = dataSources.associateWith { dataSource ->
             val dataSourceFilters = filters.value?.get(dataSource) ?: emptyList()
@@ -148,6 +151,11 @@ class GeoPackageExportViewModel @Inject constructor(
                dataSource to dgpsStationRepository.getDgpsStations(
                   filters = filters.value?.get(dataSource) ?: emptyList()
                ).map { DgpsStationFeature(it) }
+            }
+            DataSource.LIGHT -> {
+               dataSource to lightRepository.getLights(
+                  filters = filters.value?.get(dataSource) ?: emptyList()
+               ).map { LightFeature(it) }
             }
             DataSource.NAVIGATION_WARNING -> {
                dataSource to navigationalWarningRepository.getNavigationalWarnings(

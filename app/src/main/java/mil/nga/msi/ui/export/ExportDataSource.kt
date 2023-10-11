@@ -36,4 +36,19 @@ sealed class ExportDataSource(val dataSource: DataSource) : Parcelable {
    @Parcelize
    @Serializable
    object RadioBeacon: ExportDataSource(DataSource.RADIO_BEACON)
+
+   companion object {
+      fun fromDataSource(dataSource: DataSource): ExportDataSource? {
+         return when (dataSource) {
+            DataSource.ASAM -> ExportDataSource.Asam
+            DataSource.DGPS_STATION -> ExportDataSource.DgpsStation
+            DataSource.LIGHT -> ExportDataSource.Light
+            DataSource.MODU -> ExportDataSource.Modu
+            DataSource.NAVIGATION_WARNING -> ExportDataSource.NavigationalWarning()
+            DataSource.PORT -> ExportDataSource.Port
+            DataSource.RADIO_BEACON -> ExportDataSource.RadioBeacon
+            else -> null
+         }
+      }
+   }
 }

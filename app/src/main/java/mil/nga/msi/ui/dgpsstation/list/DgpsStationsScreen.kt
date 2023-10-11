@@ -102,7 +102,7 @@ fun DgpsStationsScreen(
          ) {
             FloatingActionButton(
                containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-               onClick = { onAction(Action.Export(ExportDataSource.DgpsStation)) }
+               onClick = { onAction(Action.Export(listOf(ExportDataSource.DgpsStation))) }
             ) {
                Icon(Icons.Outlined.Download,
                   contentDescription = "Export digital GPS stations as GeoPackage"
