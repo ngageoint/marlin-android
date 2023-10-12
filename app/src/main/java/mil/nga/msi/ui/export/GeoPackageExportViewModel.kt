@@ -7,6 +7,9 @@ import androidx.core.content.FileProvider
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.liveData
+import androidx.lifecycle.map
+import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -15,6 +18,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mil.nga.geopackage.GeoPackageManager
 import mil.nga.msi.datasource.DataSource
+import mil.nga.msi.datasource.filter.AsamFilter
+import mil.nga.msi.datasource.filter.DgpsStationFilter
+import mil.nga.msi.datasource.filter.LightFilter
+import mil.nga.msi.datasource.filter.ModuFilter
+import mil.nga.msi.datasource.filter.PortFilter
+import mil.nga.msi.datasource.filter.RadioBeaconFilter
 import mil.nga.msi.datasource.navigationwarning.NavigationArea
 import mil.nga.msi.filter.ComparatorType
 import mil.nga.msi.filter.Filter
@@ -70,8 +79,36 @@ class GeoPackageExportViewModel @Inject constructor(
    private val _filters = MutableLiveData<Map<DataSource, List<Filter>>>()
    val filters: LiveData<Map<DataSource, List<Filter>>> = _filters
 
-   private val _counts = MutableLiveData<Map<DataSource, Int>>()
-   val counts: LiveData<Map<DataSource, Int>> = _counts
+   val filterParameters = mapOf(
+      DataSource.ASAM to AsamFilter.parameters,
+      DataSource.MODU to ModuFilter.parameters,
+      DataSource.LIGHT to LightFilter.parameters,
+      DataSource.PORT to PortFilter.parameters,
+      DataSource.RADIO_BEACON to RadioBeaconFilter.parameters,
+      DataSource.DGPS_STATION to DgpsStationFilter.parameters,
+   )
+
+   val counts = _filters.switchMap { _ ->
+      liveData {
+         val dataSources = _dataSources.value ?: emptySet()
+         val counts = dataSources.associateWith { dataSource ->
+            val dataSourceFilters = filters.value?.get(dataSource) ?: emptyList()
+            when (dataSource) {
+               DataSource.ASAM -> asamRepository.count(dataSourceFilters)
+               DataSource.DGPS_STATION -> dgpsStationRepository.count(dataSourceFilters)
+               DataSource.LIGHT -> lightRepository.count(dataSourceFilters)
+               DataSource.NAVIGATION_WARNING -> navigationalWarningRepository.count(dataSourceFilters)
+               DataSource.MODU -> moduRepository.count(dataSourceFilters)
+               DataSource.PORT -> portRepository.count(dataSourceFilters)
+               DataSource.RADIO_BEACON -> radioBeaconRepository.count(dataSourceFilters)
+
+               else -> 0
+            }
+         }
+
+         emit(counts)
+      }
+   }
 
    init {
       viewModelScope.launch {
@@ -122,21 +159,13 @@ class GeoPackageExportViewModel @Inject constructor(
          }.toSet()
 
          _dataSources.value = sortedDataSources
-
-         _counts.value = dataSources.associateWith { dataSource ->
-            val dataSourceFilters = filters.value?.get(dataSource) ?: emptyList()
-            when (dataSource) {
-               DataSource.ASAM -> { asamRepository.count(dataSourceFilters) }
-               DataSource.DGPS_STATION -> { dgpsStationRepository.count(dataSourceFilters) }
-               DataSource.LIGHT -> { lightRepository.count(dataSourceFilters) }
-               DataSource.NAVIGATION_WARNING -> { navigationalWarningRepository.count(dataSourceFilters) }
-               DataSource.MODU -> { moduRepository.count(dataSourceFilters) }
-               DataSource.PORT -> { portRepository.count(dataSourceFilters) }
-               DataSource.RADIO_BEACON -> { radioBeaconRepository.count(dataSourceFilters) }
-               else -> 0
-            }
-         }
       }
+   }
+
+   fun setFilters(dataSource: DataSource, dataSourceFilters: List<Filter>) {
+      val filters = _filters.value?.toMutableMap() ?: mutableMapOf()
+      filters[dataSource] = dataSourceFilters
+      _filters.value = filters
    }
 
    suspend fun createGeoPackage() = withContext(Dispatchers.IO) {
