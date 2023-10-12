@@ -10,4 +10,5 @@ data class ClusterItem(
    override fun getPosition() = latLng
    override fun getTitle() = null
    override fun getSnippet() = null
+   override fun getZIndex() = null
 }

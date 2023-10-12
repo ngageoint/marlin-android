@@ -199,8 +199,7 @@ dependencies {
 
     implementation 'com.google.android.gms:play-services-location:21.0.1'
 
-    implementation 'mil.nga.geopackage:geopackage-android:6.7.1'
-    implementation 'mil.nga.geopackage.map:geopackage-android-map:6.7.1'
+    implementation 'mil.nga.geopackage.map:geopackage-android-map:6.7.2'
 
     implementation('edu.stanford.nlp:stanford-corenlp:4.5.4') {
         exclude group: 'org.hamcrest'
