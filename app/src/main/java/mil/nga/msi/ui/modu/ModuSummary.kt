@@ -18,46 +18,48 @@ import java.util.Locale
 
 @Composable
 fun ModuSummary(
-   moduWithBookmark: ModuWithBookmark
+   moduWithBookmark: ModuWithBookmark,
+   modifier: Modifier = Modifier
 ) {
    val (modu, bookmark) = moduWithBookmark
-
-   CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-      modu.date.let { date ->
-         val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
-         Text(
-            text = dateFormat.format(date),
-            fontWeight = FontWeight.SemiBold,
-            style = MaterialTheme.typography.labelSmall,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-         )
-      }
-   }
-
-   Text(
-      text = modu.name,
-      style = MaterialTheme.typography.titleLarge,
-      maxLines = 1,
-      overflow = TextOverflow.Ellipsis,
-      modifier = Modifier.padding(top = 16.dp)
-   )
-
-   CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-      modu.rigStatus?.let {
-         Text(
-            text = it.name,
-            style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.padding(top = 4.dp)
-         )
-      }
-      modu.specialStatus?.let {
-         Text(
-            text = it,
-            style = MaterialTheme.typography.bodyMedium
-         )
+   Column(modifier = modifier) {
+      CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+         modu.date.let { date ->
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+            Text(
+               text = dateFormat.format(date),
+               fontWeight = FontWeight.SemiBold,
+               style = MaterialTheme.typography.labelSmall,
+               maxLines = 1,
+               overflow = TextOverflow.Ellipsis
+            )
+         }
       }
 
-      BookmarkNotes(notes = bookmark?.notes)
+      Text(
+         text = modu.name,
+         style = MaterialTheme.typography.titleLarge,
+         maxLines = 1,
+         overflow = TextOverflow.Ellipsis,
+         modifier = Modifier.padding(top = 16.dp)
+      )
+
+      CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+         modu.rigStatus?.let {
+            Text(
+               text = it.name,
+               style = MaterialTheme.typography.bodyLarge,
+               modifier = Modifier.padding(top = 4.dp)
+            )
+         }
+         modu.specialStatus?.let {
+            Text(
+               text = it,
+               style = MaterialTheme.typography.bodyMedium
+            )
+         }
+
+         BookmarkNotes(notes = bookmark?.notes)
+      }
    }
 }
