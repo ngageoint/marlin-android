@@ -77,8 +77,7 @@ data class MapPosition(
 @Composable
 fun MapScreen(
    mapDestination : MapPosition? = null,
-   onAnnotationClick: (MapAnnotation) -> Unit,
-   onAnnotationsClick: (Collection<MapAnnotation>) -> Unit,
+   onMapTap: (LatLng, LatLngBounds) -> Unit,
    onMapSettings: () -> Unit,
    onExport: (List<DataSource>) -> Unit,
    openFilter: () -> Unit,
@@ -221,39 +220,15 @@ fun MapScreen(
                   viewModel.setMapLocation(mapLocation, position.zoom.toInt())
                }
             },
-            onMapClick = { latLng, zoom, region ->
+            onMapTap = { latLng, region ->
                val screenPercentage = 0.04
                val tolerance = (region.farRight.longitude - region.farLeft.longitude) * screenPercentage
-               scope.launch {
-                  val mapAnnotations = viewModel.getMapAnnotations(
-                     minLongitude = latLng.longitude - tolerance,
-                     maxLongitude = latLng.longitude + tolerance,
-                     minLatitude = latLng.latitude - tolerance,
-                     maxLatitude = latLng.latitude + tolerance,
-                     point = latLng
-                  )
+               val bounds = LatLngBounds(
+                  LatLng(latLng.latitude - tolerance, latLng.longitude - tolerance),
+                  LatLng(latLng.latitude + tolerance, latLng.longitude + tolerance)
+               )
 
-                  if (mapAnnotations.isNotEmpty()) {
-                     val bounds = LatLngBounds.builder().apply {
-                        mapAnnotations.forEach { this.include(LatLng(it.latitude, it.longitude)) }
-                     }.build()
-
-                     destination = MapPosition(
-                        location = MapLocation.newBuilder()
-                           .setLatitude(bounds.center.latitude)
-                           .setLongitude(bounds.center.longitude)
-                           .setZoom(zoom.toDouble())
-                           .build()
-                     )
-
-                     if (mapAnnotations.size == 1) {
-                        viewModel.annotationProvider.setMapAnnotation(mapAnnotations.first())
-                        onAnnotationClick(mapAnnotations.first())
-                     } else if (mapAnnotations.isNotEmpty()) {
-                        onAnnotationsClick(mapAnnotations)
-                     }
-                  }
-               }
+               onMapTap(latLng, bounds)
             }
          )
 
@@ -411,7 +386,7 @@ private fun Map(
    annotation: MapAnnotation?,
    cameraPositionState: CameraPositionState,
    onMapMove: (CameraPosition, Int) -> Unit,
-   onMapClick: (LatLng, Float, VisibleRegion) -> Unit
+   onMapTap: (LatLng, VisibleRegion) -> Unit
 ) {
    val scope = rememberCoroutineScope()
    val context = LocalContext.current
@@ -517,7 +492,7 @@ private fun Map(
          }
 
          map.setOnMapClickListener { latLng ->
-            onMapClick(latLng, map.cameraPosition.zoom, map.projection.visibleRegion)
+            onMapTap(latLng, map.projection.visibleRegion)
          }
 
          if (annotation != null) {

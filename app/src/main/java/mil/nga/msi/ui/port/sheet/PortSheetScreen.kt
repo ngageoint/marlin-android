@@ -29,7 +29,7 @@ fun PortSheetScreen(
    Column(modifier = modifier) {
       Column(Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
          DataSourceIcon(
-            dataSource = DataSource.ASAM,
+            dataSource = DataSource.PORT,
             modifier = Modifier.padding(bottom = 16.dp)
          )
 
