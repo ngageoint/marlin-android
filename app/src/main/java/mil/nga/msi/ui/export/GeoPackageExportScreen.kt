@@ -455,7 +455,7 @@ fun ExportActionButton(
                contentDescription = "Share GeoPackage"
             )
             Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-            Text("Share")
+            Text("Share Export")
          }
       }
       is ExportState.None, is ExportState.Error -> {

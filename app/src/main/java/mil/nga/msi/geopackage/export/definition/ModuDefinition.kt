@@ -1,11 +1,10 @@
-package mil.nga.msi.geopackage.export
+package mil.nga.msi.geopackage.export.definition
 
 import mil.nga.geopackage.db.GeoPackageDataType
 import mil.nga.geopackage.extension.nga.style.FeatureTableStyles
 import mil.nga.geopackage.extension.nga.style.StyleRow
 import mil.nga.mgrs.MGRS
 import mil.nga.msi.datasource.DataSource
-import mil.nga.msi.datasource.asam.Asam
 import mil.nga.msi.datasource.modu.Modu
 import mil.nga.msi.ui.map.cluster.MapAnnotation
 import mil.nga.sf.Point

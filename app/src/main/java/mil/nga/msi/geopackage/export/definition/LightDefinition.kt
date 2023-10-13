@@ -1,4 +1,4 @@
-package mil.nga.msi.geopackage.export
+package mil.nga.msi.geopackage.export.definition
 
 import mil.nga.color.Color
 import mil.nga.geopackage.GeoPackage

@@ -1,4 +1,4 @@
-package mil.nga.msi.geopackage.export
+package mil.nga.msi.geopackage.export.definition
 
 import androidx.compose.ui.graphics.Color
 import mil.nga.geopackage.GeoPackage

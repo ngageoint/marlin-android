@@ -24,6 +24,8 @@ import mil.nga.geopackage.features.user.FeatureColumn
 import mil.nga.geopackage.features.user.FeatureTable
 import mil.nga.geopackage.features.user.FeatureTableMetadata
 import mil.nga.msi.datasource.DataSource
+import mil.nga.msi.geopackage.export.definition.DataSourceDefinition
+import mil.nga.msi.geopackage.export.definition.Feature
 import mil.nga.proj.ProjectionConstants
 import mil.nga.sf.GeometryType
 import java.io.ByteArrayOutputStream
@@ -50,8 +52,6 @@ class Export @Inject constructor(
       onStatus: (Map<DataSource, ExportStatus>) -> Unit,
       onError: () -> Unit
    ) = withContext(Dispatchers.IO) {
-      Log.i("Billy", "geopackage export $items")
-
       val status = items.map { (dataSource, features) ->
          dataSource to ExportStatus(features.size, 0)
       }.toMap().toMutableMap()

@@ -1,4 +1,4 @@
-package mil.nga.msi.geopackage.export
+package mil.nga.msi.geopackage.export.definition
 
 import mil.nga.geopackage.db.GeoPackageDataType
 import mil.nga.geopackage.extension.nga.style.FeatureTableStyles
