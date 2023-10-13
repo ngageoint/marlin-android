@@ -30,6 +30,7 @@ import mil.nga.msi.datasource.filter.AsamFilter
 import mil.nga.msi.datasource.filter.DgpsStationFilter
 import mil.nga.msi.datasource.filter.LightFilter
 import mil.nga.msi.datasource.filter.ModuFilter
+import mil.nga.msi.datasource.filter.NavigationalWarningFilter
 import mil.nga.msi.datasource.filter.PortFilter
 import mil.nga.msi.datasource.filter.RadioBeaconFilter
 import mil.nga.msi.datasource.navigationwarning.NavigationArea
@@ -91,6 +92,7 @@ class GeoPackageExportViewModel @Inject constructor(
       DataSource.ASAM to AsamFilter.parameters,
       DataSource.MODU to ModuFilter.parameters,
       DataSource.LIGHT to LightFilter.parameters,
+      DataSource.NAVIGATION_WARNING to NavigationalWarningFilter.parameters,
       DataSource.PORT to PortFilter.parameters,
       DataSource.RADIO_BEACON to RadioBeaconFilter.parameters,
       DataSource.DGPS_STATION to DgpsStationFilter.parameters,
