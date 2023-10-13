@@ -243,7 +243,7 @@ private fun DataSourceFilters(
    dataSources: Set<DataSource>,
    filters: Map<DataSource, List<Filter>>,
    filterParameters: Map<DataSource, List<FilterParameter>>,
-   counts: Map<DataSource, Int>,
+   counts: Map<DataSource, Int?>,
    exportState: ExportState,
    onAddFilter: (DataSource, Filter) -> Unit,
    onRemoveFilter: (DataSource, Filter) -> Unit
@@ -269,7 +269,7 @@ private fun DataSourceFilters(
             dataSource = dataSource,
             filters = filters[dataSource] ?: emptyList(),
             filterParameters = filterParameters[dataSource] ?: emptyList(),
-            count = counts[dataSource] ?: 0,
+            count = counts[dataSource],
             exportStatus = exportStatus[dataSource],
             location = null,
             expand = expanded[dataSource] ?: false,
@@ -290,7 +290,7 @@ private fun DataSourceFilter(
    dataSource: DataSource,
    filters: List<Filter>,
    filterParameters: List<FilterParameter>,
-   count: Int,
+   count: Int?,
    exportStatus: ExportStatus?,
    location: Location?,
    expand: Boolean,
@@ -353,7 +353,7 @@ private fun DataSourceFilter(
                      ) {
                         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceDisabled) {
                            Text(
-                              text = count.toString(),
+                              text = count?.toString().orEmpty(),
                               style = MaterialTheme.typography.bodyMedium,
                               fontWeight = FontWeight.SemiBold,
                               modifier = Modifier.padding(end = 16.dp)

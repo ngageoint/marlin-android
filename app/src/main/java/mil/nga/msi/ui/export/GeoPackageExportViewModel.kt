@@ -7,13 +7,21 @@ import androidx.core.content.FileProvider
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asFlow
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.liveData
 import androidx.lifecycle.map
 import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMap
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.transform
+import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mil.nga.geopackage.GeoPackageManager
@@ -88,27 +96,26 @@ class GeoPackageExportViewModel @Inject constructor(
       DataSource.DGPS_STATION to DgpsStationFilter.parameters,
    )
 
-   val counts = _filters.switchMap { _ ->
-      liveData {
-         val dataSources = _dataSources.value ?: emptySet()
-         val counts = dataSources.associateWith { dataSource ->
-            val dataSourceFilters = filters.value?.get(dataSource) ?: emptyList()
-            when (dataSource) {
-               DataSource.ASAM -> asamRepository.count(dataSourceFilters)
-               DataSource.DGPS_STATION -> dgpsStationRepository.count(dataSourceFilters)
-               DataSource.LIGHT -> lightRepository.count(dataSourceFilters)
-               DataSource.NAVIGATION_WARNING -> navigationalWarningRepository.count(dataSourceFilters)
-               DataSource.MODU -> moduRepository.count(dataSourceFilters)
-               DataSource.PORT -> portRepository.count(dataSourceFilters)
-               DataSource.RADIO_BEACON -> radioBeaconRepository.count(dataSourceFilters)
-
-               else -> 0
-            }
+   @OptIn(ExperimentalCoroutinesApi::class)
+   val counts = combine(dataSources.asFlow(), filters.asFlow()) { dataSources, filters ->
+      dataSources to filters
+   }.transformLatest { (dataSources, filters) ->
+      val counts = dataSources.associateWith { dataSource ->
+         val dataSourceFilters = filters[dataSource] ?: emptyList()
+         when (dataSource) {
+            DataSource.ASAM -> asamRepository.count(dataSourceFilters)
+            DataSource.DGPS_STATION -> dgpsStationRepository.count(dataSourceFilters)
+            DataSource.LIGHT -> lightRepository.count(dataSourceFilters)
+            DataSource.NAVIGATION_WARNING -> navigationalWarningRepository.count(dataSourceFilters)
+            DataSource.MODU -> moduRepository.count(dataSourceFilters)
+            DataSource.PORT -> portRepository.count(dataSourceFilters)
+            DataSource.RADIO_BEACON -> radioBeaconRepository.count(dataSourceFilters)
+            else -> null
          }
-
-         emit(counts)
       }
-   }
+
+      emit(counts)
+   }.asLiveData()
 
    init {
       viewModelScope.launch {
