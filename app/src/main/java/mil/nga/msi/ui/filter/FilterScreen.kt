@@ -138,7 +138,7 @@ fun FilterContent(
       FilterHeader(
          location = location,
          filterParameters = filterParameters,
-         addFilter = {onAddFilter(it) }
+         addFilter = { onAddFilter(it) }
       )
    }
 }
@@ -579,7 +579,6 @@ private fun ValueSelection(
    }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DateValue(
    comparator: ComparatorType,
@@ -685,7 +684,6 @@ fun DoubleValue(
    }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun IntValue(
    value: String,
@@ -703,7 +701,7 @@ fun IntValue(
    }
 }
 
-@OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun LocationValue(
    location: Location?,

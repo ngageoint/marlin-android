@@ -21,6 +21,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ExpandMore
@@ -60,6 +62,7 @@ import androidx.core.graphics.drawable.toBitmap
 import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.launch
 import mil.nga.msi.datasource.DataSource
+import mil.nga.msi.filter.ComparatorType
 import mil.nga.msi.filter.Filter
 import mil.nga.msi.filter.FilterParameter
 import mil.nga.msi.geopackage.export.ExportStatus
@@ -76,11 +79,14 @@ fun GeoPackageExportScreen(
    viewModel: GeoPackageExportViewModel = hiltViewModel()
 ) {
    val scope = rememberCoroutineScope()
+   val scrollState = rememberScrollState()
    val counts by viewModel.counts.observeAsState(emptyMap())
-   val filters by viewModel.filters.observeAsState(emptyMap())
+   val commonFilters by viewModel.commonFilters.observeAsState(emptyList())
+   val dataSourceFilters by viewModel.dataSourceFilters.observeAsState(emptyMap())
    val dataSources by viewModel.dataSources.observeAsState(emptySet())
    val exportState by viewModel.exportState.observeAsState(ExportState.None)
    var showErrorDialog by remember { mutableStateOf(false) }
+   val location by viewModel.locationPolicy.bestLocationProvider.observeAsState()
 
    LaunchedEffect(exportDataSources) {
       viewModel.setExport(exportDataSources)
@@ -110,7 +116,11 @@ fun GeoPackageExportScreen(
          modifier = Modifier.fillMaxHeight()
       ) {
          Box(Modifier.fillMaxWidth()) {
-            Column {
+            Column(
+               Modifier
+                  .verticalScroll(scrollState)
+                  .padding(bottom = 16.dp)
+            ) {
                DataSources(
                   dataSources = dataSources,
                   onDataSourceToggle = {
@@ -118,22 +128,36 @@ fun GeoPackageExportScreen(
                   }
                )
 
-               CommonFilters(exportState = exportState)
+               CommonFilters(
+                  filters = commonFilters,
+                  filterParameters = viewModel.commonFilterParameters,
+                  location = location,
+                  exportState = exportState,
+                  onAddFilter = { filter ->
+                     val filters = commonFilters.toMutableList().apply { add(filter) }
+                     viewModel.setCommonFilters(filters)
+                  },
+                  onRemoveFilter = { filter ->
+                     val filters = commonFilters.toMutableList().apply { remove(filter) }
+                     viewModel.setCommonFilters(filters)
+                  }
+               )
                DataSourceFilters(
                   dataSources = dataSources,
-                  filters = filters,
+                  filters = dataSourceFilters,
                   filterParameters = viewModel.filterParameters,
+                  location,
                   counts = counts,
                   exportState = exportState,
                   onAddFilter = { dataSource, filter ->
-                     val added = filters[dataSource]?.toMutableList() ?: mutableListOf()
+                     val added = dataSourceFilters[dataSource]?.toMutableList() ?: mutableListOf()
                      added.add(filter)
-                     viewModel.setFilters(dataSource, added)
+                     viewModel.setDataSourceFilters(dataSource, added)
                   },
                   onRemoveFilter = { dataSource, filter ->
-                     val removed = filters[dataSource]?.toMutableList() ?: mutableListOf()
+                     val removed = dataSourceFilters[dataSource]?.toMutableList() ?: mutableListOf()
                      removed.remove(filter)
-                     viewModel.setFilters(dataSource, removed)
+                     viewModel.setDataSourceFilters(dataSource, removed)
                   }
                )
             }
@@ -220,8 +244,15 @@ private fun DataSourceItem(
 
 @Composable
 private fun CommonFilters(
-   exportState: ExportState
+   filters: List<Filter>,
+   filterParameters: List<FilterParameter>,
+   location: Location?,
+   exportState: ExportState,
+   onAddFilter: (Filter) -> Unit,
+   onRemoveFilter: (Filter) -> Unit
 ) {
+   var expanded by remember { mutableStateOf<Boolean>(false) }
+
    Column(
       Modifier
          .padding(top = 16.dp)
@@ -235,6 +266,16 @@ private fun CommonFilters(
             )
          }
       }
+
+      LocationFilter(
+         filters = filters,
+         filterParameters = filterParameters,
+         location = location,
+         expand = expanded,
+         onExpand = { expanded = !expanded },
+         onAddFilter = onAddFilter,
+         onRemoveFilter = onRemoveFilter
+      )
    }
 }
 
@@ -243,6 +284,7 @@ private fun DataSourceFilters(
    dataSources: Set<DataSource>,
    filters: Map<DataSource, List<Filter>>,
    filterParameters: Map<DataSource, List<FilterParameter>>,
+   location: Location?,
    counts: Map<DataSource, Int?>,
    exportState: ExportState,
    onAddFilter: (DataSource, Filter) -> Unit,
@@ -271,7 +313,7 @@ private fun DataSourceFilters(
             filterParameters = filterParameters[dataSource] ?: emptyList(),
             count = counts[dataSource],
             exportStatus = exportStatus[dataSource],
-            location = null,
+            location = location,
             expand = expanded[dataSource] ?: false,
             onExpand = { expand ->
                expanded = expanded.toMutableMap().apply {
@@ -281,6 +323,120 @@ private fun DataSourceFilters(
             onAddFilter = onAddFilter,
             onRemoveFilter = onRemoveFilter
          )
+      }
+   }
+}
+
+@Composable
+private fun LocationFilter(
+   filters: List<Filter>,
+   filterParameters: List<FilterParameter>,
+   location: Location?,
+   expand: Boolean,
+   onExpand: (Boolean) -> Unit,
+   onAddFilter: (Filter) -> Unit,
+   onRemoveFilter: (Filter) -> Unit
+) {
+   val angle: Float by animateFloatAsState(
+      targetValue = if (expand) 180F else 0F,
+      animationSpec = tween(
+         durationMillis = 250,
+         easing = FastOutSlowInEasing
+      ),
+      label = "Filter Animation"
+   )
+
+   Surface(Modifier.fillMaxWidth()) {
+      Column {
+         Column(
+            Modifier
+               .height(56.dp)
+               .fillMaxWidth()
+         ) {
+            Row(
+               verticalAlignment = Alignment.CenterVertically,
+               modifier = Modifier
+                  .fillMaxSize()
+                  .clickable { onExpand(!expand) }
+            ) {
+               Box(
+                  modifier = Modifier
+                     .width(8.dp)
+                     .fillMaxHeight()
+                     .background(MaterialTheme.colorScheme.primary)
+               )
+
+               Column(
+                  verticalArrangement = Arrangement.Center,
+                  modifier = Modifier.fillMaxWidth()
+               ) {
+                  Row(
+                     verticalAlignment = Alignment.CenterVertically,
+                     horizontalArrangement = Arrangement.SpaceBetween,
+                     modifier = Modifier
+                        .height(72.dp)
+                        .fillMaxWidth()
+                        .weight(1f)
+                        .padding(horizontal = 8.dp)
+                  ) {
+                     CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
+                        Text(
+                           text = "Location",
+                           style = MaterialTheme.typography.bodyMedium,
+                           fontWeight = FontWeight.Medium
+                        )
+                     }
+
+                     Row(
+                        Modifier.padding(horizontal = 16.dp)
+                     ) {
+                        CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceDisabled) {
+                           Text(
+                              text = if (filters.isEmpty()) "" else "${filters.size} Common Filters",
+                              style = MaterialTheme.typography.bodyMedium,
+                              fontWeight = FontWeight.SemiBold,
+                              modifier = Modifier.padding(end = 16.dp)
+                           )
+                        }
+
+                        Icon(
+                           imageVector = Icons.Default.ExpandMore,
+                           tint = MaterialTheme.colorScheme.primary,
+                           modifier = Modifier.rotate(angle),
+                           contentDescription = "Expand Filter"
+                        )
+                     }
+                  }
+               }
+            }
+         }
+
+         Column(
+            Modifier
+               .fillMaxWidth()
+               .background(MaterialTheme.colorScheme.background)
+               .animateContentSize()
+         ) {
+            if (expand) {
+               FilterContent(
+                  location = location,
+                  filters = filters,
+                  filterParameters = filterParameters,
+                  onAddFilter = { filter ->
+                     if (filter.comparator == ComparatorType.NEAR_ME) {
+                        // TODO test with location services off
+                        val latitude = location?.latitude ?: 0.0
+                        val longitude = location?.longitude ?: 0.0
+                        val values = if (filter.value.toString().isNotEmpty()) filter.value.toString().split(",") else emptyList()
+                        val distance = values.getOrNull(2)?.toDoubleOrNull()
+                        val locationFilter = filter.copy(value = "${latitude},${longitude},${distance}")
+                        onAddFilter(locationFilter)
+                     }
+                  },
+                  onRemoveFilter = onRemoveFilter
+               )
+            }
+         }
       }
    }
 }

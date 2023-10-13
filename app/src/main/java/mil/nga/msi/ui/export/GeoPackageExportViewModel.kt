@@ -40,6 +40,7 @@ import mil.nga.msi.geopackage.export.definition.ModuFeature
 import mil.nga.msi.geopackage.export.definition.NavigationalWarningFeature
 import mil.nga.msi.geopackage.export.definition.PortFeature
 import mil.nga.msi.geopackage.export.definition.RadioBeaconFeature
+import mil.nga.msi.location.LocationPolicy
 import mil.nga.msi.repository.asam.AsamRepository
 import mil.nga.msi.repository.dgpsstation.DgpsStationRepository
 import mil.nga.msi.repository.light.LightRepository
@@ -60,6 +61,7 @@ sealed class ExportState {
 
 @HiltViewModel
 class GeoPackageExportViewModel @Inject constructor(
+   val locationPolicy: LocationPolicy,
    private val application: Application,
    private val geoPackageManager: GeoPackageManager,
    private val asamRepository: AsamRepository,
@@ -72,14 +74,9 @@ class GeoPackageExportViewModel @Inject constructor(
    private val filterRepository: FilterRepository,
    private val userPreferencesRepository: UserPreferencesRepository
 ): ViewModel() {
-   private val _exportStatus = MutableLiveData<ExportState>()
-   val exportState: LiveData<ExportState> = _exportStatus
-
-   private val _dataSources = MutableLiveData<Set<DataSource>>()
-   val dataSources: LiveData<Set<DataSource>> = _dataSources
-
-   private val _filters = MutableLiveData<Map<DataSource, List<Filter>>>()
-   val filters: LiveData<Map<DataSource, List<Filter>>> = _filters
+   val commonFilterParameters = listOf(
+      FilterParameter(title = "Location", parameter = "location", type = FilterParameterType.LOCATION),
+   )
 
    val filterParameters = mapOf(
       DataSource.ASAM to AsamFilter.parameters,
@@ -91,20 +88,32 @@ class GeoPackageExportViewModel @Inject constructor(
       DataSource.DGPS_STATION to DgpsStationFilter.parameters,
    )
 
+   private val _exportStatus = MutableLiveData<ExportState>()
+   val exportState: LiveData<ExportState> = _exportStatus
+
+   private val _dataSources = MutableLiveData<Set<DataSource>>()
+   val dataSources: LiveData<Set<DataSource>> = _dataSources
+
+   private val _dataSourceFilters = MutableLiveData<Map<DataSource, List<Filter>>>()
+   val dataSourceFilters: LiveData<Map<DataSource, List<Filter>>> = _dataSourceFilters
+
+   private val _commonFilters = MutableLiveData<List<Filter>>()
+   val commonFilters: LiveData<List<Filter>> = _commonFilters
+
    @OptIn(ExperimentalCoroutinesApi::class)
-   val counts = combine(dataSources.asFlow(), filters.asFlow()) { dataSources, filters ->
-      dataSources to filters
-   }.transformLatest { (dataSources, filters) ->
+   val counts = combine(dataSources.asFlow(),  commonFilters.asFlow(), dataSourceFilters.asFlow()) { dataSources, commonFilters, dataSourceFilters ->
+      Triple(dataSources, commonFilters, dataSourceFilters)
+   }.transformLatest { (dataSources, commonFilters, dataSourceFilters) ->
       val counts = dataSources.associateWith { dataSource ->
-         val dataSourceFilters = filters[dataSource] ?: emptyList()
+         val filters = (dataSourceFilters[dataSource] ?: emptyList()) + commonFilters
          when (dataSource) {
-            DataSource.ASAM -> asamRepository.count(dataSourceFilters)
-            DataSource.DGPS_STATION -> dgpsStationRepository.count(dataSourceFilters)
-            DataSource.LIGHT -> lightRepository.count(dataSourceFilters)
-            DataSource.NAVIGATION_WARNING -> navigationalWarningRepository.count(dataSourceFilters)
-            DataSource.MODU -> moduRepository.count(dataSourceFilters)
-            DataSource.PORT -> portRepository.count(dataSourceFilters)
-            DataSource.RADIO_BEACON -> radioBeaconRepository.count(dataSourceFilters)
+            DataSource.ASAM -> asamRepository.count(filters)
+            DataSource.DGPS_STATION -> dgpsStationRepository.count(filters)
+            DataSource.LIGHT -> lightRepository.count(filters)
+            DataSource.NAVIGATION_WARNING -> navigationalWarningRepository.count(filters)
+            DataSource.MODU -> moduRepository.count(filters)
+            DataSource.PORT -> portRepository.count(filters)
+            DataSource.RADIO_BEACON -> radioBeaconRepository.count(filters)
             else -> null
          }
       }
@@ -114,7 +123,7 @@ class GeoPackageExportViewModel @Inject constructor(
 
    init {
       viewModelScope.launch {
-         _filters.value = filterRepository.filters.first()
+         _dataSourceFilters.value = filterRepository.filters.first()
       }
    }
 
@@ -134,11 +143,11 @@ class GeoPackageExportViewModel @Inject constructor(
                   comparator = ComparatorType.EQUALS,
                   value = dataSource.navigationArea
                )
-               val filters = _filters.value?.toMutableMap() ?: mutableMapOf()
+               val filters = _dataSourceFilters.value?.toMutableMap() ?: mutableMapOf()
                val dataSourceFilters = filters[DataSource.NAVIGATION_WARNING]?.toMutableList() ?: mutableListOf()
                dataSourceFilters.add(filter)
                filters[DataSource.NAVIGATION_WARNING] = dataSourceFilters
-               _filters.value = filters
+               _dataSourceFilters.value = filters
             }
          }
       }
@@ -164,10 +173,14 @@ class GeoPackageExportViewModel @Inject constructor(
       }
    }
 
-   fun setFilters(dataSource: DataSource, dataSourceFilters: List<Filter>) {
-      val filters = _filters.value?.toMutableMap() ?: mutableMapOf()
+   fun setCommonFilters(filters: List<Filter>) {
+      _commonFilters.value = filters
+   }
+
+   fun setDataSourceFilters(dataSource: DataSource, dataSourceFilters: List<Filter>) {
+      val filters = _dataSourceFilters.value?.toMutableMap() ?: mutableMapOf()
       filters[dataSource] = dataSourceFilters
-      _filters.value = filters
+      _dataSourceFilters.value = filters
    }
 
    suspend fun createGeoPackage() = withContext(Dispatchers.IO) {
@@ -177,37 +190,37 @@ class GeoPackageExportViewModel @Inject constructor(
          when (dataSource) {
             DataSource.ASAM -> {
                dataSource to asamRepository.getAsams(
-                  filters = filters.value?.get(dataSource) ?: emptyList()
+                  filters = dataSourceFilters.value?.get(dataSource) ?: emptyList()
                ).map { AsamFeature(it) }
             }
             DataSource.DGPS_STATION -> {
                dataSource to dgpsStationRepository.getDgpsStations(
-                  filters = filters.value?.get(dataSource) ?: emptyList()
+                  filters = dataSourceFilters.value?.get(dataSource) ?: emptyList()
                ).map { DgpsStationFeature(it) }
             }
             DataSource.LIGHT -> {
                dataSource to lightRepository.getLights(
-                  filters = filters.value?.get(dataSource) ?: emptyList()
+                  filters = dataSourceFilters.value?.get(dataSource) ?: emptyList()
                ).map { LightFeature(it) }
             }
             DataSource.NAVIGATION_WARNING -> {
                dataSource to navigationalWarningRepository.getNavigationalWarnings(
-                  filters = filters.value?.get(dataSource) ?: emptyList()
+                  filters = dataSourceFilters.value?.get(dataSource) ?: emptyList()
                ).map { NavigationalWarningFeature(it) }
             }
             DataSource.MODU -> {
                dataSource to moduRepository.getModus(
-                  filters = filters.value?.get(dataSource) ?: emptyList()
+                  filters = dataSourceFilters.value?.get(dataSource) ?: emptyList()
                ).map { ModuFeature(it) }
             }
             DataSource.PORT -> {
                dataSource to portRepository.getPorts(
-                  filters = filters.value?.get(dataSource) ?: emptyList()
+                  filters = dataSourceFilters.value?.get(dataSource) ?: emptyList()
                ).map { PortFeature(it) }
             }
             DataSource.RADIO_BEACON -> {
                dataSource to radioBeaconRepository.getRadioBeacons(
-                  filters = filters.value?.get(dataSource) ?: emptyList()
+                  filters = dataSourceFilters.value?.get(dataSource) ?: emptyList()
                ).map { RadioBeaconFeature(it) }
             }
             else -> null
