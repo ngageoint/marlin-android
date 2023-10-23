@@ -202,6 +202,8 @@ class NavTextParser {
          currentLocationType = "LineString"
       } else if (line.contains("POSITION")) {
          currentLocationType = "Point"
+      } else if (line.contains("IN VICINITY")) {
+         currentLocationType = "Point"
       }
    }
 
