@@ -20,6 +20,10 @@ interface ModuDao {
    @Query("SELECT COUNT(*) from modus")
    fun count(): Int
 
+   @RawQuery
+   @RewriteQueriesToDropUnusedColumns
+   suspend fun count(query: SupportSQLiteQuery): Int
+
    @Query("SELECT * FROM modus")
    fun observeModus(): Flow<List<Modu>>
 

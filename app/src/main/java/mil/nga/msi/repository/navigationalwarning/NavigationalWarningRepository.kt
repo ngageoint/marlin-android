@@ -5,8 +5,11 @@ import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import mil.nga.msi.MarlinNotification
 import mil.nga.msi.datasource.DataSource
+import mil.nga.msi.datasource.asam.Asam
+import mil.nga.msi.datasource.filter.QueryBuilder
 import mil.nga.msi.datasource.navigationwarning.NavigationArea
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarning
+import mil.nga.msi.filter.Filter
 import mil.nga.msi.repository.preferences.UserPreferencesRepository
 import mil.nga.msi.startup.navigationalwarning.NavigationalWarningInitializer.Companion.FETCH_LATEST_NAVIGATIONAL_WARNINGS_TASK
 import java.util.Date
@@ -20,6 +23,7 @@ class NavigationalWarningRepository @Inject constructor(
    private val userPreferencesRepository: UserPreferencesRepository
 ) {
    fun getNavigationalWarningsByArea(navigationArea: NavigationArea?) = localDataSource.observeNavigationalWarningsByArea(navigationArea)
+
    fun getNavigationalWarningsByNavigationArea(
       hydroarc: Date,
       hydrolant: Date,
@@ -28,6 +32,17 @@ class NavigationalWarningRepository @Inject constructor(
       navareaXII: Date,
       special: Date
    )  = localDataSource.observeNavigationalWarningsByNavigationArea(hydroarc, hydrolant, hydropac, navareaIV, navareaXII, special)
+
+   suspend fun getNavigationalWarnings() = localDataSource.getNavigationalWarnings()
+
+   fun getNavigationalWarnings(filters: List<Filter>): List<NavigationalWarning> {
+      val query = QueryBuilder(
+         table = "navigational_warnings",
+         filters = filters
+      ).buildQuery()
+      return localDataSource.getNavigationalWarnings(query)
+   }
+
    fun getNavigationalWarnings(
       minLatitude: Double,
       minLongitude: Double,
@@ -39,6 +54,14 @@ class NavigationalWarningRepository @Inject constructor(
    fun observeUnparsedNavigationalWarnings() = localDataSource.observeUnparsedNavigationalWarnings()
    fun observeNavigationalWarning(key: NavigationalWarningKey) = localDataSource.observeNavigationalWarning(key)
    suspend fun getNavigationalWarning(key: NavigationalWarningKey) = localDataSource.getNavigationalWarning(key)
+
+   suspend fun count(filters: List<Filter>): Int {
+      val query = QueryBuilder(
+         table = "navigational_warnings",
+         filters = filters,
+      ).buildQuery(count = true)
+      return localDataSource.count(query)
+   }
 
    suspend fun fetchNavigationalWarnings(refresh: Boolean = false): List<NavigationalWarning> {
       if (refresh) {

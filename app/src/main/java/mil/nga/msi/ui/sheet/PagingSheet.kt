@@ -10,6 +10,9 @@ import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -17,6 +20,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
 import kotlinx.coroutines.launch
 import mil.nga.msi.repository.dgpsstation.DgpsStationKey
 import mil.nga.msi.repository.geopackage.GeoPackageFeatureKey
@@ -36,16 +41,24 @@ import mil.nga.msi.ui.radiobeacon.sheet.RadioBeaconSheetScreen
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun PagingSheet(
-   mapAnnotations: List<MapAnnotation>,
+   point: LatLng,
+   bounds: LatLngBounds,
    onDetails: (MapAnnotation) -> Unit,
    viewModel: PagingSheetViewModel = hiltViewModel()
 ) {
    val scope = rememberCoroutineScope()
+
+   LaunchedEffect(point, bounds) {
+      viewModel.setLocation(point, bounds);
+   }
+   val mapAnnotations by viewModel.mapAnnotations.observeAsState(emptyList())
+
    val pagerState = androidx.compose.foundation.pager.rememberPagerState(
       pageCount = { mapAnnotations.size }
    )
-   var badgeColor = remember(pagerState.currentPage) {
-      mapAnnotations[pagerState.currentPage].key.type.route.color
+
+   var badgeColor = remember(pagerState.currentPage, mapAnnotations) {
+      mapAnnotations.getOrNull(pagerState.currentPage)?.key?.type?.route?.color ?: Color.Transparent
    }
 
    Row(Modifier.height(280.dp)) {

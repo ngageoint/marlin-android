@@ -45,7 +45,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.graphics.drawable.toBitmap
 import androidx.hilt.navigation.compose.hiltViewModel
 import mil.nga.msi.datasource.DataSource
-import mil.nga.msi.ui.filter.Filter
+import mil.nga.msi.ui.filter.FilterScreen
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.MapRoute
 import mil.nga.msi.ui.navigation.mainRouteFor
@@ -115,7 +115,8 @@ private fun DataSource(
       animationSpec = tween(
          durationMillis = 250,
          easing = FastOutSlowInEasing
-      )
+      ),
+      label = "Filter Animation"
    )
 
    Surface(
@@ -197,7 +198,7 @@ private fun DataSource(
                   .animateContentSize()
             ) {
                if (expand) {
-                  Filter(dataSource = dataSourceModel.dataSource, location = location)
+                  FilterScreen(dataSource = dataSourceModel.dataSource, location = location)
                }
             }
          }

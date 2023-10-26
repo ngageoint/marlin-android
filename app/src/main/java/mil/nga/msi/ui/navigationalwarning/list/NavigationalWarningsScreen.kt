@@ -20,7 +20,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowUpward
+import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material3.Card
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
@@ -43,6 +45,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.launch
+import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.navigationwarning.NavigationArea
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarning
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarningListItem
@@ -55,6 +58,7 @@ import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.navigationalwarning.NavigationWarningRoute
 import mil.nga.msi.ui.action.NavigationalWarningAction
 import mil.nga.msi.ui.bookmark.BookmarkNotes
+import mil.nga.msi.ui.export.ExportDataSource
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -78,40 +82,60 @@ fun NavigationalWarningsScreen(
       )
 
       if (items.isNotEmpty()) {
-         NavigationalWarnings(
-            items = items,
-            lastViewed = lastViewed,
-            onTap = {
-               val key = NavigationalWarningKey.fromNavigationWarning(it)
-               onAction(NavigationalWarningAction.Tap(key))
-            },
-            onShare = { warning ->
-               scope.launch {
-                  val key = NavigationalWarningKey.fromNavigationWarning(warning)
-                  viewModel.getNavigationalWarning(key)?.let { warning ->
-                     onAction(NavigationalWarningAction.Share(warning))
-                  }
-               }
-            },
-            onZoom = { warning ->
-               scope.launch {
-                  val key = NavigationalWarningKey.fromNavigationWarning(warning)
-                  viewModel.getNavigationalWarning(key)?.let { warning ->
-                     warning.bounds()?.let { bounds ->
-                        onAction(NavigationalWarningAction.Zoom(bounds))
+         Box(Modifier.fillMaxWidth()) {
+            NavigationalWarnings(
+               items = items,
+               lastViewed = lastViewed,
+               onTap = {
+                  val key = NavigationalWarningKey.fromNavigationWarning(it)
+                  onAction(NavigationalWarningAction.Tap(key))
+               },
+               onShare = { warning ->
+                  scope.launch {
+                     val key = NavigationalWarningKey.fromNavigationWarning(warning)
+                     viewModel.getNavigationalWarning(key)?.let { warning ->
+                        onAction(NavigationalWarningAction.Share(warning))
                      }
                   }
+               },
+               onZoom = { warning ->
+                  scope.launch {
+                     val key = NavigationalWarningKey.fromNavigationWarning(warning)
+                     viewModel.getNavigationalWarning(key)?.let { warning ->
+                        warning.bounds()?.let { bounds ->
+                           onAction(NavigationalWarningAction.Zoom(bounds))
+                        }
+                     }
+                  }
+               },
+               onBookmark = { (warning, bookmark) ->
+                  if (bookmark == null) {
+                     onAction(Action.Bookmark(BookmarkKey.fromNavigationalWarning(warning)))
+                  } else {
+                     viewModel.deleteBookmark(bookmark)
+                  }
+               },
+               onItemViewed = { viewModel.setNavigationalWarningViewed(navigationArea, it) }
+            )
+
+            Box(
+               Modifier
+                  .align(Alignment.BottomEnd)
+                  .padding(16.dp)
+            ) {
+               FloatingActionButton(
+                  containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                  onClick = {
+                     val export = ExportDataSource.NavigationalWarning(navigationArea = navigationArea)
+                     onAction(Action.Export(listOf(export)))
+                  }
+               ) {
+                  Icon(Icons.Outlined.Download,
+                     contentDescription = "Export digital GPS stations as GeoPackage"
+                  )
                }
-            },
-            onBookmark = { (warning, bookmark) ->
-               if (bookmark == null) {
-                  onAction(Action.Bookmark(BookmarkKey.fromNavigationalWarning(warning)))
-               } else {
-                  viewModel.deleteBookmark(bookmark)
-               }
-            },
-            onItemViewed = { viewModel.setNavigationalWarningViewed(navigationArea, it) }
-         )
+            }
+         }
       }
    }
 }

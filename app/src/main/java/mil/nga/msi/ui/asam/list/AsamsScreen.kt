@@ -5,10 +5,12 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -18,6 +20,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
 import kotlinx.coroutines.flow.Flow
+import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.asam.Asam
 import mil.nga.msi.datasource.asam.AsamWithBookmark
 import mil.nga.msi.repository.bookmark.BookmarkKey
@@ -26,6 +29,7 @@ import mil.nga.msi.ui.action.AsamAction
 import mil.nga.msi.ui.asam.AsamRoute
 import mil.nga.msi.ui.asam.AsamSummary
 import mil.nga.msi.ui.datasource.DataSourceActions
+import mil.nga.msi.ui.export.ExportDataSource
 import mil.nga.msi.ui.main.TopBar
 import java.util.*
 
@@ -75,20 +79,37 @@ fun AsamsScreen(
          }
       )
 
-      Asams(
-         pagingState = viewModel.asams,
-         onTap = { onAction(AsamAction.Tap(it)) },
-         onZoom = { onAction(AsamAction.Zoom(it.latLng)) },
-         onShare = { onAction(AsamAction.Share(it)) },
-         onBookmark = { (asam, bookmark) ->
-            if (bookmark == null) {
-               onAction(Action.Bookmark(BookmarkKey.fromAsam(asam)))
-            } else {
-               viewModel.deleteBookmark(bookmark)
+      Box(Modifier.fillMaxWidth()) {
+         Asams(
+            pagingState = viewModel.asams,
+            onTap = { onAction(AsamAction.Tap(it)) },
+            onZoom = { onAction(AsamAction.Zoom(it.latLng)) },
+            onShare = { onAction(AsamAction.Share(it)) },
+            onBookmark = { (asam, bookmark) ->
+               if (bookmark == null) {
+                  onAction(Action.Bookmark(BookmarkKey.fromAsam(asam)))
+               } else {
+                  viewModel.deleteBookmark(bookmark)
+               }
+            },
+            onCopyLocation = { onAction(AsamAction.Location(it)) }
+         )
+
+         Box(
+            Modifier
+               .align(Alignment.BottomEnd)
+               .padding(16.dp)
+         ) {
+            FloatingActionButton(
+               containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+               onClick = { onAction(Action.Export(listOf(ExportDataSource.Asam))) }
+            ) {
+               Icon(Icons.Outlined.Download,
+                  contentDescription = "Export ASAMs as GeoPackage"
+               )
             }
-         },
-         onCopyLocation = { onAction(AsamAction.Location(it)) }
-      )
+         }
+      }
    }
 }
 

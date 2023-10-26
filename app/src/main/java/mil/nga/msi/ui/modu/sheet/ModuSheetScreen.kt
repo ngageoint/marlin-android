@@ -11,7 +11,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import mil.nga.msi.datasource.DataSource
-import mil.nga.msi.datasource.modu.ModuWithBookmark
 import mil.nga.msi.ui.datasource.DataSourceIcon
 import mil.nga.msi.ui.modu.ModuSummary
 import mil.nga.msi.ui.modu.ModuViewModel
@@ -26,27 +25,24 @@ fun ModuSheetScreen(
    viewModel.setName(name)
    val moduWithBookmark by viewModel.moduWithBookmark.observeAsState()
    Column(modifier = modifier) {
-      ModuContent(moduWithBookmark) {
-         onDetails?.invoke()
-      }
-   }
-}
+      Column(Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
+         DataSourceIcon(
+            dataSource = DataSource.MODU,
+            modifier = Modifier.padding(bottom = 16.dp)
+         )
 
-@Composable
-private fun ModuContent(
-   moduWithBookmark: ModuWithBookmark?,
-   onDetails: () -> Unit,
-) {
-   Column(modifier = Modifier.padding(vertical = 8.dp)) {
-      DataSourceIcon(dataSource = DataSource.MODU)
+         moduWithBookmark?.let {
+            ModuSummary(
+               moduWithBookmark = it,
+               modifier = Modifier.padding(bottom = 16.dp)
+            )
+         }
 
-      moduWithBookmark?.let { ModuSummary(moduWithBookmark = it) }
-
-      TextButton(
-         onClick = { onDetails() },
-         modifier = Modifier.padding(horizontal = 16.dp)
-      ) {
-         Text("MORE DETAILS")
+         TextButton(
+            onClick = { onDetails?.invoke() }
+         ) {
+            Text("MORE DETAILS")
+         }
       }
    }
 }

@@ -13,7 +13,9 @@ import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.navigationwarning.NavigationArea
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarning
 import mil.nga.msi.repository.navigationalwarning.NavigationalWarningKey
+import mil.nga.msi.ui.action.Action
 import mil.nga.msi.ui.action.NavigationalWarningAction
+import mil.nga.msi.ui.export.ExportDataSource
 import mil.nga.msi.ui.map.MapPosition
 import mil.nga.msi.ui.map.MapRoute
 import mil.nga.msi.ui.map.cluster.MapAnnotation
@@ -75,6 +77,9 @@ fun NavGraphBuilder.navigationalWarningGraph(
          NavigationalWarningGroupScreen(
             position = mapPosition,
             openDrawer = { openNavigationDrawer() },
+            onExport = {
+               Action.Export(listOf(ExportDataSource.NavigationalWarning())).navigate(navController)
+            },
             onGroupTap = { navigationArea ->
                navController.navigate( "${NavigationWarningRoute.List.name}?navigationArea=${navigationArea.code}")
             },

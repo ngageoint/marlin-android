@@ -19,6 +19,10 @@ interface DgpsStationDao {
    @Query("SELECT COUNT(*) from dgps_stations")
    fun count(): Int
 
+   @RawQuery
+   @RewriteQueriesToDropUnusedColumns
+   suspend fun count(query: SupportSQLiteQuery): Int
+
    @Query("SELECT * FROM dgps_stations")
    suspend fun getDgpsStations(): List<DgpsStation>
 

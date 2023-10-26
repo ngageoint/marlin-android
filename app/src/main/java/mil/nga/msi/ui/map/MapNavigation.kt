@@ -12,6 +12,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import com.google.accompanist.navigation.material.bottomSheet
+import com.google.android.gms.maps.model.LatLng
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import mil.nga.msi.repository.dgpsstation.DgpsStationKey
@@ -19,8 +20,10 @@ import mil.nga.msi.repository.geopackage.GeoPackageFeatureKey
 import mil.nga.msi.repository.light.LightKey
 import mil.nga.msi.repository.navigationalwarning.NavigationalWarningKey
 import mil.nga.msi.repository.radiobeacon.RadioBeaconKey
+import mil.nga.msi.ui.action.Action
 import mil.nga.msi.ui.asam.AsamRoute
 import mil.nga.msi.ui.dgpsstation.DgpsStationRoute
+import mil.nga.msi.ui.export.ExportDataSource
 import mil.nga.msi.ui.geopackage.GeoPackageRoute
 import mil.nga.msi.ui.light.LightRoute
 import mil.nga.msi.ui.map.cluster.MapAnnotation
@@ -101,47 +104,14 @@ fun NavGraphBuilder.mapGraph(
 
       MapScreen(
          mapDestination = destination,
-         onAnnotationClick = { annotation ->
-            when (annotation.key.type) {
-               MapAnnotation.Type.ASAM ->  {
-                  navController.navigate(AsamRoute.Sheet.name + "?reference=${annotation.key.id}")
-               }
-               MapAnnotation.Type.MODU ->  {
-                  navController.navigate(ModuRoute.Sheet.name + "?name=${annotation.key.id}")
-               }
-               MapAnnotation.Type.LIGHT -> {
-                  val lightKey = LightKey.fromId(annotation.key.id)
-                  val encoded = Uri.encode(Json.encodeToString(lightKey))
-                  navController.navigate(LightRoute.Sheet.name + "?key=${encoded}")
-               }
-               MapAnnotation.Type.PORT -> {
-                  navController.navigate(PortRoute.Sheet.name + "?portNumber=${annotation.key.id}")
-               }
-               MapAnnotation.Type.RADIO_BEACON -> {
-                  val beaconKey = RadioBeaconKey.fromId(annotation.key.id)
-                  val encoded = Uri.encode(Json.encodeToString(beaconKey))
-                  navController.navigate(RadioBeaconRoute.Sheet.name + "?key=${encoded}")
-               }
-               MapAnnotation.Type.DGPS_STATION -> {
-                  val dgpsStationKey = DgpsStationKey.fromId(annotation.key.id)
-                  val encoded = Uri.encode(Json.encodeToString(dgpsStationKey))
-                  navController.navigate(DgpsStationRoute.Sheet.name + "?key=${encoded}")
-               }
-               MapAnnotation.Type.NAVIGATIONAL_WARNING -> {
-                  val featureKey = NavigationalWarningKey.fromId(annotation.key.id)
-                  val encoded = Uri.encode(Json.encodeToString(featureKey))
-                  navController.navigate(NavigationWarningRoute.Sheet.name + "?key=${encoded}")
-               }
-               MapAnnotation.Type.GEOPACKAGE -> {
-                  val featureKey = GeoPackageFeatureKey.fromId(annotation.key.id)
-                  val encoded = Uri.encode(Json.encodeToString(featureKey))
-                  navController.navigate(GeoPackageRoute.Sheet.name + "?key=${encoded}")
-               }
-            }
+         onMapTap = { latLng, bounds ->
+            val encodedPoint = Uri.encode(Json.encodeToString(NavPoint(latLng.latitude, latLng.longitude)))
+            val encodedBounds = Uri.encode(Json.encodeToString(Bounds.fromLatLngBounds(bounds)))
+            navController.navigate(MapRoute.PagerSheet.name + "?point=${encodedPoint}&bounds=${encodedBounds}")
          },
-         onAnnotationsClick = { annotations ->
-            val encoded = Uri.encode(Json.encodeToString(annotations))
-            navController.navigate(MapRoute.PagerSheet.name + "?annotations=${encoded}")
+         onExport = { dataSources ->
+            val exportDataSources = dataSources.mapNotNull { ExportDataSource.fromDataSource(it) }
+            Action.Export(exportDataSources).navigate(navController)
          },
          onMapSettings = { navController.navigate(MapRoute.Settings.name) },
          openDrawer = { openNavigationDrawer() },
@@ -177,54 +147,72 @@ fun NavGraphBuilder.mapGraph(
    }
 
    bottomSheet(
-      route = "${MapRoute.PagerSheet.name}?annotations={annotations}",
-      arguments = listOf(navArgument("annotations") { type = NavType.MapAnnotationsType })
+      route = "${MapRoute.PagerSheet.name}?point={point}&bounds={bounds}",
+      arguments = listOf(
+         navArgument("point") {
+            defaultValue = null
+            type = NavType.NavTypePoint
+            nullable = true
+         },
+         navArgument("bounds") {
+            defaultValue = null
+            type = NavType.NavTypeBounds
+            nullable = true
+         }
+      )
    ) { backstackEntry ->
-      backstackEntry.arguments?.let { bundle ->
-         BundleCompat.getParcelableArray(bundle, "annotations", MapAnnotation::class.java)?.map { it as MapAnnotation }?.toList()
-      }?.let { annotations ->
-         PagingSheet(
-            annotations,
-            onDetails =  { annotation ->
-               when (annotation.key.type) {
-                  MapAnnotation.Type.ASAM -> {
-                     navController.navigate(AsamRoute.Detail.name + "?reference=${annotation.key.id}")
-                  }
-                  MapAnnotation.Type.MODU -> {
-                     navController.navigate(ModuRoute.Detail.name + "?name=${annotation.key.id}")
-                  }
-                  MapAnnotation.Type.LIGHT -> {
-                     val key = LightKey.fromId(annotation.key.id)
-                     val encoded = Uri.encode(Json.encodeToString(key))
-                     navController.navigate(LightRoute.Detail.name + "?key=${encoded}")
-                  }
-                  MapAnnotation.Type.PORT -> {
-                     navController.navigate(PortRoute.Detail.name + "?portNumber=${annotation.key.id}")
-                  }
-                  MapAnnotation.Type.RADIO_BEACON -> {
-                     val key = RadioBeaconKey.fromId(annotation.key.id)
-                     val encoded = Uri.encode(Json.encodeToString(key))
-                     navController.navigate(RadioBeaconRoute.Detail.name + "?key=${encoded}")
-                  }
-                  MapAnnotation.Type.DGPS_STATION -> {
-                     val key = DgpsStationKey.fromId(annotation.key.id)
-                     val encoded = Uri.encode(Json.encodeToString(key))
-                     navController.navigate(DgpsStationRoute.Detail.name + "?key=${encoded}")
-                  }
-                  MapAnnotation.Type.NAVIGATIONAL_WARNING -> {
-                     val key = NavigationalWarningKey.fromId(annotation.key.id)
-                     val encoded = Uri.encode(Json.encodeToString(key))
-                     navController.navigate(NavigationWarningRoute.Detail.name + "?key=${encoded}")
-                  }
-                  MapAnnotation.Type.GEOPACKAGE -> {
-                     val key = GeoPackageFeatureKey.fromId(annotation.key.id)
-                     val encoded = Uri.encode(Json.encodeToString(key))
-                     navController.navigate(GeoPackageRoute.Detail.name + "?key=${encoded}")
-                  }
+      val point = backstackEntry.arguments?.let { bundle ->
+         BundleCompat.getParcelable(bundle, "point", NavPoint::class.java)
+      }
+      requireNotNull(point) { "'point' argument is required" }
+
+      val bounds = backstackEntry.arguments?.let { bundle ->
+         BundleCompat.getParcelable(bundle, "bounds", Bounds::class.java)?.asLatLngBounds()
+      }
+      requireNotNull(bounds) { "'bounds' argument is required" }
+
+      PagingSheet(
+         point = LatLng(point.latitude, point.longitude),
+         bounds = bounds,
+         onDetails =  { annotation ->
+            when (annotation.key.type) {
+               MapAnnotation.Type.ASAM -> {
+                  navController.navigate(AsamRoute.Detail.name + "?reference=${annotation.key.id}")
+               }
+               MapAnnotation.Type.MODU -> {
+                  navController.navigate(ModuRoute.Detail.name + "?name=${annotation.key.id}")
+               }
+               MapAnnotation.Type.LIGHT -> {
+                  val key = LightKey.fromId(annotation.key.id)
+                  val encoded = Uri.encode(Json.encodeToString(key))
+                  navController.navigate(LightRoute.Detail.name + "?key=${encoded}")
+               }
+               MapAnnotation.Type.PORT -> {
+                  navController.navigate(PortRoute.Detail.name + "?portNumber=${annotation.key.id}")
+               }
+               MapAnnotation.Type.RADIO_BEACON -> {
+                  val key = RadioBeaconKey.fromId(annotation.key.id)
+                  val encoded = Uri.encode(Json.encodeToString(key))
+                  navController.navigate(RadioBeaconRoute.Detail.name + "?key=${encoded}")
+               }
+               MapAnnotation.Type.DGPS_STATION -> {
+                  val key = DgpsStationKey.fromId(annotation.key.id)
+                  val encoded = Uri.encode(Json.encodeToString(key))
+                  navController.navigate(DgpsStationRoute.Detail.name + "?key=${encoded}")
+               }
+               MapAnnotation.Type.NAVIGATIONAL_WARNING -> {
+                  val key = NavigationalWarningKey.fromId(annotation.key.id)
+                  val encoded = Uri.encode(Json.encodeToString(key))
+                  navController.navigate(NavigationWarningRoute.Detail.name + "?key=${encoded}")
+               }
+               MapAnnotation.Type.GEOPACKAGE -> {
+                  val key = GeoPackageFeatureKey.fromId(annotation.key.id)
+                  val encoded = Uri.encode(Json.encodeToString(key))
+                  navController.navigate(GeoPackageRoute.Detail.name + "?key=${encoded}")
                }
             }
-         )
-      }
+         }
+      )
    }
 
    bottomSheet(MapRoute.Filter.name) {

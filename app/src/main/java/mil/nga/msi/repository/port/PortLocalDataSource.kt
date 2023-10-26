@@ -15,6 +15,7 @@ class PortLocalDataSource @Inject constructor(
    fun getPorts(query: SimpleSQLiteQuery) = dao.getPorts(query)
 
    fun isEmpty() = dao.count() == 0
+   suspend fun count(query: SimpleSQLiteQuery) = dao.count(query)
 
    suspend fun getPort(portNumber: Int) = dao.getPort(portNumber)
    suspend fun getPorts(): List<Port> = dao.getPorts()

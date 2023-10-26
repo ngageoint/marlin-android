@@ -19,6 +19,10 @@ interface RadioBeaconDao {
    @Query("SELECT COUNT(*) from radio_beacons")
    fun count(): Int
 
+   @RawQuery
+   @RewriteQueriesToDropUnusedColumns
+   suspend fun count(query: SupportSQLiteQuery): Int
+
    @Query("SELECT * FROM radio_beacons")
    suspend fun getRadioBeacons(): List<RadioBeacon>
 

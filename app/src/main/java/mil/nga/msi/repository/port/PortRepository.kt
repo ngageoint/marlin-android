@@ -55,6 +55,14 @@ class PortRepository @Inject constructor(
    fun observePort(portNumber: Int) = localDataSource.observePort(portNumber)
    suspend fun getPort(portNumber: Int) = localDataSource.getPort(portNumber)
 
+   suspend fun count(filters: List<Filter>): Int {
+      val query = QueryBuilder(
+         table = "ports",
+         filters = filters,
+      ).buildQuery(count = true)
+      return localDataSource.count(query)
+   }
+
    suspend fun fetchPorts(refresh: Boolean = false): List<Port> {
       if (refresh) {
          val ports = remoteDataSource.fetchPorts()

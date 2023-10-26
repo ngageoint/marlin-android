@@ -60,6 +60,14 @@ class AsamRepository @Inject constructor(
       return localDataSource.getAsams(query)
    }
 
+   suspend fun count(filters: List<Filter>): Int {
+      val query = QueryBuilder(
+         table = "asams",
+         filters = filters,
+      ).buildQuery(count = true)
+      return localDataSource.count(query)
+   }
+
    suspend fun fetchAsams(refresh: Boolean = false): List<Asam> {
       if (refresh) {
          val asams = remoteDataSource.fetchAsams()

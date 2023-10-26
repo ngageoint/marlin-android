@@ -1,5 +1,6 @@
 package mil.nga.msi.location
 
+import android.util.Log
 import mil.nga.msi.coordinate.WGS84
 import org.junit.Assert
 import org.junit.Test
@@ -11,6 +12,25 @@ class NavTextParserTest {
       val text = "12-15.16N 071-57.30W"
       val latLng = WGS84.from(text)
       Assert.assertNotNull(latLng)
+   }
+
+   @Test
+   fun testFix() {
+      val text = "WESTERN INDIAN OCEAN.\n" +
+              "MAURITIUS.\n" +
+              "DNC 02.\n" +
+              "1. UNDERWATER OPERATIONS IN PROGRESS UNTIL\n" +
+              "   FURTHER NOTICE:\n" +
+              "   A. IN AREA BOUND BY\n" +
+              "      20-26.10S 057-43.1E0, 20-25.10S 057-44.00E,\n" +
+              "      20-24.00S 057-45.50E.\n" +
+              "   B. IN VICINITY 20-26.60S 057-44.60E.\n" +
+              "   TWO MILE BERTH REQUESTED.\n" +
+              "2. CANCEL HYDROPAC 536/23.\n"
+
+      val parser = NavTextParser()
+      val foo = parser.parseToMappedLocation(text)
+      Log.i("foo", "$foo")
    }
 
    @Test
