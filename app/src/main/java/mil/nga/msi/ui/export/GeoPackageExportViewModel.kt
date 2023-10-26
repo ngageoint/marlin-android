@@ -123,6 +123,7 @@ class GeoPackageExportViewModel @Inject constructor(
 
    init {
       viewModelScope.launch {
+         _commonFilters.value = emptyList()
          _dataSourceFilters.value = filterRepository.filters.first()
       }
    }
