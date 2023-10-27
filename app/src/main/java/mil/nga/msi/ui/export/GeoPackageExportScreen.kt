@@ -26,6 +26,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.SentimentVeryDissatisfied
 import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.Share
@@ -379,12 +380,23 @@ private fun LocationFilter(
                         .weight(1f)
                         .padding(horizontal = 8.dp)
                   ) {
-                     CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
-                        Text(
-                           text = "Location",
-                           style = MaterialTheme.typography.bodyMedium,
-                           fontWeight = FontWeight.Medium
-                        )
+
+                     Row {
+                        CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+                           Icon(
+                              imageVector = Icons.Filled.LocationOn,
+                              modifier = Modifier.padding(end = 8.dp),
+                              contentDescription = "Location Filter Icon"
+                           )
+                        }
+
+                        CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
+                           Text(
+                              text = "Location",
+                              style = MaterialTheme.typography.bodyMedium,
+                              fontWeight = FontWeight.Medium
+                           )
+                        }
                      }
 
                      Row(
@@ -482,6 +494,18 @@ private fun DataSourceFilter(
                      .fillMaxHeight()
                      .background(dataSource.color)
                )
+
+               CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+                  val bitmap = AppCompatResources.getDrawable(
+                     LocalContext.current,
+                     dataSource.icon
+                  )!!.toBitmap().asImageBitmap()
+                  Icon(
+                     bitmap = bitmap,
+                     modifier = Modifier.padding(start = 8.dp),
+                     contentDescription = "Datasource Icon"
+                  )
+               }
 
                Column(
                   verticalArrangement = Arrangement.Center,

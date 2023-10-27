@@ -4,7 +4,6 @@ import android.Manifest
 import android.animation.ValueAnimator
 import android.content.res.Configuration
 import android.graphics.Bitmap
-import android.util.Log
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.fadeOut
@@ -57,9 +56,7 @@ import mil.nga.msi.coordinate.CoordinateSystem
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.repository.geocoder.GeocoderState
 import mil.nga.msi.type.MapLocation
-import mil.nga.msi.ui.action.Action
 import mil.nga.msi.ui.coordinate.CoordinateText
-import mil.nga.msi.ui.export.ExportDataSource
 import mil.nga.msi.ui.location.LocationPermission
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.cluster.MapAnnotation
@@ -289,7 +286,6 @@ fun MapScreen(
             ) {
                Box {
                   FloatingActionButton(
-                     containerColor = MaterialTheme.colorScheme.tertiaryContainer,
                      onClick = {
                         val dataSources = viewModel.mapped.value?.toList()
                            ?.filter { (_, mapped) -> mapped}
@@ -298,7 +294,9 @@ fun MapScreen(
                         onExport(dataSources)
                      }
                   ) {
-                     Icon(Icons.Outlined.Download,
+                     Icon(
+                        imageVector = Icons.Outlined.Download,
+                        tint = MaterialTheme.colorScheme.tertiary,
                         contentDescription = "Export Map Features as GeoPackage"
                      )
                   }
