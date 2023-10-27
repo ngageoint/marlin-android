@@ -68,8 +68,8 @@ class BookmarksViewModel @Inject constructor(
                val key = GeoPackageFeatureKey.fromId(bookmark.id)
                layerRepository.getLayer(key.layerId)?.let { layer ->
                   val geoPackage = geoPackageManager.openExternal(layer.filePath)
-                  geoPackage.getFeature(layer.id, layer.name, key.table, key.featureId)?.let { geoPackage ->
-                     ItemWithBookmark(key to geoPackage, DataSource.GEOPACKAGE, bookmark)
+                  geoPackage.getFeature(layer.id, layer.name, key.table, key.featureId)?.let { feature ->
+                     ItemWithBookmark(key to feature, DataSource.GEOPACKAGE, bookmark)
                   }
                }
             }

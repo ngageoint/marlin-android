@@ -78,7 +78,7 @@ fun PublicationDetail(
     publicationWithBookmark: ElectronicPublicationWithBookmark?,
     onAction: (PublicationAction) -> Unit
 ) {
-    publicationWithBookmark?.let { (publication, bookmark) ->
+    publicationWithBookmark?.let { (publication, _) ->
         val fileType = publication.fileExtension?.toUpperCase(Locale.current) ?: "Unknown file type"
 
         val fileSize = publication.fileSize?.let {size ->
