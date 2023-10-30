@@ -21,6 +21,7 @@ sealed class AboutRoute(
    object List: AboutRoute("about/list", "Settings")
    object Licenses: AboutRoute("about/acknowledgements", "Acknowledgements")
    object Disclaimer: AboutRoute("about/disclaimer", "Disclaimer")
+   object Privacy: AboutRoute("about/privacy", "Privacy Policy")
 }
 
 fun NavGraphBuilder.settingsGraph(
@@ -41,6 +42,9 @@ fun NavGraphBuilder.settingsGraph(
             onDisclaimer = {
                navController.navigate(AboutRoute.Disclaimer.name)
             },
+            onPrivacy = {
+               navController.navigate(AboutRoute.Privacy.name)
+            },
             onContact = {
                val intent = Intent(Intent.ACTION_SENDTO)
                intent.data = Uri.parse("mailto:")
@@ -55,6 +59,14 @@ fun NavGraphBuilder.settingsGraph(
          bottomBarVisibility(true)
 
          DisclaimerScreen(
+            close = { navController.popBackStack() }
+         )
+      }
+
+      composable(AboutRoute.Privacy.name) {
+         bottomBarVisibility(true)
+
+         PrivacyPolicyScreen(
             close = { navController.popBackStack() }
          )
       }
