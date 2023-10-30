@@ -3,7 +3,6 @@ package mil.nga.msi.network.modu
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mil.nga.msi.datasource.modu.Modu
 import mil.nga.msi.repository.modu.ModuLocalDataSource
@@ -14,7 +13,6 @@ import retrofit2.Response
 import java.text.SimpleDateFormat
 import java.util.Date
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class ModuServiceTest {
 
     @Test

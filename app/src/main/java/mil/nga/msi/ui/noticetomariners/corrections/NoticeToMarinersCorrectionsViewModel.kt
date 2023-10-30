@@ -10,14 +10,12 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.noticetomariners.ChartCorrection
-import mil.nga.msi.location.LocationPolicy
 import mil.nga.msi.repository.noticetomariners.NoticeToMarinersRepository
 import mil.nga.msi.repository.preferences.FilterRepository
 import javax.inject.Inject
 
 @HiltViewModel
 class NoticeToMarinersCorrectionsViewModel @Inject constructor(
-   val locationPolicy: LocationPolicy,
    filterRepository: FilterRepository,
    private val repository: NoticeToMarinersRepository
 ): ViewModel() {

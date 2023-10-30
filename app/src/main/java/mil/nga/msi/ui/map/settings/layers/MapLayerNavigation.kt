@@ -32,16 +32,16 @@ sealed class MapLayerRoute(
    override val shortTitle: String = title,
    override val color: Color = Color.Transparent
 ): Route {
-   object Layers: MapLayerRoute("mapLayers", "Map Layers")
-   object NewLayer: MapLayerRoute("mapNewLayer", "New Layer")
-   object CreateGridLayer: MapLayerRoute("mapCreateGridLayer", "Grid Layer")
-   object EditGridLayer: MapLayerRoute("mapEditGridLayer", "Grid Layer")
-   object WMSLayerCreateSettings: MapLayerRoute("mapWMSCreateLayerSettings", "WMS Layer")
-   object WMSLayerEditSettings: MapLayerRoute("mapWMSEditLayerSettings", "WMS Layer")
-   object WMSLayer: MapLayerRoute("mapWMSLayer", "WMS Layer")
-   object GeoPackageLayerCreateSettings: MapLayerRoute("mapGPCreateLayerSettings", "GeoPackage Layer")
-   object GeoPackageLayerEditSettings: MapLayerRoute("mapEditGPLayer", "GeoPackage Layer")
-   object GeoPackageLayer: MapLayerRoute("mapGPLayer", "GeoPackage Layer")
+   data object Layers: MapLayerRoute("mapLayers", "Map Layers")
+   data object NewLayer: MapLayerRoute("mapNewLayer", "New Layer")
+   data object CreateGridLayer: MapLayerRoute("mapCreateGridLayer", "Grid Layer")
+   data object EditGridLayer: MapLayerRoute("mapEditGridLayer", "Grid Layer")
+   data object WMSLayerCreateSettings: MapLayerRoute("mapWMSCreateLayerSettings", "WMS Layer")
+   data object WMSLayerEditSettings: MapLayerRoute("mapWMSEditLayerSettings", "WMS Layer")
+   data object WMSLayer: MapLayerRoute("mapWMSLayer", "WMS Layer")
+   data object GeoPackageLayerCreateSettings: MapLayerRoute("mapGPCreateLayerSettings", "GeoPackage Layer")
+   data object GeoPackageLayerEditSettings: MapLayerRoute("mapEditGPLayer", "GeoPackage Layer")
+   data object GeoPackageLayer: MapLayerRoute("mapGPLayer", "GeoPackage Layer")
 }
 
 fun NavGraphBuilder.mapLayerGraph(

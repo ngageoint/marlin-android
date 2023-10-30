@@ -59,7 +59,7 @@ class ElectronicPublicationRepository @Inject constructor(
      * receive the updates.
      */
     suspend fun updateDownloadProgress() {
-        localDataSource.updateDownloadProgress() { downloadingEPubs ->
+        localDataSource.updateDownloadProgress { downloadingEPubs ->
             val ePubsByDownloadId = downloadingEPubs.associateBy { it.localDownloadId }
             val downloadIds = downloadingEPubs.map { it.localDownloadId!! }
             val downloadIdsArray = LongArray(downloadIds.size)

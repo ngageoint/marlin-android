@@ -14,7 +14,7 @@ import mil.nga.msi.ui.map.MapRoute
 import mil.nga.msi.ui.navigation.Bounds
 import mil.nga.msi.ui.navigationalwarning.NavigationWarningRoute
 
-sealed class NavigationalWarningAction(): Action() {
+sealed class NavigationalWarningAction : Action() {
    class Export(val dataSource: DataSource, val navigationArea: NavigationArea): Action() {
       override fun navigate(navController: NavController) {
          navController.navigate("${ExportRoute.Export.name}?dataSource=${dataSource}&navigationAreaCode=${navigationArea.code}")

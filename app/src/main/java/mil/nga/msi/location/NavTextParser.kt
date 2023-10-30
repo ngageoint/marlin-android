@@ -1,12 +1,10 @@
 package mil.nga.msi.location
 
-import android.util.Log
 import mil.nga.msi.coordinate.DMS
 import mil.nga.msi.coordinate.WGS84
 import mil.nga.msi.nlp.NumberNormalizer
 import mil.nga.sf.geojson.Feature
 import mil.nga.sf.geojson.FeatureCollection
-import mil.nga.sf.geojson.GeometryType
 import mil.nga.sf.geojson.LineString
 import mil.nga.sf.geojson.Point
 import mil.nga.sf.geojson.Polygon

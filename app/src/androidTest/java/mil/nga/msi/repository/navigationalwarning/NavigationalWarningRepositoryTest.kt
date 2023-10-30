@@ -11,7 +11,6 @@ import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
@@ -28,7 +27,6 @@ import java.time.Instant
 import java.util.Date
 import java.util.UUID
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class NavigationalWarningRepositoryTest {
 
    @After

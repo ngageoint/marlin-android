@@ -16,7 +16,7 @@ import javax.inject.Singleton
 @Singleton
 open class LocationFilterService @Inject constructor(
    val filterRepository: FilterRepository
-): Observer<Location> {
+): Observer<Location?> {
 
    private var location: Location? = null
 
@@ -26,7 +26,7 @@ open class LocationFilterService @Inject constructor(
       }
    }
 
-   override fun onChanged(value: Location) {
+   override fun onChanged(value: Location?) {
       val filters = runBlocking { filterRepository.filters.first() }
       updateLocationFilter(value, filters)
    }

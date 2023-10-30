@@ -210,7 +210,9 @@ class MarlinNotification @Inject constructor(
          .build()
 
       with(NotificationManagerCompat.from(application)) {
-         notify(notificationId, notification)
+         try {
+            notify(notificationId, notification)
+         } catch (_: SecurityException) {}
       }
    }
 
@@ -229,7 +231,6 @@ class MarlinNotification @Inject constructor(
       private const val RadioBeaconFetchNotificationId = 60
       private const val DgpsStationsNotificationId = 7
       private const val DgpsStationsFetchNotificationId = 70
-      private const val ElectronicPublicationNotificationId = 8
       private const val ElectronicPublicationFetchNotificationId = 80
       private const val NoticeToMarinersNotificationId = 9
       private const val NoticeToMarinersFetchNotificationId = 90

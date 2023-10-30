@@ -24,7 +24,7 @@ import java.time.Instant
 import java.time.temporal.ChronoUnit
 
 class LoadNoticeToMarinersWorkerFactory(private val dataSource: NoticeToMarinersLocalDataSource) : WorkerFactory() {
-   override fun createWorker(appContext: Context, workerClassName: String, workerParameters: WorkerParameters): ListenableWorker? {
+   override fun createWorker(appContext: Context, workerClassName: String, workerParameters: WorkerParameters): ListenableWorker {
       return LoadNoticeToMarinersWorker(appContext, workerParameters, dataSource)
    }
 }
@@ -34,7 +34,7 @@ class RefreshNoticeToMarinersWorkerFactory(
    private val userPreferencesRepository: UserPreferencesRepository,
    private val notification: MarlinNotification
 ) : WorkerFactory() {
-   override fun createWorker(appContext: Context, workerClassName: String, workerParameters: WorkerParameters): ListenableWorker? {
+   override fun createWorker(appContext: Context, workerClassName: String, workerParameters: WorkerParameters): ListenableWorker {
       return RefreshNoticeToMarinersWorker(appContext, workerParameters, repository, userPreferencesRepository, notification)
    }
 }

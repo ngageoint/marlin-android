@@ -27,12 +27,12 @@ sealed class LightRoute(
    override val shortTitle: String = title,
    override val color: Color = DataSource.LIGHT.color
 ): Route {
-   object Main: LightRoute("lights", "Lights")
-   object Detail: LightRoute("lights/detail", "Light Details")
-   object List: LightRoute("lights/list", "Lights")
-   object Sheet: LightRoute("lights/sheet", "Light Sheet")
-   object Filter: LightRoute("lights/filter", "Light Filters", "Light Filters")
-   object Sort: LightRoute("lights/sort", "Light Sort", "Light Sort")
+   data object Main: LightRoute("lights", "Lights")
+   data object Detail: LightRoute("lights/detail", "Light Details")
+   data object List: LightRoute("lights/list", "Lights")
+   data object Sheet: LightRoute("lights/sheet", "Light Sheet")
+   data object Filter: LightRoute("lights/filter", "Light Filters", "Light Filters")
+   data object Sort: LightRoute("lights/sort", "Light Sort", "Light Sort")
 }
 
 @OptIn(ExperimentalMaterialNavigationApi::class)

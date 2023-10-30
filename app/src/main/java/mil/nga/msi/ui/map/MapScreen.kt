@@ -391,7 +391,7 @@ private fun Map(
    val context = LocalContext.current
 
    var isMapLoaded by remember { mutableStateOf(false) }
-   var cameraMoveReason by remember { mutableStateOf(0) }
+   var cameraMoveReason by remember { mutableIntStateOf(0) }
 
    LaunchedEffect(origin) {
       origin?.let { origin ->

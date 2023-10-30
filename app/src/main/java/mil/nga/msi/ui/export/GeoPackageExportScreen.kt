@@ -94,7 +94,7 @@ fun GeoPackageExportScreen(
    }
 
    if (showErrorDialog) {
-      ExportErrorDialog() {
+      ExportErrorDialog {
          showErrorDialog = false
       }
    }
@@ -252,7 +252,7 @@ private fun CommonFilters(
    onAddFilter: (Filter) -> Unit,
    onRemoveFilter: (Filter) -> Unit
 ) {
-   var expanded by remember { mutableStateOf<Boolean>(false) }
+   var expanded by remember { mutableStateOf(false) }
 
    Column(
       Modifier
@@ -567,7 +567,7 @@ private fun DataSourceFilter(
                      onAddFilter(dataSource, filter)
                   },
                   onRemoveFilter = { filter ->
-                     onRemoveFilter(dataSource, filter);
+                     onRemoveFilter(dataSource, filter)
                   }
                )
             }

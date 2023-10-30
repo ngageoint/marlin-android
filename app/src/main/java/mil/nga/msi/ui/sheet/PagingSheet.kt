@@ -49,7 +49,7 @@ fun PagingSheet(
    val scope = rememberCoroutineScope()
 
    LaunchedEffect(point, bounds) {
-      viewModel.setLocation(point, bounds);
+      viewModel.setLocation(point, bounds)
    }
    val mapAnnotations by viewModel.mapAnnotations.observeAsState(emptyList())
 

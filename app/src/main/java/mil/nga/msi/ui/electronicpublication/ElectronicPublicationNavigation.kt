@@ -13,19 +13,18 @@ import kotlinx.serialization.json.Json
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.electronicpublication.ElectronicPublicationType
 import mil.nga.msi.repository.bookmark.BookmarkKey
-import mil.nga.msi.ui.asam.AsamRoute
 import mil.nga.msi.ui.bookmark.BookmarkRoute
 import mil.nga.msi.ui.navigation.Route
 
 sealed class ElectronicPublicationRoute(
     override val name: String,
-    override val title: String,
-    override val shortTitle: String,
+    override val title: String = "Electronic Publications",
+    override val shortTitle: String = "E-Pubs",
 ): Route {
     override val color: Color = DataSource.ELECTRONIC_PUBLICATION.color
-    object Main: ElectronicPublicationRoute("electronicPublications", "Electronic Publications", "E-Pubs")
-    object List: ElectronicPublicationRoute("electronicPublication/types", "Electronic Publications", "E-Pubs")
-    object Detail: ElectronicPublicationRoute("electronicPublication/detail", "Electronic Publications", "E-Pubs")
+    data object Main: ElectronicPublicationRoute("electronicPublications")
+    data object List: ElectronicPublicationRoute("electronicPublication/types")
+    data object Detail: ElectronicPublicationRoute("electronicPublication/detail")
 }
 
 fun routeForPubType(pubType: ElectronicPublicationType): String {

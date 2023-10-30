@@ -2,7 +2,6 @@ package mil.nga.msi.network.port
 
 import io.mockk.coEvery
 import io.mockk.mockk
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mil.nga.msi.datasource.port.Port
 import mil.nga.msi.repository.port.PortRemoteDataSource
@@ -10,7 +9,6 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 import retrofit2.Response
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class PortServiceTest {
 
     @Test

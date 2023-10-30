@@ -9,7 +9,7 @@ import mil.nga.msi.datasource.modu.Modu
 import mil.nga.msi.ui.map.cluster.MapAnnotation
 import mil.nga.sf.Point
 
-class ModuDefinition() : DataSourceDefinition {
+class ModuDefinition : DataSourceDefinition {
    override val tableName = "modus"
    override val icon = MapAnnotation.Type.MODU.icon
    override val color = DataSource.MODU.color

@@ -1,4 +1,5 @@
-import mil.nga.msi.datasource.noticetomariners.NoticeToMariners
+package mil.nga.msi.datasource.noticetomariners
+
 import org.junit.Assert
 
 /**

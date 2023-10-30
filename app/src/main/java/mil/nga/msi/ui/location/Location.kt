@@ -1,8 +1,6 @@
 package mil.nga.msi.ui.location
 
 import android.location.Location
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.LatLngBounds
 import mil.nga.sf.Point
 import kotlin.math.PI
 import kotlin.math.atan
@@ -47,27 +45,6 @@ fun Point.webMercatorToWgs84(): Point {
    val longitude = lambda / PI * 180
 
    return Point(longitude, latitude)
-}
-
-fun LatLng.toPixel(tileBounds3857: LatLngBounds, tileSize: Double): Point {
-   val object3857Location = to3857()
-   val xPosition = (((object3857Location.x - tileBounds3857.southwest.longitude) / (tileBounds3857.northeast.longitude - tileBounds3857.southwest.longitude)) * tileSize)
-   val yPosition = tileSize - (((object3857Location.y - tileBounds3857.southwest.latitude) / (tileBounds3857.northeast.latitude - tileBounds3857.southwest.latitude)) * tileSize)
-   return Point(xPosition, yPosition)
-}
-
-fun LatLng.to3857(): Point {
-   val a = 6378137.0
-   val lambda = longitude / 180 * PI
-   val phi = latitude / 180 *  PI
-   val x = a * lambda
-   val y = a * ln(tan(PI / 4 + phi / 2))
-
-   return Point(x, y)
-}
-
-fun Double.toRadians(): Double {
-   return this * PI / 180.0
 }
 
 fun Double.toDegrees(): Double {

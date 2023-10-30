@@ -24,12 +24,12 @@ sealed class PortRoute(
    override val shortTitle: String,
    override val color: Color = DataSource.PORT.color
 ): Route {
-   object Main: PortRoute("ports", "World Ports", "Ports")
-   object Detail: PortRoute("ports/detail", "World Port Details", "Port Details")
-   object List: PortRoute("ports/list", "World Ports", "Ports")
-   object Sheet: PortRoute("ports/sheet", "World Port Sheet", "Port Sheet")
-   object Filter: PortRoute("ports/filter", "World Port Filter", "Port Filters")
-   object Sort: PortRoute("ports/sort", "World Port Sort", "Port Sort")
+   data object Main: PortRoute("ports", "World Ports", "Ports")
+   data object Detail: PortRoute("ports/detail", "World Port Details", "Port Details")
+   data object List: PortRoute("ports/list", "World Ports", "Ports")
+   data object Sheet: PortRoute("ports/sheet", "World Port Sheet", "Port Sheet")
+   data object Filter: PortRoute("ports/filter", "World Port Filter", "Port Filters")
+   data object Sort: PortRoute("ports/sort", "World Port Sort", "Port Sort")
 }
 
 @OptIn(ExperimentalMaterialNavigationApi::class)

@@ -24,7 +24,7 @@ import java.time.Instant
 import java.time.temporal.ChronoUnit
 
 class LoadModuWorkerFactory(private val dataSource: ModuLocalDataSource) : WorkerFactory() {
-   override fun createWorker(appContext: Context, workerClassName: String, workerParameters: WorkerParameters): ListenableWorker? {
+   override fun createWorker(appContext: Context, workerClassName: String, workerParameters: WorkerParameters): ListenableWorker {
       return LoadModuWorker(appContext, workerParameters, dataSource)
    }
 }
@@ -34,7 +34,7 @@ class RefreshModuWorkerFactory(
    private val userPreferencesRepository: UserPreferencesRepository,
    private val notification: MarlinNotification
 ) : WorkerFactory() {
-   override fun createWorker(appContext: Context, workerClassName: String, workerParameters: WorkerParameters): ListenableWorker? {
+   override fun createWorker(appContext: Context, workerClassName: String, workerParameters: WorkerParameters): ListenableWorker {
       return RefreshModuWorker(appContext, workerParameters, repository, userPreferencesRepository, notification)
    }
 }

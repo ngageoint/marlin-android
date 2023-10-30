@@ -3,24 +3,16 @@ package mil.nga.msi.ui.noticetomariners.query
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.launch
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.filter.NoticeToMarinersFilter
-import mil.nga.msi.filter.ComparatorType
 import mil.nga.msi.filter.Filter
 import mil.nga.msi.location.LocationPolicy
 import mil.nga.msi.repository.preferences.FilterRepository
 import javax.inject.Inject
-
-data class NoticeToMarinersLocationFilter(
-   val comparator: ComparatorType,
-   val location: LatLng? = null,
-   val distance: Float? = null,
-)
 
 @HiltViewModel
 class NoticeToMarinersQueryViewModel @Inject constructor(

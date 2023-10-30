@@ -8,23 +8,23 @@ import javax.inject.Singleton
 @Singleton
 class LocationPolicy @Inject constructor(val locationProvider: LocationProvider) {
 
-    var bestLocationProvider: MediatorLiveData<Location> = MediatorLiveData()
-    var filterLocationProvider: MediatorLiveData<Location> = MediatorLiveData()
+    var bestLocationProvider: MediatorLiveData<Location?> = MediatorLiveData()
+    var filterLocationProvider: MediatorLiveData<Location?> = MediatorLiveData()
 
-    var bestLocation: Location? = null
-    var filterLocation: Location? = null
+    private var bestLocation: Location? = null
+    private var filterLocation: Location? = null
 
     private val bestLocationObserver = { location: Location? ->
         if (location != null && isBetterLocation(location, bestLocation)) {
             bestLocation = location
-            bestLocationProvider.setValue(location)
+            bestLocationProvider.value = location
         }
     }
 
     private val filterLocationObserver = { location: Location? ->
         if (location != null && updateFilterLocation(location, filterLocation)) {
             filterLocation = location
-            filterLocationProvider.setValue(location)
+            filterLocationProvider.value = location
         }
     }
 

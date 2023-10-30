@@ -1,12 +1,12 @@
 package mil.nga.msi.network.electronicpublication
 
-import assertEPubsEqual
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
 import mil.nga.msi.ISO_OFFSET_DATE_TIME_MOD
 import mil.nga.msi.datasource.electronicpublication.ElectronicPublication
+import mil.nga.msi.datasource.electronicpublication.assertEPubsEqual
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Before
@@ -14,10 +14,9 @@ import org.junit.Test
 import java.io.StringReader
 import java.time.Instant
 
-
 class ElectronicPublicationTypeAdapterTest {
 
-    lateinit var subject: ElectronicPublicationTypeAdapter
+    private lateinit var subject: ElectronicPublicationTypeAdapter
 
     @Before
     fun setup() {
@@ -57,7 +56,7 @@ class ElectronicPublicationTypeAdapterTest {
     @Test
     fun deserializes_an_array() {
 
-        val jsonIn = JsonReader(StringReader("""[ ${ePubJson}, ${ePubJson} ]""" ))
+        val jsonIn = JsonReader(StringReader("""[ ${ePubJson}, $ePubJson ]""" ))
         val gson = GsonBuilder().registerTypeAdapter(object: TypeToken<ElectronicPublication>() {}.type, ElectronicPublicationTypeAdapter()).create()
         val read = gson.fromJson<List<ElectronicPublication>>(jsonIn, object: TypeToken<ArrayList<ElectronicPublication>>() {}.type)
 

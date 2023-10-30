@@ -6,7 +6,6 @@ import androidx.room.Entity
 import androidx.room.Index
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
-import mil.nga.msi.datasource.port.types.Decision
 import mil.nga.msi.datasource.port.types.EnumerationType
 import mil.nga.sf.geojson.Feature
 import mil.nga.sf.geojson.FeatureConverter

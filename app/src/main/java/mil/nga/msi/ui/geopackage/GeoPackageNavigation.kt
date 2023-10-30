@@ -16,7 +16,6 @@ import mil.nga.msi.ui.action.GeoPackageFeatureAction
 import mil.nga.msi.ui.geopackage.detail.GeoPackageFeatureDetailScreen
 import mil.nga.msi.ui.geopackage.media.GeoPackageMediaScreen
 import mil.nga.msi.ui.geopackage.sheet.GeoPackageFeatureSheetScreen
-import mil.nga.msi.ui.map.MapRoute
 import mil.nga.msi.ui.navigation.*
 
 sealed class GeoPackageRoute(
@@ -25,9 +24,9 @@ sealed class GeoPackageRoute(
    override val shortTitle: String,
    override val color: Color = DataSource.GEOPACKAGE.color
 ): Route {
-   object Detail: GeoPackageRoute("geopackage/detail", "GeoPackage Detail", "GeoPackage Detail")
-   object Media: GeoPackageRoute("geopackage/media", "GeoPackage Media", "GeoPackage Media")
-   object Sheet: GeoPackageRoute("geopackage/sheet", "GeoPackage Sheet", "GeoPackage Sheet")
+   data object Detail: GeoPackageRoute("geopackage/detail", "GeoPackage Detail", "GeoPackage Detail")
+   data object Media: GeoPackageRoute("geopackage/media", "GeoPackage Media", "GeoPackage Media")
+   data object Sheet: GeoPackageRoute("geopackage/sheet", "GeoPackage Sheet", "GeoPackage Sheet")
 }
 
 @OptIn(ExperimentalMaterialNavigationApi::class)

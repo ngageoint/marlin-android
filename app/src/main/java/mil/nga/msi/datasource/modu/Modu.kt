@@ -4,7 +4,6 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.google.android.gms.maps.model.LatLng
-import mil.nga.msi.datasource.bookmark.Bookmark
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale

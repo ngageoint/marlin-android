@@ -10,7 +10,7 @@ import mil.nga.sf.Geometry
 import mil.nga.sf.geojson.FeatureConverter
 import mil.nga.sf.geojson.GeometryCollection
 
-class NavigationalWarningDefinition() : DataSourceDefinition {
+class NavigationalWarningDefinition : DataSourceDefinition {
    override val tableName = "navigational_warnings"
    override val icon = MapAnnotation.Type.NAVIGATIONAL_WARNING.icon
    override val color = DataSource.NAVIGATION_WARNING.color

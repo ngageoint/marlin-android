@@ -22,7 +22,7 @@ import mil.nga.sf.Polygon
 
 private const val METERS_IN_NAUTICAL_MILE = 1852
 
-class LightDefinition() : DataSourceDefinition {
+class LightDefinition : DataSourceDefinition {
    override val tableName = "lights"
    override val icon = MapAnnotation.Type.LIGHT.icon
    override val color = DataSource.LIGHT.color
@@ -59,72 +59,69 @@ class LightDefinition() : DataSourceDefinition {
       val styleRows = mutableListOf<StyleRow>()
 
       tableStyles.styleDao.newRow().apply {
-         setName("RedLightStyle")
-         setColor(Color(LightColor.RED.color.red, LightColor.RED.color.green, LightColor.RED.color.blue))
-         setFillColor(Color(LightColor.RED.color.red, LightColor.RED.color.green, LightColor.RED.color.blue))
-         setFillOpacity(0.3)
-         setWidth(2.0)
+         name = "RedLightStyle"
+         color = Color(LightColor.RED.color.red, LightColor.RED.color.green, LightColor.RED.color.blue)
+         fillColor = Color(LightColor.RED.color.red, LightColor.RED.color.green, LightColor.RED.color.blue)
+         fillOpacity = 0.3
+         width = 2.0
       }?.let { styleRows.add(it) }
 
       tableStyles.styleDao.newRow().apply {
-         setName("GreenLightStyle")
-         setColor(Color(LightColor.GREEN.color.red, LightColor.GREEN.color.green, LightColor.GREEN.color.blue))
-         setFillColor(Color(LightColor.GREEN.color.red, LightColor.GREEN.color.green, LightColor.GREEN.color.blue))
-         setFillOpacity(0.3)
-         setWidth(2.0)
+         name = "GreenLightStyle"
+         color = Color(LightColor.GREEN.color.red, LightColor.GREEN.color.green, LightColor.GREEN.color.blue)
+         fillColor = Color(LightColor.GREEN.color.red, LightColor.GREEN.color.green, LightColor.GREEN.color.blue)
+         fillOpacity = 0.3
+         width = 2.0
       }?.let { styleRows.add(it) }
 
       tableStyles.styleDao.newRow().apply {
-         setName("BlueLightStyle")
-         setColor(Color(LightColor.BLUE.color.red, LightColor.BLUE.color.green, LightColor.BLUE.color.blue))
-         setFillColor(Color(LightColor.BLUE.color.red, LightColor.BLUE.color.green, LightColor.BLUE.color.blue))
-         setFillOpacity(0.3)
-         setWidth(2.0)
+         name = "BlueLightStyle"
+         color = Color(LightColor.BLUE.color.red, LightColor.BLUE.color.green, LightColor.BLUE.color.blue)
+         fillColor = Color(LightColor.BLUE.color.red, LightColor.BLUE.color.green, LightColor.BLUE.color.blue)
+         fillOpacity = 0.3
+         width = 2.0
       }?.let { styleRows.add(it) }
 
       tableStyles.styleDao.newRow().apply {
-         setName("WhiteLightStyle")
-         setColor(Color(LightColor.WHITE.color.red, LightColor.WHITE.color.green, LightColor.WHITE.color.blue))
-         setFillColor(Color(LightColor.WHITE.color.red, LightColor.WHITE.color.green, LightColor.WHITE.color.blue))
-         setFillOpacity(0.3)
-         setWidth(2.0)
+         name = "WhiteLightStyle"
+         color = Color(LightColor.WHITE.color.red, LightColor.WHITE.color.green, LightColor.WHITE.color.blue)
+         fillColor = Color(LightColor.WHITE.color.red, LightColor.WHITE.color.green, LightColor.WHITE.color.blue)
+         fillOpacity = 0.3
+         width = 2.0
       }?.let { styleRows.add(it) }
 
       tableStyles.styleDao.newRow().apply {
-         setName("YellowLightStyle")
-         setColor(Color(LightColor.YELLOW.color.red, LightColor.YELLOW.color.green, LightColor.YELLOW.color.blue))
-         setFillColor(Color(LightColor.YELLOW.color.red, LightColor.YELLOW.color.green, LightColor.YELLOW.color.blue))
-         setFillOpacity(0.3)
-         setWidth(2.0)
+         name = "YellowLightStyle"
+         color = Color(LightColor.YELLOW.color.red, LightColor.YELLOW.color.green, LightColor.YELLOW.color.blue)
+         fillColor = Color(LightColor.YELLOW.color.red, LightColor.YELLOW.color.green, LightColor.YELLOW.color.blue)
+         fillOpacity = 0.3
+         width = 2.0
       }?.let { styleRows.add(it) }
 
       tableStyles.styleDao.newRow().apply {
-         setName("VioletLightStyle")
-         setColor(Color(LightColor.VIOLET.color.red, LightColor.VIOLET.color.green, LightColor.VIOLET.color.blue))
-         setFillColor(Color(LightColor.VIOLET.color.red, LightColor.VIOLET.color.green, LightColor.VIOLET.color.blue))
-         setFillOpacity(0.3)
-         setWidth(2.0)
+         name = "VioletLightStyle"
+         color = Color(LightColor.VIOLET.color.red, LightColor.VIOLET.color.green, LightColor.VIOLET.color.blue)
+         fillColor = Color(LightColor.VIOLET.color.red, LightColor.VIOLET.color.green, LightColor.VIOLET.color.blue)
+         fillOpacity = 0.3
+         width = 2.0
       }?.let { styleRows.add(it) }
 
       tableStyles.styleDao.newRow().apply {
-         setName("OrangeLightStyle")
-         setColor(Color(LightColor.ORANGE.color.red, LightColor.ORANGE.color.green, LightColor.ORANGE.color.blue))
-         setFillColor(Color(LightColor.ORANGE.color.red, LightColor.ORANGE.color.green, LightColor.ORANGE.color.blue))
-         setFillOpacity(0.3)
-         setWidth(2.0)
+         name = "OrangeLightStyle"
+         color = Color(LightColor.ORANGE.color.red, LightColor.ORANGE.color.green, LightColor.ORANGE.color.blue)
+         fillColor = Color(LightColor.ORANGE.color.red, LightColor.ORANGE.color.green, LightColor.ORANGE.color.blue)
+         fillOpacity = 0.3
+         width = 2.0
       }?.let { styleRows.add(it) }
 
       return styleRows
    }
 }
 
-var transform: Light.() -> Unit = { println("Hello $this") }
-
-
 class LightFeature(
    private val light: Light
 ) : Feature {
-   override val geometry: Geometry?
+   override val geometry: Geometry
       get() {
          val geometries = geometryByColor()
          return if (geometries.isNotEmpty()) {
@@ -135,10 +132,6 @@ class LightFeature(
             collection
          } else Point(light.longitude, light.latitude)
       }
-
-   fun foo() {
-      transform(this.light)
-   }
 
    override val values = listOf(
       FeatureData("name", light.name),

@@ -15,12 +15,12 @@ import mil.nga.msi.ui.navigation.Route
 
 sealed class ExportRoute(
    override val name: String,
-   override val title: String,
-   override val shortTitle: String,
+   override val title: String = "GeoPackage Export",
+   override val shortTitle: String = "GeoPackage Export",
    override val color: Color = DataSource.ASAM.color
 ): Route {
-   object Main: ExportRoute("exportMain", "GeoPackage Export", "GeoPackage Export")
-   object Export: ExportRoute("export", "GeoPackage Export", "GeoPackage Export")
+   data object Main: ExportRoute("exportMain")
+   data object Export: ExportRoute("export")
 }
 
 fun NavGraphBuilder.exportGraph(

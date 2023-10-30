@@ -2,7 +2,6 @@ package mil.nga.msi.repository.modu
 
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.asLiveData
-import androidx.paging.testing.asPagingSourceFactory
 import androidx.work.Data
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
@@ -11,7 +10,6 @@ import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
@@ -26,7 +24,6 @@ import java.time.Instant
 import java.util.Date
 import java.util.UUID
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class ModuRepositoryTest {
 
    @Test

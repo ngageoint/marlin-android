@@ -27,12 +27,12 @@ sealed class DgpsStationRoute(
    override val shortTitle: String,
    override val color: Color = DataSource.DGPS_STATION.color
 ): Route {
-   object Main: DgpsStationRoute("dgpsStations", "Differential GPS Stations", "DGPS")
-   object Detail: DgpsStationRoute("dgpsStations/detail", "Differential GPS Station Details", "DGPS Details")
-   object List: DgpsStationRoute("dgpsStations/list", "Differential GPS Stations", "DGPS Stations")
-   object Sheet: DgpsStationRoute("dgpsStations/sheet", "Differential GPS Station Sheet", "DGPS Station Sheet")
-   object Filter: DgpsStationRoute("dgpsStations/filter", "Differential GPS Station Filter", "DGPS Station Filter")
-   object Sort: DgpsStationRoute("dgpsStations/sort", "Differential GPS Station Sort", "DGPS Station Sort")
+   data object Main: DgpsStationRoute("dgpsStations", "Differential GPS Stations", "DGPS")
+   data object Detail: DgpsStationRoute("dgpsStations/detail", "Differential GPS Station Details", "DGPS Details")
+   data object List: DgpsStationRoute("dgpsStations/list", "Differential GPS Stations", "DGPS Stations")
+   data object Sheet: DgpsStationRoute("dgpsStations/sheet", "Differential GPS Station Sheet", "DGPS Station Sheet")
+   data object Filter: DgpsStationRoute("dgpsStations/filter", "Differential GPS Station Filter", "DGPS Station Filter")
+   data  object Sort: DgpsStationRoute("dgpsStations/sort", "Differential GPS Station Sort", "DGPS Station Sort")
 }
 
 @OptIn(ExperimentalMaterialNavigationApi::class)

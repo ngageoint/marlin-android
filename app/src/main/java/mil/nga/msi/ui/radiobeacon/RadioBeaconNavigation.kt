@@ -27,12 +27,12 @@ sealed class RadioBeaconRoute(
    override val shortTitle: String,
    override val color: Color = DataSource.RADIO_BEACON.color
 ): Route {
-   object Main: RadioBeaconRoute("radioBeacons", "Radio Beacons", "Beacons")
-   object Detail: RadioBeaconRoute("radioBeacons/detail", "Radio Beacon Details", "Beacon Details")
-   object List: RadioBeaconRoute("radioBeacons/list", "Radio Beacons", "Beacons")
-   object Sheet: RadioBeaconRoute("radioBeacons/sheet", "Radio Beacon Sheet", "Beacon Sheet")
-   object Filter: RadioBeaconRoute("radioBeacons/filter", "Radio Beacon Filter", "Radio Beacon Filter")
-   object Sort: RadioBeaconRoute("radioBeacons/sort", "Radio Beacon Sort", "Radio Beacon Sort")
+   data object Main: RadioBeaconRoute("radioBeacons", "Radio Beacons", "Beacons")
+   data object Detail: RadioBeaconRoute("radioBeacons/detail", "Radio Beacon Details", "Beacon Details")
+   data object List: RadioBeaconRoute("radioBeacons/list", "Radio Beacons", "Beacons")
+   data object Sheet: RadioBeaconRoute("radioBeacons/sheet", "Radio Beacon Sheet", "Beacon Sheet")
+   data object Filter: RadioBeaconRoute("radioBeacons/filter", "Radio Beacon Filter", "Radio Beacon Filter")
+   data object Sort: RadioBeaconRoute("radioBeacons/sort", "Radio Beacon Sort", "Radio Beacon Sort")
 }
 
 @OptIn(ExperimentalMaterialNavigationApi::class)

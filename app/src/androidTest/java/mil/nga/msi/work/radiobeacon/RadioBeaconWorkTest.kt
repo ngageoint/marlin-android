@@ -15,9 +15,6 @@ import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.runBlocking
 import mil.nga.msi.MarlinNotification
 import mil.nga.msi.datasource.DataSource
-import mil.nga.msi.datasource.radiobeacon.RadioBeacon
-import mil.nga.msi.repository.port.PortLocalDataSource
-import mil.nga.msi.repository.port.PortRepository
 import mil.nga.msi.repository.preferences.UserPreferencesRepository
 import mil.nga.msi.repository.radiobeacon.RadioBeaconLocalDataSource
 import mil.nga.msi.repository.radiobeacon.RadioBeaconRepository
@@ -27,7 +24,7 @@ import java.time.Instant
 import java.time.temporal.ChronoUnit
 
 class LoadRadioBeaconWorkerFactory(private val dataSource: RadioBeaconLocalDataSource) : WorkerFactory() {
-   override fun createWorker(appContext: Context, workerClassName: String, workerParameters: WorkerParameters): ListenableWorker? {
+   override fun createWorker(appContext: Context, workerClassName: String, workerParameters: WorkerParameters): ListenableWorker {
       return LoadRadioBeaconWorker(appContext, workerParameters, dataSource)
    }
 }
@@ -37,7 +34,7 @@ class RefreshRadioBeaconWorkerFactory(
    private val userPreferencesRepository: UserPreferencesRepository,
    private val notification: MarlinNotification
 ) : WorkerFactory() {
-   override fun createWorker(appContext: Context, workerClassName: String, workerParameters: WorkerParameters): ListenableWorker? {
+   override fun createWorker(appContext: Context, workerClassName: String, workerParameters: WorkerParameters): ListenableWorker {
       return RefreshRadioBeaconWorker(appContext, workerParameters, repository, userPreferencesRepository, notification)
    }
 }

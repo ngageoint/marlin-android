@@ -6,14 +6,10 @@ import mil.nga.geopackage.extension.nga.style.StyleRow
 import mil.nga.mgrs.MGRS
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.radiobeacon.RadioBeacon
-import mil.nga.msi.geopackage.export.definition.DataSourceDefinition
-import mil.nga.msi.geopackage.export.definition.Feature
-import mil.nga.msi.geopackage.export.definition.FeatureColumn
-import mil.nga.msi.geopackage.export.definition.FeatureData
 import mil.nga.msi.ui.map.cluster.MapAnnotation
 import mil.nga.sf.Point
 
-class RadioBeaconDefinition() : DataSourceDefinition {
+class RadioBeaconDefinition : DataSourceDefinition {
    override val tableName = "radio_beacons"
    override val icon = MapAnnotation.Type.RADIO_BEACON.icon
    override val color = DataSource.RADIO_BEACON.color

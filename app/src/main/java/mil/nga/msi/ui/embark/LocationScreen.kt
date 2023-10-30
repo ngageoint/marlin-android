@@ -45,7 +45,7 @@ fun LocationScreen(
 private fun Location(
    done: () -> Unit,
 ) {
-   var height by remember { mutableStateOf(0) }
+   var height by remember { mutableIntStateOf(0) }
    val locationPermissionState = rememberMultiplePermissionsState(
       listOf(
          android.Manifest.permission.ACCESS_FINE_LOCATION,

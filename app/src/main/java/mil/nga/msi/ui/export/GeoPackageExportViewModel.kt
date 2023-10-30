@@ -53,8 +53,8 @@ import mil.nga.msi.repository.radiobeacon.RadioBeaconRepository
 import javax.inject.Inject
 
 sealed class ExportState {
-   object None: ExportState()
-   object Error: ExportState()
+   data object None: ExportState()
+   data object Error: ExportState()
    data class Creating(val status: Map<DataSource, ExportStatus>): ExportState()
    data class Complete(val uri: Uri, val status: Map<DataSource, ExportStatus>): ExportState()
 }

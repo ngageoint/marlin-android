@@ -2,7 +2,6 @@ package mil.nga.msi.network.asam
 
 import io.mockk.coEvery
 import io.mockk.mockk
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mil.nga.msi.datasource.asam.Asam
 import mil.nga.msi.repository.asam.AsamRemoteDataSource
@@ -11,7 +10,6 @@ import org.junit.Test
 import retrofit2.Response
 import java.util.Date
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class AsamServiceTest {
 
     @Test

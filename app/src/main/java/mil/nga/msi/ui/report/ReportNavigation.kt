@@ -16,10 +16,10 @@ sealed class ReportRoute(
    val icon: Int = 0,
    val url: String = ""
 ): Route {
-   object Main: ReportRoute("report", "Submit a Report to NGA")
-   object List: ReportRoute("report/list", "NGA Report Submission")
+   data object Main: ReportRoute("report", "Submit a Report to NGA")
+   data object List: ReportRoute("report/list", "NGA Report Submission")
 
-   object ASAM: ReportRoute(
+   data object ASAM: ReportRoute(
       name = "report/asam",
       title = "Anti-Shipping Activity Message ASAM",
       shortTitle = "ASAM Report",
@@ -27,7 +27,7 @@ sealed class ReportRoute(
       url = "https://msi.nga.mil/submit-report/ASAM-Report"
    )
 
-   object MODU: ReportRoute(
+   data object MODU: ReportRoute(
       name = "report/modu",
       title = "Mobile offshore Drilling Unit Movement Report MODU",
       shortTitle = "MODU Report",
@@ -35,7 +35,7 @@ sealed class ReportRoute(
       url = "https://msi.nga.mil/submit-report/MODU-Report"
    )
 
-   object Observer: ReportRoute(
+   data object Observer: ReportRoute(
       name = "report/observer",
       title = "Observer Report",
       shortTitle = "Observer Report",
@@ -43,7 +43,7 @@ sealed class ReportRoute(
       url = "https://msi.nga.mil/submit-report/Observ-Report"
    )
 
-   object PortVisit: ReportRoute(
+   data object PortVisit: ReportRoute(
       name = "report/portVisit",
       title = "US Navy Port Visit Request",
       shortTitle = "Port Visit Request",
@@ -51,7 +51,7 @@ sealed class ReportRoute(
       url = "https://msi.nga.mil/submit-report/Visit-Report"
    )
 
-   object HostileShip: ReportRoute(
+   data object HostileShip: ReportRoute(
       name = "report/hostileShip",
       title = "Ship Hostile Action Report",
       shortTitle = "Ship Hostile Action Report",

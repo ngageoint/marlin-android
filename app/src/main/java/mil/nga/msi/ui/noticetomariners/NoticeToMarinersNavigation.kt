@@ -30,13 +30,13 @@ sealed class NoticeToMarinersRoute(
    override val shortTitle: String,
    override val color: Color = DataSource.ASAM.color
 ): Route {
-   object Main: NoticeToMarinersRoute("ntms", "Notice To Mariners", "NTMs")
-   object Home: NoticeToMarinersRoute("ntms/home", "Notice To Mariners", "NTMs")
-   object All: NoticeToMarinersRoute("ntms/all", "Notice To Mariners", "NTMs")
-   object Query: NoticeToMarinersRoute("ntms/query", "Notice To Mariners", "NTMs")
-   object Corrections: NoticeToMarinersRoute("ntms/corrections", "Chart Corrections", "NTMs")
-   object Detail: NoticeToMarinersRoute("ntms/detail", "Notice To Mariners", "NTMs")
-   object Graphic: NoticeToMarinersRoute("ntms/graphic", "Notice To Mariners Graphic", "NTMs Graphic")
+   data object Main: NoticeToMarinersRoute("ntms", "Notice To Mariners", "NTMs")
+   data object Home: NoticeToMarinersRoute("ntms/home", "Notice To Mariners", "NTMs")
+   data object All: NoticeToMarinersRoute("ntms/all", "Notice To Mariners", "NTMs")
+   data object Query: NoticeToMarinersRoute("ntms/query", "Notice To Mariners", "NTMs")
+   data object Corrections: NoticeToMarinersRoute("ntms/corrections", "Chart Corrections", "NTMs")
+   data object Detail: NoticeToMarinersRoute("ntms/detail", "Notice To Mariners", "NTMs")
+   data object Graphic: NoticeToMarinersRoute("ntms/graphic", "Notice To Mariners Graphic", "NTMs Graphic")
 }
 
 fun NavGraphBuilder.noticeToMarinersGraph(

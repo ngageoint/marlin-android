@@ -1,7 +1,6 @@
 package mil.nga.msi.startup
 
 import android.content.Context
-import android.util.Log
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.startup.Initializer
 import androidx.work.Configuration

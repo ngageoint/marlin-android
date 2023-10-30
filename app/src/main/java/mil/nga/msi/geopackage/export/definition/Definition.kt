@@ -17,10 +17,10 @@ data class FeatureData(
 )
 
 interface Feature {
-   abstract val geometry: Geometry?
-   abstract val values: List<FeatureData>
+   val geometry: Geometry?
+   val values: List<FeatureData>
 
-   open fun createFeature(
+   fun createFeature(
       geoPackage: GeoPackage,
       table: FeatureTable,
       styleRows: List<StyleRow>
@@ -49,7 +49,7 @@ interface DataSourceDefinition {
    val color: Color
    val columns: List<FeatureColumn>
 
-   abstract fun getStyles(tableStyles: FeatureTableStyles): List<StyleRow>
+   fun getStyles(tableStyles: FeatureTableStyles): List<StyleRow>
 
    companion object {
       fun fromDataSource(dataSource: DataSource): DataSourceDefinition {

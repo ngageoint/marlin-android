@@ -207,7 +207,7 @@ class DMS(
                val lastDirectionIndex = parsable.indexOfLast { "NSEW".contains(it.uppercase()) }
 
                if (firstDirectionIndex == 0) {
-                  if (lastDirectionIndex != firstDirectionIndex) {
+                  if (lastDirectionIndex != 0) {
                      return listOf(
                         parsable.substring(0, lastDirectionIndex - 1),
                         parsable.substring(lastDirectionIndex)

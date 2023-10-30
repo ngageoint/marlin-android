@@ -5,14 +5,12 @@ import androidx.navigation.NavController
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.modu.Modu
-import mil.nga.msi.ui.export.ExportRoute
 import mil.nga.msi.ui.map.MapRoute
 import mil.nga.msi.ui.modu.ModuRoute
 import mil.nga.msi.ui.navigation.NavPoint
 
-sealed class ModuAction(): Action() {
+sealed class ModuAction : Action() {
    class Tap(val modu: Modu): ModuAction() {
       override fun navigate(navController: NavController) {
          navController.navigate("${ModuRoute.Detail.name}?name=${modu.name}")

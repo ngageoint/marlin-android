@@ -3,7 +3,6 @@ package mil.nga.msi.datasource.navigationwarning
 import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteQuery
 import kotlinx.coroutines.flow.Flow
-import mil.nga.msi.datasource.asam.Asam
 import java.util.*
 
 @Dao

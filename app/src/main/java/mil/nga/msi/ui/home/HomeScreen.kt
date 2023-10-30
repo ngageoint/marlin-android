@@ -1,11 +1,8 @@
 package mil.nga.msi.ui.home
 
-import android.content.ClipData
-import android.content.ClipDescription
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.runtime.LaunchedEffect
-import androidx.core.app.ShareCompat
 import androidx.core.os.BundleCompat
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder

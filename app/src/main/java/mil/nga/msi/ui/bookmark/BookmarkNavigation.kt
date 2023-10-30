@@ -31,9 +31,9 @@ sealed class BookmarkRoute(
    override val shortTitle: String,
    override val color: Color = Color.Transparent
 ): Route {
-   object Main: BookmarkRoute("bookmarks/main", "Bookmarks", "Bookmarks")
-   object List: BookmarkRoute("bookmarks/list", "Bookmarks", "Bookmarks")
-   object Notes: BookmarkRoute("bookmarks/notes", "Bookmark Notes", "Notes")
+   data object Main: BookmarkRoute("bookmarks/main", "Bookmarks", "Bookmarks")
+   data object List: BookmarkRoute("bookmarks/list", "Bookmarks", "Bookmarks")
+   data object Notes: BookmarkRoute("bookmarks/notes", "Bookmark Notes", "Notes")
 }
 
 @OptIn(ExperimentalMaterialNavigationApi::class)

@@ -10,7 +10,7 @@ import mil.nga.msi.ui.map.cluster.MapAnnotation
 import mil.nga.msi.ui.port.detail.asNonZeroOrNull
 import mil.nga.sf.Point
 
-class PortDefinition() : DataSourceDefinition {
+class PortDefinition : DataSourceDefinition {
    override val tableName = "ports"
    override val icon = MapAnnotation.Type.PORT.icon
    override val color = DataSource.PORT.color

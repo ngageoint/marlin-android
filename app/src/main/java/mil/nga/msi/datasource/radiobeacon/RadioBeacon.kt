@@ -3,7 +3,6 @@ package mil.nga.msi.datasource.radiobeacon
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import com.google.android.gms.maps.model.LatLng
-import mil.nga.msi.coordinate.DMS
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.light.LightSector
 
@@ -137,14 +136,12 @@ data class RadioBeacon(
                arrayOf("startdeg", "startminutes", "enddeg", "endminutes").forEach { name ->
                   val component = groups[name]
                   if (component != null) {
-                     if (name == "startdeg") {
-                        start = (start ?: 0.0) + (remark.substring(component.range).toDoubleOrNull() ?: 0.0) - 90
-                     } else if (name == "startminutes") {
-                        start = (start ?: 0.0) + ((remark.substring(component.range).toDoubleOrNull() ?: 0.0)  / 60)
-                     } else if (name == "enddeg") {
-                        end = (remark.substring(component.range).toDoubleOrNull() ?: 0.0) - 90
-                     } else if (name == "endminutes") {
-                        end += (remark.substring(component.range).toDoubleOrNull() ?: 0.0) / 60
+                     when(name) {
+                        "startdeg" ->  start = (start ?: 0.0) + (remark.substring(component.range).toDoubleOrNull() ?: 0.0) - 90
+                        "startminutes" ->  start = (start ?: 0.0) + ((remark.substring(component.range).toDoubleOrNull() ?: 0.0)  / 60)
+                        "enddeg" ->  end = (remark.substring(component.range).toDoubleOrNull() ?: 0.0) - 90
+                        "endminutes" ->  end += (remark.substring(component.range).toDoubleOrNull() ?: 0.0) / 60
+
                      }
                   }
                }

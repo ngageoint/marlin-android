@@ -11,19 +11,19 @@ import mil.nga.msi.datasource.navigationwarning.NavigationArea
 sealed class ExportDataSource(val dataSource: DataSource) : Parcelable {
    @Parcelize
    @Serializable
-   object Asam: ExportDataSource(DataSource.ASAM)
+   data object Asam: ExportDataSource(DataSource.ASAM)
 
    @Parcelize
    @Serializable
-   object DgpsStation: ExportDataSource(DataSource.DGPS_STATION)
+   data object DgpsStation: ExportDataSource(DataSource.DGPS_STATION)
 
    @Parcelize
    @Serializable
-   object Light: ExportDataSource(DataSource.LIGHT)
+   data object Light: ExportDataSource(DataSource.LIGHT)
 
    @Parcelize
    @Serializable
-   object Modu: ExportDataSource(DataSource.MODU)
+   data object Modu: ExportDataSource(DataSource.MODU)
 
    @Parcelize
    @Serializable
@@ -31,22 +31,22 @@ sealed class ExportDataSource(val dataSource: DataSource) : Parcelable {
 
    @Parcelize
    @Serializable
-   object Port: ExportDataSource(DataSource.PORT)
+   data object Port: ExportDataSource(DataSource.PORT)
 
    @Parcelize
    @Serializable
-   object RadioBeacon: ExportDataSource(DataSource.RADIO_BEACON)
+   data object RadioBeacon: ExportDataSource(DataSource.RADIO_BEACON)
 
    companion object {
       fun fromDataSource(dataSource: DataSource): ExportDataSource? {
          return when (dataSource) {
-            DataSource.ASAM -> ExportDataSource.Asam
-            DataSource.DGPS_STATION -> ExportDataSource.DgpsStation
-            DataSource.LIGHT -> ExportDataSource.Light
-            DataSource.MODU -> ExportDataSource.Modu
-            DataSource.NAVIGATION_WARNING -> ExportDataSource.NavigationalWarning()
-            DataSource.PORT -> ExportDataSource.Port
-            DataSource.RADIO_BEACON -> ExportDataSource.RadioBeacon
+            DataSource.ASAM -> Asam
+            DataSource.DGPS_STATION -> DgpsStation
+            DataSource.LIGHT -> Light
+            DataSource.MODU -> Modu
+            DataSource.NAVIGATION_WARNING -> NavigationalWarning()
+            DataSource.PORT -> Port
+            DataSource.RADIO_BEACON -> RadioBeacon
             else -> null
          }
       }

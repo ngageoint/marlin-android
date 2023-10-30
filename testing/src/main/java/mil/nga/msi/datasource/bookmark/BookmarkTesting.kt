@@ -1,4 +1,5 @@
-import mil.nga.msi.datasource.bookmark.Bookmark
+package mil.nga.msi.datasource.bookmark
+
 import org.junit.Assert
 
 /**

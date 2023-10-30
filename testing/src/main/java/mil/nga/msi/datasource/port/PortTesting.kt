@@ -1,4 +1,5 @@
-import mil.nga.msi.datasource.port.Port
+package mil.nga.msi.datasource.port
+
 import org.junit.Assert
 
 /**

@@ -17,11 +17,11 @@ sealed class AboutRoute(
    override val shortTitle: String = title,
    override val color: Color = Color(0xFF000000)
 ): Route {
-   object Main: AboutRoute("about", "About")
-   object List: AboutRoute("about/list", "Settings")
-   object Licenses: AboutRoute("about/acknowledgements", "Acknowledgements")
-   object Disclaimer: AboutRoute("about/disclaimer", "Disclaimer")
-   object Privacy: AboutRoute("about/privacy", "Privacy Policy")
+   data object Main: AboutRoute("about", "About")
+   data object List: AboutRoute("about/list", "Settings")
+   data object Licenses: AboutRoute("about/acknowledgements", "Acknowledgements")
+   data object Disclaimer: AboutRoute("about/disclaimer", "Disclaimer")
+   data object Privacy: AboutRoute("about/privacy", "Privacy Policy")
 }
 
 fun NavGraphBuilder.settingsGraph(

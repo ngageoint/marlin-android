@@ -4,7 +4,6 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.google.android.gms.maps.model.LatLng
-import mil.nga.msi.coordinate.DMS
 import mil.nga.msi.datasource.port.types.Decision
 import mil.nga.msi.datasource.port.types.HarborType
 import mil.nga.msi.datasource.port.types.HarborUse

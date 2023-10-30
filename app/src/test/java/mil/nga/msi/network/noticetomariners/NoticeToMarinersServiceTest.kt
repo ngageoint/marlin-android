@@ -4,7 +4,6 @@ import android.app.Application
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mil.nga.msi.datasource.noticetomariners.NoticeToMariners
 import mil.nga.msi.repository.noticetomariners.NoticeToMarinersLocalDataSource
@@ -14,7 +13,6 @@ import org.junit.Test
 import retrofit2.Response
 import java.util.Calendar
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class NoticeToMarinersServiceTest {
 
     @Test

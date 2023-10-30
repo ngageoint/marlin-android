@@ -1,5 +1,5 @@
-//package mil.nga.msi.ui.about
-//
+package mil.nga.msi.ui.about
+
 //import androidx.compose.ui.test.assertIsDisplayed
 //import androidx.compose.ui.test.junit4.createComposeRule
 //import androidx.compose.ui.test.onNodeWithContentDescription

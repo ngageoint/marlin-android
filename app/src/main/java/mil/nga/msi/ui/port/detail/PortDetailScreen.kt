@@ -275,7 +275,7 @@ private fun PortSection(
          Card(
             modifier = Modifier.padding(vertical = 8.dp)
          ) {
-            Column() {
+            Column {
                section.forEach { entry ->
                   PortProperty(title = entry.key, value = entry.value)
                }

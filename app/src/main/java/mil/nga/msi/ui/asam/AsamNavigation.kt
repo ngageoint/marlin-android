@@ -24,12 +24,12 @@ sealed class AsamRoute(
    override val shortTitle: String,
    override val color: Color = DataSource.ASAM.color
 ): Route {
-   object Main: AsamRoute("asams", "Anti-Shipping Activity Messages", "ASAMs")
-   object Detail: AsamRoute("asams/detail", "Anti-Shipping Activity Message Details", "ASAM Details")
-   object List: AsamRoute("asams/list", "Anti-Shipping Activity Messages", "ASAMs")
-   object Sheet: AsamRoute("asams/sheet", "Anti-Shipping Activity Message Sheet", "ASAM Sheet")
-   object Filter: AsamRoute("asams/filter", "Anti-Shipping Activity Message Filter", "ASAM Filters")
-   object Sort: AsamRoute("asams/sort", "Anti-Shipping Activity Message Sort", "ASAM Sort")
+   data object Main: AsamRoute("asams", "Anti-Shipping Activity Messages", "ASAMs")
+   data object Detail: AsamRoute("asams/detail", "Anti-Shipping Activity Message Details", "ASAM Details")
+   data object List: AsamRoute("asams/list", "Anti-Shipping Activity Messages", "ASAMs")
+   data object Sheet: AsamRoute("asams/sheet", "Anti-Shipping Activity Message Sheet", "ASAM Sheet")
+   data object Filter: AsamRoute("asams/filter", "Anti-Shipping Activity Message Filter", "ASAM Filters")
+   data object Sort: AsamRoute("asams/sort", "Anti-Shipping Activity Message Sort", "ASAM Sort")
 }
 
 @OptIn(ExperimentalMaterialNavigationApi::class)

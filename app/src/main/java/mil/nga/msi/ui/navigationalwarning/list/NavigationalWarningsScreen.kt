@@ -45,7 +45,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.launch
-import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.navigationwarning.NavigationArea
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarning
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarningListItem

@@ -25,12 +25,12 @@ sealed class ModuRoute(
    override val shortTitle: String,
    override val color: Color = DataSource.MODU.color
 ): Route {
-   object Main: ModuRoute("modus", "Mobile Offshore Drilling Units", "MODUs")
-   object Detail: ModuRoute("modus/detail", "Mobile Offshore Drilling Unit Details", "MODU Details")
-   object List: ModuRoute("modus/list", "Mobile Offshore Drilling Units", "MODUs")
-   object Filter: ModuRoute("modus/filter", "Mobile Offshore Drilling Units Filters", "MODU Filters")
-   object Sort: ModuRoute("modus/sort", "Mobile Offshore Drilling Units Sort", "MODU Sort")
-   object Sheet: ModuRoute("modus/sheet", "Mobile Offshore Drilling Unit Sheet", "Modu Sheet")
+   data object Main: ModuRoute("modus", "Mobile Offshore Drilling Units", "MODUs")
+   data object Detail: ModuRoute("modus/detail", "Mobile Offshore Drilling Unit Details", "MODU Details")
+   data object List: ModuRoute("modus/list", "Mobile Offshore Drilling Units", "MODUs")
+   data object Filter: ModuRoute("modus/filter", "Mobile Offshore Drilling Units Filters", "MODU Filters")
+   data object Sort: ModuRoute("modus/sort", "Mobile Offshore Drilling Units Sort", "MODU Sort")
+   data object Sheet: ModuRoute("modus/sheet", "Mobile Offshore Drilling Unit Sheet", "Modu Sheet")
 }
 
 @OptIn(ExperimentalMaterialNavigationApi::class)

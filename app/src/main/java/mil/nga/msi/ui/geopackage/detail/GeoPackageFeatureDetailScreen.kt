@@ -95,7 +95,7 @@ fun GeoPackageFeatureDetailScreen(
             }
          },
          onCopyLocation = { onAction(GeoPackageFeatureAction.Location(it)) },
-         onMedia = { onAction(GeoPackageFeatureAction.Media(it)) }
+         onMedia = { onAction(GeoPackageFeatureAction.Media) }
       )
    }
 }
@@ -188,7 +188,7 @@ fun FeatureDetails(
                )
             }
 
-            GeoPackageProperties(feature.properties) { property ->
+            GeoPackageProperties(feature.properties) { property: GeoPackageMediaProperty ->
                val key = GeoPackageMediaKey(feature.id, property.mediaTable, property.mediaId)
                onMedia(key)
             }

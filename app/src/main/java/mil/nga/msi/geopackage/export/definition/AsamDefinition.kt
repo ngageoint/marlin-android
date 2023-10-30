@@ -9,7 +9,7 @@ import mil.nga.msi.datasource.asam.Asam
 import mil.nga.msi.ui.map.cluster.MapAnnotation
 import mil.nga.sf.Point
 
-class AsamDefinition() : DataSourceDefinition {
+class AsamDefinition : DataSourceDefinition {
    override val tableName = "asams"
    override val icon = MapAnnotation.Type.ASAM.icon
    override val color = DataSource.ASAM.color

@@ -8,7 +8,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.google.maps.android.compose.*
 import kotlinx.coroutines.launch
 import mil.nga.msi.datasource.layer.Layer
 import mil.nga.msi.ui.main.TopBar
@@ -58,7 +57,6 @@ fun MapGeoPackageLayerScreen(
    }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun GeoPackageLayer(
    name: String,

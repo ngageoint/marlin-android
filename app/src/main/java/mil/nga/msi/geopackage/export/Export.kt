@@ -108,10 +108,10 @@ class Export @Inject constructor(
       val geometryColumns = GeometryColumns()
       geometryColumns.tableName = definition.tableName
       geometryColumns.columnName = "geometry"
-      geometryColumns.setGeometryType(GeometryType.GEOMETRY)
+      geometryColumns.geometryType = GeometryType.GEOMETRY
       geometryColumns.z = 0
       geometryColumns.m = 0
-      geometryColumns.setSrs(srs)
+      geometryColumns.srs = srs
 
       val columns = mutableListOf<FeatureColumn>()
       val dataColumns = mutableListOf<DataColumns>()
@@ -152,13 +152,13 @@ class Export @Inject constructor(
       val featureTableStyles = FeatureTableStyles(geoPackage, featureTable)
       val styleDao = style.styleDao
       val tableStyleDefault = styleDao.newRow()
-      tableStyleDefault.setName("${definition.tableName} Style")
-      tableStyleDefault.setColor(Color(definition.color.red, definition.color.green, definition.color.blue))
-      tableStyleDefault.setFillColor(Color(definition.color.red, definition.color.green, definition.color.blue))
+      tableStyleDefault.name = "${definition.tableName} Style"
+      tableStyleDefault.color = Color(definition.color.red, definition.color.green, definition.color.blue)
+      tableStyleDefault.fillColor = Color(definition.color.red, definition.color.green, definition.color.blue)
       tableStyleDefault.opacity = definition.color.alpha.toDouble()
-      tableStyleDefault.setFillOpacity(0.3)
-      tableStyleDefault.setWidth(2.0)
-      featureTableStyles.setTableStyleDefault(tableStyleDefault)
+      tableStyleDefault.fillOpacity = 0.3
+      tableStyleDefault.width = 2.0
+      featureTableStyles.tableStyleDefault = tableStyleDefault
 
       val bitmap = ContextCompat.getDrawable(application, definition.icon)?.toBitmap()!!
 
@@ -174,7 +174,7 @@ class Export @Inject constructor(
       iconStyleDefault.data = imageData
       iconStyleDefault.width = 30.0
       iconStyleDefault.height = 30.0
-      featureTableStyles.setTableIconDefault(iconStyleDefault)
+      featureTableStyles.tableIconDefault = iconStyleDefault
 
       return featureTable
    }

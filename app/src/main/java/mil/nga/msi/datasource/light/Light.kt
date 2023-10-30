@@ -5,7 +5,6 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import com.google.android.gms.maps.model.LatLng
-import mil.nga.msi.coordinate.DMS
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
@@ -207,27 +206,19 @@ data class Light(
             arrayOf("visible", "fullLightObscured", "color", "unintensified", "obscured", "startdeg", "startminutes", "enddeg", "endminutes").forEach { name ->
                val component = matcher.group(name)
                if (component?.isNotEmpty() == true) {
-                  if (name == "visible") {
-                     visibleColor = lightColors.firstOrNull()
-                  }
-                  else if (name == "fullLightObscured") {
-                     visibleColor = lightColors.firstOrNull()
-                     fullLightObscured = true
-                  }
-                  else if (name == "color") {
-                     color = component
-                  }
-                  else if (name == "obscured") {
-                     obscured = true
-                  }
-                  else if (name == "startdeg") {
-                     start = (start ?: 0.0) + (component.toDoubleOrNull() ?: 0.0)
-                  } else if (name == "startminutes") {
-                     start = (start ?: 0.0) + ((component.toDoubleOrNull() ?: 0.0)  / 60)
-                  } else if (name == "enddeg") {
-                     end = component.toDoubleOrNull() ?: 0.0
-                  } else if (name == "endminutes") {
-                     end += (component.toDoubleOrNull() ?: 0.0) / 60
+                  when(name) {
+                     "visible" ->  visibleColor = lightColors.firstOrNull()
+                     "fullLightObscured" -> {
+                        visibleColor = lightColors.firstOrNull()
+                        fullLightObscured = true
+                     }
+                     "color" ->  color = component
+                     "obscured" ->  obscured = true
+                     "startdeg" -> start = (start ?: 0.0) + (component.toDoubleOrNull() ?: 0.0)
+                     "startminutes" ->  start = (start ?: 0.0) + ((component.toDoubleOrNull() ?: 0.0)  / 60)
+                     "enddeg" ->  end = component.toDoubleOrNull() ?: 0.0
+                     "endminutes" ->  end += (component.toDoubleOrNull() ?: 0.0) / 60
+
                   }
                }
             }
@@ -372,7 +363,7 @@ data class Light(
          "removeFromList: ${removeFromList.orEmpty()}\n" +
          "structure: ${structure.orEmpty()}\n" +
          "subregionHeading: ${subregionHeading.orEmpty()}\n" +
-         "volumeNumber: ${volumeNumber}"
+         "volumeNumber: $volumeNumber"
    }
 
    companion object {

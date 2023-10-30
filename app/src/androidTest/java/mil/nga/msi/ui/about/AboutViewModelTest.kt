@@ -1,4 +1,4 @@
-//package mil.nga.msi.ui.about
+package mil.nga.msi.ui.about
 //
 //import kotlinx.coroutines.ExperimentalCoroutinesApi
 //import kotlinx.coroutines.flow.emptyFlow

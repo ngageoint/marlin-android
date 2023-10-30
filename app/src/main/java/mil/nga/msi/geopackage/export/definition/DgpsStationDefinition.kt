@@ -6,14 +6,10 @@ import mil.nga.geopackage.extension.nga.style.StyleRow
 import mil.nga.mgrs.MGRS
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.dgpsstation.DgpsStation
-import mil.nga.msi.geopackage.export.definition.DataSourceDefinition
-import mil.nga.msi.geopackage.export.definition.Feature
-import mil.nga.msi.geopackage.export.definition.FeatureColumn
-import mil.nga.msi.geopackage.export.definition.FeatureData
 import mil.nga.msi.ui.map.cluster.MapAnnotation
 import mil.nga.sf.Point
 
-class DgpsStationDefinition() : DataSourceDefinition {
+class DgpsStationDefinition : DataSourceDefinition {
    override val tableName = "dgps_stations"
    override val icon = MapAnnotation.Type.DGPS_STATION.icon
    override val color = DataSource.DGPS_STATION.color

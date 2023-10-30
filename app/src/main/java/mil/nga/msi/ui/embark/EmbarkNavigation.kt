@@ -14,12 +14,12 @@ sealed class EmbarkRoute(
    override val shortTitle: String = "",
    override val color: Color = Color.Transparent
 ): Route {
-   object Welcome: EmbarkRoute("embark/welcome")
-   object Disclaimer: EmbarkRoute("embark/disclaimer")
-   object Location: EmbarkRoute("embark/Location")
-   object Notification: EmbarkRoute("embark/notification")
-   object Tabs: EmbarkRoute("embark/tabs")
-   object Map: EmbarkRoute("embark/map")
+   data object Welcome: EmbarkRoute("embark/welcome")
+   data object Disclaimer: EmbarkRoute("embark/disclaimer")
+   data object Location: EmbarkRoute("embark/Location")
+   data object Notification: EmbarkRoute("embark/notification")
+   data object Tabs: EmbarkRoute("embark/tabs")
+   data object Map: EmbarkRoute("embark/map")
 }
 
 fun NavGraphBuilder.embarkGraph(

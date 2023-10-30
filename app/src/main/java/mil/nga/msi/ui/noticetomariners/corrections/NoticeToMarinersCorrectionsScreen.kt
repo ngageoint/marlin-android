@@ -143,13 +143,14 @@ private fun Chart(
       animationSpec = tween(
          durationMillis = 250,
          easing = FastOutSlowInEasing
-      )
+      ),
+      label = "angle_animator"
    )
 
    Card(
       modifier = Modifier.padding(top = 8.dp, start = 8.dp, end = 8.dp)
    ) {
-      Column() {
+      Column {
          Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(vertical = 16.dp)

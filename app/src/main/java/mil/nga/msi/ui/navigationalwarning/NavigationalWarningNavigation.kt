@@ -33,11 +33,11 @@ sealed class NavigationWarningRoute(
    override val shortTitle: String,
    override val color: Color = DataSource.NAVIGATION_WARNING.color
 ): Route {
-   object Main: NavigationWarningRoute("navigational_warnings", "Navigational Warnings", "Warnings")
-   object Group: NavigationWarningRoute("navigational_warnings/group", "Navigational Warnings", "Navigational Warnings")
-   object List: NavigationWarningRoute("navigational_warnings/list", "Navigational Warnings", "Navigational Warnings")
-   object Detail: NavigationWarningRoute("navigational_warnings/detail", "Navigational Warning Details", "Navigational Warning Details")
-   object Sheet: NavigationWarningRoute("navigational_warnings/sheet", "Navigational Warning Sheet", "Navigational Warning Sheet")
+   data object Main: NavigationWarningRoute("navigational_warnings", "Navigational Warnings", "Warnings")
+   data object Group: NavigationWarningRoute("navigational_warnings/group", "Navigational Warnings", "Navigational Warnings")
+   data object List: NavigationWarningRoute("navigational_warnings/list", "Navigational Warnings", "Navigational Warnings")
+   data object Detail: NavigationWarningRoute("navigational_warnings/detail", "Navigational Warning Details", "Navigational Warning Details")
+   data object Sheet: NavigationWarningRoute("navigational_warnings/sheet", "Navigational Warning Sheet", "Navigational Warning Sheet")
 }
 
 @OptIn(ExperimentalMaterialNavigationApi::class)

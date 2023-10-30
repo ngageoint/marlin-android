@@ -28,8 +28,6 @@ class NoticeToMarinersRepository @Inject constructor(
       return localDataSource.observeNoticeToMarinersListItems()
    }
 
-   suspend fun getNoticeToMariners(noticeNumber: Int) = localDataSource.getNoticeToMariners(noticeNumber)
-
    suspend fun getNoticeToMarinersGraphics(noticeNumber: Int): List<NoticeToMarinersGraphics> {
       return remoteDataSource.fetchNoticeToMarinersGraphics(noticeNumber)
    }

@@ -306,7 +306,7 @@ private fun NavigationRow(
    onMapClicked: (() -> Unit)? = null,
    onDestinationClicked: (route: Route) -> Unit
 ) {
-   val elevation by animateDpAsState(if (isDragging) 4.dp else 0.dp)
+   val elevation by animateDpAsState(if (isDragging) 4.dp else 0.dp, label = "elevation_animator")
 
    Surface(
       tonalElevation = elevation,

@@ -1,9 +1,9 @@
 package mil.nga.msi.network.asam
 
-import assertAsamsEqual
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
 import mil.nga.msi.datasource.asam.Asam
+import mil.nga.msi.datasource.asam.assertAsamsEqual
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -32,7 +32,7 @@ class AsamTypeAdapterTest {
     }
 
     companion object {
-        val dateFormat = SimpleDateFormat("yyyy-MM-dd")
+        private val dateFormat = SimpleDateFormat("yyyy-MM-dd")
 
         const val asamJson = """
             {

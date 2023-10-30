@@ -11,7 +11,7 @@ import mil.nga.msi.ui.light.LightRoute
 import mil.nga.msi.ui.map.MapRoute
 import mil.nga.msi.ui.navigation.NavPoint
 
-sealed class LightAction(): Action() {
+sealed class LightAction : Action() {
    class Tap(val light: Light): LightAction() {
       override fun navigate(navController: NavController) {
          val key = LightKey.fromLight(light)

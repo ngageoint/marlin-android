@@ -19,8 +19,6 @@ class NoticeToMarinersLocalDataSource @Inject constructor(
 
    suspend fun getNoticeToMariners() = dao.getNoticeToMariners()
 
-   suspend fun getNoticeToMariners(noticeNumber: Int) = dao.getNoticeToMariners(noticeNumber)
-
    suspend fun existingNoticeToMariners(odsEntryIds: List<Int>) = dao.getNoticeToMariners(odsEntryIds)
 
    suspend fun insert(noticeToMariners: List<NoticeToMariners>) = dao.insert(noticeToMariners)

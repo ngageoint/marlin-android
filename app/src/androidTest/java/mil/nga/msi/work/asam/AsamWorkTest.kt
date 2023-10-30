@@ -22,10 +22,9 @@ import org.junit.After
 import org.junit.Test
 import java.time.Instant
 import java.time.temporal.ChronoUnit
-import java.time.temporal.TemporalUnit
 
 class LoadAsamWorkerFactory(private val dataSource: AsamLocalDataSource) : WorkerFactory() {
-   override fun createWorker(appContext: Context, workerClassName: String, workerParameters: WorkerParameters): ListenableWorker? {
+   override fun createWorker(appContext: Context, workerClassName: String, workerParameters: WorkerParameters): ListenableWorker {
       return LoadAsamWorker(appContext, workerParameters, dataSource)
    }
 }
@@ -35,7 +34,7 @@ class RefreshAsamWorkerFactory(
    private val userPreferencesRepository: UserPreferencesRepository,
    private val notification: MarlinNotification
 ) : WorkerFactory() {
-   override fun createWorker(appContext: Context, workerClassName: String, workerParameters: WorkerParameters): ListenableWorker? {
+   override fun createWorker(appContext: Context, workerClassName: String, workerParameters: WorkerParameters): ListenableWorker {
       return RefreshAsamWorker(appContext, workerParameters, repository, userPreferencesRepository, notification)
    }
 }

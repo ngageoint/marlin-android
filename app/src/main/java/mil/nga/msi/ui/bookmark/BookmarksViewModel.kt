@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import mil.nga.geopackage.GeoPackage
 import mil.nga.geopackage.GeoPackageManager
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.bookmark.Bookmark

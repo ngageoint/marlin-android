@@ -44,12 +44,12 @@ sealed class MapRoute(
    override val shortTitle: String = title,
    override val color: Color = Color.Transparent
 ): Route {
-   object Map: MapRoute("map", "Map")
-   object Settings: MapRoute("mapSettings", "Map Settings")
-   object WMSLayer: MapRoute("mapWMSLayer", "WMS Layer")
-   object LightSettings: MapRoute("lightSettings", "Light Settings")
-   object PagerSheet: MapRoute("annotationPagerSheet", "Map")
-   object Filter: MapRoute("mapFilter", "Filters", "Filters")
+   data object Map: MapRoute("map", "Map")
+   data object Settings: MapRoute("mapSettings", "Map Settings")
+   data object WMSLayer: MapRoute("mapWMSLayer", "WMS Layer")
+   data object LightSettings: MapRoute("lightSettings", "Light Settings")
+   data object PagerSheet: MapRoute("annotationPagerSheet", "Map")
+   data object Filter: MapRoute("mapFilter", "Filters", "Filters")
 }
 
 @OptIn(ExperimentalMaterialNavigationApi::class)

@@ -32,7 +32,7 @@ class GeopackageModule {
    @Named("naturalEarth_1_100")
    fun provideNaturalEarthLowResTileProvider(application: Application, geopackageManager: GeoPackageManager): TileProvider {
       val resource = application.resources.openRawResource(R.raw.natural_earth_1_100)
-      try { geopackageManager.importGeoPackage("natural_earth_1_100", resource) } catch (e: Exception) { }
+      try { geopackageManager.importGeoPackage("natural_earth_1_100", resource) } catch (_: Exception) { }
       val database = geopackageManager.databasesLike("natural_earth_1_100").firstOrNull()
       val geopackage = geopackageManager.open(database)
       val features: List<String> = geopackage.featureTables
@@ -50,7 +50,7 @@ class GeopackageModule {
    @Named("navigationAreas")
    fun provideNavigationAreaTileProvider(application: Application, geopackageManager: GeoPackageManager): TileProvider {
       val resource = application.resources.openRawResource(R.raw.navigation_areas)
-      try { geopackageManager.importGeoPackage("navigation_areas", resource) } catch (e: Exception) { }
+      try { geopackageManager.importGeoPackage("navigation_areas", resource) } catch (_: Exception) { }
       val database = geopackageManager.databasesLike("navigation_areas").firstOrNull()
       val geopackage = geopackageManager.open(database)
       val features: List<String> = geopackage.featureTables
