@@ -31,8 +31,8 @@ android {
         ext.repo = Grgit.open(currentDir: project.rootDir)
 
         applicationId "mil.nga.msi"
-        minSdk 26
-        targetSdk 33
+        minSdk 27
+        targetSdk 34
         versionName project.version
         versionCode ext.repo.log().size() as int
 
