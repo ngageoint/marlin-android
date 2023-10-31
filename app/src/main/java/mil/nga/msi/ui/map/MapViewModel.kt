@@ -47,8 +47,11 @@ import mil.nga.msi.type.MapLocation
 import mil.nga.msi.ui.map.cluster.MapAnnotation
 import mil.nga.msi.ui.map.overlay.*
 import mil.nga.sf.GeometryEnvelope
+import mil.nga.sf.Point
+import mil.nga.sf.geojson.Feature
 import javax.inject.Inject
 import javax.inject.Named
+import kotlin.math.abs
 
 enum class TileProviderType {
    MGRS,
@@ -436,12 +439,36 @@ class MapViewModel @Inject constructor(
                maxLongitude = maxLongitude
             )
             .flatMap { warning ->
-               warning.getFeatures().filter { feature ->
-                  geometryEnvelope.contains(feature.geometry.geometry.envelope) ||
-                  geometryEnvelope.intersects(feature.geometry.geometry.envelope)
-               }.map { feature ->
+               warning.getFeatures().filter(fun(feature: Feature): Boolean {
+                  val envelope = feature.geometry.geometry.envelope
+
+                  // check for 180th meridian crossing
+                  val intersects = if(abs(envelope.maxX-envelope.minX) > 180){
+                     // max and min X are swapped here because the envelope doesn't account for 180th meridian crossing
+                     val leftEnvelope = GeometryEnvelope(envelope.maxX, envelope.minY, 180.0, envelope.maxY)
+                     val rightEnvelope = GeometryEnvelope(-180.0, envelope.minY, envelope.minX, envelope.maxY)
+                     geometryEnvelope.contains(leftEnvelope) ||
+                             geometryEnvelope.intersects(leftEnvelope) ||
+                             geometryEnvelope.contains(rightEnvelope) ||
+                             geometryEnvelope.intersects(rightEnvelope)
+
+                  } else {
+                     geometryEnvelope.contains(envelope) || geometryEnvelope.intersects(envelope)
+                  }
+                  return intersects
+               }).map { feature ->
                   val key = MapAnnotation.Key(NavigationalWarningKey.fromNavigationWarning(warning).id(), MapAnnotation.Type.NAVIGATIONAL_WARNING)
-                  val center = feature.geometry.geometry.centroid
+                  val envelope = feature.geometry.geometry.envelope
+                  val centroid = envelope.centroid
+
+                  // shift center longitude 180 degrees if the shape crosses the 180th meridian
+                  val center = if(abs(envelope.maxX - envelope.minX) > 180){
+                     val antipodalX = if(centroid.x > 0) centroid.x-180 else centroid.x+180
+                     Point(antipodalX, centroid.y)
+                  } else {
+                     centroid
+                  }
+
                   MapAnnotation(key, center.y, center.x)
                }
             }

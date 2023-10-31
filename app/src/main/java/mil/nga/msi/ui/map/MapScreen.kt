@@ -61,6 +61,7 @@ import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.cluster.MapAnnotation
 import mil.nga.msi.ui.navigation.mainRouteFor
 import mil.nga.msi.ui.theme.onSurfaceDisabled
+import kotlin.math.abs
 import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.seconds
 
@@ -219,7 +220,16 @@ fun MapScreen(
             },
             onMapClick = { latLng, zoom, region ->
                val screenPercentage = 0.04
-               val tolerance = (region.farRight.longitude - region.farLeft.longitude) * screenPercentage
+               val screenRightLong = region.farRight.longitude
+               val screenLeftLong = region.farLeft.longitude
+
+               val tolerance = if(screenRightLong > screenLeftLong) {
+                  (screenRightLong - screenLeftLong) * screenPercentage
+               } else {
+                  // 180th meridian is on screen
+                  (360 - abs(screenRightLong) - abs(screenLeftLong)) * screenPercentage
+               }
+
                scope.launch {
                   val mapAnnotations = viewModel.getMapAnnotations(
                      minLongitude = latLng.longitude - tolerance,
