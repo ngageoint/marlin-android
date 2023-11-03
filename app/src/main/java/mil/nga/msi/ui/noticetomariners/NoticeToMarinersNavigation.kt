@@ -28,7 +28,6 @@ sealed class NoticeToMarinersRoute(
    override val name: String,
    override val title: String,
    override val shortTitle: String,
-   override val color: Color = DataSource.ASAM.color
 ): Route {
    data object Main: NoticeToMarinersRoute("ntms", "Notice To Mariners", "NTMs")
    data object Home: NoticeToMarinersRoute("ntms/home", "Notice To Mariners", "NTMs")

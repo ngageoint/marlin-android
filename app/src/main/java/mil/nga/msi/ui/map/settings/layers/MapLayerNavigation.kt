@@ -29,8 +29,7 @@ import mil.nga.msi.ui.navigation.Route
 sealed class MapLayerRoute(
    override val name: String,
    override val title: String,
-   override val shortTitle: String = title,
-   override val color: Color = Color.Transparent
+   override val shortTitle: String = title
 ): Route {
    data object Layers: MapLayerRoute("mapLayers", "Map Layers")
    data object NewLayer: MapLayerRoute("mapNewLayer", "New Layer")

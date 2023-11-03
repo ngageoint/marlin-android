@@ -2,7 +2,6 @@ package mil.nga.msi.ui.map
 
 import android.net.Uri
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.graphics.Color
 import androidx.core.os.BundleCompat
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
@@ -12,7 +11,6 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import com.google.accompanist.navigation.material.bottomSheet
-import com.google.android.gms.maps.model.LatLng
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import mil.nga.msi.repository.dgpsstation.DgpsStationKey
@@ -36,13 +34,12 @@ import mil.nga.msi.ui.navigation.*
 import mil.nga.msi.ui.navigationalwarning.NavigationWarningRoute
 import mil.nga.msi.ui.port.PortRoute
 import mil.nga.msi.ui.radiobeacon.RadioBeaconRoute
-import mil.nga.msi.ui.sheet.PagingSheet
+import mil.nga.msi.ui.sheet.BottomSheet
 
 sealed class MapRoute(
    override val name: String,
    override val title: String,
-   override val shortTitle: String = title,
-   override val color: Color = Color.Transparent
+   override val shortTitle: String = title
 ): Route {
    data object Map: MapRoute("map", "Map")
    data object Settings: MapRoute("mapSettings", "Map Settings")
@@ -58,6 +55,7 @@ fun NavGraphBuilder.mapGraph(
    bottomBarVisibility: (Boolean) -> Unit,
    openNavigationDrawer: () -> Unit,
    showSnackbar: (String) -> Unit,
+   share: (Pair<String, String>) -> Unit,
    annotationProvider: AnnotationProvider
 ) {
    composable(
@@ -89,25 +87,14 @@ fun NavGraphBuilder.mapGraph(
       } else null
 
       val navStackBackEntry by navController.currentBackStackEntryAsState()
-      val route = navStackBackEntry?.destination?.route
-      if (route?.startsWith(AsamRoute.Sheet.name) != true &&
-         route?.startsWith(ModuRoute.Sheet.name) != true &&
-         route?.startsWith(LightRoute.Sheet.name) != true &&
-         route?.startsWith(PortRoute.Sheet.name) != true &&
-         route?.startsWith(RadioBeaconRoute.Sheet.name) != true &&
-         route?.startsWith(DgpsStationRoute.Sheet.name) != true &&
-         route?.startsWith(NavigationWarningRoute.Sheet.name) != true &&
-         route?.startsWith(GeoPackageRoute.Sheet.name) != true
-      ) {
+      if (navStackBackEntry?.destination?.route?.startsWith(MapRoute.Map.name) == true) {
          annotationProvider.setMapAnnotation(null)
       }
 
       MapScreen(
          mapDestination = destination,
-         onMapTap = { latLng, bounds ->
-            val encodedPoint = Uri.encode(Json.encodeToString(NavPoint(latLng.latitude, latLng.longitude)))
-            val encodedBounds = Uri.encode(Json.encodeToString(Bounds.fromLatLngBounds(bounds)))
-            navController.navigate(MapRoute.PagerSheet.name + "?point=${encodedPoint}&bounds=${encodedBounds}")
+         onMapTap = {
+            navController.navigate(MapRoute.PagerSheet.name)
          },
          onExport = { dataSources ->
             val exportDataSources = dataSources.mapNotNull { ExportDataSource.fromDataSource(it) }
@@ -146,34 +133,8 @@ fun NavGraphBuilder.mapGraph(
       )
    }
 
-   bottomSheet(
-      route = "${MapRoute.PagerSheet.name}?point={point}&bounds={bounds}",
-      arguments = listOf(
-         navArgument("point") {
-            defaultValue = null
-            type = NavType.NavTypePoint
-            nullable = true
-         },
-         navArgument("bounds") {
-            defaultValue = null
-            type = NavType.NavTypeBounds
-            nullable = true
-         }
-      )
-   ) { backstackEntry ->
-      val point = backstackEntry.arguments?.let { bundle ->
-         BundleCompat.getParcelable(bundle, "point", NavPoint::class.java)
-      }
-      requireNotNull(point) { "'point' argument is required" }
-
-      val bounds = backstackEntry.arguments?.let { bundle ->
-         BundleCompat.getParcelable(bundle, "bounds", Bounds::class.java)?.asLatLngBounds()
-      }
-      requireNotNull(bounds) { "'bounds' argument is required" }
-
-      PagingSheet(
-         point = LatLng(point.latitude, point.longitude),
-         bounds = bounds,
+   bottomSheet(MapRoute.PagerSheet.name) {
+      BottomSheet(
          onDetails =  { annotation ->
             when (annotation.key.type) {
                MapAnnotation.Type.ASAM -> {
@@ -211,7 +172,9 @@ fun NavGraphBuilder.mapGraph(
                   navController.navigate(GeoPackageRoute.Detail.name + "?key=${encoded}")
                }
             }
-         }
+         },
+         onShare = { share(it) },
+         onBookmark = { key -> Action.Bookmark(key).navigate(navController) }
       )
    }
 

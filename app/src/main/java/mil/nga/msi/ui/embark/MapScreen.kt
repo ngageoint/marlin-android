@@ -46,7 +46,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import mil.nga.msi.datasource.DataSource
-import mil.nga.msi.ui.navigation.mainRouteFor
 
 @Composable
 fun MapScreen(
@@ -156,12 +155,12 @@ private fun Map(
                               imageVector = ImageVector.vectorResource(id = dataSource.icon),
                               tint = MaterialTheme.colorScheme.onPrimary,
                               modifier = Modifier.align(Center),
-                              contentDescription = "${mainRouteFor(dataSource).shortTitle} icon"
+                              contentDescription = "${dataSource.label} icon"
                            )
                         }
 
                         Text(
-                           text = mainRouteFor(dataSource).shortTitle,
+                           text = DataSource.ASAM.labelPlural,
                            style = MaterialTheme.typography.titleMedium,
                            textAlign = TextAlign.Center,
                            modifier = Modifier
@@ -191,7 +190,7 @@ private fun Map(
                            imageVector = Icons.Default.Check,
                            tint = MaterialTheme.colorScheme.onPrimary,
                            modifier = Modifier.size(16.dp),
-                           contentDescription = "${mainRouteFor(dataSource).shortTitle} selected"
+                           contentDescription = "${dataSource.labelPlural} selected"
                         )
                      }
                   }

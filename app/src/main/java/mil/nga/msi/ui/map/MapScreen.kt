@@ -4,6 +4,7 @@ import android.Manifest
 import android.animation.ValueAnimator
 import android.content.res.Configuration
 import android.graphics.Bitmap
+import android.util.Log
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.fadeOut
@@ -60,7 +61,6 @@ import mil.nga.msi.ui.coordinate.CoordinateText
 import mil.nga.msi.ui.location.LocationPermission
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.cluster.MapAnnotation
-import mil.nga.msi.ui.navigation.mainRouteFor
 import mil.nga.msi.ui.theme.onSurfaceDisabled
 import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.seconds
@@ -75,7 +75,7 @@ data class MapPosition(
 @Composable
 fun MapScreen(
    mapDestination : MapPosition? = null,
-   onMapTap: (LatLng, LatLngBounds) -> Unit,
+   onMapTap: () -> Unit,
    onMapSettings: () -> Unit,
    onExport: (List<DataSource>) -> Unit,
    openFilter: () -> Unit,
@@ -102,7 +102,7 @@ fun MapScreen(
    val mapped by viewModel.mapped.observeAsState(emptyMap())
    val annotation by viewModel.annotationProvider.annotation.observeAsState()
    val clipboardManager: ClipboardManager = LocalClipboardManager.current
-
+   
    LaunchedEffect(fetching) {
       if(fetching.none { it.value } && fetchingVisibility) {
          delay(1.seconds)
@@ -226,7 +226,10 @@ fun MapScreen(
                   LatLng(latLng.latitude + tolerance, latLng.longitude + tolerance)
                )
 
-               onMapTap(latLng, bounds)
+               scope.launch {
+                  val count = viewModel.setTapLocation(latLng, bounds)
+                  if (count > 0) { onMapTap() }
+               }
             }
          )
 
@@ -803,7 +806,7 @@ private fun DataSourceItem(
          bitmap = bitmap,
          tint = tint,
          modifier = Modifier.size(24.dp),
-         contentDescription = "${mainRouteFor(dataSource).title} map toggle"
+         contentDescription = "${dataSource.labelPlural} map toggle"
       )
    }
 }

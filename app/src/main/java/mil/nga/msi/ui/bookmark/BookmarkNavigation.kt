@@ -28,8 +28,7 @@ import mil.nga.msi.ui.navigation.Route
 sealed class BookmarkRoute(
    override val name: String,
    override val title: String,
-   override val shortTitle: String,
-   override val color: Color = Color.Transparent
+   override val shortTitle: String
 ): Route {
    data object Main: BookmarkRoute("bookmarks/main", "Bookmarks", "Bookmarks")
    data object List: BookmarkRoute("bookmarks/list", "Bookmarks", "Bookmarks")

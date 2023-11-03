@@ -11,8 +11,7 @@ import mil.nga.msi.ui.theme.MsiEmbarkTheme
 sealed class EmbarkRoute(
    override val name: String,
    override val title: String = "",
-   override val shortTitle: String = "",
-   override val color: Color = Color.Transparent
+   override val shortTitle: String = ""
 ): Route {
    data object Welcome: EmbarkRoute("embark/welcome")
    data object Disclaimer: EmbarkRoute("embark/disclaimer")

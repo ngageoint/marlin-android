@@ -46,7 +46,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import mil.nga.msi.datasource.DataSource
-import mil.nga.msi.ui.navigation.mainRouteFor
 
 @Composable
 fun TabsScreen(
@@ -130,7 +129,7 @@ private fun Tabs(
                .padding(vertical = 8.dp)
                .weight(1f)
          ) {
-            items(DataSource.values().asList().filter{ it.tab }) { dataSource ->
+            items(DataSource.values().asList().filter { it.tab != null }) { dataSource ->
                Box(contentAlignment = Alignment.TopEnd) {
                   Card(
                      colors = CardDefaults.cardColors(
@@ -156,12 +155,12 @@ private fun Tabs(
                               imageVector = ImageVector.vectorResource(id = dataSource.icon),
                               tint = MaterialTheme.colorScheme.onPrimary,
                               modifier = Modifier.align(Center),
-                              contentDescription = "${mainRouteFor(dataSource).shortTitle} icon"
+                              contentDescription = "${dataSource.label} icon"
                            )
                         }
 
                         Text(
-                           text = mainRouteFor(dataSource).shortTitle,
+                           text = dataSource.labelPlural,
                            style = MaterialTheme.typography.titleMedium,
                            textAlign = TextAlign.Center,
                            modifier = Modifier
@@ -191,7 +190,7 @@ private fun Tabs(
                            imageVector = Icons.Default.Check,
                            tint = MaterialTheme.colorScheme.onPrimary,
                            modifier = Modifier.size(16.dp),
-                           contentDescription = "${mainRouteFor(dataSource).shortTitle} selected"
+                           contentDescription = "${dataSource.labelPlural} selected"
                         )
                      }
                   }

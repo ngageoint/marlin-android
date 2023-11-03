@@ -37,8 +37,6 @@ import mil.nga.msi.R
 import mil.nga.msi.ui.home.homeGraph
 import mil.nga.msi.ui.map.MapRoute
 import mil.nga.msi.ui.navigation.NavigationDrawer
-import mil.nga.msi.ui.navigation.mainRouteFor
-
 
 data class SnackbarState(
    val message: String,
@@ -155,17 +153,16 @@ fun MainScreen(
                      )
 
                      tabs.forEach { tab ->
-                        val tabRoute = mainRouteFor(tab)
                         BottomNavigationItem(
                            icon = {
                               Icon(
-                                 imageVector = ImageVector.vectorResource(id = tab.icon),
-                                 contentDescription = tabRoute.title
+                                 imageVector = ImageVector.vectorResource(id = tab.dataSource.icon),
+                                 contentDescription = tab.route.title
                               )
                            },
                            label = {
                               Text(
-                                 text = tabRoute.shortTitle,
+                                 text = tab.route.shortTitle,
                                  maxLines = 1,
                                  overflow = TextOverflow.Ellipsis
                               )
@@ -175,11 +172,11 @@ fun MainScreen(
                               alpha = ContentAlpha.disabled
                            ),
                            selected = currentDestination?.hierarchy?.any {
-                              it.route?.substringBefore("?") == tabRoute.name
+                              it.route?.substringBefore("?") == tab.route.name
                            } == true,
                            onClick = {
-                              if (currentDestination?.route?.substringBefore("?") != tabRoute.name) {
-                                 navController.navigate(tabRoute.name) {
+                              if (currentDestination?.route?.substringBefore("?") != tab.route.name) {
+                                 navController.navigate(tab.route.name) {
                                     launchSingleTop = true
                                     restoreState = true
                                  }

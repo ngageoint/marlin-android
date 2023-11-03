@@ -69,7 +69,6 @@ import mil.nga.msi.filter.FilterParameter
 import mil.nga.msi.geopackage.export.ExportStatus
 import mil.nga.msi.ui.filter.FilterContent
 import mil.nga.msi.ui.main.TopBar
-import mil.nga.msi.ui.navigation.mainRouteFor
 import mil.nga.msi.ui.theme.onSurfaceDisabled
 
 @Composable
@@ -238,7 +237,7 @@ private fun DataSourceItem(
          bitmap = bitmap,
          tint = tint,
          modifier = Modifier.size(24.dp),
-         contentDescription = "${mainRouteFor(dataSource).title} export"
+         contentDescription = "GeoPackage export"
       )
    }
 }
@@ -522,7 +521,7 @@ private fun DataSourceFilter(
                   ) {
                      CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
                         Text(
-                           text = mainRouteFor(dataSource).title,
+                           text = "GeoPackage Detail",
                            style = MaterialTheme.typography.bodyMedium,
                            fontWeight = FontWeight.Medium
                         )

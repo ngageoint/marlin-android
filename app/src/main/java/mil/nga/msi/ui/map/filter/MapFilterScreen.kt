@@ -48,7 +48,6 @@ import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.ui.filter.FilterScreen
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.MapRoute
-import mil.nga.msi.ui.navigation.mainRouteFor
 
 @Composable
 fun MapFilterScreen(
@@ -156,7 +155,7 @@ private fun DataSource(
                ) {
                   CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
                      Text(
-                        text = mainRouteFor(dataSourceModel.dataSource).title,
+                        text = dataSourceModel.dataSource.labelPlural,
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Medium
                      )

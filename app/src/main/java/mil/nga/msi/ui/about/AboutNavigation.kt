@@ -14,8 +14,7 @@ import mil.nga.msi.ui.navigation.Route
 sealed class AboutRoute(
    override val name: String,
    override val title: String,
-   override val shortTitle: String = title,
-   override val color: Color = Color(0xFF000000)
+   override val shortTitle: String = title
 ): Route {
    data object Main: AboutRoute("about", "About")
    data object List: AboutRoute("about/list", "Settings")

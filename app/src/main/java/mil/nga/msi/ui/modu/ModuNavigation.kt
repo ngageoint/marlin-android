@@ -1,6 +1,5 @@
 package mil.nga.msi.ui.modu
 
-import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -15,22 +14,19 @@ import mil.nga.msi.ui.action.ModuAction
 import mil.nga.msi.ui.filter.FilterScreen
 import mil.nga.msi.ui.modu.detail.ModuDetailScreen
 import mil.nga.msi.ui.modu.list.ModusScreen
-import mil.nga.msi.ui.modu.sheet.ModuSheetScreen
 import mil.nga.msi.ui.navigation.Route
 import mil.nga.msi.ui.sort.SortScreen
 
 sealed class ModuRoute(
    override val name: String,
    override val title: String,
-   override val shortTitle: String,
-   override val color: Color = DataSource.MODU.color
+   override val shortTitle: String
 ): Route {
    data object Main: ModuRoute("modus", "Mobile Offshore Drilling Units", "MODUs")
    data object Detail: ModuRoute("modus/detail", "Mobile Offshore Drilling Unit Details", "MODU Details")
    data object List: ModuRoute("modus/list", "Mobile Offshore Drilling Units", "MODUs")
    data object Filter: ModuRoute("modus/filter", "Mobile Offshore Drilling Units Filters", "MODU Filters")
    data object Sort: ModuRoute("modus/sort", "Mobile Offshore Drilling Units Sort", "MODU Sort")
-   data object Sheet: ModuRoute("modus/sheet", "Mobile Offshore Drilling Unit Sheet", "Modu Sheet")
 }
 
 @OptIn(ExperimentalMaterialNavigationApi::class)
@@ -57,12 +53,8 @@ fun NavGraphBuilder.moduGraph(
 
          ModusScreen(
             openDrawer = { openNavigationDrawer() },
-            openFilter = {
-               navController.navigate(ModuRoute.Filter.name)
-            },
-            openSort = {
-               navController.navigate(ModuRoute.Sort.name)
-            },
+            openFilter = { navController.navigate(ModuRoute.Filter.name) },
+            openSort = { navController.navigate(ModuRoute.Sort.name) },
             onAction = { action ->
                when(action) {
                   is ModuAction.Share -> shareModu(action.modu)
@@ -72,6 +64,7 @@ fun NavGraphBuilder.moduGraph(
             }
          )
       }
+
       composable("${ModuRoute.Detail.name}?name={name}") { backstackEntry ->
          bottomBarVisibility(false)
 
@@ -89,27 +82,18 @@ fun NavGraphBuilder.moduGraph(
             )
          }
       }
-      bottomSheet("${ModuRoute.Sheet.name}?name={name}") { backstackEntry ->
-         backstackEntry.arguments?.getString("name")?.let { name ->
-            ModuSheetScreen(name, onDetails = {
-               navController.navigate("${ModuRoute.Detail.name}?name=$name")
-            })
-         }
-      }
+
       bottomSheet(ModuRoute.Filter.name) {
          FilterScreen(
             dataSource = DataSource.MODU,
-            close = {
-               navController.popBackStack()
-            }
+            close = { navController.popBackStack() }
          )
       }
+
       bottomSheet(ModuRoute.Sort.name) {
          SortScreen(
             dataSource = DataSource.MODU,
-            close = {
-               navController.popBackStack()
-            }
+            close = { navController.popBackStack() }
          )
       }
    }

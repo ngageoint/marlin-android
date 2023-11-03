@@ -21,7 +21,6 @@ sealed class ElectronicPublicationRoute(
     override val title: String = "Electronic Publications",
     override val shortTitle: String = "E-Pubs",
 ): Route {
-    override val color: Color = DataSource.ELECTRONIC_PUBLICATION.color
     data object Main: ElectronicPublicationRoute("electronicPublications")
     data object List: ElectronicPublicationRoute("electronicPublication/types")
     data object Detail: ElectronicPublicationRoute("electronicPublication/detail")

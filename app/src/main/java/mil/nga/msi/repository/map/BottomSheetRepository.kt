@@ -1,16 +1,12 @@
-package mil.nga.msi.ui.sheet
+package mil.nga.msi.repository.map
 
 import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mil.nga.geopackage.BoundingBox
 import mil.nga.geopackage.GeoPackageManager
@@ -41,9 +37,10 @@ import mil.nga.msi.ui.map.AnnotationProvider
 import mil.nga.msi.ui.map.cluster.MapAnnotation
 import mil.nga.sf.GeometryEnvelope
 import javax.inject.Inject
+import javax.inject.Singleton
 
-@HiltViewModel
-class PagingSheetViewModel @Inject constructor(
+@Singleton
+class BottomSheetRepository @Inject constructor(
    val annotationProvider: AnnotationProvider,
    private val application: Application,
    private val filterRepository: FilterRepository,
@@ -57,17 +54,22 @@ class PagingSheetViewModel @Inject constructor(
    private val dgpsStationRepository: DgpsStationRepository,
    private val navigationalWarningRepository: NavigationalWarningRepository,
    private val userPreferencesRepository: UserPreferencesRepository
-): ViewModel() {
+) {
    private val _mapAnnotations = MutableLiveData<List<MapAnnotation>>()
    val mapAnnotations: LiveData<List<MapAnnotation>> = _mapAnnotations
 
-   fun setLocation(point: LatLng, bounds: LatLngBounds) {
-      viewModelScope.launch {
-         _mapAnnotations.value = getMapAnnotations(
-            point = point,
-            bounds = bounds
-         )
-      }
+   suspend fun setLocation(point: LatLng, bounds: LatLngBounds): Int {
+      val annotations = getMapAnnotations(
+         point = point,
+         bounds = bounds
+      )
+
+      _mapAnnotations.value = annotations
+      return annotations.size
+   }
+
+   fun clearLocation() {
+      _mapAnnotations.value = emptyList()
    }
 
    private suspend fun getMapAnnotations(

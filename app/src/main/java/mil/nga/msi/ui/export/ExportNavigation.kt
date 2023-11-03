@@ -16,8 +16,7 @@ import mil.nga.msi.ui.navigation.Route
 sealed class ExportRoute(
    override val name: String,
    override val title: String = "GeoPackage Export",
-   override val shortTitle: String = "GeoPackage Export",
-   override val color: Color = DataSource.ASAM.color
+   override val shortTitle: String = "GeoPackage Export"
 ): Route {
    data object Main: ExportRoute("exportMain")
    data object Export: ExportRoute("export")

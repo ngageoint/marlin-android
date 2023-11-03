@@ -1,6 +1,5 @@
 package mil.nga.msi.ui.port
 
-import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -15,19 +14,16 @@ import mil.nga.msi.ui.filter.FilterScreen
 import mil.nga.msi.ui.navigation.Route
 import mil.nga.msi.ui.port.detail.PortDetailScreen
 import mil.nga.msi.ui.port.list.PortsScreen
-import mil.nga.msi.ui.port.sheet.PortSheetScreen
 import mil.nga.msi.ui.sort.SortScreen
 
 sealed class PortRoute(
    override val name: String,
    override val title: String,
-   override val shortTitle: String,
-   override val color: Color = DataSource.PORT.color
+   override val shortTitle: String
 ): Route {
    data object Main: PortRoute("ports", "World Ports", "Ports")
    data object Detail: PortRoute("ports/detail", "World Port Details", "Port Details")
    data object List: PortRoute("ports/list", "World Ports", "Ports")
-   data object Sheet: PortRoute("ports/sheet", "World Port Sheet", "Port Sheet")
    data object Filter: PortRoute("ports/filter", "World Port Filter", "Port Filters")
    data object Sort: PortRoute("ports/sort", "World Port Sort", "Port Sort")
 }
@@ -88,13 +84,7 @@ fun NavGraphBuilder.portGraph(
             )
          }
       }
-      bottomSheet("${PortRoute.Sheet.name}?portNumber={portNumber}") { backstackEntry ->
-         backstackEntry.arguments?.getString("portNumber")?.toIntOrNull()?.let { portNumber ->
-            PortSheetScreen(portNumber, onDetails = {
-               navController.navigate("${PortRoute.Detail.name}?portNumber=$portNumber")
-            })
-         }
-      }
+
       bottomSheet(PortRoute.Filter.name) {
          FilterScreen(
             dataSource = DataSource.PORT,
@@ -103,6 +93,7 @@ fun NavGraphBuilder.portGraph(
             }
          )
       }
+
       bottomSheet(PortRoute.Sort.name) {
          SortScreen(
             dataSource = DataSource.PORT,

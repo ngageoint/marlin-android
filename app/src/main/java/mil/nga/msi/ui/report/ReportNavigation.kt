@@ -1,6 +1,5 @@
 package mil.nga.msi.ui.report
 
-import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -12,7 +11,6 @@ sealed class ReportRoute(
    override val name: String,
    override val title: String,
    override val shortTitle: String = title,
-   override val color: Color = Color(0xFF000000),
    val icon: Int = 0,
    val url: String = ""
 ): Route {

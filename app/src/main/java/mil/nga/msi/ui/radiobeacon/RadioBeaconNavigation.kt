@@ -1,14 +1,10 @@
 package mil.nga.msi.ui.radiobeacon
 
-import android.net.Uri
-import androidx.compose.ui.graphics.Color
 import androidx.core.os.BundleCompat
 import androidx.navigation.*
 import androidx.navigation.compose.composable
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import com.google.accompanist.navigation.material.bottomSheet
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.radiobeacon.RadioBeacon
 import mil.nga.msi.repository.radiobeacon.RadioBeaconKey
@@ -18,19 +14,16 @@ import mil.nga.msi.ui.navigation.RadioBeacon
 import mil.nga.msi.ui.navigation.Route
 import mil.nga.msi.ui.radiobeacon.detail.RadioBeaconDetailScreen
 import mil.nga.msi.ui.radiobeacon.list.RadioBeaconsScreen
-import mil.nga.msi.ui.radiobeacon.sheet.RadioBeaconSheetScreen
 import mil.nga.msi.ui.sort.SortScreen
 
 sealed class RadioBeaconRoute(
    override val name: String,
    override val title: String,
-   override val shortTitle: String,
-   override val color: Color = DataSource.RADIO_BEACON.color
+   override val shortTitle: String
 ): Route {
    data object Main: RadioBeaconRoute("radioBeacons", "Radio Beacons", "Beacons")
    data object Detail: RadioBeaconRoute("radioBeacons/detail", "Radio Beacon Details", "Beacon Details")
    data object List: RadioBeaconRoute("radioBeacons/list", "Radio Beacons", "Beacons")
-   data object Sheet: RadioBeaconRoute("radioBeacons/sheet", "Radio Beacon Sheet", "Beacon Sheet")
    data object Filter: RadioBeaconRoute("radioBeacons/filter", "Radio Beacon Filter", "Radio Beacon Filter")
    data object Sort: RadioBeaconRoute("radioBeacons/sort", "Radio Beacon Sort", "Radio Beacon Sort")
 }
@@ -95,20 +88,6 @@ fun NavGraphBuilder.radioBeaconGraph(
                   }
                }
             )
-         }
-      }
-
-      bottomSheet(
-         route = "${RadioBeaconRoute.Sheet.name}?key={key}",
-         arguments = listOf(navArgument("key") { type = NavType.RadioBeacon })
-      ) { backstackEntry ->
-         backstackEntry.arguments?.let { bundle ->
-            BundleCompat.getParcelable(bundle, "key", RadioBeaconKey::class.java)
-         }?.let { key ->
-            RadioBeaconSheetScreen(key = key, onDetails = {
-               val encoded = Uri.encode(Json.encodeToString(key))
-               navController.navigate( "${RadioBeaconRoute.Detail.name}?key=$encoded")
-            })
          }
       }
 

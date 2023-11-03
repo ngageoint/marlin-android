@@ -1,6 +1,5 @@
 package mil.nga.msi.ui.asam
 
-import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -13,7 +12,6 @@ import mil.nga.msi.datasource.asam.Asam
 import mil.nga.msi.ui.action.AsamAction
 import mil.nga.msi.ui.asam.detail.AsamDetailScreen
 import mil.nga.msi.ui.asam.list.AsamsScreen
-import mil.nga.msi.ui.asam.sheet.AsamSheetScreen
 import mil.nga.msi.ui.filter.FilterScreen
 import mil.nga.msi.ui.navigation.Route
 import mil.nga.msi.ui.sort.SortScreen
@@ -22,12 +20,10 @@ sealed class AsamRoute(
    override val name: String,
    override val title: String,
    override val shortTitle: String,
-   override val color: Color = DataSource.ASAM.color
 ): Route {
    data object Main: AsamRoute("asams", "Anti-Shipping Activity Messages", "ASAMs")
    data object Detail: AsamRoute("asams/detail", "Anti-Shipping Activity Message Details", "ASAM Details")
    data object List: AsamRoute("asams/list", "Anti-Shipping Activity Messages", "ASAMs")
-   data object Sheet: AsamRoute("asams/sheet", "Anti-Shipping Activity Message Sheet", "ASAM Sheet")
    data object Filter: AsamRoute("asams/filter", "Anti-Shipping Activity Message Filter", "ASAM Filters")
    data object Sort: AsamRoute("asams/sort", "Anti-Shipping Activity Message Sort", "ASAM Sort")
 }
@@ -56,23 +52,18 @@ fun NavGraphBuilder.asamGraph(
 
          AsamsScreen(
             openDrawer = { openNavigationDrawer() },
-            openFilter = {
-               navController.navigate(AsamRoute.Filter.name)
-            },
-            openSort = {
-               navController.navigate(AsamRoute.Sort.name)
-            },
+            openFilter = { navController.navigate(AsamRoute.Filter.name) },
+            openSort = { navController.navigate(AsamRoute.Sort.name) },
             onAction = { action ->
                when(action) {
                   is AsamAction.Share -> shareAsam(action.asam)
                   is AsamAction.Location -> showSnackbar("${action.text} copied to clipboard")
-                  else -> {
-                     action.navigate(navController)
-                  }
+                  else -> { action.navigate(navController) }
                }
             }
          )
       }
+
       composable("${AsamRoute.Detail.name}?reference={reference}") { backstackEntry ->
          bottomBarVisibility(false)
 
@@ -90,27 +81,18 @@ fun NavGraphBuilder.asamGraph(
             )
          }
       }
-      bottomSheet("${AsamRoute.Sheet.name}?reference={reference}") { backstackEntry ->
-         backstackEntry.arguments?.getString("reference")?.let { reference ->
-            AsamSheetScreen(reference, onDetails = {
-               navController.navigate("${AsamRoute.Detail.name}?reference=$reference")
-            })
-         }
-      }
+
       bottomSheet(AsamRoute.Filter.name) {
          FilterScreen(
             dataSource = DataSource.ASAM,
-            close = {
-               navController.popBackStack()
-            }
+            close = { navController.popBackStack() }
          )
       }
+
       bottomSheet(AsamRoute.Sort.name) {
          SortScreen(
             dataSource = DataSource.ASAM,
-            close = {
-               navController.popBackStack()
-            }
+            close = { navController.popBackStack() }
          )
       }
    }

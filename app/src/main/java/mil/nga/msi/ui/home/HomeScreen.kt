@@ -119,6 +119,7 @@ fun NavGraphBuilder.homeGraph(
       bottomBarVisibility = { bottomBarVisibility(it) },
       openNavigationDrawer = openNavigationDrawer,
       showSnackbar = { showSnackbar(SnackbarState(message = it)) },
+      share = { shareDataSource(it) },
       annotationProvider = annotationProvider
    )
 

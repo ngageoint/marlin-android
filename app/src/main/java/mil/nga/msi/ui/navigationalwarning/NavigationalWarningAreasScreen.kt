@@ -31,6 +31,7 @@ import com.google.accompanist.permissions.rememberPermissionState
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.TileProvider
 import com.google.maps.android.compose.*
@@ -61,7 +62,7 @@ fun NavigationalWarningGroupScreen(
    openDrawer: () -> Unit,
    onExport: () -> Unit,
    onGroupTap: (NavigationArea) -> Unit,
-   onNavigationWarningsTap: (List<NavigationalWarningKey>) -> Unit,
+   onNavigationWarningsTap: (LatLng, LatLngBounds) -> Unit,
    viewModel: NavigationalWarningAreasViewModel = hiltViewModel()
 ) {
    val scrollState = rememberScrollState()
@@ -113,7 +114,10 @@ fun NavigationalWarningGroupScreen(
                         }
                      },
                      onMapFullScreen = { fullScreenMap = it },
-                     onNavigationWarningsTap = { keys -> onNavigationWarningsTap(keys) },
+                     onNavigationWarningsTap = {
+                        // TODO FIXME
+//                        keys -> onNavigationWarningsTap(keys)
+                     },
                      onMapPositionChanged = { mapPosition = it },
                      location = location,
                      annotations = annotations,
