@@ -37,6 +37,7 @@ import mil.nga.msi.R
 import mil.nga.msi.ui.home.homeGraph
 import mil.nga.msi.ui.map.MapRoute
 import mil.nga.msi.ui.navigation.NavigationDrawer
+import mil.nga.msi.ui.navigation.rememberMarlinAppState
 
 data class SnackbarState(
    val message: String,
@@ -70,6 +71,8 @@ fun MainScreen(
    navController.addOnDestinationChangedListener { _: NavController, destination: NavDestination, _: Bundle? ->
       viewModel.track(destination)
    }
+
+   val appState = rememberMarlinAppState(navController)
 
    val openDrawer = {
       scope.launch { scaffoldState.drawerState.open() }
@@ -195,7 +198,7 @@ fun MainScreen(
             modifier = Modifier.padding(paddingValues)
          ) {
             homeGraph(
-               navController = navController,
+               appState = appState,
                bottomBarVisibility = { visible ->
                   bottomBarVisibility = visible && tabs.isNotEmpty()
                },

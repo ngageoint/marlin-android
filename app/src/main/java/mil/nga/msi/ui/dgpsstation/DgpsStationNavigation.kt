@@ -1,6 +1,5 @@
 package mil.nga.msi.ui.dgpsstation
 
-import androidx.compose.ui.graphics.Color
 import androidx.core.os.BundleCompat
 import androidx.navigation.*
 import androidx.navigation.compose.composable
@@ -14,6 +13,7 @@ import mil.nga.msi.ui.dgpsstation.detail.DgpsStationDetailScreen
 import mil.nga.msi.ui.dgpsstation.list.DgpsStationsScreen
 import mil.nga.msi.ui.filter.FilterScreen
 import mil.nga.msi.ui.navigation.DgpsStation
+import mil.nga.msi.ui.navigation.MarlinAppState
 import mil.nga.msi.ui.navigation.Route
 import mil.nga.msi.ui.sort.SortScreen
 
@@ -31,7 +31,7 @@ sealed class DgpsStationRoute(
 
 @OptIn(ExperimentalMaterialNavigationApi::class)
 fun NavGraphBuilder.dgpsStationGraph(
-   navController: NavController,
+   appState: MarlinAppState,
    bottomBarVisibility: (Boolean) -> Unit,
    openNavigationDrawer: () -> Unit,
    share: (Pair<String, String>) -> Unit,
@@ -53,13 +53,13 @@ fun NavGraphBuilder.dgpsStationGraph(
 
          DgpsStationsScreen(
             openDrawer = { openNavigationDrawer() },
-            openFilter = { navController.navigate(DgpsStationRoute.Filter.name) },
-            openSort = { navController.navigate(DgpsStationRoute.Sort.name) },
+            openFilter = { appState.navController.navigate(DgpsStationRoute.Filter.name) },
+            openSort = { appState.navController.navigate(DgpsStationRoute.Sort.name) },
             onAction = { action ->
                when(action) {
                   is DgpsStationAction.Share -> shareDgps(action.dgpsStation)
                   is DgpsStationAction.Location -> showSnackbar("${action.text} copied to clipboard")
-                  else -> action.navigate(navController)
+                  else -> action.navigate(appState.navController)
                }
             }
          )
@@ -76,12 +76,12 @@ fun NavGraphBuilder.dgpsStationGraph(
          }?.let { key ->
             DgpsStationDetailScreen(
                key,
-               close = { navController.popBackStack() },
+               close = { appState.navController.popBackStack() },
                onAction = { action ->
                   when(action) {
                      is DgpsStationAction.Share -> shareDgps(action.dgpsStation)
                      is DgpsStationAction.Location -> showSnackbar("${action.text} copied to clipboard")
-                     else -> action.navigate(navController)
+                     else -> action.navigate(appState.navController)
                   }
                }
             )
@@ -91,13 +91,13 @@ fun NavGraphBuilder.dgpsStationGraph(
       bottomSheet(DgpsStationRoute.Filter.name) {
          FilterScreen(
             dataSource = DataSource.DGPS_STATION,
-            close = { navController.popBackStack() }
+            close = { appState.navController.popBackStack() }
          )
       }
       bottomSheet(DgpsStationRoute.Sort.name) {
          SortScreen(
             dataSource = DataSource.DGPS_STATION,
-            close = { navController.popBackStack() }
+            close = { appState.navController.popBackStack() }
          )
       }
    }

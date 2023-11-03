@@ -10,6 +10,7 @@ import mil.nga.msi.datasource.radiobeacon.RadioBeacon
 import mil.nga.msi.repository.radiobeacon.RadioBeaconKey
 import mil.nga.msi.ui.action.RadioBeaconAction
 import mil.nga.msi.ui.filter.FilterScreen
+import mil.nga.msi.ui.navigation.MarlinAppState
 import mil.nga.msi.ui.navigation.RadioBeacon
 import mil.nga.msi.ui.navigation.Route
 import mil.nga.msi.ui.radiobeacon.detail.RadioBeaconDetailScreen
@@ -30,7 +31,7 @@ sealed class RadioBeaconRoute(
 
 @OptIn(ExperimentalMaterialNavigationApi::class)
 fun NavGraphBuilder.radioBeaconGraph(
-   navController: NavController,
+   appState: MarlinAppState,
    bottomBarVisibility: (Boolean) -> Unit,
    openNavigationDrawer: () -> Unit,
    share: (Pair<String, String>) -> Unit,
@@ -53,16 +54,16 @@ fun NavGraphBuilder.radioBeaconGraph(
          RadioBeaconsScreen(
             openDrawer = { openNavigationDrawer() },
             openFilter = {
-               navController.navigate(RadioBeaconRoute.Filter.name)
+               appState.navController.navigate(RadioBeaconRoute.Filter.name)
             },
             openSort = {
-               navController.navigate(RadioBeaconRoute.Sort.name)
+               appState.navController.navigate(RadioBeaconRoute.Sort.name)
             },
             onAction = { action ->
                when (action) {
                   is RadioBeaconAction.Share -> shareBeacon(action.radioBeacon)
                   is RadioBeaconAction.Location -> showSnackbar("${action.text} copied to clipboard")
-                  else -> action.navigate(navController)
+                  else -> action.navigate(appState.navController)
                }
             }
          )
@@ -79,12 +80,12 @@ fun NavGraphBuilder.radioBeaconGraph(
          }?.let { key ->
             RadioBeaconDetailScreen(
                key,
-               close = { navController.popBackStack() },
+               close = { appState.navController.popBackStack() },
                onAction = { action ->
                   when (action) {
                      is RadioBeaconAction.Share -> shareBeacon(action.radioBeacon)
                      is RadioBeaconAction.Location -> showSnackbar("${action.text} copied to clipboard")
-                     else -> action.navigate(navController)
+                     else -> action.navigate(appState.navController)
                   }
                }
             )
@@ -94,18 +95,14 @@ fun NavGraphBuilder.radioBeaconGraph(
       bottomSheet(RadioBeaconRoute.Filter.name) {
          FilterScreen(
             dataSource = DataSource.RADIO_BEACON,
-            close = {
-               navController.popBackStack()
-            }
+            close = { appState.navController.popBackStack() }
          )
       }
 
       bottomSheet(RadioBeaconRoute.Sort.name) {
          SortScreen(
             dataSource = DataSource.RADIO_BEACON,
-            close = {
-               navController.popBackStack()
-            }
+            close = { appState.navController.popBackStack() }
          )
       }
    }

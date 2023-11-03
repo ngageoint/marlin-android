@@ -1,10 +1,9 @@
 package mil.nga.msi.ui.embark
 
-import androidx.compose.ui.graphics.Color
-import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import mil.nga.msi.ui.map.MapRoute
+import mil.nga.msi.ui.navigation.MarlinAppState
 import mil.nga.msi.ui.navigation.Route
 import mil.nga.msi.ui.theme.MsiEmbarkTheme
 
@@ -22,7 +21,7 @@ sealed class EmbarkRoute(
 }
 
 fun NavGraphBuilder.embarkGraph(
-   navController: NavController,
+   appState: MarlinAppState,
    bottomBarVisibility: (Boolean) -> Unit
 ) {
    composable(EmbarkRoute.Welcome.name) {
@@ -31,7 +30,7 @@ fun NavGraphBuilder.embarkGraph(
       MsiEmbarkTheme {
          WelcomeScreen(
             done = {
-               navController.navigate(EmbarkRoute.Disclaimer.name)
+               appState.navController.navigate(EmbarkRoute.Disclaimer.name)
             }
          )
       }
@@ -43,7 +42,7 @@ fun NavGraphBuilder.embarkGraph(
       MsiEmbarkTheme {
          DisclaimerScreen(
             done = {
-               navController.navigate(EmbarkRoute.Location.name)
+               appState.navController.navigate(EmbarkRoute.Location.name)
             }
          )
       }
@@ -55,7 +54,7 @@ fun NavGraphBuilder.embarkGraph(
       MsiEmbarkTheme {
          LocationScreen(
             done = {
-               navController.navigate(EmbarkRoute.Notification.name)
+               appState.navController.navigate(EmbarkRoute.Notification.name)
             }
          )
       }
@@ -67,7 +66,7 @@ fun NavGraphBuilder.embarkGraph(
       MsiEmbarkTheme {
          NotificationScreen(
             done = {
-               navController.navigate(EmbarkRoute.Tabs.name)
+               appState.navController.navigate(EmbarkRoute.Tabs.name)
             }
          )
       }
@@ -79,7 +78,7 @@ fun NavGraphBuilder.embarkGraph(
       MsiEmbarkTheme {
          TabsScreen(
             done = {
-               navController.navigate(EmbarkRoute.Map.name)
+               appState.navController.navigate(EmbarkRoute.Map.name)
             }
          )
       }
@@ -91,7 +90,7 @@ fun NavGraphBuilder.embarkGraph(
       MsiEmbarkTheme {
          MapScreen(
             done = {
-               navController.navigate(MapRoute.Map.name) {
+               appState.navController.navigate(MapRoute.Map.name) {
                   popUpTo(EmbarkRoute.Welcome.name) {
                      inclusive = true
                   }

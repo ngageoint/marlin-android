@@ -20,7 +20,7 @@ sealed class GeoPackageRoute(
 }
 
 fun NavGraphBuilder.geopackageGraph(
-   navController: NavController,
+   appState: MarlinAppState,
    showSnackbar: (String) -> Unit
 ) {
    composable(
@@ -32,11 +32,11 @@ fun NavGraphBuilder.geopackageGraph(
       }?.let { key ->
          GeoPackageFeatureDetailScreen(
             key = key,
-            close = { navController.popBackStack() },
+            close = { appState.navController.popBackStack() },
             onAction = { action ->
                when(action) {
                   is GeoPackageFeatureAction.Location -> showSnackbar("${action.text} copied to clipboard")
-                  else -> action.navigate(navController)
+                  else -> action.navigate(appState.navController)
                }
             }
          )
@@ -52,7 +52,7 @@ fun NavGraphBuilder.geopackageGraph(
       }?.let { key ->
          GeoPackageMediaScreen(
             key = key,
-            close = { navController.popBackStack() }
+            close = { appState.navController.popBackStack() }
          )
       }
    }

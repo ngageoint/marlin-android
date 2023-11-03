@@ -15,6 +15,7 @@ import mil.nga.msi.ui.export.ExportDataSource
 import mil.nga.msi.ui.map.MapPosition
 import mil.nga.msi.ui.map.MapRoute
 import mil.nga.msi.ui.navigation.Bounds
+import mil.nga.msi.ui.navigation.MarlinAppState
 import mil.nga.msi.ui.navigation.NavPoint
 import mil.nga.msi.ui.navigation.NavTypeBounds
 import mil.nga.msi.ui.navigation.NavTypeNavigationalWarningKey
@@ -34,7 +35,7 @@ sealed class NavigationWarningRoute(
 }
 
 fun NavGraphBuilder.navigationalWarningGraph(
-   navController: NavController,
+   appState: MarlinAppState,
    bottomBarVisibility: (Boolean) -> Unit,
    openNavigationDrawer: () -> Unit,
    share: (Pair<String, String>) -> Unit
@@ -70,15 +71,15 @@ fun NavGraphBuilder.navigationalWarningGraph(
             position = mapPosition,
             openDrawer = { openNavigationDrawer() },
             onExport = {
-               Action.Export(listOf(ExportDataSource.NavigationalWarning())).navigate(navController)
+               Action.Export(listOf(ExportDataSource.NavigationalWarning())).navigate(appState.navController)
             },
             onGroupTap = { navigationArea ->
-               navController.navigate( "${NavigationWarningRoute.List.name}?navigationArea=${navigationArea.code}")
+               appState.navController.navigate( "${NavigationWarningRoute.List.name}?navigationArea=${navigationArea.code}")
             },
             onNavigationWarningsTap = { latLng, bounds ->
                val encodedPoint = Uri.encode(Json.encodeToString(NavPoint(latLng.latitude, latLng.longitude)))
                val encodedBounds = Uri.encode(Json.encodeToString(Bounds.fromLatLngBounds(bounds)))
-               navController.navigate(MapRoute.PagerSheet.name + "?point=${encodedPoint}&bounds=${encodedBounds}")
+               appState.navController.navigate(MapRoute.PagerSheet.name + "?point=${encodedPoint}&bounds=${encodedBounds}")
             }
          )
       }
@@ -93,13 +94,13 @@ fun NavGraphBuilder.navigationalWarningGraph(
             val navigationArea = NavigationArea.fromCode(navigationAreaCode)!!
             NavigationalWarningsScreen(
                navigationArea,
-               close = { navController.popBackStack() },
+               close = { appState.navController.popBackStack() },
                onAction = { action ->
                   when(action) {
                      is NavigationalWarningAction.Share -> {
                         shareNavigationalWarning(action.warning)
                      }
-                     else -> action.navigate(navController)
+                     else -> action.navigate(appState.navController)
                   }
                }
             )
@@ -117,13 +118,13 @@ fun NavGraphBuilder.navigationalWarningGraph(
          }?.let { key ->
             NavigationalWarningDetailScreen(
                key = key,
-               close = { navController.popBackStack() },
+               close = { appState.navController.popBackStack() },
                onAction = { action ->
                   when(action) {
                      is NavigationalWarningAction.Share -> {
                         shareNavigationalWarning(action.warning)
                      }
-                     else -> action.navigate(navController)
+                     else -> action.navigate(appState.navController)
                   }
                }
             )

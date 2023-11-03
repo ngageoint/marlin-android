@@ -1,6 +1,5 @@
 package mil.nga.msi.ui.port
 
-import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navDeepLink
@@ -11,6 +10,7 @@ import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.port.Port
 import mil.nga.msi.ui.action.PortAction
 import mil.nga.msi.ui.filter.FilterScreen
+import mil.nga.msi.ui.navigation.MarlinAppState
 import mil.nga.msi.ui.navigation.Route
 import mil.nga.msi.ui.port.detail.PortDetailScreen
 import mil.nga.msi.ui.port.list.PortsScreen
@@ -30,7 +30,7 @@ sealed class PortRoute(
 
 @OptIn(ExperimentalMaterialNavigationApi::class)
 fun NavGraphBuilder.portGraph(
-   navController: NavController,
+   appState: MarlinAppState,
    bottomBarVisibility: (Boolean) -> Unit,
    openNavigationDrawer: () -> Unit,
    share: (Pair<String, String>) -> Unit,
@@ -53,16 +53,16 @@ fun NavGraphBuilder.portGraph(
          PortsScreen(
             openDrawer = { openNavigationDrawer() },
             openFilter = {
-               navController.navigate(PortRoute.Filter.name)
+               appState.navController.navigate(PortRoute.Filter.name)
             },
             openSort = {
-               navController.navigate(PortRoute.Sort.name)
+               appState.navController.navigate(PortRoute.Sort.name)
             },
             onAction = { action ->
                when(action) {
                   is PortAction.Share -> sharePort(action.port)
                   is PortAction.Location -> showSnackbar("${action.text} copied to clipboard")
-                  else -> action.navigate(navController)
+                  else -> action.navigate(appState.navController)
                }
             }
          )
@@ -73,12 +73,12 @@ fun NavGraphBuilder.portGraph(
          backstackEntry.arguments?.getString("portNumber")?.toIntOrNull()?.let { portNumber ->
             PortDetailScreen(
                portNumber,
-               close = { navController.popBackStack() },
+               close = { appState.navController.popBackStack() },
                onAction = { action ->
                   when(action) {
                      is PortAction.Share -> sharePort(action.port)
                      is PortAction.Location -> showSnackbar("${action.text} copied to clipboard")
-                     else -> action.navigate(navController)
+                     else -> action.navigate(appState.navController)
                   }
                }
             )
@@ -88,18 +88,14 @@ fun NavGraphBuilder.portGraph(
       bottomSheet(PortRoute.Filter.name) {
          FilterScreen(
             dataSource = DataSource.PORT,
-            close = {
-               navController.popBackStack()
-            }
+            close = { appState.navController.popBackStack() }
          )
       }
 
       bottomSheet(PortRoute.Sort.name) {
          SortScreen(
             dataSource = DataSource.PORT,
-            close = {
-               navController.popBackStack()
-            }
+            close = { appState.navController.popBackStack() }
          )
       }
    }

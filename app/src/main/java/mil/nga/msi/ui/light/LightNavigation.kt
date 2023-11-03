@@ -12,6 +12,7 @@ import mil.nga.msi.ui.action.LightAction
 import mil.nga.msi.ui.filter.FilterScreen
 import mil.nga.msi.ui.light.detail.LightDetailScreen
 import mil.nga.msi.ui.light.list.LightsScreen
+import mil.nga.msi.ui.navigation.MarlinAppState
 import mil.nga.msi.ui.navigation.NavTypeLightKey
 import mil.nga.msi.ui.navigation.Route
 import mil.nga.msi.ui.sort.SortScreen
@@ -30,7 +31,7 @@ sealed class LightRoute(
 
 @OptIn(ExperimentalMaterialNavigationApi::class)
 fun NavGraphBuilder.lightGraph(
-   navController: NavController,
+   appState: MarlinAppState,
    bottomBarVisibility: (Boolean) -> Unit,
    openNavigationDrawer: () -> Unit,
    share: (Pair<String, String>) -> Unit,
@@ -52,13 +53,13 @@ fun NavGraphBuilder.lightGraph(
 
          LightsScreen(
             openDrawer = { openNavigationDrawer() },
-            openFilter = { navController.navigate(LightRoute.Filter.name) },
-            openSort = { navController.navigate(LightRoute.Sort.name) },
+            openFilter = { appState.navController.navigate(LightRoute.Filter.name) },
+            openSort = { appState.navController.navigate(LightRoute.Sort.name) },
             onAction = { action ->
                when(action) {
                   is LightAction.Share -> shareLight(action.light)
                   is LightAction.Location -> showSnackbar("${action.text} copied to clipboard")
-                  else -> action.navigate(navController)
+                  else -> action.navigate(appState.navController)
                }
             }
          )
@@ -75,12 +76,12 @@ fun NavGraphBuilder.lightGraph(
          }?.let { key ->
             LightDetailScreen(
                key = key,
-               close = { navController.popBackStack() },
+               close = { appState.navController.popBackStack() },
                onAction = { action ->
                   when(action) {
                      is LightAction.Share -> shareLight(action.light)
                      is LightAction.Location -> showSnackbar("${action.text} copied to clipboard")
-                     else -> action.navigate(navController)
+                     else -> action.navigate(appState.navController)
                   }
                }
             )
@@ -90,14 +91,14 @@ fun NavGraphBuilder.lightGraph(
       bottomSheet(LightRoute.Filter.name) {
          FilterScreen(
             dataSource = DataSource.LIGHT,
-            close = { navController.popBackStack() }
+            close = { appState.navController.popBackStack() }
          )
       }
 
       bottomSheet(LightRoute.Sort.name) {
          SortScreen(
             dataSource = DataSource.LIGHT,
-            close = { navController.popBackStack() }
+            close = { appState.navController.popBackStack() }
          )
       }
    }

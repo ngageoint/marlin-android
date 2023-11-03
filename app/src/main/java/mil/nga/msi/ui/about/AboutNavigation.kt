@@ -2,13 +2,12 @@ package mil.nga.msi.ui.about
 
 import android.content.Intent
 import android.net.Uri
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat.startActivity
-import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
+import mil.nga.msi.ui.navigation.MarlinAppState
 import mil.nga.msi.ui.navigation.Route
 
 sealed class AboutRoute(
@@ -24,7 +23,7 @@ sealed class AboutRoute(
 }
 
 fun NavGraphBuilder.settingsGraph(
-   navController: NavController,
+   appState: MarlinAppState,
    bottomBarVisibility: (Boolean) -> Unit
 ) {
    navigation(
@@ -37,12 +36,12 @@ fun NavGraphBuilder.settingsGraph(
          val context = LocalContext.current
 
          AboutScreen(
-            onClose = { navController.popBackStack() },
+            onClose = { appState.navController.popBackStack() },
             onDisclaimer = {
-               navController.navigate(AboutRoute.Disclaimer.name)
+               appState.navController.navigate(AboutRoute.Disclaimer.name)
             },
             onPrivacy = {
-               navController.navigate(AboutRoute.Privacy.name)
+               appState.navController.navigate(AboutRoute.Privacy.name)
             },
             onContact = {
                val intent = Intent(Intent.ACTION_SENDTO)
@@ -58,7 +57,7 @@ fun NavGraphBuilder.settingsGraph(
          bottomBarVisibility(true)
 
          DisclaimerScreen(
-            close = { navController.popBackStack() }
+            close = { appState.navController.popBackStack() }
          )
       }
 
@@ -66,7 +65,7 @@ fun NavGraphBuilder.settingsGraph(
          bottomBarVisibility(true)
 
          PrivacyPolicyScreen(
-            close = { navController.popBackStack() }
+            close = { appState.navController.popBackStack() }
          )
       }
    }

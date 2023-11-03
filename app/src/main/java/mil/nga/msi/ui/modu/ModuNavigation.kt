@@ -1,6 +1,5 @@
 package mil.nga.msi.ui.modu
 
-import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navDeepLink
@@ -14,6 +13,7 @@ import mil.nga.msi.ui.action.ModuAction
 import mil.nga.msi.ui.filter.FilterScreen
 import mil.nga.msi.ui.modu.detail.ModuDetailScreen
 import mil.nga.msi.ui.modu.list.ModusScreen
+import mil.nga.msi.ui.navigation.MarlinAppState
 import mil.nga.msi.ui.navigation.Route
 import mil.nga.msi.ui.sort.SortScreen
 
@@ -31,7 +31,7 @@ sealed class ModuRoute(
 
 @OptIn(ExperimentalMaterialNavigationApi::class)
 fun NavGraphBuilder.moduGraph(
-   navController: NavController,
+   appState: MarlinAppState,
    bottomBarVisibility: (Boolean) -> Unit,
    openNavigationDrawer: () -> Unit,
    share: (Pair<String, String>) -> Unit,
@@ -53,13 +53,13 @@ fun NavGraphBuilder.moduGraph(
 
          ModusScreen(
             openDrawer = { openNavigationDrawer() },
-            openFilter = { navController.navigate(ModuRoute.Filter.name) },
-            openSort = { navController.navigate(ModuRoute.Sort.name) },
+            openFilter = { appState.navController.navigate(ModuRoute.Filter.name) },
+            openSort = { appState.navController.navigate(ModuRoute.Sort.name) },
             onAction = { action ->
                when(action) {
                   is ModuAction.Share -> shareModu(action.modu)
                   is ModuAction.Location -> showSnackbar("${action.text} copied to clipboard")
-                  else -> action.navigate(navController)
+                  else -> action.navigate(appState.navController)
                }
             }
          )
@@ -71,12 +71,12 @@ fun NavGraphBuilder.moduGraph(
          backstackEntry.arguments?.getString("name")?.let { name ->
             ModuDetailScreen(
                name,
-               close = { navController.popBackStack() },
+               close = { appState.navController.popBackStack() },
                onAction = { action: Action ->
                   when(action) {
                      is ModuAction.Share -> shareModu(action.modu)
                      is ModuAction.Location -> showSnackbar("${action.text} copied to clipboard")
-                     else -> action.navigate(navController)
+                     else -> action.navigate(appState.navController)
                   }
                }
             )
@@ -86,14 +86,14 @@ fun NavGraphBuilder.moduGraph(
       bottomSheet(ModuRoute.Filter.name) {
          FilterScreen(
             dataSource = DataSource.MODU,
-            close = { navController.popBackStack() }
+            close = { appState.navController.popBackStack() }
          )
       }
 
       bottomSheet(ModuRoute.Sort.name) {
          SortScreen(
             dataSource = DataSource.MODU,
-            close = { navController.popBackStack() }
+            close = { appState.navController.popBackStack() }
          )
       }
    }

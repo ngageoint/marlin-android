@@ -1,8 +1,6 @@
 package mil.nga.msi.ui.bookmark
 
-import androidx.compose.ui.graphics.Color
 import androidx.core.os.BundleCompat
-import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
@@ -22,6 +20,7 @@ import mil.nga.msi.ui.action.NavigationalWarningAction
 import mil.nga.msi.ui.action.NoticeToMarinersAction
 import mil.nga.msi.ui.action.PortAction
 import mil.nga.msi.ui.action.RadioBeaconAction
+import mil.nga.msi.ui.navigation.MarlinAppState
 import mil.nga.msi.ui.navigation.NavTypeBookmark
 import mil.nga.msi.ui.navigation.Route
 
@@ -37,7 +36,7 @@ sealed class BookmarkRoute(
 
 @OptIn(ExperimentalMaterialNavigationApi::class)
 fun NavGraphBuilder.bookmarksGraph(
-   navController: NavController,
+   appState: MarlinAppState,
    bottomBarVisibility: (Boolean) -> Unit,
    share: (Pair<String, String>) -> Unit,
    showSnackbar: (String) -> Unit,
@@ -56,7 +55,7 @@ fun NavGraphBuilder.bookmarksGraph(
       when(action) {
          is AsamAction.Share -> onShare(action.asam.toString())
          is AsamAction.Location -> onShowSnackbar(action.text)
-         else -> { action.navigate(navController) }
+         else -> { action.navigate(appState.navController) }
       }
    }
 
@@ -64,18 +63,18 @@ fun NavGraphBuilder.bookmarksGraph(
       when(action) {
          is DgpsStationAction.Share -> onShare(action.dgpsStation.toString())
          is DgpsStationAction.Location -> onShowSnackbar(action.text)
-         else -> { action.navigate(navController) }
+         else -> { action.navigate(appState.navController) }
       }
    }
 
    val onElectronicPublicationAction: (ElectronicPublicationAction) -> Unit = { action ->
-      action.navigate(navController)
+      action.navigate(appState.navController)
    }
 
    val onGeoPackageFeatureAction: (GeoPackageFeatureAction) -> Unit = { action ->
       when(action) {
          is GeoPackageFeatureAction.Location -> onShowSnackbar(action.text)
-         else -> { action.navigate(navController) }
+         else -> { action.navigate(appState.navController) }
       }
    }
 
@@ -83,7 +82,7 @@ fun NavGraphBuilder.bookmarksGraph(
       when(action) {
          is LightAction.Share -> onShare(action.light.toString())
          is LightAction.Location -> onShowSnackbar(action.text)
-         else -> { action.navigate(navController) }
+         else -> { action.navigate(appState.navController) }
       }
    }
 
@@ -91,7 +90,7 @@ fun NavGraphBuilder.bookmarksGraph(
       when(action) {
          is ModuAction.Share -> onShare(action.modu.toString())
          is ModuAction.Location -> onShowSnackbar(action.text)
-         else -> { action.navigate(navController) }
+         else -> { action.navigate(appState.navController) }
       }
    }
 
@@ -99,19 +98,19 @@ fun NavGraphBuilder.bookmarksGraph(
       when(action) {
          is NavigationalWarningAction.Share -> onShare(action.warning.toString())
          is NavigationalWarningAction.Location -> onShowSnackbar(action.text)
-         else -> { action.navigate(navController) }
+         else -> { action.navigate(appState.navController) }
       }
    }
 
    val onNoticeToMarinersAction: (NoticeToMarinersAction) -> Unit = { action ->
-      action.navigate(navController)
+      action.navigate(appState.navController)
    }
 
    val onPortAction: (PortAction) -> Unit = { action ->
       when(action) {
          is PortAction.Share -> onShare(action.port.toString())
          is PortAction.Location -> onShowSnackbar(action.text)
-         else -> { action.navigate(navController) }
+         else -> { action.navigate(appState.navController) }
       }
    }
 
@@ -119,7 +118,7 @@ fun NavGraphBuilder.bookmarksGraph(
       when(action) {
          is RadioBeaconAction.Share -> onShare(action.radioBeacon.toString())
          is RadioBeaconAction.Location -> onShowSnackbar(action.text)
-         else -> { action.navigate(navController) }
+         else -> { action.navigate(appState.navController) }
       }
    }
 
@@ -162,7 +161,7 @@ fun NavGraphBuilder.bookmarksGraph(
          }?.let { bookmark ->
             BookmarkNotesScreen(
                bookmark = bookmark,
-               onDone = { navController.popBackStack() }
+               onDone = { appState.navController.popBackStack() }
             )
          }
       }

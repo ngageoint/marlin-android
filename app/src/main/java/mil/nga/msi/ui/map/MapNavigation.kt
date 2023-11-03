@@ -51,7 +51,7 @@ sealed class MapRoute(
 
 @OptIn(ExperimentalMaterialNavigationApi::class)
 fun NavGraphBuilder.mapGraph(
-   navController: NavController,
+   appState: MarlinAppState,
    bottomBarVisibility: (Boolean) -> Unit,
    openNavigationDrawer: () -> Unit,
    showSnackbar: (String) -> Unit,
@@ -86,23 +86,21 @@ fun NavGraphBuilder.mapGraph(
          MapPosition(bounds = latLngBounds)
       } else null
 
-      val navStackBackEntry by navController.currentBackStackEntryAsState()
+      val navStackBackEntry by appState.navController.currentBackStackEntryAsState()
       if (navStackBackEntry?.destination?.route?.startsWith(MapRoute.Map.name) == true) {
          annotationProvider.setMapAnnotation(null)
       }
 
       MapScreen(
          mapDestination = destination,
-         onMapTap = {
-            navController.navigate(MapRoute.PagerSheet.name)
-         },
+         onMapTap = { appState.navController.navigate(MapRoute.PagerSheet.name) },
          onExport = { dataSources ->
             val exportDataSources = dataSources.mapNotNull { ExportDataSource.fromDataSource(it) }
-            Action.Export(exportDataSources).navigate(navController)
+            Action.Export(exportDataSources).navigate(appState.navController)
          },
-         onMapSettings = { navController.navigate(MapRoute.Settings.name) },
+         onMapSettings = { appState.navController.navigate(MapRoute.Settings.name) },
          openDrawer = { openNavigationDrawer() },
-         openFilter = { navController.navigate(MapRoute.Filter.name) },
+         openFilter = { appState.navController.navigate(MapRoute.Filter.name) },
          locationCopy = { showSnackbar("$it copied to clipboard") }
       )
    }
@@ -111,15 +109,9 @@ fun NavGraphBuilder.mapGraph(
       bottomBarVisibility(false)
 
       MapSettingsScreen(
-         onLayers = {
-            navController.navigate(MapLayerRoute.Layers.name)
-         },
-         onLightSettings = {
-            navController.navigate(MapRoute.LightSettings.name)
-         },
-         onClose = {
-            navController.popBackStack()
-         }
+         onLayers = { appState.navController.navigate(MapLayerRoute.Layers.name) },
+         onLightSettings = { appState.navController.navigate(MapRoute.LightSettings.name) },
+         onClose = { appState.navController.popBackStack() }
       )
    }
 
@@ -128,7 +120,7 @@ fun NavGraphBuilder.mapGraph(
 
       MapLightSettingsScreen(
          onClose = {
-            navController.popBackStack()
+            appState.navController.popBackStack()
          }
       )
    }
@@ -138,51 +130,49 @@ fun NavGraphBuilder.mapGraph(
          onDetails =  { annotation ->
             when (annotation.key.type) {
                MapAnnotation.Type.ASAM -> {
-                  navController.navigate(AsamRoute.Detail.name + "?reference=${annotation.key.id}")
+                  appState.navController.navigate(AsamRoute.Detail.name + "?reference=${annotation.key.id}")
                }
                MapAnnotation.Type.MODU -> {
-                  navController.navigate(ModuRoute.Detail.name + "?name=${annotation.key.id}")
+                  appState.navController.navigate(ModuRoute.Detail.name + "?name=${annotation.key.id}")
                }
                MapAnnotation.Type.LIGHT -> {
                   val key = LightKey.fromId(annotation.key.id)
                   val encoded = Uri.encode(Json.encodeToString(key))
-                  navController.navigate(LightRoute.Detail.name + "?key=${encoded}")
+                  appState.navController.navigate(LightRoute.Detail.name + "?key=${encoded}")
                }
                MapAnnotation.Type.PORT -> {
-                  navController.navigate(PortRoute.Detail.name + "?portNumber=${annotation.key.id}")
+                  appState.navController.navigate(PortRoute.Detail.name + "?portNumber=${annotation.key.id}")
                }
                MapAnnotation.Type.RADIO_BEACON -> {
                   val key = RadioBeaconKey.fromId(annotation.key.id)
                   val encoded = Uri.encode(Json.encodeToString(key))
-                  navController.navigate(RadioBeaconRoute.Detail.name + "?key=${encoded}")
+                  appState.navController.navigate(RadioBeaconRoute.Detail.name + "?key=${encoded}")
                }
                MapAnnotation.Type.DGPS_STATION -> {
                   val key = DgpsStationKey.fromId(annotation.key.id)
                   val encoded = Uri.encode(Json.encodeToString(key))
-                  navController.navigate(DgpsStationRoute.Detail.name + "?key=${encoded}")
+                  appState.navController.navigate(DgpsStationRoute.Detail.name + "?key=${encoded}")
                }
                MapAnnotation.Type.NAVIGATIONAL_WARNING -> {
                   val key = NavigationalWarningKey.fromId(annotation.key.id)
                   val encoded = Uri.encode(Json.encodeToString(key))
-                  navController.navigate(NavigationWarningRoute.Detail.name + "?key=${encoded}")
+                  appState.navController.navigate(NavigationWarningRoute.Detail.name + "?key=${encoded}")
                }
                MapAnnotation.Type.GEOPACKAGE -> {
                   val key = GeoPackageFeatureKey.fromId(annotation.key.id)
                   val encoded = Uri.encode(Json.encodeToString(key))
-                  navController.navigate(GeoPackageRoute.Detail.name + "?key=${encoded}")
+                  appState.navController.navigate(GeoPackageRoute.Detail.name + "?key=${encoded}")
                }
             }
          },
          onShare = { share(it) },
-         onBookmark = { key -> Action.Bookmark(key).navigate(navController) }
+         onBookmark = { key -> Action.Bookmark(key).navigate(appState.navController) }
       )
    }
 
    bottomSheet(MapRoute.Filter.name) {
       MapFilterScreen(
-         close = {
-            navController.popBackStack()
-         }
+         close = { appState.navController.popBackStack() }
       )
    }
 }
