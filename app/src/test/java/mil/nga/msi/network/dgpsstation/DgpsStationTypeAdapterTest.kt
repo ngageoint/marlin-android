@@ -1,9 +1,9 @@
 package mil.nga.msi.network.dgpsstation
 
-import assertDgpsStationsEqual
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
 import mil.nga.msi.datasource.dgpsstation.DgpsStation
+import mil.nga.msi.datasource.dgpsstation.assertDgpsStationsEqual
 import mil.nga.msi.network.dgpsstations.DgpsStationsTypeAdapter
 import org.junit.Assert.assertEquals
 import org.junit.Before

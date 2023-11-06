@@ -1,10 +1,10 @@
 package mil.nga.msi.network.modu
 
-import assertModusEqual
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
 import mil.nga.msi.datasource.modu.Modu
 import mil.nga.msi.datasource.modu.RigStatus
+import mil.nga.msi.datasource.modu.assertModusEqual
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test

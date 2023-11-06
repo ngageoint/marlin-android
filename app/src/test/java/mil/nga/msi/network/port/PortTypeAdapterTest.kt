@@ -1,9 +1,9 @@
 package mil.nga.msi.network.port
 
-import assertPortsEqual
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
 import mil.nga.msi.datasource.port.Port
+import mil.nga.msi.datasource.port.assertPortsEqual
 import mil.nga.msi.datasource.port.types.Decision
 import mil.nga.msi.datasource.port.types.HarborType
 import mil.nga.msi.datasource.port.types.HarborUse
