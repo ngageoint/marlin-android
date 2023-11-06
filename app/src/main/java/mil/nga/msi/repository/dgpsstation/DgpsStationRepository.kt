@@ -63,6 +63,14 @@ class DgpsStationRepository @Inject constructor(
       return localDataSource.getDgpsStations(query)
    }
 
+   suspend fun count(filters: List<Filter>): Int {
+      val query = QueryBuilder(
+         table = "dgps_stations",
+         filters = filters,
+      ).buildQuery(count = true)
+      return localDataSource.count(query)
+   }
+
    suspend fun fetchDgpsStations(refresh: Boolean = false): List<DgpsStation> {
       if (refresh) {
          val newStations = mutableListOf<DgpsStation>()

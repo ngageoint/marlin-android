@@ -1,4 +1,5 @@
-import mil.nga.msi.datasource.dgpsstation.DgpsStation
+package mil.nga.msi.datasource.dgpsstation
+
 import org.junit.Assert
 
 /**

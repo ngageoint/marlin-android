@@ -233,7 +233,7 @@ private fun Layers(
                            when (dismissState.targetValue) {
                               DismissValue.Default -> MaterialTheme.colorScheme.surface
                               else -> MaterialTheme.colorScheme.remove
-                           }
+                           }, label = "color_state_animator"
                         )
 
                         Surface(
@@ -280,7 +280,7 @@ private fun Layer(
    onZoom: (LatLngBounds) -> Unit,
    onToggle: (Layer, Boolean) -> Unit
 ) {
-   val elevation by animateDpAsState(if (isDragging) 4.dp else 0.dp)
+   val elevation by animateDpAsState(if (isDragging) 4.dp else 0.dp, label = "elevation_animator")
 
    ListItem(
       tonalElevation = elevation,

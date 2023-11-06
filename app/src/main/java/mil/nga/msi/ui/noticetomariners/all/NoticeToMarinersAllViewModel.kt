@@ -30,7 +30,7 @@ class NoticeToMarinersAllViewModel @Inject constructor(
       notices
    }.map { notices ->
       notices.map {
-         val bookmark = bookmarkRepository.getBookmark(mil.nga.msi.datasource.DataSource.NOTICE_TO_MARINERS, it.noticeNumber.toString())
+         val bookmark = bookmarkRepository.getBookmark(DataSource.NOTICE_TO_MARINERS, it.noticeNumber.toString())
          NoticeToMarinersWithBookmark(it.noticeNumber, bookmark)
       }.toSet().groupBy {
          it.noticeNumber.toString().take(4)

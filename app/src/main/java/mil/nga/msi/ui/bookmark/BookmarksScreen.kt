@@ -66,12 +66,12 @@ import mil.nga.msi.ui.port.PortSummary
 import mil.nga.msi.ui.radiobeacon.RadioBeaconSummary
 import mil.nga.msi.ui.geopackage.GeoPackageFeatureSummary
 
-sealed class BookmarkAction() {
-   object Tap: BookmarkAction()
-   object Zoom: BookmarkAction()
-   object Share: BookmarkAction()
-   object Bookmark: BookmarkAction()
-   class Location(val text: String): BookmarkAction()
+sealed class BookmarkAction {
+   data object Tap: BookmarkAction()
+   data object Zoom: BookmarkAction()
+   data object Share: BookmarkAction()
+   data object Bookmark: BookmarkAction()
+   data object Location : BookmarkAction()
 }
 
 @Composable

@@ -51,8 +51,8 @@ fun NavigationDrawer(
    val tabsPreference by viewModel.tabs.observeAsState()
    val nonTabsPreference by viewModel.nonTabs.observeAsState()
 
-   var previousTabs by remember { mutableStateOf<List<DataSource>?>(null) }
-   var previousNonTabs by remember { mutableStateOf<List<DataSource>?>(null) }
+   var previousTabs by remember { mutableStateOf<List<Tab>?>(null) }
+   var previousNonTabs by remember { mutableStateOf<List<Tab>?>(null) }
    if (previousTabs == null) { previousTabs = tabsPreference }
    if (previousNonTabs == null) { previousNonTabs = nonTabsPreference }
 
@@ -136,20 +136,21 @@ fun NavigationDrawer(
 
             itemsIndexed(
                tabs,
-               key = { _, tab -> tab.name }
+               key = { _, tab -> tab.dataSource.name }
             ) { index, tab ->
                DraggableItem(dragDropState, index + 1) { isDragging ->
-                  val isMapped = mapped?.get(tab) ?: false
+                  val isMapped = mapped?.get(tab.dataSource) ?: false
+
                   NavigationRow(
-                     tab = tab,
-                     loading = loadingState[tab],
+                     dataSource = tab.dataSource,
+                     loading = loadingState[tab.dataSource],
                      isMapped = isMapped,
                      isDragging = isDragging,
                      onMapClicked = {
-                        viewModel.toggleOnMap(tab)
+                        viewModel.toggleOnMap(tab.dataSource)
                      },
                      onDestinationClicked = {
-                        onDestinationClicked(it.name)
+                        onDestinationClicked(tab.route.name)
                      }
                   )
                }
@@ -168,30 +169,29 @@ fun NavigationDrawer(
 
             itemsIndexed(
                nonTabs,
-               key = { _, tab -> tab.name }
+               key = { _, tab -> tab.dataSource.name }
             ) { index, tab ->
                DraggableItem(dragDropState, tabs.size + index + 2) { isDragging ->
-                  val isMapped = mapped?.get(tab) ?: false
+                  val isMapped = mapped?.get(tab.dataSource) ?: false
 
                   NavigationRow(
-                     tab = tab,
-                     loading = loadingState[tab],
+                     dataSource = tab.dataSource,
+                     loading = loadingState[tab.dataSource],
                      isMapped = isMapped,
                      isDragging = isDragging,
                      onMapClicked = {
                         scope.launch {
-                           viewModel.toggleOnMap(tab)
+                           viewModel.toggleOnMap(tab.dataSource)
                         }
                      },
                      onDestinationClicked = {
-                        onDestinationClicked(it.name)
+                        onDestinationClicked(tab.route.name)
                      }
                   )
                }
             }
 
             item {
-
                Column(
                   Modifier
                      .padding(top = 32.dp)
@@ -299,14 +299,14 @@ fun NavigationDrawer(
 
 @Composable
 private fun NavigationRow(
-   tab: DataSource,
+   dataSource: DataSource,
    loading: Boolean?,
    isDragging: Boolean = false,
    isMapped: Boolean,
    onMapClicked: (() -> Unit)? = null,
-   onDestinationClicked: (route: Route) -> Unit
+   onDestinationClicked: () -> Unit
 ) {
-   val elevation by animateDpAsState(if (isDragging) 4.dp else 0.dp)
+   val elevation by animateDpAsState(if (isDragging) 4.dp else 0.dp, label = "elevation_animator")
 
    Surface(
       tonalElevation = elevation,
@@ -322,14 +322,14 @@ private fun NavigationRow(
             modifier = Modifier
                .fillMaxSize()
                .clickable {
-                  onDestinationClicked(mainRouteFor(tab))
+                  onDestinationClicked()
                }
          ) {
             Box(
                modifier = Modifier
                   .width(8.dp)
                   .fillMaxHeight()
-                  .background(tab.color)
+                  .background(dataSource.color)
             )
 
             if (loading == true) {
@@ -342,7 +342,7 @@ private fun NavigationRow(
                }
             } else {
                CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-                  val bitmap = AppCompatResources.getDrawable(LocalContext.current, tab.icon)!!.toBitmap().asImageBitmap()
+                  val bitmap = AppCompatResources.getDrawable(LocalContext.current, dataSource.icon)!!.toBitmap().asImageBitmap()
                   Icon(
                      bitmap = bitmap,
                      modifier = Modifier.padding(start = 8.dp),
@@ -366,13 +366,13 @@ private fun NavigationRow(
                ) {
                   CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
                      Text(
-                        text = mainRouteFor(tab).title,
+                        text = dataSource.labelPlural,
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Medium
                      )
                   }
 
-                  if (tab.mappable) {
+                  if (dataSource.mappable) {
                      var icon = Icons.Default.LocationOff
                      var iconColor = Color.Black.copy(alpha = 0.38f)
                      if (isMapped) {

@@ -52,7 +52,7 @@ fun NoticeToMarinersGraphicScreen(
                   scope.launch {
                      viewModel.getNoticeToMarinersGraphic(graphic)?.let { uri ->
                         val shareIntent = Intent.createChooser(Intent().apply {
-                           clipData = ClipData.newRawUri("", uri);
+                           clipData = ClipData.newRawUri("", uri)
                            action = Intent.ACTION_SEND
                            putExtra(Intent.EXTRA_TITLE, "NTM Graphic")
                            putExtra(Intent.EXTRA_STREAM, uri)

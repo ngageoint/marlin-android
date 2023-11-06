@@ -12,6 +12,7 @@ val LightColorPalette = lightColorScheme(
    primary = SeaGreen,
    primaryContainer = Color.White,
    secondaryContainer = NgaBlue,
+   tertiaryContainer = SeaGreen,
    surfaceVariant = Color(red = 245, green = 242, blue = 245),
    tertiary = SeaGreen,
    secondary = NgaBlue,
@@ -22,6 +23,7 @@ val DarkColorPalette = darkColorScheme(
    secondary = Color(0xDDFFFFFF),
    primaryContainer = NgaBlue,
    secondaryContainer = SeaGreen,
+   tertiaryContainer = NgaBlue,
    tertiary = Color(0xDDFFFFFF),
    surfaceVariant = Color(red = 42, green = 41, blue = 45),
    onPrimary = Color.White

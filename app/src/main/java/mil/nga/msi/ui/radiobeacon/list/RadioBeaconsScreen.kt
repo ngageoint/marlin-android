@@ -5,10 +5,12 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -26,6 +28,7 @@ import mil.nga.msi.ui.action.AsamAction
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.action.RadioBeaconAction
 import mil.nga.msi.ui.datasource.DataSourceActions
+import mil.nga.msi.ui.export.ExportDataSource
 import mil.nga.msi.ui.radiobeacon.RadioBeaconRoute
 import mil.nga.msi.ui.radiobeacon.RadioBeaconSummary
 
@@ -75,20 +78,37 @@ fun RadioBeaconsScreen(
          }
       )
 
-      RadioBeacons(
-         pagingState = viewModel.radioBeacons,
-         onTap = { onAction(RadioBeaconAction.Tap(it)) },
-         onZoom = { onAction(RadioBeaconAction.Zoom(it.latLng)) },
-         onShare = { onAction(RadioBeaconAction.Share(it)) },
-         onBookmark = { (beacon, bookmark) ->
-            if (bookmark == null) {
-               onAction(Action.Bookmark(BookmarkKey.fromRadioBeacon(beacon)))
-            } else {
-               viewModel.deleteBookmark(bookmark)
+      Box(Modifier.fillMaxWidth()) {
+         RadioBeacons(
+            pagingState = viewModel.radioBeacons,
+            onTap = { onAction(RadioBeaconAction.Tap(it)) },
+            onZoom = { onAction(RadioBeaconAction.Zoom(it.latLng)) },
+            onShare = { onAction(RadioBeaconAction.Share(it)) },
+            onBookmark = { (beacon, bookmark) ->
+               if (bookmark == null) {
+                  onAction(Action.Bookmark(BookmarkKey.fromRadioBeacon(beacon)))
+               } else {
+                  viewModel.deleteBookmark(bookmark)
+               }
+            },
+            onCopyLocation = { onAction(AsamAction.Location(it)) }
+         )
+
+         Box(
+            Modifier
+               .align(Alignment.BottomEnd)
+               .padding(16.dp)
+         ) {
+            FloatingActionButton(
+               containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+               onClick = { onAction(Action.Export(listOf(ExportDataSource.RadioBeacon))) }
+            ) {
+               Icon(Icons.Outlined.Download,
+                  contentDescription = "Export radio beacons as GeoPackage"
+               )
             }
-         },
-         onCopyLocation = { onAction(AsamAction.Location(it)) }
-      )
+         }
+      }
    }
 }
 

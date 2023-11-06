@@ -4,8 +4,6 @@ import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import assertNoticeToMarinersEqual
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mil.nga.msi.datasource.MsiDatabase
 import org.junit.After
@@ -15,7 +13,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.IOException
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
 class NoticeToMarinersEntityTest {
 

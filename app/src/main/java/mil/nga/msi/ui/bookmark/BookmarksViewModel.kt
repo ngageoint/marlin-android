@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import mil.nga.geopackage.GeoPackage
 import mil.nga.geopackage.GeoPackageManager
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.bookmark.Bookmark
@@ -68,8 +67,8 @@ class BookmarksViewModel @Inject constructor(
                val key = GeoPackageFeatureKey.fromId(bookmark.id)
                layerRepository.getLayer(key.layerId)?.let { layer ->
                   val geoPackage = geoPackageManager.openExternal(layer.filePath)
-                  geoPackage.getFeature(layer.id, layer.name, key.table, key.featureId)?.let { geoPackage ->
-                     ItemWithBookmark(key to geoPackage, DataSource.GEOPACKAGE, bookmark)
+                  geoPackage.getFeature(layer.id, layer.name, key.table, key.featureId)?.let { feature ->
+                     ItemWithBookmark(key to feature, DataSource.GEOPACKAGE, bookmark)
                   }
                }
             }

@@ -19,6 +19,10 @@ interface PortDao {
    @Query("SELECT COUNT(*) from ports")
    fun count(): Int
 
+   @RawQuery
+   @RewriteQueriesToDropUnusedColumns
+   suspend fun count(query: SupportSQLiteQuery): Int
+
    @Query("SELECT * FROM ports WHERE port_number = :portNumber")
    fun observePort(portNumber: Int): Flow<Port>
 

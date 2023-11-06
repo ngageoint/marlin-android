@@ -10,7 +10,7 @@ import mil.nga.msi.ui.map.MapRoute
 import mil.nga.msi.ui.modu.ModuRoute
 import mil.nga.msi.ui.navigation.NavPoint
 
-sealed class ModuAction(): Action() {
+sealed class ModuAction : Action() {
    class Tap(val modu: Modu): ModuAction() {
       override fun navigate(navController: NavController) {
          navController.navigate("${ModuRoute.Detail.name}?name=${modu.name}")

@@ -14,6 +14,7 @@ class ModuLocalDataSource @Inject constructor(
    fun observeModuListItems(query: SimpleSQLiteQuery) = dao.observeModuListItems(query)
 
    fun isEmpty() = dao.count() == 0
+   suspend fun count(query: SimpleSQLiteQuery) = dao.count(query)
 
    suspend fun getModu(name: String) = dao.getModu(name)
    suspend fun getModus() = dao.getModus()

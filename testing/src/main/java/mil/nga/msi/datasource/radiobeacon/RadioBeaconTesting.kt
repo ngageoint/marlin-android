@@ -1,4 +1,5 @@
-import mil.nga.msi.datasource.radiobeacon.RadioBeacon
+package mil.nga.msi.datasource.radiobeacon
+
 import org.junit.Assert
 
 /**

@@ -114,7 +114,7 @@ data class DgpsStation(
          "Frequency: ${frequency.toString()}\n" +
          "Station Remark: ${remarks.orEmpty()}\n" +
          "Remove From List: ${removeFromList.orEmpty()}\n" +
-         "Volume Number: ${volumeNumber}"
+         "Volume Number: $volumeNumber"
    }
 
    fun compositeKey(): String {

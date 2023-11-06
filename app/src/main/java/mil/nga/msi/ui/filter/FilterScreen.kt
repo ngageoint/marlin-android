@@ -85,7 +85,7 @@ fun FilterScreen(
                .fillMaxSize()
                .verticalScroll(scrollState)
          ) {
-            Filter(
+            FilterScreen(
                dataSource = dataSource,
                location = location
             )
@@ -95,7 +95,7 @@ fun FilterScreen(
 }
 
 @Composable
-fun Filter(
+fun FilterScreen(
    dataSource: DataSource,
    location: Location?,
    viewModel: FilterViewModel = hiltViewModel()
@@ -104,24 +104,41 @@ fun Filter(
    val filters by viewModel.filters.observeAsState(emptyList())
    val filterParameters by viewModel.filterParameters.observeAsState(emptyList())
 
-   Filters(
+   FilterContent(
+      location = location,
       filters = filters,
-      removeFilter = {
+      filterParameters = filterParameters,
+      onAddFilter = {
+         val added = filters.toMutableList()
+         added.add(it)
+         viewModel.setFilters(dataSource, added)
+      },
+      onRemoveFilter = {
          val removed = filters.toMutableList()
          removed.remove(it)
          viewModel.setFilters(dataSource, removed)
       }
+   )
+}
+
+@Composable
+fun FilterContent(
+   location: Location?,
+   filters: List<Filter>,
+   filterParameters: List<FilterParameter>,
+   onAddFilter: (Filter) -> Unit,
+   onRemoveFilter: (Filter) -> Unit
+) {
+   Filters(
+      filters = filters,
+      removeFilter = { onRemoveFilter(it) }
    )
 
    if (filterParameters.isNotEmpty()) {
       FilterHeader(
          location = location,
          filterParameters = filterParameters,
-         addFilter = {
-            val added = filters.toMutableList()
-            added.add(it)
-            viewModel.setFilters(dataSource, added)
-         }
+         addFilter = { onAddFilter(it) }
       )
    }
 }
@@ -258,7 +275,7 @@ private fun FilterHeader(
 
    Surface(
       contentColor = MaterialTheme.colorScheme.onSurface,
-      modifier = Modifier.fillMaxSize()
+      modifier = Modifier.fillMaxWidth()
    ) {
       Row(
          verticalAlignment = Alignment.CenterVertically,
@@ -562,7 +579,6 @@ private fun ValueSelection(
    }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DateValue(
    comparator: ComparatorType,
@@ -668,7 +684,6 @@ fun DoubleValue(
    }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun IntValue(
    value: String,
@@ -686,7 +701,7 @@ fun IntValue(
    }
 }
 
-@OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun LocationValue(
    location: Location?,
@@ -817,7 +832,6 @@ fun LocationValue(
    }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun StringValue(
    value: String,

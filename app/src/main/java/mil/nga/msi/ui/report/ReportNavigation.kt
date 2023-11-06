@@ -1,25 +1,23 @@
 package mil.nga.msi.ui.report
 
-import androidx.compose.ui.graphics.Color
-import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import mil.nga.msi.R
+import mil.nga.msi.ui.navigation.MarlinAppState
 import mil.nga.msi.ui.navigation.Route
 
 sealed class ReportRoute(
    override val name: String,
    override val title: String,
    override val shortTitle: String = title,
-   override val color: Color = Color(0xFF000000),
    val icon: Int = 0,
    val url: String = ""
 ): Route {
-   object Main: ReportRoute("report", "Submit a Report to NGA")
-   object List: ReportRoute("report/list", "NGA Report Submission")
+   data object Main: ReportRoute("report", "Submit a Report to NGA")
+   data object List: ReportRoute("report/list", "NGA Report Submission")
 
-   object ASAM: ReportRoute(
+   data object ASAM: ReportRoute(
       name = "report/asam",
       title = "Anti-Shipping Activity Message ASAM",
       shortTitle = "ASAM Report",
@@ -27,7 +25,7 @@ sealed class ReportRoute(
       url = "https://msi.nga.mil/submit-report/ASAM-Report"
    )
 
-   object MODU: ReportRoute(
+   data object MODU: ReportRoute(
       name = "report/modu",
       title = "Mobile offshore Drilling Unit Movement Report MODU",
       shortTitle = "MODU Report",
@@ -35,7 +33,7 @@ sealed class ReportRoute(
       url = "https://msi.nga.mil/submit-report/MODU-Report"
    )
 
-   object Observer: ReportRoute(
+   data object Observer: ReportRoute(
       name = "report/observer",
       title = "Observer Report",
       shortTitle = "Observer Report",
@@ -43,7 +41,7 @@ sealed class ReportRoute(
       url = "https://msi.nga.mil/submit-report/Observ-Report"
    )
 
-   object PortVisit: ReportRoute(
+   data object PortVisit: ReportRoute(
       name = "report/portVisit",
       title = "US Navy Port Visit Request",
       shortTitle = "Port Visit Request",
@@ -51,7 +49,7 @@ sealed class ReportRoute(
       url = "https://msi.nga.mil/submit-report/Visit-Report"
    )
 
-   object HostileShip: ReportRoute(
+   data object HostileShip: ReportRoute(
       name = "report/hostileShip",
       title = "Ship Hostile Action Report",
       shortTitle = "Ship Hostile Action Report",
@@ -61,7 +59,7 @@ sealed class ReportRoute(
 }
 
 fun NavGraphBuilder.reportGraph(
-   navController: NavController,
+   appState: MarlinAppState,
    bottomBarVisibility: (Boolean) -> Unit
 ) {
    navigation(
@@ -73,53 +71,39 @@ fun NavGraphBuilder.reportGraph(
          bottomBarVisibility(true)
 
          ReportsScreen(
-            close = {
-               navController.popBackStack()
-            },
-            onTap = { route ->
-               navController.navigate(route.name)
-            }
+            close = { appState.navController.popBackStack() },
+            onTap = { route -> appState.navController.navigate(route.name) }
          )
       }
 
       composable(ReportRoute.ASAM.name) {
          bottomBarVisibility(true)
 
-         ReportPage(ReportRoute.ASAM) {
-            navController.popBackStack()
-         }
+         ReportPage(ReportRoute.ASAM) { appState.navController.popBackStack() }
       }
 
       composable(ReportRoute.Observer.name) {
          bottomBarVisibility(true)
 
-         ReportPage(ReportRoute.Observer) {
-            navController.popBackStack()
-         }
+         ReportPage(ReportRoute.Observer) { appState.navController.popBackStack() }
       }
 
       composable(ReportRoute.MODU.name) {
          bottomBarVisibility(true)
 
-         ReportPage(ReportRoute.MODU) {
-            navController.popBackStack()
-         }
+         ReportPage(ReportRoute.MODU) { appState.navController.popBackStack() }
       }
 
       composable(ReportRoute.PortVisit.name) {
          bottomBarVisibility(true)
 
-         ReportPage(ReportRoute.PortVisit) {
-            navController.popBackStack()
-         }
+         ReportPage(ReportRoute.PortVisit) { appState.navController.popBackStack() }
       }
 
       composable(ReportRoute.HostileShip.name) {
          bottomBarVisibility(true)
 
-         ReportPage(ReportRoute.HostileShip) {
-            navController.popBackStack()
-         }
+         ReportPage(ReportRoute.HostileShip) { appState.navController.popBackStack() }
       }
    }
 }

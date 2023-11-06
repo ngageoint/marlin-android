@@ -2,6 +2,7 @@ package mil.nga.msi.ui.map.settings.layers.wms
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -9,8 +10,17 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.Checkbox
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.ListItem
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.MyLocation
+import androidx.compose.material.icons.outlined.Folder
+import androidx.compose.material.icons.outlined.Layers
 import androidx.compose.material3.Button
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
@@ -26,6 +36,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -206,6 +217,7 @@ private fun WMSLayer(
    }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun WMSCapabilitiesLayer(
    layer: mil.nga.msi.network.layer.wms.Layer,
@@ -214,40 +226,40 @@ private fun WMSCapabilitiesLayer(
    onLayerChecked: (mil.nga.msi.network.layer.wms.Layer, String, Boolean) -> Unit
 ) {
    if (layer.layers.isNotEmpty()) {
-//      ListItem(
-//         headlineContent = {
-//            Text(
-//               text = layer.title ?: "Folder",
-//               maxLines = 1,
-//               overflow = TextOverflow.Ellipsis
-//            )
-//         },
-//         supportingContent = {
-//            layer.abstract?.let {
-//               Text(
-//                  text = it,
-//                  maxLines = 1,
-//                  overflow = TextOverflow.Ellipsis
-//               )
-//            }
-//         },
-//         leadingContent = {
-//            Icon(
-//               Icons.Outlined.Folder,
-//               contentDescription = "Folder"
-//            )
-//         },
-//         trailingContent = {
-//            IconButton(
-//               onClick = { onZoom(layer) }
-//            ) {
-//               Icon(
-//                  Icons.Default.ExpandMore,
-//                  contentDescription = "Expand Folder"
-//               )
-//            }
-//         }
-//      )
+      ListItem(
+         text = {
+            Text(
+               text = layer.title ?: "Folder",
+               maxLines = 1,
+               overflow = TextOverflow.Ellipsis
+            )
+         },
+         secondaryText = {
+            layer.abstract?.let {
+               Text(
+                  text = it,
+                  maxLines = 1,
+                  overflow = TextOverflow.Ellipsis
+               )
+            }
+         },
+         icon = {
+            Icon(
+               Icons.Outlined.Folder,
+               contentDescription = "Folder"
+            )
+         },
+         trailing = {
+            IconButton(
+               onClick = { onZoom(layer) }
+            ) {
+               Icon(
+                  Icons.Default.ExpandMore,
+                  contentDescription = "Expand Folder"
+               )
+            }
+         }
+      )
 
       layer.layers.forEach {
          WMSCapabilitiesLayer(
@@ -258,44 +270,44 @@ private fun WMSCapabilitiesLayer(
          )
       }
    } else if (layer.hasTiles()) {
-//      ListItem(
-//         headlineContent = {
-//            Text(
-//               text = layer.title ?: "Layer",
-//               maxLines = 1,
-//               overflow = TextOverflow.Ellipsis
-//            )
-//         },
-//         supportingContent = {
-//            layer.abstract?.let {
-//               Text(
-//                  text = it,
-//                  maxLines = 1,
-//                  overflow = TextOverflow.Ellipsis
-//               )
-//            }
-//         },
-//         leadingContent = {
-//            Icon(
-//               Icons.Outlined.Layers,
-//               contentDescription = "Layer"
-//            )
-//         },
-//         trailingContent = {
-//            Row {
-//               IconButton(onClick = { onZoom(layer) }) {
-//                  Icon(Icons.Default.MyLocation, contentDescription = "Zoom to GeoPackage Bounds")
-//               }
-//
-//               Checkbox(
-//                  checked = wmsLayers.contains(layer.name),
-//                  onCheckedChange = { checked ->
-//                     layer.name?.let { name -> onLayerChecked(layer, name, checked) }
-//                  }
-//               )
-//            }
-//         }
-//      )
+      ListItem(
+         text = {
+            Text(
+               text = layer.title ?: "Layer",
+               maxLines = 1,
+               overflow = TextOverflow.Ellipsis
+            )
+         },
+         secondaryText = {
+            layer.abstract?.let {
+               Text(
+                  text = it,
+                  maxLines = 1,
+                  overflow = TextOverflow.Ellipsis
+               )
+            }
+         },
+         icon = {
+            Icon(
+               Icons.Outlined.Layers,
+               contentDescription = "Layer"
+            )
+         },
+         trailing = {
+            Row {
+               IconButton(onClick = { onZoom(layer) }) {
+                  Icon(Icons.Default.MyLocation, contentDescription = "Zoom to GeoPackage Bounds")
+               }
+
+               Checkbox(
+                  checked = wmsLayers.contains(layer.name),
+                  onCheckedChange = { checked ->
+                     layer.name?.let { name -> onLayerChecked(layer, name, checked) }
+                  }
+               )
+            }
+         }
+      )
    }
 }
 

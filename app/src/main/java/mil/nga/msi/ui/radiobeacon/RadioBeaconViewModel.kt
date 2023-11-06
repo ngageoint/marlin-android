@@ -1,6 +1,5 @@
 package mil.nga.msi.ui.radiobeacon
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
@@ -12,9 +11,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import mil.nga.msi.datasource.DataSource
-import mil.nga.msi.datasource.asam.AsamWithBookmark
 import mil.nga.msi.datasource.bookmark.Bookmark
-import mil.nga.msi.datasource.radiobeacon.RadioBeacon
 import mil.nga.msi.datasource.radiobeacon.RadioBeaconWithBookmark
 import mil.nga.msi.repository.bookmark.BookmarkRepository
 import mil.nga.msi.repository.radiobeacon.RadioBeaconKey

@@ -1,4 +1,5 @@
-import mil.nga.msi.datasource.modu.Modu
+package mil.nga.msi.datasource.modu
+
 import org.junit.Assert
 
 /**

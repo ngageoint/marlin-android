@@ -3,8 +3,6 @@ package mil.nga.msi.network.dgpsstation
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
-import io.mockk.verify
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mil.nga.msi.datasource.dgpsstation.DgpsStation
 import mil.nga.msi.datasource.light.PublicationVolume
@@ -17,7 +15,6 @@ import org.junit.Test
 import retrofit2.Response
 import java.util.Calendar
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class DgpsStationServiceTest {
 
     @Test

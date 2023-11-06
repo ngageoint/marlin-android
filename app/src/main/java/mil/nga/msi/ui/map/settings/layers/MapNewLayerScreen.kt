@@ -206,7 +206,6 @@ private fun NoServer() {
    }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun Layer(
    url: String,
@@ -437,27 +436,28 @@ private fun WMSServiceProperty(
    name: String,
    value: String
 ) {
-   Column(
-      Modifier.padding(vertical = 8.dp)
-   ) {
-      CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-         Text(
-            text = name,
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(bottom = 4.dp)
-         )
-      }
+   if (value.isNotBlank()) {
+      Column(
+         Modifier.padding(vertical = 8.dp)
+      ) {
+         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+            Text(
+               text = name,
+               style = MaterialTheme.typography.bodyMedium,
+               modifier = Modifier.padding(bottom = 4.dp)
+            )
+         }
 
-      CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
-         Text(
-            text = value,
-            style = MaterialTheme.typography.bodyLarge
-         )
+         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
+            Text(
+               text = value,
+               style = MaterialTheme.typography.bodyLarge
+            )
+         }
       }
    }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun Credentials(
    username: String,

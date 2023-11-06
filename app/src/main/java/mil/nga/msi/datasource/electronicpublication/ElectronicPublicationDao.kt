@@ -69,11 +69,8 @@ interface ElectronicPublicationDao {
     }
 
     @Transaction
-    suspend fun updateToRemoveDownload(ePub: ElectronicPublication, removeDownloadedFile: suspend () -> Unit): Unit {
-        val latest = findById(ePub.s3Key)
-        if (latest == null) {
-            return
-        }
+    suspend fun updateToRemoveDownload(ePub: ElectronicPublication, removeDownloadedFile: suspend () -> Unit) {
+        val latest = findById(ePub.s3Key) ?: return
         val scrubDownloadUpdate = latest.copy(isDownloading = false, isDownloaded = false,
             downloadedBytes = 0, localDownloadId = null, localDownloadRelPath = null)
         update(scrubDownloadUpdate)

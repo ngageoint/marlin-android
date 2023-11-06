@@ -24,7 +24,7 @@ fun DgpsStationSummary(
    Column(modifier = modifier) {
       CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
          Text(
-            text = "${dgpsStation.featureNumber.toString()} ${dgpsStation.volumeNumber}",
+            text = "${dgpsStation.featureNumber} ${dgpsStation.volumeNumber}",
             fontWeight = FontWeight.SemiBold,
             style = MaterialTheme.typography.labelSmall,
             maxLines = 1,

@@ -1,6 +1,7 @@
 package mil.nga.msi.ui.action
 
 import android.net.Uri
+import android.util.Log
 import androidx.navigation.NavController
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.serialization.encodeToString
@@ -10,7 +11,7 @@ import mil.nga.msi.ui.asam.AsamRoute
 import mil.nga.msi.ui.map.MapRoute
 import mil.nga.msi.ui.navigation.NavPoint
 
-sealed class AsamAction(): Action() {
+sealed class AsamAction : Action() {
    class Tap(private val asam: Asam): AsamAction() {
       override fun navigate(navController: NavController) {
          navController.navigate("${AsamRoute.Detail.name}?reference=${asam.reference}")

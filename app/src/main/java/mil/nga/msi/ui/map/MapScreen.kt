@@ -4,6 +4,7 @@ import android.Manifest
 import android.animation.ValueAnimator
 import android.content.res.Configuration
 import android.graphics.Bitmap
+import android.util.Log
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.fadeOut
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.LocationSearching
 import androidx.compose.material.icons.outlined.Map
 import androidx.compose.material.icons.outlined.MyLocation
@@ -59,7 +61,6 @@ import mil.nga.msi.ui.coordinate.CoordinateText
 import mil.nga.msi.ui.location.LocationPermission
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.cluster.MapAnnotation
-import mil.nga.msi.ui.navigation.mainRouteFor
 import mil.nga.msi.ui.theme.onSurfaceDisabled
 import kotlin.math.abs
 import kotlin.math.roundToInt
@@ -75,9 +76,9 @@ data class MapPosition(
 @Composable
 fun MapScreen(
    mapDestination : MapPosition? = null,
-   onAnnotationClick: (MapAnnotation) -> Unit,
-   onAnnotationsClick: (Collection<MapAnnotation>) -> Unit,
+   onMapTap: () -> Unit,
    onMapSettings: () -> Unit,
+   onExport: (List<DataSource>) -> Unit,
    openFilter: () -> Unit,
    openDrawer: () -> Unit,
    locationCopy: (String) -> Unit,
@@ -218,7 +219,7 @@ fun MapScreen(
                   viewModel.setMapLocation(mapLocation, position.zoom.toInt())
                }
             },
-            onMapClick = { latLng, zoom, region ->
+            onMapTap = { latLng, region ->
                val screenPercentage = 0.04
                val screenRightLong = region.farRight.longitude
                val screenLeftLong = region.farLeft.longitude
@@ -230,35 +231,14 @@ fun MapScreen(
                   (360 - abs(screenRightLong) - abs(screenLeftLong)) * screenPercentage
                }
 
+               val bounds = LatLngBounds(
+                  LatLng(latLng.latitude - tolerance, latLng.longitude - tolerance),
+                  LatLng(latLng.latitude + tolerance, latLng.longitude + tolerance)
+               )
+
                scope.launch {
-                  val mapAnnotations = viewModel.getMapAnnotations(
-                     minLongitude = latLng.longitude - tolerance,
-                     maxLongitude = latLng.longitude + tolerance,
-                     minLatitude = latLng.latitude - tolerance,
-                     maxLatitude = latLng.latitude + tolerance,
-                     point = latLng
-                  )
-
-                  if (mapAnnotations.isNotEmpty()) {
-                     val bounds = LatLngBounds.builder().apply {
-                        mapAnnotations.forEach { this.include(LatLng(it.latitude, it.longitude)) }
-                     }.build()
-
-                     destination = MapPosition(
-                        location = MapLocation.newBuilder()
-                           .setLatitude(bounds.center.latitude)
-                           .setLongitude(bounds.center.longitude)
-                           .setZoom(zoom.toDouble())
-                           .build()
-                     )
-
-                     if (mapAnnotations.size == 1) {
-                        viewModel.annotationProvider.setMapAnnotation(mapAnnotations.first())
-                        onAnnotationClick(mapAnnotations.first())
-                     } else if (mapAnnotations.isNotEmpty()) {
-                        onAnnotationsClick(mapAnnotations)
-                     }
-                  }
+                  val count = viewModel.setTapLocation(latLng, bounds)
+                  if (count > 0) { onMapTap() }
                }
             }
          )
@@ -314,31 +294,52 @@ fun MapScreen(
                .align(Alignment.BottomEnd)
                .padding(16.dp)
          ) {
-            Row {
-               if (showScale) {
-                  ScaleBar(
-                     modifier = Modifier.padding(end = 16.dp),
-                     cameraPositionState = cameraPositionState
-                  )
+            Column(
+               verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+               Box {
+                  FloatingActionButton(
+                     onClick = {
+                        val dataSources = viewModel.mapped.value?.toList()
+                           ?.filter { (_, mapped) -> mapped}
+                           ?.map { (dataSource, _) -> dataSource } ?: emptyList()
+
+                        onExport(dataSources)
+                     }
+                  ) {
+                     Icon(
+                        imageVector = Icons.Outlined.Download,
+                        tint = MaterialTheme.colorScheme.tertiary,
+                        contentDescription = "Export Map Features as GeoPackage"
+                     )
+                  }
                }
 
-               if (locationPermissionState.status.isGranted) {
-                  Zoom(located) {
-                     located = true
-                     scope.launch {
-                        destination = MapPosition(
-                           location = MapLocation.newBuilder()
-                              .setLatitude(location?.latitude ?: 0.0)
-                              .setLongitude(location?.longitude ?: 0.0)
-                              .setZoom(17.0)
-                              .build()
-                        )
+               Row {
+                  if (showScale) {
+                     ScaleBar(
+                        modifier = Modifier.padding(end = 16.dp),
+                        cameraPositionState = cameraPositionState
+                     )
+                  }
+
+                  if (locationPermissionState.status.isGranted) {
+                     Zoom(located) {
+                        located = true
+                        scope.launch {
+                           destination = MapPosition(
+                              location = MapLocation.newBuilder()
+                                 .setLatitude(location?.latitude ?: 0.0)
+                                 .setLongitude(location?.longitude ?: 0.0)
+                                 .setZoom(17.0)
+                                 .build()
+                           )
+                        }
                      }
                   }
                }
             }
          }
-
 
          Box(
             modifier = Modifier
@@ -397,13 +398,13 @@ private fun Map(
    annotation: MapAnnotation?,
    cameraPositionState: CameraPositionState,
    onMapMove: (CameraPosition, Int) -> Unit,
-   onMapClick: (LatLng, Float, VisibleRegion) -> Unit
+   onMapTap: (LatLng, VisibleRegion) -> Unit
 ) {
    val scope = rememberCoroutineScope()
    val context = LocalContext.current
 
    var isMapLoaded by remember { mutableStateOf(false) }
-   var cameraMoveReason by remember { mutableStateOf(0) }
+   var cameraMoveReason by remember { mutableIntStateOf(0) }
 
    LaunchedEffect(origin) {
       origin?.let { origin ->
@@ -503,7 +504,7 @@ private fun Map(
          }
 
          map.setOnMapClickListener { latLng ->
-            onMapClick(latLng, map.cameraPosition.zoom, map.projection.visibleRegion)
+            onMapTap(latLng, map.projection.visibleRegion)
          }
 
          if (annotation != null) {
@@ -764,7 +765,7 @@ private fun Search(
 @Composable
 private fun DataSources(
    mapped: Map<DataSource, Boolean>,
-   onDataSourceToggle: (DataSource) -> Unit,
+   onDataSourceToggle: (DataSource) -> Unit
 ) {
    if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT) {
       Column(
@@ -815,7 +816,7 @@ private fun DataSourceItem(
          bitmap = bitmap,
          tint = tint,
          modifier = Modifier.size(24.dp),
-         contentDescription = "${mainRouteFor(dataSource).title} map toggle"
+         contentDescription = "${dataSource.labelPlural} map toggle"
       )
    }
 }

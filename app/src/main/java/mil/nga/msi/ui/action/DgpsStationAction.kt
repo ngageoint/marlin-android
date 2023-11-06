@@ -11,7 +11,7 @@ import mil.nga.msi.ui.dgpsstation.DgpsStationRoute
 import mil.nga.msi.ui.map.MapRoute
 import mil.nga.msi.ui.navigation.NavPoint
 
-sealed class DgpsStationAction(): Action() {
+sealed class DgpsStationAction : Action() {
    class Tap(val dgpsStation: DgpsStation): DgpsStationAction() {
       override fun navigate(navController: NavController) {
          val key = DgpsStationKey.fromDgpsStation(dgpsStation)

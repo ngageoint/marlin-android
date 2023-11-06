@@ -26,7 +26,7 @@ class RefreshNavigationalWarningWorkerFactory(
    private val userPreferencesRepository: UserPreferencesRepository,
    private val notification: MarlinNotification
 ) : WorkerFactory() {
-   override fun createWorker(appContext: Context, workerClassName: String, workerParameters: WorkerParameters): ListenableWorker? {
+   override fun createWorker(appContext: Context, workerClassName: String, workerParameters: WorkerParameters): ListenableWorker {
       return RefreshNavigationalWarningWorker(appContext, workerParameters, repository, userPreferencesRepository, notification)
    }
 }

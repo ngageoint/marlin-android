@@ -1,6 +1,8 @@
 package mil.nga.msi.ui.modu.sheet
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -11,7 +13,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import mil.nga.msi.datasource.DataSource
+import mil.nga.msi.datasource.modu.Modu
 import mil.nga.msi.datasource.modu.ModuWithBookmark
+import mil.nga.msi.ui.datasource.DataSourceActions
 import mil.nga.msi.ui.datasource.DataSourceIcon
 import mil.nga.msi.ui.modu.ModuSummary
 import mil.nga.msi.ui.modu.ModuViewModel
@@ -20,33 +24,41 @@ import mil.nga.msi.ui.modu.ModuViewModel
 fun ModuSheetScreen(
    name: String,
    modifier: Modifier = Modifier,
-   onDetails: (() -> Unit)? = null,
+   onDetails: () -> Unit,
+   onShare: (Modu) -> Unit,
+   onBookmark: (ModuWithBookmark) -> Unit,
    viewModel: ModuViewModel = hiltViewModel()
 ) {
    viewModel.setName(name)
    val moduWithBookmark by viewModel.moduWithBookmark.observeAsState()
    Column(modifier = modifier) {
-      ModuContent(moduWithBookmark) {
-         onDetails?.invoke()
-      }
-   }
-}
+      Column(Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
+         DataSourceIcon(
+            dataSource = DataSource.MODU,
+            modifier = Modifier.padding(bottom = 16.dp)
+         )
 
-@Composable
-private fun ModuContent(
-   moduWithBookmark: ModuWithBookmark?,
-   onDetails: () -> Unit,
-) {
-   Column(modifier = Modifier.padding(vertical = 8.dp)) {
-      DataSourceIcon(dataSource = DataSource.MODU)
+         moduWithBookmark?.let {
+            ModuSummary(
+               moduWithBookmark = it,
+               modifier = Modifier.padding(bottom = 16.dp)
+            )
+         }
 
-      moduWithBookmark?.let { ModuSummary(moduWithBookmark = it) }
+         Row(horizontalArrangement = Arrangement.SpaceBetween) {
+            TextButton(
+               onClick = onDetails
+            ) {
+               Text("MORE DETAILS")
+            }
 
-      TextButton(
-         onClick = { onDetails() },
-         modifier = Modifier.padding(horizontal = 16.dp)
-      ) {
-         Text("MORE DETAILS")
+            DataSourceActions(
+               bookmarked = moduWithBookmark?.bookmark != null,
+               onShare = { moduWithBookmark?.modu?.let { onShare(it) } },
+               onBookmark = { moduWithBookmark?.let { onBookmark(it) } },
+               modifier = Modifier.padding(end = 8.dp, bottom = 8.dp)
+            )
+         }
       }
    }
 }

@@ -24,7 +24,7 @@ import java.time.Instant
 import java.time.temporal.ChronoUnit
 
 class LoadDgpsStationWorkerFactory(private val dataSource: DgpsStationLocalDataSource) : WorkerFactory() {
-   override fun createWorker(appContext: Context, workerClassName: String, workerParameters: WorkerParameters): ListenableWorker? {
+   override fun createWorker(appContext: Context, workerClassName: String, workerParameters: WorkerParameters): ListenableWorker {
       return LoadDgpsStationWorker(appContext, workerParameters, dataSource)
    }
 }
@@ -34,7 +34,7 @@ class RefreshDgpsStationWorkerFactory(
    private val userPreferencesRepository: UserPreferencesRepository,
    private val notification: MarlinNotification
 ) : WorkerFactory() {
-   override fun createWorker(appContext: Context, workerClassName: String, workerParameters: WorkerParameters): ListenableWorker? {
+   override fun createWorker(appContext: Context, workerClassName: String, workerParameters: WorkerParameters): ListenableWorker {
       return RefreshDgpsStationWorker(appContext, workerParameters, repository, userPreferencesRepository, notification)
    }
 }

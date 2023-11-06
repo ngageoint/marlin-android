@@ -1,6 +1,5 @@
 package mil.nga.msi.datasource.modu
 
-import androidx.lifecycle.LiveData
 import androidx.paging.PagingSource
 import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteQuery
@@ -19,6 +18,10 @@ interface ModuDao {
 
    @Query("SELECT COUNT(*) from modus")
    fun count(): Int
+
+   @RawQuery
+   @RewriteQueriesToDropUnusedColumns
+   suspend fun count(query: SupportSQLiteQuery): Int
 
    @Query("SELECT * FROM modus")
    fun observeModus(): Flow<List<Modu>>

@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:ignore="UseCompoundDrawables">
 
-    <ImageView
+    <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/marker"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:tint="@color/nga_blue"
         android:layout_gravity="center"
-        android:src="@drawable/ic_round_location_on_24">
-    </ImageView>
+        android:src="@drawable/ic_round_location_on_24"
+        android:tint="@color/nga_blue">
+    </androidx.appcompat.widget.AppCompatImageView>
 
     <TextView
         android:id="@+id/label"
@@ -29,6 +31,5 @@
         android:shadowDy="2"
         android:shadowRadius="0.01">
     </TextView>
-
 
 </LinearLayout>

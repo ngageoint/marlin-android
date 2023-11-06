@@ -11,7 +11,7 @@ import mil.nga.msi.ui.map.MapRoute
 import mil.nga.msi.ui.navigation.NavPoint
 import mil.nga.msi.ui.radiobeacon.RadioBeaconRoute
 
-sealed class RadioBeaconAction(): Action() {
+sealed class RadioBeaconAction : Action() {
    class Tap(private val radioBeacon: RadioBeacon): RadioBeaconAction() {
       override fun navigate(navController: NavController) {
          val key = RadioBeaconKey.fromRadioBeacon(radioBeacon)

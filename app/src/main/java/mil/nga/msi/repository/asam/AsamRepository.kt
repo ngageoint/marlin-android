@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.flatMapLatest
 import mil.nga.msi.MarlinNotification
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.asam.Asam
-import mil.nga.msi.datasource.asam.AsamListItem
 import mil.nga.msi.datasource.asam.AsamMapItem
 import mil.nga.msi.datasource.filter.QueryBuilder
 import mil.nga.msi.filter.Filter
@@ -58,6 +57,14 @@ class AsamRepository @Inject constructor(
          filters = filters
       ).buildQuery()
       return localDataSource.getAsams(query)
+   }
+
+   suspend fun count(filters: List<Filter>): Int {
+      val query = QueryBuilder(
+         table = "asams",
+         filters = filters,
+      ).buildQuery(count = true)
+      return localDataSource.count(query)
    }
 
    suspend fun fetchAsams(refresh: Boolean = false): List<Asam> {

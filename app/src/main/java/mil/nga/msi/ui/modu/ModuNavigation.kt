@@ -1,47 +1,37 @@
 package mil.nga.msi.ui.modu
 
-import android.net.Uri
-import androidx.compose.ui.graphics.Color
-import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navDeepLink
 import androidx.navigation.navigation
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import com.google.accompanist.navigation.material.bottomSheet
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.modu.Modu
 import mil.nga.msi.ui.action.Action
 import mil.nga.msi.ui.action.ModuAction
-import mil.nga.msi.ui.bookmark.BookmarkRoute
 import mil.nga.msi.ui.filter.FilterScreen
-import mil.nga.msi.ui.map.MapRoute
 import mil.nga.msi.ui.modu.detail.ModuDetailScreen
 import mil.nga.msi.ui.modu.list.ModusScreen
-import mil.nga.msi.ui.modu.sheet.ModuSheetScreen
-import mil.nga.msi.ui.navigation.NavPoint
+import mil.nga.msi.ui.navigation.MarlinAppState
 import mil.nga.msi.ui.navigation.Route
 import mil.nga.msi.ui.sort.SortScreen
 
 sealed class ModuRoute(
    override val name: String,
    override val title: String,
-   override val shortTitle: String,
-   override val color: Color = DataSource.MODU.color
+   override val shortTitle: String
 ): Route {
-   object Main: ModuRoute("modus", "Mobile Offshore Drilling Units", "MODUs")
-   object Detail: ModuRoute("modus/detail", "Mobile Offshore Drilling Unit Details", "MODU Details")
-   object List: ModuRoute("modus/list", "Mobile Offshore Drilling Units", "MODUs")
-   object Filter: ModuRoute("modus/filter", "Mobile Offshore Drilling Units Filters", "MODU Filters")
-   object Sort: ModuRoute("modus/sort", "Mobile Offshore Drilling Units Sort", "MODU Sort")
-   object Sheet: ModuRoute("modus/sheet", "Mobile Offshore Drilling Unit Sheet", "Modu Sheet")
+   data object Main: ModuRoute("modus", "Mobile Offshore Drilling Units", "MODUs")
+   data object Detail: ModuRoute("modus/detail", "Mobile Offshore Drilling Unit Details", "MODU Details")
+   data object List: ModuRoute("modus/list", "Mobile Offshore Drilling Units", "MODUs")
+   data object Filter: ModuRoute("modus/filter", "Mobile Offshore Drilling Units Filters", "MODU Filters")
+   data object Sort: ModuRoute("modus/sort", "Mobile Offshore Drilling Units Sort", "MODU Sort")
 }
 
 @OptIn(ExperimentalMaterialNavigationApi::class)
 fun NavGraphBuilder.moduGraph(
-   navController: NavController,
+   appState: MarlinAppState,
    bottomBarVisibility: (Boolean) -> Unit,
    openNavigationDrawer: () -> Unit,
    share: (Pair<String, String>) -> Unit,
@@ -63,59 +53,47 @@ fun NavGraphBuilder.moduGraph(
 
          ModusScreen(
             openDrawer = { openNavigationDrawer() },
-            openFilter = {
-               navController.navigate(ModuRoute.Filter.name)
-            },
-            openSort = {
-               navController.navigate(ModuRoute.Sort.name)
-            },
+            openFilter = { appState.navController.navigate(ModuRoute.Filter.name) },
+            openSort = { appState.navController.navigate(ModuRoute.Sort.name) },
             onAction = { action ->
                when(action) {
                   is ModuAction.Share -> shareModu(action.modu)
                   is ModuAction.Location -> showSnackbar("${action.text} copied to clipboard")
-                  else -> action.navigate(navController)
+                  else -> action.navigate(appState.navController)
                }
             }
          )
       }
+
       composable("${ModuRoute.Detail.name}?name={name}") { backstackEntry ->
          bottomBarVisibility(false)
 
          backstackEntry.arguments?.getString("name")?.let { name ->
             ModuDetailScreen(
                name,
-               close = { navController.popBackStack() },
+               close = { appState.navController.popBackStack() },
                onAction = { action: Action ->
                   when(action) {
                      is ModuAction.Share -> shareModu(action.modu)
                      is ModuAction.Location -> showSnackbar("${action.text} copied to clipboard")
-                     else -> action.navigate(navController)
+                     else -> action.navigate(appState.navController)
                   }
                }
             )
          }
       }
-      bottomSheet("${ModuRoute.Sheet.name}?name={name}") { backstackEntry ->
-         backstackEntry.arguments?.getString("name")?.let { name ->
-            ModuSheetScreen(name, onDetails = {
-               navController.navigate("${ModuRoute.Detail.name}?name=$name")
-            })
-         }
-      }
+
       bottomSheet(ModuRoute.Filter.name) {
          FilterScreen(
             dataSource = DataSource.MODU,
-            close = {
-               navController.popBackStack()
-            }
+            close = { appState.navController.popBackStack() }
          )
       }
+
       bottomSheet(ModuRoute.Sort.name) {
          SortScreen(
             dataSource = DataSource.MODU,
-            close = {
-               navController.popBackStack()
-            }
+            close = { appState.navController.popBackStack() }
          )
       }
    }

@@ -1,6 +1,5 @@
 package mil.nga.msi.ui.main
 
-import android.R.attr.maxLines
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -38,7 +37,7 @@ import mil.nga.msi.R
 import mil.nga.msi.ui.home.homeGraph
 import mil.nga.msi.ui.map.MapRoute
 import mil.nga.msi.ui.navigation.NavigationDrawer
-import mil.nga.msi.ui.navigation.mainRouteFor
+import mil.nga.msi.ui.navigation.rememberMarlinAppState
 
 data class SnackbarState(
    val message: String,
@@ -73,20 +72,13 @@ fun MainScreen(
       viewModel.track(destination)
    }
 
+   val appState = rememberMarlinAppState(navController)
+
    val openDrawer = {
       scope.launch { scaffoldState.drawerState.open() }
    }
 
-   val share: (Pair<String, String>) -> Unit = { pair ->
-      val shareIntent = Intent.createChooser(Intent().apply {
-         action = Intent.ACTION_SEND
-         putExtra(Intent.EXTRA_TITLE, pair.first)
-         putExtra(Intent.EXTRA_TEXT, pair.second)
-         type = "text/*"
-      }, pair.first)
-
-      context.startActivity(shareIntent)
-   }
+   val share: (Intent) -> Unit = { context.startActivity(it) }
 
    val showSnackbar: (SnackbarState) -> Unit = { state ->
       scope.launch {
@@ -164,17 +156,16 @@ fun MainScreen(
                      )
 
                      tabs.forEach { tab ->
-                        val tabRoute = mainRouteFor(tab)
                         BottomNavigationItem(
                            icon = {
                               Icon(
-                                 imageVector = ImageVector.vectorResource(id = tab.icon),
-                                 contentDescription = tabRoute.title
+                                 imageVector = ImageVector.vectorResource(id = tab.dataSource.icon),
+                                 contentDescription = tab.route.title
                               )
                            },
                            label = {
                               Text(
-                                 text = tabRoute.shortTitle,
+                                 text = tab.route.shortTitle,
                                  maxLines = 1,
                                  overflow = TextOverflow.Ellipsis
                               )
@@ -184,11 +175,11 @@ fun MainScreen(
                               alpha = ContentAlpha.disabled
                            ),
                            selected = currentDestination?.hierarchy?.any {
-                              it.route?.substringBefore("?") == tabRoute.name
+                              it.route?.substringBefore("?") == tab.route.name
                            } == true,
                            onClick = {
-                              if (currentDestination?.route?.substringBefore("?") != tabRoute.name) {
-                                 navController.navigate(tabRoute.name) {
+                              if (currentDestination?.route?.substringBefore("?") != tab.route.name) {
+                                 navController.navigate(tab.route.name) {
                                     launchSingleTop = true
                                     restoreState = true
                                  }
@@ -207,7 +198,7 @@ fun MainScreen(
             modifier = Modifier.padding(paddingValues)
          ) {
             homeGraph(
-               navController = navController,
+               appState = appState,
                bottomBarVisibility = { visible ->
                   bottomBarVisibility = visible && tabs.isNotEmpty()
                },

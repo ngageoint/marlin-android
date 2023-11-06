@@ -54,7 +54,7 @@ fun NotificationScreen(
 private fun Notification(
    done: () -> Unit,
 ) {
-   var height by remember { mutableStateOf(0) }
+   var height by remember { mutableIntStateOf(0) }
    val scrollState = rememberScrollState()
 
    val notificationPermissionState = rememberPermissionState(

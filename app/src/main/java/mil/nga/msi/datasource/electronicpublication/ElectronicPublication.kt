@@ -1,7 +1,5 @@
 package mil.nga.msi.datasource.electronicpublication
 
-import android.content.Context
-import android.text.format.Formatter
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -42,7 +40,7 @@ enum class ElectronicPublicationType(
     }
 
     companion object {
-        val typeCodeToType = buildMap {
+        private val typeCodeToType = buildMap {
             putAll(values().map { x -> x.typeId to x })
         }
         fun fromTypeCode(x: Int?): ElectronicPublicationType = typeCodeToType[x ?: Unknown.typeId] ?: Unknown
@@ -114,9 +112,6 @@ data class ElectronicPublication(
     @ColumnInfo(name = "upload_time")
     val uploadTime: Instant? = null,
 ) {
-
-    @Transient
-    val pubType: ElectronicPublicationType = ElectronicPublicationType.fromTypeCode(pubTypeId)
 
     override fun equals(other: Any?): Boolean {
         return super.equals(other) ||

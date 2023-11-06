@@ -1,5 +1,5 @@
-import mil.nga.msi.datasource.navigationwarning.NavigationalWarning
-import mil.nga.msi.datasource.navigationwarning.NavigationalWarningListItem
+package mil.nga.msi.datasource.navigationwarning
+
 import org.junit.Assert
 
 /**

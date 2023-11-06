@@ -1,4 +1,5 @@
-import mil.nga.msi.datasource.electronicpublication.ElectronicPublication
+package mil.nga.msi.datasource.electronicpublication
+
 import org.junit.Assert
 
 /**

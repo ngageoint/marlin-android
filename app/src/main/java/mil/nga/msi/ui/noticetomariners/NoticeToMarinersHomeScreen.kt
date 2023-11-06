@@ -61,7 +61,7 @@ private fun NoticeToMariners(
 
          Divider(Modifier.fillMaxWidth())
 
-         Surface() {
+         Surface {
             Box(Modifier
                .fillMaxWidth()
                .clickable { onTap(NoticeToMarinersHomeChoice.QUERY) }

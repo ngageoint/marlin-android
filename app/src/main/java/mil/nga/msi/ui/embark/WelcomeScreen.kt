@@ -17,7 +17,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
@@ -48,7 +48,7 @@ fun WelcomeScreen(
 private fun Welcome(
    done: () -> Unit,
 ) {
-   var height by remember { mutableStateOf(0) }
+   var height by remember { mutableIntStateOf(0) }
 
    Column(
       modifier = Modifier

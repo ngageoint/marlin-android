@@ -242,7 +242,7 @@ private fun sectorImageLarge(
 }
 
 // TODO this lives in two places, refactor
-private fun sectorCoordinates(
+fun sectorCoordinates(
    center: LatLng,
    range: Double,
    startDegrees: Double,

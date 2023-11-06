@@ -17,7 +17,7 @@ import org.junit.After
 import org.junit.Test
 
 class LoadDgpsStationWorkerFactory(private val dataSource: ElectronicPublicationLocalDataSource) : WorkerFactory() {
-   override fun createWorker(appContext: Context, workerClassName: String, workerParameters: WorkerParameters): ListenableWorker? {
+   override fun createWorker(appContext: Context, workerClassName: String, workerParameters: WorkerParameters): ListenableWorker {
       return LoadElectronicPublicationsWorker(appContext, workerParameters, dataSource)
    }
 }

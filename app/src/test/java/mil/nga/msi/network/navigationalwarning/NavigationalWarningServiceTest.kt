@@ -2,7 +2,6 @@ package mil.nga.msi.network.navigationalwarning
 
 import io.mockk.coEvery
 import io.mockk.mockk
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mil.nga.msi.datasource.navigationwarning.NavigationArea
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarning
@@ -12,7 +11,6 @@ import org.junit.Test
 import retrofit2.Response
 import java.util.Date
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class NavigationalWarningServiceTest {
 
     @Test

@@ -19,6 +19,10 @@ interface LightDao {
    @Query("SELECT COUNT(*) from lights")
    fun count(): Int
 
+   @RawQuery
+   @RewriteQueriesToDropUnusedColumns
+   suspend fun count(query: SupportSQLiteQuery): Int
+
    @Query("SELECT * FROM lights")
    suspend fun getLights(): List<Light>
 

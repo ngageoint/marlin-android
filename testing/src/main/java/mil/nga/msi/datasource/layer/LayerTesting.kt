@@ -1,4 +1,5 @@
-import mil.nga.msi.datasource.layer.Layer
+package mil.nga.msi.datasource.layer
+
 import org.junit.Assert
 
 /**

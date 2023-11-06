@@ -31,6 +31,14 @@ class ModuRepository @Inject constructor(
    fun observeModu(name: String) = localDataSource.observeModu(name)
    suspend fun getModu(name: String) = localDataSource.getModu(name)
 
+   suspend fun count(filters: List<Filter>): Int {
+      val query = QueryBuilder(
+         table = "modus",
+         filters = filters,
+      ).buildQuery(count = true)
+      return localDataSource.count(query)
+   }
+
    @OptIn(ExperimentalCoroutinesApi::class)
    fun observeModuMapItems(): Flow<List<ModuMapItem>> {
       return filterRepository.filters.flatMapLatest { entry ->

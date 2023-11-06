@@ -22,6 +22,7 @@ import mil.nga.msi.ui.map.settings.layers.grid.MapGridLayerScreen
 import mil.nga.msi.ui.map.settings.layers.wms.MapWMSLayerScreen
 import mil.nga.msi.ui.map.settings.layers.wms.MapWMSLayerSettingsScreen
 import mil.nga.msi.ui.navigation.Bounds
+import mil.nga.msi.ui.navigation.MarlinAppState
 import mil.nga.msi.ui.navigation.NavTypeCredentials
 import mil.nga.msi.ui.navigation.NavTypeLayer
 import mil.nga.msi.ui.navigation.Route
@@ -29,23 +30,22 @@ import mil.nga.msi.ui.navigation.Route
 sealed class MapLayerRoute(
    override val name: String,
    override val title: String,
-   override val shortTitle: String = title,
-   override val color: Color = Color.Transparent
+   override val shortTitle: String = title
 ): Route {
-   object Layers: MapLayerRoute("mapLayers", "Map Layers")
-   object NewLayer: MapLayerRoute("mapNewLayer", "New Layer")
-   object CreateGridLayer: MapLayerRoute("mapCreateGridLayer", "Grid Layer")
-   object EditGridLayer: MapLayerRoute("mapEditGridLayer", "Grid Layer")
-   object WMSLayerCreateSettings: MapLayerRoute("mapWMSCreateLayerSettings", "WMS Layer")
-   object WMSLayerEditSettings: MapLayerRoute("mapWMSEditLayerSettings", "WMS Layer")
-   object WMSLayer: MapLayerRoute("mapWMSLayer", "WMS Layer")
-   object GeoPackageLayerCreateSettings: MapLayerRoute("mapGPCreateLayerSettings", "GeoPackage Layer")
-   object GeoPackageLayerEditSettings: MapLayerRoute("mapEditGPLayer", "GeoPackage Layer")
-   object GeoPackageLayer: MapLayerRoute("mapGPLayer", "GeoPackage Layer")
+   data object Layers: MapLayerRoute("mapLayers", "Map Layers")
+   data object NewLayer: MapLayerRoute("mapNewLayer", "New Layer")
+   data object CreateGridLayer: MapLayerRoute("mapCreateGridLayer", "Grid Layer")
+   data object EditGridLayer: MapLayerRoute("mapEditGridLayer", "Grid Layer")
+   data object WMSLayerCreateSettings: MapLayerRoute("mapWMSCreateLayerSettings", "WMS Layer")
+   data object WMSLayerEditSettings: MapLayerRoute("mapWMSEditLayerSettings", "WMS Layer")
+   data object WMSLayer: MapLayerRoute("mapWMSLayer", "WMS Layer")
+   data object GeoPackageLayerCreateSettings: MapLayerRoute("mapGPCreateLayerSettings", "GeoPackage Layer")
+   data object GeoPackageLayerEditSettings: MapLayerRoute("mapEditGPLayer", "GeoPackage Layer")
+   data object GeoPackageLayer: MapLayerRoute("mapGPLayer", "GeoPackage Layer")
 }
 
 fun NavGraphBuilder.mapLayerGraph(
-   navController: NavController,
+   appState: MarlinAppState,
    showSnackbar: (SnackbarState) -> Unit,
    bottomBarVisibility: (Boolean) -> Unit
 ) {
@@ -66,18 +66,18 @@ fun NavGraphBuilder.mapLayerGraph(
                }
             }
 
-            navController.navigate(route)
+            appState.navController.navigate(route)
          },
          onZoom = { bounds ->
             val encoded = Uri.encode(Json.encodeToString(Bounds.fromLatLngBounds(bounds)))
             val route = "${MapRoute.Map.name}?bounds=${encoded}"
-            navController.navigate(route) {
+            appState.navController.navigate(route) {
                popUpTo(route) { inclusive = true }
             }
          },
          onAddLayer = {
             val route = MapLayerRoute.NewLayer.name
-            navController.navigate(route) {
+            appState.navController.navigate(route) {
                popUpTo(route) { inclusive = true }
             }
          },
@@ -89,9 +89,7 @@ fun NavGraphBuilder.mapLayerGraph(
             )
             showSnackbar(snackbarState)
          },
-         onClose = {
-            navController.popBackStack()
-         }
+         onClose = { appState.navController.popBackStack() }
       )
    }
 
@@ -110,27 +108,25 @@ fun NavGraphBuilder.mapLayerGraph(
             when (layer.type) {
                LayerType.WMS -> {
                   val route = "${MapLayerRoute.WMSLayerCreateSettings.name}?layer=${encodedLayer}&credentials=${encodedCredentials}"
-                  navController.navigate(route) {
+                  appState.navController.navigate(route) {
                      popUpTo(route) { inclusive = true }
                   }
                }
                LayerType.TMS, LayerType.XYZ -> {
                   val route = "${MapLayerRoute.CreateGridLayer.name}?layer=${encodedLayer}&credentials=${encodedCredentials}"
-                  navController.navigate(route) {
+                  appState.navController.navigate(route) {
                      popUpTo(route) { inclusive = true }
                   }
                }
                LayerType.GEOPACKAGE -> {
                   val route = "${MapLayerRoute.GeoPackageLayerCreateSettings.name}?layer=${encodedLayer}"
-                  navController.navigate(route) {
+                  appState.navController.navigate(route) {
                      popUpTo(route) { inclusive = true }
                   }
                }
             }
          },
-         onClose = {
-            navController.popBackStack(MapLayerRoute.Layers.name, false)
-         }
+         onClose = { appState.navController.popBackStack(MapLayerRoute.Layers.name, false) }
       )
    }
 
@@ -155,9 +151,7 @@ fun NavGraphBuilder.mapLayerGraph(
       MapGridLayerScreen(
          layer = layer,
          credentials = credentials,
-         onClose = {
-            navController.popBackStack(MapLayerRoute.Layers.name, false)
-         }
+         onClose = { appState.navController.popBackStack(MapLayerRoute.Layers.name, false) }
       )
    }
 
@@ -169,9 +163,7 @@ fun NavGraphBuilder.mapLayerGraph(
 
       MapGridLayerScreen(
          id = id,
-         onClose = {
-            navController.popBackStack(MapLayerRoute.Layers.name, false)
-         }
+         onClose = { appState.navController.popBackStack(MapLayerRoute.Layers.name, false) }
       )
    }
 
@@ -199,13 +191,11 @@ fun NavGraphBuilder.mapLayerGraph(
             val encodedLayer = Uri.encode(Json.encodeToString(it))
             val encodedCredentials = Uri.encode(Json.encodeToString(credentials))
             val route = "${MapLayerRoute.WMSLayer.name}?layer=${encodedLayer}&credentials=${encodedCredentials}"
-            navController.navigate(route) {
+            appState.navController.navigate(route) {
                popUpTo(route) { inclusive = true }
             }
          },
-         onClose = {
-            navController.popBackStack(MapLayerRoute.Layers.name, false)
-         }
+         onClose = { appState.navController.popBackStack(MapLayerRoute.Layers.name, false) }
       )
    }
 
@@ -220,13 +210,11 @@ fun NavGraphBuilder.mapLayerGraph(
          done = { layer ->
             val encoded = Uri.encode(Json.encodeToString(layer))
             val route = "${MapLayerRoute.WMSLayer.name}?layer=${encoded}"
-            navController.navigate(route) {
+            appState.navController.navigate(route) {
                popUpTo(route) { inclusive = true }
             }
          },
-         onClose = {
-            navController.popBackStack(MapLayerRoute.Layers.name, false)
-         }
+         onClose = { appState.navController.popBackStack(MapLayerRoute.Layers.name, false) }
       )
    }
 
@@ -251,9 +239,7 @@ fun NavGraphBuilder.mapLayerGraph(
       MapWMSLayerScreen(
          layer = layer,
          credentials,
-         onClose = {
-            navController.popBackStack(MapLayerRoute.Layers.name, false)
-         }
+         onClose = { appState.navController.popBackStack(MapLayerRoute.Layers.name, false) }
       )
    }
 
@@ -275,13 +261,11 @@ fun NavGraphBuilder.mapLayerGraph(
          done = {
             val encoded = Uri.encode(Json.encodeToString(it))
             val route = "${MapLayerRoute.GeoPackageLayer.name}?layer=${encoded}&import=${import}"
-            navController.navigate(route) {
+            appState.navController.navigate(route) {
                popUpTo(route) { inclusive = true }
             }
          },
-         onClose = {
-            navController.popBackStack(MapLayerRoute.Layers.name, false)
-         }
+         onClose = { appState.navController.popBackStack(MapLayerRoute.Layers.name, false) }
       )
    }
 
@@ -296,13 +280,11 @@ fun NavGraphBuilder.mapLayerGraph(
          done = { layer ->
             val encoded = Uri.encode(Json.encodeToString(layer))
             val route = "${MapLayerRoute.GeoPackageLayer.name}?layer=${encoded}"
-            navController.navigate(route) {
+            appState.navController.navigate(route) {
                popUpTo(route) { inclusive = true }
             }
          },
-         onClose = {
-            navController.popBackStack(MapLayerRoute.Layers.name, false)
-         }
+         onClose = { appState.navController.popBackStack(MapLayerRoute.Layers.name, false) }
       )
    }
 
@@ -326,17 +308,17 @@ fun NavGraphBuilder.mapLayerGraph(
             if (import) {
                if (embark) {
                   val route = MapRoute.Map.name
-                  navController.navigate(route) {
+                  appState.navController.navigate(route) {
                      popUpTo(route) { inclusive = true }
                   }
                } else {
                   val route = EmbarkRoute.Welcome.name
-                  navController.navigate(EmbarkRoute.Welcome.name) {
+                  appState.navController.navigate(EmbarkRoute.Welcome.name) {
                      popUpTo(route) { inclusive = true }
                   }
                }
             } else {
-               navController.popBackStack(MapLayerRoute.Layers.name, false)
+               appState.navController.popBackStack(MapLayerRoute.Layers.name, false)
             }
          }
       )

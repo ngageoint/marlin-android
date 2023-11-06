@@ -5,18 +5,11 @@ import android.text.format.Formatter
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Bookmark
-import androidx.compose.material.icons.filled.Cancel
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Download
-import androidx.compose.material.icons.filled.Preview
-import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.intl.Locale
@@ -78,7 +71,7 @@ fun PublicationDetail(
     publicationWithBookmark: ElectronicPublicationWithBookmark?,
     onAction: (PublicationAction) -> Unit
 ) {
-    publicationWithBookmark?.let { (publication, bookmark) ->
+    publicationWithBookmark?.let { (publication, _) ->
         val fileType = publication.fileExtension?.toUpperCase(Locale.current) ?: "Unknown file type"
 
         val fileSize = publication.fileSize?.let {size ->

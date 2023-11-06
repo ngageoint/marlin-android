@@ -1,9 +1,7 @@
 package mil.nga.msi.ui.noticetomariners
 
 import android.net.Uri
-import androidx.compose.ui.graphics.Color
 import androidx.core.os.BundleCompat
-import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
@@ -16,6 +14,7 @@ import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.repository.bookmark.BookmarkKey
 import mil.nga.msi.repository.noticetomariners.NoticeToMarinersGraphic
 import mil.nga.msi.ui.bookmark.BookmarkRoute
+import mil.nga.msi.ui.navigation.MarlinAppState
 import mil.nga.msi.ui.navigation.NavTypeNoticeToMarinersGraphic
 import mil.nga.msi.ui.navigation.Route
 import mil.nga.msi.ui.noticetomariners.all.NoticeToMarinersAllScreen
@@ -28,19 +27,18 @@ sealed class NoticeToMarinersRoute(
    override val name: String,
    override val title: String,
    override val shortTitle: String,
-   override val color: Color = DataSource.ASAM.color
 ): Route {
-   object Main: NoticeToMarinersRoute("ntms", "Notice To Mariners", "NTMs")
-   object Home: NoticeToMarinersRoute("ntms/home", "Notice To Mariners", "NTMs")
-   object All: NoticeToMarinersRoute("ntms/all", "Notice To Mariners", "NTMs")
-   object Query: NoticeToMarinersRoute("ntms/query", "Notice To Mariners", "NTMs")
-   object Corrections: NoticeToMarinersRoute("ntms/corrections", "Chart Corrections", "NTMs")
-   object Detail: NoticeToMarinersRoute("ntms/detail", "Notice To Mariners", "NTMs")
-   object Graphic: NoticeToMarinersRoute("ntms/graphic", "Notice To Mariners Graphic", "NTMs Graphic")
+   data object Main: NoticeToMarinersRoute("ntms", "Notice To Mariners", "NTMs")
+   data object Home: NoticeToMarinersRoute("ntms/home", "Notice To Mariners", "NTMs")
+   data object All: NoticeToMarinersRoute("ntms/all", "Notice To Mariners", "NTMs")
+   data object Query: NoticeToMarinersRoute("ntms/query", "Notice To Mariners", "NTMs")
+   data object Corrections: NoticeToMarinersRoute("ntms/corrections", "Chart Corrections", "NTMs")
+   data object Detail: NoticeToMarinersRoute("ntms/detail", "Notice To Mariners", "NTMs")
+   data object Graphic: NoticeToMarinersRoute("ntms/graphic", "Notice To Mariners Graphic", "NTMs Graphic")
 }
 
 fun NavGraphBuilder.noticeToMarinersGraph(
-   navController: NavController,
+   appState: MarlinAppState,
    bottomBarVisibility: (Boolean) -> Unit,
    openNavigationDrawer: () -> Unit
 ) {
@@ -59,10 +57,10 @@ fun NavGraphBuilder.noticeToMarinersGraph(
             onTap = { type ->
                when (type) {
                   NoticeToMarinersHomeChoice.ALL -> {
-                     navController.navigate(NoticeToMarinersRoute.All.name)
+                     appState.navController.navigate(NoticeToMarinersRoute.All.name)
                   }
                   NoticeToMarinersHomeChoice.QUERY -> {
-                     navController.navigate(NoticeToMarinersRoute.Query.name)
+                     appState.navController.navigate(NoticeToMarinersRoute.Query.name)
                   }
                }
             }
@@ -73,9 +71,9 @@ fun NavGraphBuilder.noticeToMarinersGraph(
          bottomBarVisibility(false)
 
          NoticeToMarinersQueryScreen(
-            close = { navController.popBackStack() },
+            close = { appState.navController.popBackStack() },
             onQuery = {
-               navController.navigate(NoticeToMarinersRoute.Corrections.name)
+               appState.navController.navigate(NoticeToMarinersRoute.Corrections.name)
             }
          )
       }
@@ -85,9 +83,9 @@ fun NavGraphBuilder.noticeToMarinersGraph(
 
          NoticeToMarinersCorrectionsScreen(
             onNoticeTap = {
-               navController.navigate("${NoticeToMarinersRoute.Detail.name}?noticeNumber=${it}")
+               appState.navController.navigate("${NoticeToMarinersRoute.Detail.name}?noticeNumber=${it}")
             },
-            close = { navController.popBackStack() }
+            close = { appState.navController.popBackStack() }
          )
       }
 
@@ -98,14 +96,14 @@ fun NavGraphBuilder.noticeToMarinersGraph(
          bottomBarVisibility(false)
 
          NoticeToMarinersAllScreen(
-            close = { navController.popBackStack() },
+            close = { appState.navController.popBackStack() },
             onTap = {
-               navController.navigate("${NoticeToMarinersRoute.Detail.name}?noticeNumber=${it}")
+               appState.navController.navigate("${NoticeToMarinersRoute.Detail.name}?noticeNumber=${it}")
             },
             onBookmark = { noticeNumber ->
                val key = BookmarkKey(noticeNumber.toString(), DataSource.NOTICE_TO_MARINERS)
                val encoded = Uri.encode(Json.encodeToString(key))
-               navController.navigate( "${BookmarkRoute.Notes.name}?bookmark=$encoded")
+               appState.navController.navigate( "${BookmarkRoute.Notes.name}?bookmark=$encoded")
             }
          )
       }
@@ -116,15 +114,15 @@ fun NavGraphBuilder.noticeToMarinersGraph(
          backstackEntry.arguments?.getString("noticeNumber")?.let { noticeNumber ->
             NoticeToMarinersDetailScreen(
                noticeNumber.toIntOrNull(),
-               close = { navController.popBackStack() },
+               close = { appState.navController.popBackStack() },
                onGraphicTap = { graphic ->
                   val encoded = Uri.encode(Json.encodeToString(graphic))
-                  navController.navigate( "${NoticeToMarinersRoute.Graphic.name}?graphic=$encoded")
+                  appState.navController.navigate( "${NoticeToMarinersRoute.Graphic.name}?graphic=$encoded")
                },
                onBookmark = {
                   val key = BookmarkKey(it.toString(), DataSource.NOTICE_TO_MARINERS)
                   val encoded = Uri.encode(Json.encodeToString(key))
-                  navController.navigate( "${BookmarkRoute.Notes.name}?bookmark=$encoded")
+                  appState.navController.navigate( "${BookmarkRoute.Notes.name}?bookmark=$encoded")
                }
             )
          }
@@ -140,7 +138,7 @@ fun NavGraphBuilder.noticeToMarinersGraph(
          }?.let { graphic ->
             NoticeToMarinersGraphicScreen(
                graphic = graphic,
-               close = { navController.popBackStack() }
+               close = { appState.navController.popBackStack() }
             )
          }
       }

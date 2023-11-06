@@ -1,5 +1,6 @@
 package mil.nga.msi.repository.navigationalwarning
 
+import androidx.sqlite.db.SimpleSQLiteQuery
 import mil.nga.msi.datasource.navigationwarning.NavigationArea
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarning
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarningDao
@@ -21,6 +22,8 @@ class NavigationalWarningLocalDataSource @Inject constructor(
    suspend fun insert(navigationalWarnings: List<NavigationalWarning>) = dao.insert(navigationalWarnings)
 
    fun isEmpty() = dao.count() == 0
+   suspend fun count(query: SimpleSQLiteQuery) = dao.count(query)
+
    suspend fun existingNavigationalWarnings(ids: List<String>) = dao.getNavigationalWarnings(ids)
 
    fun observeNavigationalWarningMapItems() = dao.observeNavigationalWarningMapItems()
@@ -38,6 +41,8 @@ class NavigationalWarningLocalDataSource @Inject constructor(
 
    suspend fun getNavigationalWarning(key: NavigationalWarningKey) = dao.getNavigationalWarning(key.number, key.year, key.navigationArea)
    suspend fun getNavigationalWarnings() = dao.getNavigationalWarnings()
+   fun getNavigationalWarnings(query: SimpleSQLiteQuery) = dao.getNavigationalWarnings(query)
+
    fun getNavigationalWarnings(
       minLatitude: Double,
       minLongitude: Double,

@@ -5,10 +5,12 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -26,6 +28,7 @@ import mil.nga.msi.ui.action.AsamAction
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.action.ModuAction
 import mil.nga.msi.ui.datasource.DataSourceActions
+import mil.nga.msi.ui.export.ExportDataSource
 import mil.nga.msi.ui.modu.ModuRoute
 import mil.nga.msi.ui.modu.ModuSummary
 import java.util.*
@@ -75,20 +78,38 @@ fun ModusScreen(
             }
          }
       )
-      Modus(
-         viewModel.modus,
-         onTap = { onAction(ModuAction.Tap(it)) },
-         onZoom = { onAction(ModuAction.Zoom(it.latLng)) },
-         onShare = { onAction(ModuAction.Share(it)) },
-         onBookmark = { (modu, bookmark) ->
-            if (bookmark == null) {
-               onAction(Action.Bookmark(BookmarkKey.fromModu(modu)))
-            } else {
-               viewModel.deleteBookmark(bookmark)
+
+      Box(Modifier.fillMaxWidth()) {
+         Modus(
+            viewModel.modus,
+            onTap = { onAction(ModuAction.Tap(it)) },
+            onZoom = { onAction(ModuAction.Zoom(it.latLng)) },
+            onShare = { onAction(ModuAction.Share(it)) },
+            onBookmark = { (modu, bookmark) ->
+               if (bookmark == null) {
+                  onAction(Action.Bookmark(BookmarkKey.fromModu(modu)))
+               } else {
+                  viewModel.deleteBookmark(bookmark)
+               }
+            },
+            onCopyLocation = { onAction(AsamAction.Location(it)) }
+         )
+
+         Box(
+            Modifier
+               .align(Alignment.BottomEnd)
+               .padding(16.dp)
+         ) {
+            FloatingActionButton(
+               containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+               onClick = { onAction(Action.Export(listOf(ExportDataSource.Modu))) }
+            ) {
+               Icon(Icons.Outlined.Download,
+                  contentDescription = "Export MODUs as GeoPackage"
+               )
             }
-         },
-         onCopyLocation = { onAction(AsamAction.Location(it)) }
-      )
+         }
+      }
    }
 }
 
@@ -166,14 +187,16 @@ private fun ModuCard(
          .padding(bottom = 8.dp)
          .clickable { onTap() }
    ) {
-      ModuSummary(moduWithBookmark = moduWithBookmark)
-      DataSourceActions(
-         latLng = modu.latLng,
-         bookmarked = bookmark != null,
-         onZoom = onZoom,
-         onShare = onShare,
-         onBookmark = onBookmark,
-         onCopyLocation = onCopyLocation
-      )
+      Column(Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
+         ModuSummary(moduWithBookmark = moduWithBookmark)
+         DataSourceActions(
+            latLng = modu.latLng,
+            bookmarked = bookmark != null,
+            onZoom = onZoom,
+            onShare = onShare,
+            onBookmark = onBookmark,
+            onCopyLocation = onCopyLocation
+         )
+      }
    }
 }

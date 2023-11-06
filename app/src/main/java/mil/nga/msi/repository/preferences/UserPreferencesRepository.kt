@@ -9,9 +9,7 @@ import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.navigationwarning.NavigationArea
 import mil.nga.msi.repository.navigationalwarning.NavigationalWarningKey
 import mil.nga.msi.type.Developer
-import mil.nga.msi.type.MapLocation
 import mil.nga.msi.type.UserPreferences
-import mil.nga.msi.ui.map.BaseMapType
 import java.time.Instant
 import javax.inject.Inject
 

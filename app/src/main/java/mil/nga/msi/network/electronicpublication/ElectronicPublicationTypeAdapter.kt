@@ -53,8 +53,7 @@ private fun readEPubKeys(jsonIn: JsonReader): ElectronicPublication? {
     val isDownloading = false
 
     while (jsonIn.hasNext() && jsonIn.peek() !== JsonToken.END_OBJECT) {
-        val keyName = jsonIn.nextName()
-        when (keyName) {
+        when (jsonIn.nextName()) {
             "s3Key" -> s3Key = jsonIn.nextStringOrNull()
             "contentId" -> contentId = jsonIn.nextIntOrNull()
             "fileExtension" -> fileExtension = jsonIn.nextStringOrNull()

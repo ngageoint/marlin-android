@@ -21,7 +21,9 @@ class QueryBuilder(
    val filters: List<Filter> = emptyList(),
    val sort: List<SortParameter> = emptyList()
 ) {
-   fun buildQuery(): SimpleSQLiteQuery {
+   fun buildQuery(
+      count: Boolean = false
+   ): SimpleSQLiteQuery {
       val filterStrings = mutableListOf<String>()
       filters.forEach { filter ->
          val filterString: String? = when (filter.parameter.type) {
@@ -57,7 +59,8 @@ class QueryBuilder(
 
       val condition = if (filterStrings.isNotEmpty()) {" WHERE ${filterStrings.joinToString(" AND ")}"} else ""
       val sort = if (sortStrings.isNotEmpty()) {" ORDER BY  ${sortStrings.joinToString(",")}"} else ""
-      return SimpleSQLiteQuery("SELECT * FROM $table $condition $sort")
+      val parameter = if (count) "COUNT(*)" else "*"
+      return SimpleSQLiteQuery("SELECT $parameter FROM $table $condition $sort")
    }
 
    private fun dateQuery(filter: Filter): String? {

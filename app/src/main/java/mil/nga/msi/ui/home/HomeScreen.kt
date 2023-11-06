@@ -17,6 +17,7 @@ import mil.nga.msi.ui.dgpsstation.dgpsStationGraph
 import mil.nga.msi.ui.electronicpublication.electronicPublicationGraph
 import mil.nga.msi.ui.embark.EmbarkRoute
 import mil.nga.msi.ui.embark.embarkGraph
+import mil.nga.msi.ui.export.exportGraph
 import mil.nga.msi.ui.geopackage.geopackageGraph
 import mil.nga.msi.ui.light.lightGraph
 import mil.nga.msi.ui.main.SnackbarState
@@ -27,6 +28,7 @@ import mil.nga.msi.ui.map.settings.layers.MapLayerRoute
 import mil.nga.msi.ui.map.settings.layers.geopackage.MapGeoPackageLayerSettingsScreen
 import mil.nga.msi.ui.map.settings.layers.mapLayerGraph
 import mil.nga.msi.ui.modu.moduGraph
+import mil.nga.msi.ui.navigation.MarlinAppState
 import mil.nga.msi.ui.navigationalwarning.navigationalWarningGraph
 import mil.nga.msi.ui.noticetomariners.noticeToMarinersGraph
 import mil.nga.msi.ui.port.portGraph
@@ -34,20 +36,32 @@ import mil.nga.msi.ui.radiobeacon.radioBeaconGraph
 import mil.nga.msi.ui.report.reportGraph
 
 fun NavGraphBuilder.homeGraph(
-   navController: NavController,
+   appState: MarlinAppState,
    embark: Boolean,
    bottomBarVisibility: (Boolean) -> Unit,
-   share: (Pair<String, String>) -> Unit,
+   share: (Intent) -> Unit,
    showSnackbar: (SnackbarState) -> Unit,
    openNavigationDrawer: () -> Unit,
    annotationProvider: AnnotationProvider
 ) {
+
+   val shareDataSource: (Pair<String, String>) -> Unit = { (title, text) ->
+      val shareIntent = Intent.createChooser(Intent().apply {
+         action = Intent.ACTION_SEND
+         putExtra(Intent.EXTRA_TITLE, title)
+         putExtra(Intent.EXTRA_TEXT, text)
+         type = "text/*"
+      }, title)
+
+      share(shareIntent)
+   }
+
    composable("main") {
       LaunchedEffect(embark) {
          if (embark) {
-            navController.navigate(MapRoute.Map.name)
+            appState.navController.navigate(MapRoute.Map.name)
          } else {
-            navController.navigate(EmbarkRoute.Welcome.name) {
+            appState.navController.navigate(EmbarkRoute.Welcome.name) {
                launchSingleTop = true
             }
          }
@@ -76,19 +90,19 @@ fun NavGraphBuilder.homeGraph(
          done = { layer ->
             val encoded = Uri.encode(Json.encodeToString(layer))
             val route = "${MapLayerRoute.GeoPackageLayer.name}?layer=${encoded}&import=true&embark=${embark}"
-            navController.navigate(route) {
+            appState.navController.navigate(route) {
                popUpTo(route) { inclusive = true }
             }
          },
          onClose = {
             if (embark) {
                val route = MapRoute.Map.name
-               navController.navigate(route) {
+               appState.navController.navigate(route) {
                   popUpTo(route) { inclusive = true }
                }
             } else {
                val route = EmbarkRoute.Welcome.name
-               navController.navigate(EmbarkRoute.Welcome.name) {
+               appState.navController.navigate(EmbarkRoute.Welcome.name) {
                   popUpTo(route) { inclusive = true }
                }
             }
@@ -97,99 +111,122 @@ fun NavGraphBuilder.homeGraph(
    }
 
    embarkGraph(
-      navController = navController,
+      appState = appState,
       bottomBarVisibility = { bottomBarVisibility(it) }
    )
 
    mapGraph(
-      navController = navController,
+      appState = appState,
       bottomBarVisibility = { bottomBarVisibility(it) },
       openNavigationDrawer = openNavigationDrawer,
       showSnackbar = { showSnackbar(SnackbarState(message = it)) },
+      share = { shareDataSource(it) },
       annotationProvider = annotationProvider
    )
 
    mapLayerGraph(
-      navController = navController,
+      appState = appState,
       bottomBarVisibility = { bottomBarVisibility(it) },
       showSnackbar = { showSnackbar(it) }
    )
 
    asamGraph(
-      navController = navController,
+      appState = appState,
       bottomBarVisibility = { bottomBarVisibility(it) },
-      share = { share(it) },
+      share = { shareDataSource(it) },
       showSnackbar = { showSnackbar(SnackbarState(message = it)) },
       openNavigationDrawer = openNavigationDrawer
    )
    moduGraph(
-      navController = navController,
+      appState = appState,
       bottomBarVisibility = { bottomBarVisibility(it) },
-      share = { share(it) },
+      share = { shareDataSource(it) },
       showSnackbar = { showSnackbar(SnackbarState(message = it)) },
       openNavigationDrawer = openNavigationDrawer
    )
+
    navigationalWarningGraph(
-      navController = navController,
+      appState = appState,
       bottomBarVisibility = { bottomBarVisibility(it) },
-      share = { share(it) },
+      share = { shareDataSource(it) },
       openNavigationDrawer = openNavigationDrawer
    )
+
    lightGraph(
-      navController = navController,
+      appState = appState,
       bottomBarVisibility = { bottomBarVisibility(it) },
-      share = { share(it) },
+      share = { shareDataSource(it) },
       showSnackbar = { showSnackbar(SnackbarState(message = it)) },
       openNavigationDrawer = openNavigationDrawer
    )
+
    portGraph(
-      navController = navController,
+      appState = appState,
       bottomBarVisibility = { bottomBarVisibility(it) },
-      share = { share(it) },
+      share = { shareDataSource(it) },
       showSnackbar = { showSnackbar(SnackbarState(message = it)) },
       openNavigationDrawer = openNavigationDrawer
    )
+
    radioBeaconGraph(
-      navController = navController,
+      appState = appState,
       bottomBarVisibility = { bottomBarVisibility(it) },
-      share = { share(it) },
+      share = { shareDataSource(it) },
       showSnackbar = { showSnackbar(SnackbarState(message = it)) },
       openNavigationDrawer = openNavigationDrawer
    )
+
    dgpsStationGraph(
-      navController = navController,
+      appState = appState,
       bottomBarVisibility = { bottomBarVisibility(it) },
-      share = { share(it) },
+      share = { shareDataSource(it) },
       showSnackbar = { showSnackbar(SnackbarState(message = it)) },
       openNavigationDrawer = openNavigationDrawer
    )
+
    electronicPublicationGraph(
-      navController = navController,
+      appState = appState,
       bottomBarVisibility = { bottomBarVisibility(it) },
       openNavigationDrawer = openNavigationDrawer
    )
+
    reportGraph(
-      navController = navController,
+      appState = appState,
       bottomBarVisibility = { bottomBarVisibility(false) }
    )
+
    geopackageGraph(
-      navController = navController,
+      appState = appState,
       showSnackbar = { showSnackbar(SnackbarState(message = it)) },
    )
+
    noticeToMarinersGraph(
-      navController = navController,
+      appState = appState,
       bottomBarVisibility = { bottomBarVisibility(it) },
       openNavigationDrawer = openNavigationDrawer
    )
+
    bookmarksGraph(
-      navController = navController,
+      appState = appState,
       bottomBarVisibility = { bottomBarVisibility(it) },
-      share = { share(it) },
+      share = { shareDataSource(it) },
       showSnackbar = { showSnackbar(SnackbarState(message = it)) },
       openNavigationDrawer = openNavigationDrawer
    )
+
+   exportGraph(
+      appState = appState,
+      share = { uri ->
+         share(Intent.createChooser(Intent(Intent.ACTION_SEND).apply {
+            putExtra(Intent.EXTRA_STREAM, uri)
+            type = "application/octet-stream"
+         }, null))
+      },
+      bottomBarVisibility = { bottomBarVisibility(it) }
+   )
+
    settingsGraph(
-      navController = navController,
+      appState = appState,
       bottomBarVisibility = { bottomBarVisibility(false) }
    )
 }

@@ -25,7 +25,6 @@ class LayerRepository @Inject constructor(
    private val mimeTypeMap = MimeTypeMap.getSingleton()
    private val contentResolver = application.contentResolver
 
-   fun observeLayer(id: Long) = localDataSource.observeLayer(id)
    fun observeLayers() = localDataSource.observeLayers()
    fun observeVisibleLayers() = localDataSource.observeVisibleLayers()
 

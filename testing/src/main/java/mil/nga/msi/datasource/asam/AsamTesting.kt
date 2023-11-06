@@ -1,4 +1,5 @@
-import mil.nga.msi.datasource.asam.Asam
+package mil.nga.msi.datasource.asam
+
 import org.junit.Assert
 
 /**

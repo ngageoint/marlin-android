@@ -4,7 +4,6 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.google.android.gms.maps.model.LatLng
-import mil.nga.msi.coordinate.DMS
 import mil.nga.msi.datasource.port.types.Decision
 import mil.nga.msi.datasource.port.types.HarborType
 import mil.nga.msi.datasource.port.types.HarborUse
@@ -354,7 +353,7 @@ data class Port(
       "World Port Index Number" to portNumber.toString(),
       "Region Name" to "${regionName.orEmpty()} - ${regionNumber?.toString().orEmpty()}",
       "Main Port Name" to portName,
-      "Alternate Main Port Name" to alternateName,
+      "Alternate Port Name" to alternateName,
       "UN/LOCODE" to unloCode,
       "Country" to countryName,
       "World Water Body" to dodWaterBody,
@@ -413,7 +412,7 @@ data class Port(
 
    fun pilotSection() = mapOf(
       "Pilotage - Compulsory" to pilotageCompulsory?.title,
-      "Pilotage - Available" to pilotageAdvisable?.title,
+      "Pilotage - Available" to pilotageAvailable?.title,
       "Pilotage - Local Assistance" to pilotageLocalAssist?.title,
       "Pilotage - Advisable" to pilotageAdvisable?.title,
       "Tugs - Salvage" to tugsSalvage?.title,
@@ -476,9 +475,7 @@ data class Port(
       "Supplies - Aviation Fuel" to suppliesAviationFuel?.title,
       "Supplies - Deck" to suppliesDeck?.title,
       "Supplies - Engine" to suppliesEngine?.title,
-      "Repair Code" to suppliesEngine?.title,
-      "Dry Dock" to suppliesEngine?.title,
-      "Railway" to suppliesEngine?.title,
+      "Repair Code" to repairCode?.title,
       "Dry Dock" to dryDock?.title,
       "Railway" to railway?.title
    )

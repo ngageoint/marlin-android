@@ -18,6 +18,7 @@ class AsamLocalDataSource @Inject constructor(
    fun getAsams(query: SimpleSQLiteQuery) = dao.getAsams(query)
 
    fun isEmpty() = dao.count() == 0
+   suspend fun count(query: SimpleSQLiteQuery) = dao.count(query)
 
    suspend fun getAsam(reference: String) = dao.getAsam(reference)
    suspend fun getAsams(): List<Asam> = dao.getAsams()

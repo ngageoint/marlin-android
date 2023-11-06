@@ -1,4 +1,5 @@
-import mil.nga.msi.datasource.light.Light
+package mil.nga.msi.datasource.light
+
 import org.junit.Assert
 
 /**

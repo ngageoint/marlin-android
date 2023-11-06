@@ -44,8 +44,8 @@ fun AsamDetailScreen(
    onAction: (Action) -> Unit,
    viewModel: AsamViewModel = hiltViewModel()
 ) {
-   viewModel.setAsamReference(reference)
    val asamWithBookmark by viewModel.asamWithBookmark.observeAsState()
+   viewModel.setAsamReference(reference)
 
    Column {
       TopBar(

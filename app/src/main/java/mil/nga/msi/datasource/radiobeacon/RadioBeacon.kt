@@ -3,7 +3,6 @@ package mil.nga.msi.datasource.radiobeacon
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import com.google.android.gms.maps.model.LatLng
-import mil.nga.msi.coordinate.DMS
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.light.LightSector
 
@@ -137,14 +136,12 @@ data class RadioBeacon(
                arrayOf("startdeg", "startminutes", "enddeg", "endminutes").forEach { name ->
                   val component = groups[name]
                   if (component != null) {
-                     if (name == "startdeg") {
-                        start = (start ?: 0.0) + (remark.substring(component.range).toDoubleOrNull() ?: 0.0) - 90
-                     } else if (name == "startminutes") {
-                        start = (start ?: 0.0) + ((remark.substring(component.range).toDoubleOrNull() ?: 0.0)  / 60)
-                     } else if (name == "enddeg") {
-                        end = (remark.substring(component.range).toDoubleOrNull() ?: 0.0) - 90
-                     } else if (name == "endminutes") {
-                        end += (remark.substring(component.range).toDoubleOrNull() ?: 0.0) / 60
+                     when(name) {
+                        "startdeg" ->  start = (start ?: 0.0) + (remark.substring(component.range).toDoubleOrNull() ?: 0.0) - 90
+                        "startminutes" ->  start = (start ?: 0.0) + ((remark.substring(component.range).toDoubleOrNull() ?: 0.0)  / 60)
+                        "enddeg" ->  end = (remark.substring(component.range).toDoubleOrNull() ?: 0.0) - 90
+                        "endminutes" ->  end += (remark.substring(component.range).toDoubleOrNull() ?: 0.0) / 60
+
                      }
                   }
                }
@@ -189,25 +186,25 @@ data class RadioBeacon(
 
    override fun toString(): String {
       return "Radio Beacon\n\n" +
-         "aidType: ${aidType.orEmpty()}\n" +
-         "characteristic: ${characteristic.orEmpty()}\n" +
-         "deleteFlag: ${deleteFlag.orEmpty()}\n" +
-         "featureNumber: ${featureNumber}\n" +
-         "geopoliticalHeading: ${geopoliticalHeading.orEmpty()}\n" +
-         "regionHeading: ${regionHeading.orEmpty()}\n" +
-         "name: ${name.orEmpty()}\n" +
-         "noticeNumber: ${noticeNumber.orEmpty()}\n" +
-         "noticeWeek: ${noticeWeek}\n" +
-         "noticeYear: ${noticeYear}\n" +
-         "position: ${position.orEmpty()}\n" +
-         "postNote: ${postNote.orEmpty()}\n" +
-         "precedingNote: ${precedingNote.orEmpty()}\n" +
-         "range: ${range.orEmpty()}\n" +
-         "sequenceText: ${sequenceText.orEmpty()}\n" +
-         "frequency: ${frequency.orEmpty()}\n" +
-         "stationRemark: ${stationRemark.orEmpty()}\n" +
-         "removeFromList: ${removeFromList.orEmpty()}\n" +
-         "volumeNumber: $volumeNumber"
+         "Aid Type: ${aidType.orEmpty()}\n" +
+         "Characteristic: ${characteristic.orEmpty()}\n" +
+         "Delete Flag: ${deleteFlag.orEmpty()}\n" +
+         "Feature Number: ${featureNumber}\n" +
+         "Geopolitical Heading: ${geopoliticalHeading.orEmpty()}\n" +
+         "Region Heading: ${regionHeading.orEmpty()}\n" +
+         "Name: ${name.orEmpty()}\n" +
+         "Notice Number: ${noticeNumber.orEmpty()}\n" +
+         "Notice Week: ${noticeWeek}\n" +
+         "Notice Year: ${noticeYear}\n" +
+         "Position: ${position.orEmpty()}\n" +
+         "Post Note: ${postNote.orEmpty()}\n" +
+         "Preceding Note: ${precedingNote.orEmpty()}\n" +
+         "Range: ${range.orEmpty()}\n" +
+         "Sequence Text: ${sequenceText.orEmpty()}\n" +
+         "Frequency: ${frequency.orEmpty()}\n" +
+         "Station Remark: ${stationRemark.orEmpty()}\n" +
+         "Remove From List: ${removeFromList.orEmpty()}\n" +
+         "Volume Number: $volumeNumber"
    }
 
    companion object {

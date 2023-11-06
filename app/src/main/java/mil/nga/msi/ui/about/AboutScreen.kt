@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Handshake
 import androidx.compose.material.icons.filled.LocationOff
 import androidx.compose.material.icons.filled.Mail
+import androidx.compose.material.icons.filled.Policy
 import androidx.compose.material.icons.filled.PrivacyTip
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
@@ -32,8 +33,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableIntStateOf import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -55,6 +55,7 @@ import mil.nga.msi.ui.main.TopBar
 fun AboutScreen(
    onClose: () -> Unit,
    onDisclaimer: () -> Unit,
+   onPrivacy: () -> Unit,
    onContact: () -> Unit,
    viewModel: AboutViewModel = hiltViewModel()
 ) {
@@ -70,6 +71,7 @@ fun AboutScreen(
       About(
          developer = developer,
          onDisclaimer = onDisclaimer,
+         onPrivacy = onPrivacy,
          onContact = onContact,
          onDeveloperMode = { viewModel.setDeveloperMode() },
          onShowNoLocationNavigationWarnings = { viewModel.setShowNoLocationNavigationWarnings(it) }
@@ -81,6 +83,7 @@ fun AboutScreen(
 private fun About(
    developer: Developer?,
    onDisclaimer: () -> Unit,
+   onPrivacy: () -> Unit,
    onContact: () -> Unit,
    onDeveloperMode: () -> Unit,
    onShowNoLocationNavigationWarnings: (Boolean) -> Unit
@@ -99,6 +102,8 @@ private fun About(
             .verticalScroll(scrollState)
       ) {
          Disclaimer { onDisclaimer() }
+         Divider(Modifier.padding(start = 16.dp))
+         Privacy { onPrivacy() }
          Divider(Modifier.padding(start = 16.dp))
          Acknowledgements {
             context.startActivity(Intent(context, OssLicensesMenuActivity::class.java))
@@ -156,6 +161,41 @@ private fun Disclaimer(
 
             Text(
                text = AboutRoute.Disclaimer.title,
+               style = MaterialTheme.typography.bodyMedium,
+               fontWeight = FontWeight.Medium
+            )
+         }
+      }
+   }
+}
+
+@Composable
+private fun Privacy(
+   onTap: () -> Unit
+) {
+   Surface {
+      Column(
+         verticalArrangement = Arrangement.Center,
+         modifier = Modifier
+            .height(48.dp)
+            .fillMaxWidth()
+            .clickable { onTap() }
+            .padding(horizontal = 16.dp)
+            .semantics { testTag = "privacy_column" }
+      ) {
+         Row(
+            verticalAlignment = Alignment.CenterVertically
+         ) {
+            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+               Icon(
+                  Icons.Default.Policy,
+                  modifier = Modifier.padding(end = 16.dp),
+                  contentDescription = "About"
+               )
+            }
+
+            Text(
+               text = AboutRoute.Privacy.title,
                style = MaterialTheme.typography.bodyMedium,
                fontWeight = FontWeight.Medium
             )
@@ -240,7 +280,7 @@ private fun Version(
 ) {
    val context =  LocalContext.current
    val packageInfo = context.packageManager.getPackageInfoCompat(context.packageName, 0)
-   var developerModeAttempts by remember { mutableStateOf(0) }
+   var developerModeAttempts by remember { mutableIntStateOf(0) }
 
    Surface {
       Column(
@@ -252,7 +292,9 @@ private fun Version(
                developerModeAttempts += 1
                if (developerModeAttempts >= 5) {
                   onDeveloperMode()
-                  Toast.makeText(context, "Developer tools enabled.", Toast.LENGTH_LONG).show()
+                  Toast
+                     .makeText(context, "Developer tools enabled.", Toast.LENGTH_LONG)
+                     .show()
                }
             }
             .padding(horizontal = 16.dp)

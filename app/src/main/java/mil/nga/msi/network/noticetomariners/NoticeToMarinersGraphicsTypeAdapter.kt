@@ -38,7 +38,7 @@ class NoticeToMarinersGraphicsTypeAdapter: TypeAdapter<NoticeToMarinersGraphicsR
    }
 
 
-   fun readNoticeToMariners(`in`: JsonReader): List<NoticeToMarinersGraphics> {
+   private fun readNoticeToMariners(`in`: JsonReader): List<NoticeToMarinersGraphics> {
       val graphics = mutableListOf<NoticeToMarinersGraphics>()
 
       if (`in`.peek() != JsonToken.BEGIN_ARRAY) {

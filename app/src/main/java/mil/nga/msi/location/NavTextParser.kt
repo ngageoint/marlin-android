@@ -101,7 +101,7 @@ data class MappedLocation(
    val chart: String? = null
 ) {
    fun featureCollection(): FeatureCollection? {
-      val features = location.mapNotNull {  it.asFeature() }
+      val features = location.mapNotNull { it.asFeature() }
       return if (features.isNotEmpty()) {
          FeatureCollection(features)
       } else null
@@ -200,7 +200,7 @@ class NavTextParser {
          currentLocationType = "Circle"
       } else if (line.contains("TRACKLINE")) {
          currentLocationType = "LineString"
-      } else if (line.contains("POSITION")) {
+      } else if (line.contains("POSITION") || line.contains("VICINITY")) {
          currentLocationType = "Point"
       } else if (line.contains("IN VICINITY")) {
          currentLocationType = "Point"

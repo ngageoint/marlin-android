@@ -55,6 +55,14 @@ class RadioBeaconRepository @Inject constructor(
       return localDataSource.getRadioBeacons(query)
    }
 
+   suspend fun count(filters: List<Filter>): Int {
+      val query = QueryBuilder(
+         table = "radio_beacons",
+         filters = filters,
+      ).buildQuery(count = true)
+      return localDataSource.count(query)
+   }
+
    suspend fun fetchRadioBeacons(refresh: Boolean = false): List<RadioBeacon> {
       if (refresh) {
          val newBeacons = mutableListOf<RadioBeacon>()
