@@ -33,6 +33,7 @@ import mil.nga.msi.ui.noticetomariners.noticeToMarinersGraph
 import mil.nga.msi.ui.port.portGraph
 import mil.nga.msi.ui.radiobeacon.radioBeaconGraph
 import mil.nga.msi.ui.report.reportGraph
+import mil.nga.msi.ui.route.list.routesGraph
 
 fun NavGraphBuilder.homeGraph(
    navController: NavController,
@@ -199,6 +200,11 @@ fun NavGraphBuilder.homeGraph(
       bottomBarVisibility = { bottomBarVisibility(it) },
       share = { shareDataSource(it) },
       showSnackbar = { showSnackbar(SnackbarState(message = it)) },
+      openNavigationDrawer = openNavigationDrawer
+   )
+   routesGraph(
+      navController = navController,
+      bottomBarVisibility = { bottomBarVisibility(it) },
       openNavigationDrawer = openNavigationDrawer
    )
    exportGraph(

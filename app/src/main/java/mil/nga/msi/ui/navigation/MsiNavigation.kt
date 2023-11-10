@@ -12,6 +12,7 @@ import mil.nga.msi.ui.navigationalwarning.NavigationWarningRoute
 import mil.nga.msi.ui.noticetomariners.NoticeToMarinersRoute
 import mil.nga.msi.ui.port.PortRoute
 import mil.nga.msi.ui.radiobeacon.RadioBeaconRoute
+import mil.nga.msi.ui.route.list.RouteRoute
 
 private val mainRoutes: Map<DataSource, Route> = DataSource.values().fold(mapOf()) { dataSourceToRoute, dataSource ->
     val route = when (dataSource) {
@@ -26,6 +27,7 @@ private val mainRoutes: Map<DataSource, Route> = DataSource.values().fold(mapOf(
         DataSource.NOTICE_TO_MARINERS -> NoticeToMarinersRoute.Main
         DataSource.GEOPACKAGE -> GeoPackageRoute.Sheet
         DataSource.BOOKMARK -> BookmarkRoute.Main
+        DataSource.ROUTE -> RouteRoute.Main
     }
     dataSourceToRoute + (dataSource to route)
 }

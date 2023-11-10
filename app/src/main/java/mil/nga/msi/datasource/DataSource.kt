@@ -22,7 +22,7 @@ enum class DataSource(
    ELECTRONIC_PUBLICATION(true, false, Color(0xFF30B0C7), R.drawable.ic_description_24dp, label = "Electronic Publication", tableName = "epubs"),
    NOTICE_TO_MARINERS(true, false, Color(0xFFFF0000), R.drawable.ic_baseline_campaign_24, label = "Notice To Mariners", tableName = "notice_to_mariners"),
    GEOPACKAGE(false, false, Color(0xFFA2855E), R.drawable.ic_round_place_24, label = "GeoPackage Feature"),
-   BOOKMARK(true, false, Color(0xFFFF9500), R.drawable.ic_outline_bookmark_border_24, label = "Bookmarks");
-
+   BOOKMARK(true, false, Color(0xFFFF9500), R.drawable.ic_outline_bookmark_border_24, label = "Bookmarks"),
+   ROUTE(true, true, Color(0xFF000000), R.drawable.ic_outline_directions_24dp, label = "Routes");
    fun labelForCount(count: Int) = if (count == 1) label else labelPlural
 }

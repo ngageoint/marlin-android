@@ -40,6 +40,7 @@ fun DataSourceIcon(
             DataSource.NOTICE_TO_MARINERS -> R.drawable.ic_baseline_campaign_24
             DataSource.PORT -> R.drawable.ic_baseline_anchor_24
             DataSource.RADIO_BEACON -> R.drawable.ic_baseline_settings_input_antenna_24
+            DataSource.ROUTE -> R.drawable.ic_outline_directions_24dp
          }
 
          Image(
