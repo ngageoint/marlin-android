@@ -11,6 +11,7 @@ import kotlinx.coroutines.withContext
 import mil.nga.geopackage.BoundingBox
 import mil.nga.geopackage.GeoPackageManager
 import mil.nga.geopackage.features.index.FeatureIndexManager
+import mil.nga.msi.createSplitEnvelopeOn180thMeridian
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.filter.MapBoundsFilter
 import mil.nga.msi.datasource.layer.LayerType
@@ -38,9 +39,13 @@ import mil.nga.msi.ui.map.cluster.MapAnnotation
 import mil.nga.sf.GeometryEnvelope
 import mil.nga.sf.Point
 import mil.nga.sf.geojson.Feature
+import mil.nga.sf.geojson.LineString
+import mil.nga.sf.geojson.Polygon
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.math.abs
+import kotlin.math.max
+import kotlin.math.min
 
 @Singleton
 class BottomSheetRepository @Inject constructor(
@@ -187,15 +192,46 @@ class BottomSheetRepository @Inject constructor(
                warning.getFeatures().filter(fun(feature: Feature): Boolean {
                   val envelope = feature.geometry.geometry.envelope
 
-                  // check for 180th meridian crossing
-                  val intersects = if(abs(envelope.maxX-envelope.minX) > 180){
-                     // max and min X are swapped here because the envelope doesn't account for 180th meridian crossing
-                     val leftEnvelope = GeometryEnvelope(envelope.maxX, envelope.minY, 180.0, envelope.maxY)
-                     val rightEnvelope = GeometryEnvelope(-180.0, envelope.minY, envelope.minX, envelope.maxY)
-                     geometryEnvelope.contains(leftEnvelope) ||
-                             geometryEnvelope.intersects(leftEnvelope) ||
-                             geometryEnvelope.contains(rightEnvelope) ||
-                             geometryEnvelope.intersects(rightEnvelope)
+                  val points: List<Point> = when (val geometry = feature.geometry) {
+                     is mil.nga.sf.geojson.Point -> {
+                        listOf(geometry.point)
+                     }
+                     is LineString ->{
+                        geometry.lineString.points
+                     }
+                     is Polygon -> {
+                        geometry.polygon.rings[0].points
+                     }
+                     else -> {
+                        emptyList()
+                     }
+                  }
+
+                  var crosses180th = false
+                  var farLeftLong = 180.0
+                  var farRightLong = -180.0
+
+                  for (i in 1..< points.count()) {
+                     val currentLong = points[i].x
+                     when {
+                        currentLong == 0.0 -> break
+                        currentLong > 0.0 -> farLeftLong = min(farLeftLong,currentLong)
+                        currentLong < 0.0 -> farRightLong = max(farRightLong,currentLong)
+                     }
+                     if(abs(currentLong - points[i-1].x) > 180){
+                        crosses180th = true
+                     }
+                  }
+                  val intersects = if(crosses180th){
+                     val splitFeature = createSplitEnvelopeOn180thMeridian(farLeftLong, farRightLong, envelope.minY, envelope.maxY)
+                     if(geometryEnvelope.minX <= geometryEnvelope.maxX){
+                        geometryEnvelope.intersects(splitFeature.leftEnvelope) ||
+                              geometryEnvelope.intersects(splitFeature.rightEnvelope)
+                     } else {
+                        val splitBounds = createSplitEnvelopeOn180thMeridian(geometryEnvelope.minX, geometryEnvelope.maxX, geometryEnvelope.minY, geometryEnvelope.maxY)
+                        splitBounds.leftEnvelope.intersects(splitFeature.leftEnvelope) ||
+                              splitBounds.rightEnvelope.intersects(splitFeature.rightEnvelope)
+                     }
 
                   } else {
                      geometryEnvelope.contains(envelope) || geometryEnvelope.intersects(envelope)
