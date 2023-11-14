@@ -2,6 +2,8 @@ package mil.nga.msi.ui.map
 
 import android.app.Application
 import androidx.lifecycle.*
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.TileProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -53,6 +55,7 @@ class MapViewModel @Inject constructor(
    private val layerService: LayerService,
    filterRepository: FilterRepository,
    layerRepository: LayerRepository,
+   private val bottomSheetRepository: BottomSheetRepository,
    private val geoPackageManager: GeoPackageManager,
    private val asamRepository: AsamRepository,
    private val asamTileRepository: AsamTileRepository,
@@ -93,6 +96,14 @@ class MapViewModel @Inject constructor(
    suspend fun setMapLocation(mapLocation: MapLocation, zoom: Int) {
       _zoom.value = zoom
       mapRepository.setMapLocation(mapLocation)
+   }
+
+   suspend fun setTapLocation(point: LatLng, bounds: LatLngBounds): Int {
+      return bottomSheetRepository.setLocation(point, bounds)
+   }
+
+   fun clearTapLocation() {
+      bottomSheetRepository.clearLocation()
    }
 
    private var asamTileProvider = AsamTileProvider(application, asamTileRepository)

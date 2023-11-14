@@ -1,6 +1,8 @@
 package mil.nga.msi.ui.modu.sheet
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -11,6 +13,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import mil.nga.msi.datasource.DataSource
+import mil.nga.msi.datasource.modu.Modu
+import mil.nga.msi.datasource.modu.ModuWithBookmark
+import mil.nga.msi.ui.datasource.DataSourceActions
 import mil.nga.msi.ui.datasource.DataSourceIcon
 import mil.nga.msi.ui.modu.ModuSummary
 import mil.nga.msi.ui.modu.ModuViewModel
@@ -19,7 +24,9 @@ import mil.nga.msi.ui.modu.ModuViewModel
 fun ModuSheetScreen(
    name: String,
    modifier: Modifier = Modifier,
-   onDetails: (() -> Unit)? = null,
+   onDetails: () -> Unit,
+   onShare: (Modu) -> Unit,
+   onBookmark: (ModuWithBookmark) -> Unit,
    viewModel: ModuViewModel = hiltViewModel()
 ) {
    viewModel.setName(name)
@@ -38,10 +45,19 @@ fun ModuSheetScreen(
             )
          }
 
-         TextButton(
-            onClick = { onDetails?.invoke() }
-         ) {
-            Text("MORE DETAILS")
+         Row(horizontalArrangement = Arrangement.SpaceBetween) {
+            TextButton(
+               onClick = onDetails
+            ) {
+               Text("MORE DETAILS")
+            }
+
+            DataSourceActions(
+               bookmarked = moduWithBookmark?.bookmark != null,
+               onShare = { moduWithBookmark?.modu?.let { onShare(it) } },
+               onBookmark = { moduWithBookmark?.let { onBookmark(it) } },
+               modifier = Modifier.padding(end = 8.dp, bottom = 8.dp)
+            )
          }
       }
    }

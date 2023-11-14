@@ -1,8 +1,6 @@
 package mil.nga.msi.ui.electronicpublication
 
 import android.net.Uri
-import androidx.compose.ui.graphics.Color
-import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
@@ -14,6 +12,7 @@ import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.electronicpublication.ElectronicPublicationType
 import mil.nga.msi.repository.bookmark.BookmarkKey
 import mil.nga.msi.ui.bookmark.BookmarkRoute
+import mil.nga.msi.ui.navigation.MarlinAppState
 import mil.nga.msi.ui.navigation.Route
 
 sealed class ElectronicPublicationRoute(
@@ -21,7 +20,6 @@ sealed class ElectronicPublicationRoute(
     override val title: String = "Electronic Publications",
     override val shortTitle: String = "E-Pubs",
 ): Route {
-    override val color: Color = DataSource.ELECTRONIC_PUBLICATION.color
     data object Main: ElectronicPublicationRoute("electronicPublications")
     data object List: ElectronicPublicationRoute("electronicPublication/types")
     data object Detail: ElectronicPublicationRoute("electronicPublication/detail")
@@ -32,7 +30,7 @@ fun routeForPubType(pubType: ElectronicPublicationType): String {
 }
 
 fun NavGraphBuilder.electronicPublicationGraph(
-    navController: NavController,
+    appState: MarlinAppState,
     bottomBarVisibility: (Boolean) -> Unit,
     openNavigationDrawer: () -> Unit
 ) {
@@ -49,7 +47,7 @@ fun NavGraphBuilder.electronicPublicationGraph(
             ElectronicPublicationsScreen(
                 openDrawer = openNavigationDrawer,
                 onPubTypeTap = { pubType ->
-                    navController.navigate(routeForPubType(pubType))
+                    appState.navController.navigate(routeForPubType(pubType))
                 }
             )
         }
@@ -60,11 +58,11 @@ fun NavGraphBuilder.electronicPublicationGraph(
         ) {
             bottomBarVisibility(true)
             ElectronicPublicationTypeBrowseScreen(
-                onBack = { navController.popBackStack() },
+                onBack = { appState.navController.popBackStack() },
                 onBookmark = { publication ->
                     val key = BookmarkKey(publication.s3Key, DataSource.ELECTRONIC_PUBLICATION)
                     val encoded = Uri.encode(Json.encodeToString(key))
-                    navController.navigate( "${BookmarkRoute.Notes.name}?bookmark=$encoded")
+                    appState.navController.navigate( "${BookmarkRoute.Notes.name}?bookmark=$encoded")
                 }
             )
         }
@@ -79,11 +77,11 @@ fun NavGraphBuilder.electronicPublicationGraph(
 
             ElectronicPublicationDetailScreen(
                 s3Key = Uri.decode(s3Key),
-                onBack = { navController.popBackStack() },
+                onBack = { appState.navController.popBackStack() },
                 onBookmark = { publication ->
                     val key = BookmarkKey(publication.s3Key, DataSource.ELECTRONIC_PUBLICATION)
                     val encoded = Uri.encode(Json.encodeToString(key))
-                    navController.navigate( "${BookmarkRoute.Notes.name}?bookmark=$encoded")
+                    appState.navController.navigate( "${BookmarkRoute.Notes.name}?bookmark=$encoded")
                 }
             )
         }

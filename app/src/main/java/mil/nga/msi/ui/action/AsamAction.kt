@@ -1,6 +1,7 @@
 package mil.nga.msi.ui.action
 
 import android.net.Uri
+import android.util.Log
 import androidx.navigation.NavController
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.serialization.encodeToString

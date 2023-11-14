@@ -1,18 +1,16 @@
 package mil.nga.msi.ui.report
 
-import androidx.compose.ui.graphics.Color
-import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import mil.nga.msi.R
+import mil.nga.msi.ui.navigation.MarlinAppState
 import mil.nga.msi.ui.navigation.Route
 
 sealed class ReportRoute(
    override val name: String,
    override val title: String,
    override val shortTitle: String = title,
-   override val color: Color = Color(0xFF000000),
    val icon: Int = 0,
    val url: String = ""
 ): Route {
@@ -61,7 +59,7 @@ sealed class ReportRoute(
 }
 
 fun NavGraphBuilder.reportGraph(
-   navController: NavController,
+   appState: MarlinAppState,
    bottomBarVisibility: (Boolean) -> Unit
 ) {
    navigation(
@@ -73,53 +71,39 @@ fun NavGraphBuilder.reportGraph(
          bottomBarVisibility(true)
 
          ReportsScreen(
-            close = {
-               navController.popBackStack()
-            },
-            onTap = { route ->
-               navController.navigate(route.name)
-            }
+            close = { appState.navController.popBackStack() },
+            onTap = { route -> appState.navController.navigate(route.name) }
          )
       }
 
       composable(ReportRoute.ASAM.name) {
          bottomBarVisibility(true)
 
-         ReportPage(ReportRoute.ASAM) {
-            navController.popBackStack()
-         }
+         ReportPage(ReportRoute.ASAM) { appState.navController.popBackStack() }
       }
 
       composable(ReportRoute.Observer.name) {
          bottomBarVisibility(true)
 
-         ReportPage(ReportRoute.Observer) {
-            navController.popBackStack()
-         }
+         ReportPage(ReportRoute.Observer) { appState.navController.popBackStack() }
       }
 
       composable(ReportRoute.MODU.name) {
          bottomBarVisibility(true)
 
-         ReportPage(ReportRoute.MODU) {
-            navController.popBackStack()
-         }
+         ReportPage(ReportRoute.MODU) { appState.navController.popBackStack() }
       }
 
       composable(ReportRoute.PortVisit.name) {
          bottomBarVisibility(true)
 
-         ReportPage(ReportRoute.PortVisit) {
-            navController.popBackStack()
-         }
+         ReportPage(ReportRoute.PortVisit) { appState.navController.popBackStack() }
       }
 
       composable(ReportRoute.HostileShip.name) {
          bottomBarVisibility(true)
 
-         ReportPage(ReportRoute.HostileShip) {
-            navController.popBackStack()
-         }
+         ReportPage(ReportRoute.HostileShip) { appState.navController.popBackStack() }
       }
    }
 }

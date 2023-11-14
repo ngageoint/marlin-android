@@ -2,27 +2,126 @@ package mil.nga.msi.datasource
 
 import androidx.compose.ui.graphics.Color
 import mil.nga.msi.R
+import mil.nga.msi.ui.asam.AsamRoute
+import mil.nga.msi.ui.bookmark.BookmarkRoute
+import mil.nga.msi.ui.dgpsstation.DgpsStationRoute
+import mil.nga.msi.ui.electronicpublication.ElectronicPublicationRoute
+import mil.nga.msi.ui.light.LightRoute
+import mil.nga.msi.ui.modu.ModuRoute
+import mil.nga.msi.ui.navigation.Route
+import mil.nga.msi.ui.navigationalwarning.NavigationWarningRoute
+import mil.nga.msi.ui.noticetomariners.NoticeToMarinersRoute
+import mil.nga.msi.ui.port.PortRoute
+import mil.nga.msi.ui.radiobeacon.RadioBeaconRoute
+
+data class Tab(val route: Route)
 
 enum class DataSource(
-   val tab: Boolean,
+   val tab: Tab? = null,
    val mappable: Boolean,
    val color: Color,
    val icon: Int,
    val label: String,
    val labelPlural: String = "${label}s",
-   val tableName: String? = null
+   val tableName: String? = null,
+   val route: Route? = null
 ) {
-   ASAM(true, true, Color(0xFF000000), R.drawable.ic_asam_24dp, label = "ASAM", tableName = "asams"),
-   MODU(true, true, Color(0xFF0042A4), R.drawable.ic_modu_24dp, label = "MODU", tableName = "modus"),
-   NAVIGATION_WARNING(true, true, Color(0xFFD32F2F), R.drawable.ic_round_warning_24, label = "Navigational Warning", tableName = "navigational_warnings"),
-   LIGHT(true, true, Color(0xFFFFC500), R.drawable.ic_baseline_lightbulb_24, label = "Light", tableName = "lights"),
-   PORT(true, true, Color(0xFF5856D6), R.drawable.ic_baseline_anchor_24, label = "World Port", tableName = "ports"),
-   RADIO_BEACON(true, true, Color(0xFF007BFF), R.drawable.ic_baseline_settings_input_antenna_24, label = "Radio Beacon", tableName = "radio_beacons"),
-   DGPS_STATION(true, true, Color(0xFF00E676), R.drawable.ic_dgps_icon_24, label = "Differential GPS Station", tableName = "dgps_stations"),
-   ELECTRONIC_PUBLICATION(true, false, Color(0xFF30B0C7), R.drawable.ic_description_24dp, label = "Electronic Publication", tableName = "epubs"),
-   NOTICE_TO_MARINERS(true, false, Color(0xFFFF0000), R.drawable.ic_baseline_campaign_24, label = "Notice To Mariners", tableName = "notice_to_mariners"),
-   GEOPACKAGE(false, false, Color(0xFFA2855E), R.drawable.ic_round_place_24, label = "GeoPackage Feature"),
-   BOOKMARK(true, false, Color(0xFFFF9500), R.drawable.ic_outline_bookmark_border_24, label = "Bookmarks"),
+   ASAM(
+      tab = Tab(AsamRoute.Main),
+      mappable = true,
+      color = Color(0xFF000000),
+      icon = R.drawable.ic_asam_24dp,
+      label = "ASAM",
+      tableName = "asams",
+      route = AsamRoute.Main
+   ),
+
+   MODU(
+      tab = Tab(ModuRoute.Main),
+      mappable = true,
+      color = Color(0xFF0042A4),
+      icon = R.drawable.ic_modu_24dp,
+      label = "MODU",
+      tableName = "modus"
+   ),
+
+   NAVIGATION_WARNING(
+      tab = Tab(NavigationWarningRoute.Main),
+      mappable = true,
+      color = Color(0xFFD32F2F),
+      icon = R.drawable.ic_round_warning_24,
+      label = "Navigational Warning",
+      tableName = "navigational_warnings",
+   ),
+
+   LIGHT(
+      tab = Tab(LightRoute.Main),
+      mappable = true,
+      color = Color(0xFFFFC500),
+      icon = R.drawable.ic_baseline_lightbulb_24,
+      label = "Light",
+      tableName = "lights",
+   ),
+
+   PORT(
+      tab = Tab(PortRoute.Main),
+      mappable = true,
+      color = Color(0xFF5856D6),
+      icon = R.drawable.ic_baseline_anchor_24,
+      label = "World Port",
+      tableName = "ports"
+   ),
+
+   RADIO_BEACON(
+      tab = Tab(RadioBeaconRoute.Main),
+      mappable = true,
+      color = Color(0xFF007BFF),
+      icon = R.drawable.ic_baseline_settings_input_antenna_24,
+      label = "Radio Beacon",
+      tableName = "radio_beacons",
+   ),
+
+   DGPS_STATION(
+      tab = Tab(DgpsStationRoute.Main),
+      mappable = true,
+      color = Color(0xFF00E676),
+      icon = R.drawable.ic_dgps_icon_24,
+      label = "Differential GPS Station",
+      tableName = "dgps_stations"
+   ),
+
+   ELECTRONIC_PUBLICATION(
+      tab = Tab(ElectronicPublicationRoute.Main),
+      mappable = false,
+      color = Color(0xFF30B0C7),
+      icon = R.drawable.ic_description_24dp,
+      label = "Electronic Publication",
+      tableName = "epubs"
+   ),
+
+   NOTICE_TO_MARINERS(
+      tab = Tab(NoticeToMarinersRoute.Main),
+      mappable = false,
+      color = Color(0xFFFF0000),
+      icon = R.drawable.ic_baseline_campaign_24,
+      label = "Notice To Mariners",
+      tableName = "notice_to_mariners"
+   ),
+
+   BOOKMARK(
+      tab = Tab(BookmarkRoute.Main),
+      mappable = false,
+      color = Color(0xFFFF9500),
+      icon = R.drawable.ic_outline_bookmark_border_24,
+      label = "Bookmarks",
+   ),
+
+   GEOPACKAGE(
+      mappable = false,
+      color = Color(0xFFA2855E),
+      icon = R.drawable.ic_round_place_24,
+      label = "GeoPackage Feature"
+   );
    ROUTE(true, true, Color(0xFF000000), R.drawable.ic_outline_directions_24dp, label = "Routes");
    fun labelForCount(count: Int) = if (count == 1) label else labelPlural
 }

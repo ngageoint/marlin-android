@@ -1,7 +1,5 @@
 package mil.nga.msi.ui.port
 
-import androidx.compose.ui.graphics.Color
-import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navDeepLink
@@ -12,29 +10,27 @@ import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.port.Port
 import mil.nga.msi.ui.action.PortAction
 import mil.nga.msi.ui.filter.FilterScreen
+import mil.nga.msi.ui.navigation.MarlinAppState
 import mil.nga.msi.ui.navigation.Route
 import mil.nga.msi.ui.port.detail.PortDetailScreen
 import mil.nga.msi.ui.port.list.PortsScreen
-import mil.nga.msi.ui.port.sheet.PortSheetScreen
 import mil.nga.msi.ui.sort.SortScreen
 
 sealed class PortRoute(
    override val name: String,
    override val title: String,
-   override val shortTitle: String,
-   override val color: Color = DataSource.PORT.color
+   override val shortTitle: String
 ): Route {
    data object Main: PortRoute("ports", "World Ports", "Ports")
    data object Detail: PortRoute("ports/detail", "World Port Details", "Port Details")
    data object List: PortRoute("ports/list", "World Ports", "Ports")
-   data object Sheet: PortRoute("ports/sheet", "World Port Sheet", "Port Sheet")
    data object Filter: PortRoute("ports/filter", "World Port Filter", "Port Filters")
    data object Sort: PortRoute("ports/sort", "World Port Sort", "Port Sort")
 }
 
 @OptIn(ExperimentalMaterialNavigationApi::class)
 fun NavGraphBuilder.portGraph(
-   navController: NavController,
+   appState: MarlinAppState,
    bottomBarVisibility: (Boolean) -> Unit,
    openNavigationDrawer: () -> Unit,
    share: (Pair<String, String>) -> Unit,
@@ -57,16 +53,16 @@ fun NavGraphBuilder.portGraph(
          PortsScreen(
             openDrawer = { openNavigationDrawer() },
             openFilter = {
-               navController.navigate(PortRoute.Filter.name)
+               appState.navController.navigate(PortRoute.Filter.name)
             },
             openSort = {
-               navController.navigate(PortRoute.Sort.name)
+               appState.navController.navigate(PortRoute.Sort.name)
             },
             onAction = { action ->
                when(action) {
                   is PortAction.Share -> sharePort(action.port)
                   is PortAction.Location -> showSnackbar("${action.text} copied to clipboard")
-                  else -> action.navigate(navController)
+                  else -> action.navigate(appState.navController)
                }
             }
          )
@@ -77,38 +73,29 @@ fun NavGraphBuilder.portGraph(
          backstackEntry.arguments?.getString("portNumber")?.toIntOrNull()?.let { portNumber ->
             PortDetailScreen(
                portNumber,
-               close = { navController.popBackStack() },
+               close = { appState.navController.popBackStack() },
                onAction = { action ->
                   when(action) {
                      is PortAction.Share -> sharePort(action.port)
                      is PortAction.Location -> showSnackbar("${action.text} copied to clipboard")
-                     else -> action.navigate(navController)
+                     else -> action.navigate(appState.navController)
                   }
                }
             )
          }
       }
-      bottomSheet("${PortRoute.Sheet.name}?portNumber={portNumber}") { backstackEntry ->
-         backstackEntry.arguments?.getString("portNumber")?.toIntOrNull()?.let { portNumber ->
-            PortSheetScreen(portNumber, onDetails = {
-               navController.navigate("${PortRoute.Detail.name}?portNumber=$portNumber")
-            })
-         }
-      }
+
       bottomSheet(PortRoute.Filter.name) {
          FilterScreen(
             dataSource = DataSource.PORT,
-            close = {
-               navController.popBackStack()
-            }
+            close = { appState.navController.popBackStack() }
          )
       }
+
       bottomSheet(PortRoute.Sort.name) {
          SortScreen(
             dataSource = DataSource.PORT,
-            close = {
-               navController.popBackStack()
-            }
+            close = { appState.navController.popBackStack() }
          )
       }
    }
