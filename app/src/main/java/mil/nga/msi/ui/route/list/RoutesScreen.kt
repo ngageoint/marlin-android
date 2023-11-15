@@ -10,6 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.outlined.Directions
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
@@ -31,6 +32,7 @@ import mil.nga.msi.ui.main.TopBar
 @Composable
 fun RoutesScreen(
     openDrawer: () -> Unit,
+    onCreate: () -> Unit,
     onAction: (Action) -> Unit,
     viewModel: RoutesViewModel = hiltViewModel()
 ) {
@@ -44,13 +46,15 @@ fun RoutesScreen(
         )
 
         if (routes.isEmpty()) {
-            EmptyState()
+            EmptyState(onCreate)
         }
     }
 }
 
 @Composable
-private fun EmptyState() {
+private fun EmptyState(
+    onCreate: () -> Unit
+) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center,
@@ -78,6 +82,15 @@ private fun EmptyState() {
                     style = MaterialTheme.typography.titleLarge,
                     modifier = Modifier.padding(horizontal = 32.dp),
                     textAlign = TextAlign.Center
+                )
+
+                ExtendedFloatingActionButton(
+                    onClick = { onCreate() },
+                    icon = { Icon(Icons.Outlined.Directions, "Route") },
+                    text = { Text(text = "Create Route") },
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier.padding(top = 32.dp)
                 )
             }
         }

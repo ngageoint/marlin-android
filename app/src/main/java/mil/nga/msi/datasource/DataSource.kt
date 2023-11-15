@@ -13,6 +13,7 @@ import mil.nga.msi.ui.navigationalwarning.NavigationWarningRoute
 import mil.nga.msi.ui.noticetomariners.NoticeToMarinersRoute
 import mil.nga.msi.ui.port.PortRoute
 import mil.nga.msi.ui.radiobeacon.RadioBeaconRoute
+import mil.nga.msi.ui.route.list.RouteRoute
 
 data class Tab(val route: Route)
 
@@ -116,12 +117,20 @@ enum class DataSource(
       label = "Bookmarks",
    ),
 
+   ROUTE(
+      tab = Tab(RouteRoute.Main),
+      mappable = false,
+      color = Color(0xFF000000),
+      icon = R.drawable.ic_outline_directions_24dp,
+      label = "Routes"
+   ),
+
    GEOPACKAGE(
       mappable = false,
       color = Color(0xFFA2855E),
       icon = R.drawable.ic_round_place_24,
       label = "GeoPackage Feature"
    );
-   ROUTE(true, true, Color(0xFF000000), R.drawable.ic_outline_directions_24dp, label = "Routes");
+
    fun labelForCount(count: Int) = if (count == 1) label else labelPlural
 }

@@ -1,27 +1,27 @@
 package mil.nga.msi.ui.route.list
 
-import androidx.compose.ui.graphics.Color
-import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navDeepLink
 import androidx.navigation.navigation
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
+import mil.nga.msi.ui.navigation.MarlinAppState
 import mil.nga.msi.ui.navigation.Route
+import mil.nga.msi.ui.route.create.RouteCreateScreen
 
 sealed class RouteRoute(
     override val name: String,
     override val title: String,
     override val shortTitle: String,
-    override val color: Color = Color.Transparent
 ): Route {
     data object Main: RouteRoute("routes/main", "Routes", "Routes")
     data object List: RouteRoute("routes/list", "Routes", "Routes")
+    data object Create: RouteRoute("routes/create", "Create Route", "Create")
 }
 
 @OptIn(ExperimentalMaterialNavigationApi::class)
 fun NavGraphBuilder.routesGraph(
-    navController: NavController,
+    appState: MarlinAppState,
     bottomBarVisibility: (Boolean) -> Unit,
     openNavigationDrawer: () -> Unit
 ) {
@@ -37,11 +37,21 @@ fun NavGraphBuilder.routesGraph(
 
             RoutesScreen(
                 openDrawer = { openNavigationDrawer() },
+                onCreate = {
+                    appState.navController.navigate(RouteRoute.Create.name)
+                },
                 onAction = { action ->
                     when (action) {
                         else -> {}
                     }
                 }
+            )
+        }
+        composable("${RouteRoute.Create.name}") { backstackEntry ->
+            bottomBarVisibility(false)
+
+            RouteCreateScreen(
+                onBack = { appState.navController.popBackStack() },
             )
         }
 

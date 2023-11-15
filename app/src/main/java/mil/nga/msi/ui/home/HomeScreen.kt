@@ -215,7 +215,7 @@ fun NavGraphBuilder.homeGraph(
       openNavigationDrawer = openNavigationDrawer
    )
    routesGraph(
-      navController = navController,
+      appState = appState,
       bottomBarVisibility = { bottomBarVisibility(it) },
       openNavigationDrawer = openNavigationDrawer
    )
