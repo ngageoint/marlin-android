@@ -65,7 +65,8 @@ class BottomSheetRepositoryTest {
 
       userPreferencesRepository = mockk()
       val dataSources = mockk<Map<DataSource, Boolean>>()
-      every { dataSources[any()] } returns true
+      every { dataSources[any()] } returns false
+      every { dataSources[DataSource.NAVIGATION_WARNING] } returns true
       every { userPreferencesRepository.mapped } returns flowOf(dataSources)
 
       bottomSheetRepository = BottomSheetRepository(
@@ -83,7 +84,6 @@ class BottomSheetRepositoryTest {
          navigationalWarningRepository = navigationalWarningRepository,
          userPreferencesRepository = userPreferencesRepository,
       )
-
    }
 
    @After
@@ -93,50 +93,34 @@ class BottomSheetRepositoryTest {
 
    @Test
    fun should_not_return_navWarnings_that_havent_been_tapped() = runTest {
-      every {
-         navigationalWarningRepository.getNavigationalWarnings(
-            any(),
-            any(),
-            any(),
-            any()
-         )
-      } returns listOf(polygonNavWarningOn180thMeridian())
-
-      val dataSources = mockk<Map<DataSource, Boolean>>()
-      every { dataSources[any()] } returns false
-      every { dataSources[DataSource.NAVIGATION_WARNING] } returns true
-      every { userPreferencesRepository.mapped } returns flowOf(dataSources)
-
+      setMockNavWarning(polygonNavWarningOn180thMeridian())
       val latLng = LatLng(50.0, 170.0)
-      val bounds = LatLngBounds(
-         LatLng(latLng.latitude - 1, latLng.longitude - 1),
-         LatLng(latLng.latitude + 1, latLng.longitude + 1)
-      )
+      val bounds = buildInputBounds(latLng.latitude, latLng.longitude, 2.5)
+
       val tappedAnnotationsCount = bottomSheetRepository.setLocation(latLng, bounds)
       Assert.assertEquals(0, tappedAnnotationsCount)
    }
 
    @Test
-   fun should_return_tapped_polygons_that_cross_180th_meridian() = runTest {
-      every {
-         navigationalWarningRepository.getNavigationalWarnings(
-            any(),
-            any(),
-            any(),
-            any()
-         )
-      } returns listOf(polygonNavWarningOn180thMeridian())
+   fun should_return_tapped_polygons_that_dont_cross_180th_meridian() = runTest {
+      setMockNavWarning(polygonNavWarning())
+      val latLng = LatLng(27.0, 145.9)
+      val bounds = buildInputBounds(latLng.latitude, latLng.longitude, 2.5)
 
-      val dataSources = mockk<Map<DataSource, Boolean>>()
-      every { dataSources[any()] } returns false
-      every { dataSources[DataSource.NAVIGATION_WARNING] } returns true
-      every { userPreferencesRepository.mapped } returns flowOf(dataSources)
-
-      val latLng = LatLng(17.0, -179.9)
-      val bounds = LatLngBounds( // .01 works
-         LatLng(latLng.latitude - 2.5, latLng.longitude - 2.5),
-         LatLng(latLng.latitude + 2.5, latLng.longitude + 2.5)
+      val tappedAnnotationsCount = bottomSheetRepository.setLocation(latLng, bounds)
+      Assert.assertEquals(1, tappedAnnotationsCount)
+      Assert.assertEquals(
+         "3403--2023--HYDROPAC",
+         bottomSheetRepository.mapAnnotations.value?.get(0)?.key?.id
       )
+   }
+
+   @Test
+   fun should_return_tapped_polygons_that_cross_180th_meridian() = runTest {
+      setMockNavWarning(polygonNavWarningOn180thMeridian())
+      val latLng = LatLng(17.0, -179.9)
+      val bounds = buildInputBounds(latLng.latitude, latLng.longitude, 2.5)
+
       val tappedAnnotationsCount = bottomSheetRepository.setLocation(latLng, bounds)
       Assert.assertEquals(1, tappedAnnotationsCount)
       Assert.assertEquals(
@@ -147,6 +131,19 @@ class BottomSheetRepositoryTest {
 
    @Test
    fun should_return_tapped_lines_that_cross_180th_meridian() = runTest {
+      setMockNavWarning(lineNavWarningOn180thMeridian())
+      val latLng = LatLng(20.0, 179.0)
+      val bounds = buildInputBounds(latLng.latitude, latLng.longitude, 2.5)
+
+      val tappedAnnotationsCount = bottomSheetRepository.setLocation(latLng, bounds)
+      Assert.assertEquals(1, tappedAnnotationsCount)
+      Assert.assertEquals(
+         "762--2023--NAVAREA_XII",
+         bottomSheetRepository.mapAnnotations.value?.get(0)?.key?.id
+      )
+   }
+
+   private fun setMockNavWarning(navWarning: NavigationalWarning) {
       every {
          navigationalWarningRepository.getNavigationalWarnings(
             any(),
@@ -154,23 +151,13 @@ class BottomSheetRepositoryTest {
             any(),
             any()
          )
-      } returns listOf(lineNavWarningOn180thMeridian())
+      } returns listOf(navWarning)
+   }
 
-      val dataSources = mockk<Map<DataSource, Boolean>>()
-      every { dataSources[any()] } returns false
-      every { dataSources[DataSource.NAVIGATION_WARNING] } returns true
-      every { userPreferencesRepository.mapped } returns flowOf(dataSources)
-
-      val latLng = LatLng(20.0, 179.0)
-      val bounds = LatLngBounds(
-         LatLng(latLng.latitude - 2.5, latLng.longitude - 2.5),
-         LatLng(latLng.latitude + 2.5, latLng.longitude + 2.5)
-      )
-      val tappedAnnotationsCount = bottomSheetRepository.setLocation(latLng, bounds)
-      Assert.assertEquals(1, tappedAnnotationsCount)
-      Assert.assertEquals(
-         "762--2023--NAVAREA_XII",
-         bottomSheetRepository.mapAnnotations.value?.get(0)?.key?.id
+   private fun buildInputBounds(lat: Double, long: Double, tolerance: Double): LatLngBounds {
+      return LatLngBounds(
+         LatLng(lat - tolerance, long - tolerance),
+         LatLng(lat + tolerance, long + tolerance)
       )
    }
 
@@ -194,6 +181,30 @@ class BottomSheetRepositoryTest {
          cancelYear = null
          geoJson = """
             {"type":"FeatureCollection","features":[{"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[172.65,14.433333333333334],[169.75,12.916666666666666],[167.65,11.733333333333333],[167.81666666666666,11.45],[168.96666666666667,11.866666666666667],[171.16666666666666,12.8],[175.33333333333334,14.483333333333333],[177.68333333333334,15.4],[-179.66666666666666,16.333333333333332],[-175.21666666666667,17.7],[-168.98333333333332,19.583333333333332],[-164.48333333333332,21.016666666666666],[-160.0,22.533333333333335],[-156.48333333333332,23.583333333333332],[-155.46666666666667,24.0],[-155.65,24.516666666666666],[-157.71666666666667,24.233333333333334],[-161.91666666666666,23.433333333333334],[-165.25,22.733333333333334],[-167.98333333333332,21.9],[-170.9,20.95],[-173.91666666666666,19.916666666666668],[-176.31666666666666,19.05],[179.98333333333332,17.65],[176.51666666666668,16.216666666666665],[175.05,15.6]]]},"properties":{}},{"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[-157.562,24.044],[-157.047,24.147],[-156.888,23.536],[-157.426,23.43]]]},"properties":{}}]}
+         """.trimIndent()
+      }
+   }
+
+   private fun polygonNavWarning(): NavigationalWarning {
+      val dateFormat = SimpleDateFormat("ddHHmm'Z' MMM yyyy", Locale.US)
+      return NavigationalWarning(
+         id = "3403--2023--HYDROPAC",
+         number = 3403,
+         year = 2023,
+         navigationArea = NavigationArea.HYDROPAC,
+         issueDate = dateFormat.parse("271213Z OCT 2023")!!
+      ).apply {
+         subregions = mutableListOf("97")
+         text =
+            "WESTERN NORTH PACIFIC.\nDNC 12.\n1. GUNNERY EXERCISES 2300Z TO 0900Z DAILY\n   31 OCT THRU 29 NOV IN AREA BOUND BY\n   28-15.25N 146-29.78E, 25-25.27N 147-37.78E,\n   25-00.26N 145-35.80E, 27-55.25N 144-57.80E.\n2. CANCEL THIS MSG 301000Z NOV 23.\n"
+         status = "A"
+         authority = "NAVAREA XI 367/23 271202Z OCT 23."
+         cancelNumber = null
+         cancelDate = null
+         cancelNavigationArea = null
+         cancelYear = null
+         geoJson = """
+            {"type":"FeatureCollection","features":[{"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[146.49633333333333,28.254166666666666],[147.62966666666668,25.421166666666668],[145.59666666666666,25.004333333333335],[144.96333333333334,27.920833333333334]]]},"properties":{}}]}
          """.trimIndent()
       }
    }

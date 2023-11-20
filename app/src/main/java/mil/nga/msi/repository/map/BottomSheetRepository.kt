@@ -11,7 +11,7 @@ import kotlinx.coroutines.withContext
 import mil.nga.geopackage.BoundingBox
 import mil.nga.geopackage.GeoPackageManager
 import mil.nga.geopackage.features.index.FeatureIndexManager
-import mil.nga.msi.createSplitEnvelopeOn180thMeridian
+import mil.nga.msi.buildEnvelopesSpanning180thMeridian
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.filter.MapBoundsFilter
 import mil.nga.msi.datasource.layer.LayerType
@@ -19,6 +19,7 @@ import mil.nga.msi.filter.ComparatorType
 import mil.nga.msi.filter.Filter
 import mil.nga.msi.filter.FilterParameter
 import mil.nga.msi.filter.FilterParameterType
+import mil.nga.msi.getPointsForGeometry
 import mil.nga.msi.repository.asam.AsamRepository
 import mil.nga.msi.repository.dgpsstation.DgpsStationKey
 import mil.nga.msi.repository.dgpsstation.DgpsStationRepository
@@ -39,8 +40,6 @@ import mil.nga.msi.ui.map.cluster.MapAnnotation
 import mil.nga.sf.GeometryEnvelope
 import mil.nga.sf.Point
 import mil.nga.sf.geojson.Feature
-import mil.nga.sf.geojson.LineString
-import mil.nga.sf.geojson.Polygon
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.math.abs
@@ -180,71 +179,80 @@ class BottomSheetRepository @Inject constructor(
       } else emptyList()
 
       val navigationalWarnings = if (dataSources[DataSource.NAVIGATION_WARNING] == true) {
-         val geometryEnvelope = GeometryEnvelope(bounds.southwest.longitude, bounds.southwest.latitude, bounds.northeast.longitude, bounds.northeast.latitude)
+         val inputEnvelopes = if (bounds.southwest.longitude > bounds.northeast.longitude) {
+            buildEnvelopesSpanning180thMeridian(
+               bounds.southwest.longitude,
+               bounds.southwest.latitude,
+               bounds.northeast.longitude,
+               bounds.northeast.latitude
+            )
+         } else {
+            listOf(
+               GeometryEnvelope(
+                  bounds.southwest.longitude,
+                  bounds.southwest.latitude,
+                  bounds.northeast.longitude,
+                  bounds.northeast.latitude
+               )
+            )
+         }
          navigationalWarningRepository
             .getNavigationalWarnings(
                minLatitude = bounds.southwest.latitude,
                minLongitude = bounds.southwest.longitude,
                maxLatitude = bounds.northeast.latitude,
-               maxLongitude =  bounds.northeast.longitude
+               maxLongitude = bounds.northeast.longitude
             )
             .flatMap { warning ->
                warning.getFeatures().filter(fun(feature: Feature): Boolean {
-                  val envelope = feature.geometry.geometry.envelope
+                  val points = getPointsForGeometry(feature.geometry)
+                  var featureCrosses180thMeridian = false
+                  var leftLong = 180.0
+                  var rightLong = -180.0
 
-                  val points: List<Point> = when (val geometry = feature.geometry) {
-                     is mil.nga.sf.geojson.Point -> {
-                        listOf(geometry.point)
-                     }
-                     is LineString ->{
-                        geometry.lineString.points
-                     }
-                     is Polygon -> {
-                        geometry.polygon.rings[0].points
-                     }
-                     else -> {
-                        emptyList()
-                     }
-                  }
-
-                  var crosses180th = false
-                  var farLeftLong = 180.0
-                  var farRightLong = -180.0
-
-                  for (i in 1..< points.count()) {
+                  // check if the feature crosses the 180th meridian and track the left/right bounds for that case
+                  // this assumes a nav warning won't cross both the prime and 180th meridians
+                  for (i in 0..<points.count()) {
                      val currentLong = points[i].x
                      when {
                         currentLong == 0.0 -> break
-                        currentLong > 0.0 -> farLeftLong = min(farLeftLong,currentLong)
-                        currentLong < 0.0 -> farRightLong = max(farRightLong,currentLong)
+                        currentLong > 0.0 -> leftLong = min(leftLong, currentLong)
+                        currentLong < 0.0 -> rightLong = max(rightLong, currentLong)
                      }
-                     if(abs(currentLong - points[i-1].x) > 180){
-                        crosses180th = true
+                     if (i > 0 && abs(currentLong - points[i - 1].x) > 180) {
+                        featureCrosses180thMeridian = true
                      }
                   }
-                  val intersects = if(crosses180th){
-                     val splitFeature = createSplitEnvelopeOn180thMeridian(farLeftLong, farRightLong, envelope.minY, envelope.maxY)
-                     if(geometryEnvelope.minX <= geometryEnvelope.maxX){
-                        geometryEnvelope.intersects(splitFeature.leftEnvelope) ||
-                              geometryEnvelope.intersects(splitFeature.rightEnvelope)
-                     } else {
-                        val splitBounds = createSplitEnvelopeOn180thMeridian(geometryEnvelope.minX, geometryEnvelope.maxX, geometryEnvelope.minY, geometryEnvelope.maxY)
-                        splitBounds.leftEnvelope.intersects(splitFeature.leftEnvelope) ||
-                              splitBounds.rightEnvelope.intersects(splitFeature.rightEnvelope)
-                     }
 
+                  val featureEnvelopes = if (featureCrosses180thMeridian) {
+                     buildEnvelopesSpanning180thMeridian(
+                        leftLong,
+                        feature.geometry.geometry.envelope.minY,
+                        rightLong,
+                        feature.geometry.geometry.envelope.maxY
+                     )
                   } else {
-                     geometryEnvelope.contains(envelope) || geometryEnvelope.intersects(envelope)
+                     listOf(feature.geometry.geometry.envelope)
                   }
-                  return intersects
+
+                  return inputEnvelopes.any { inputEnvelope ->
+                     featureEnvelopes.any { featureEnvelope ->
+                        inputEnvelope.intersects(
+                           featureEnvelope
+                        )
+                     }
+                  }
                }).map { feature ->
-                  val key = MapAnnotation.Key(NavigationalWarningKey.fromNavigationWarning(warning).id(), MapAnnotation.Type.NAVIGATIONAL_WARNING)
+                  val key = MapAnnotation.Key(
+                     NavigationalWarningKey.fromNavigationWarning(warning).id(),
+                     MapAnnotation.Type.NAVIGATIONAL_WARNING
+                  )
                   val envelope = feature.geometry.geometry.envelope
                   val centroid = envelope.centroid
 
                   // shift center longitude 180 degrees if the shape crosses the 180th meridian
-                  val center = if(abs(envelope.maxX - envelope.minX) > 180){
-                     val antipodalX = if(centroid.x > 0) centroid.x-180 else centroid.x+180
+                  val center = if (abs(envelope.maxX - envelope.minX) > 180) {
+                     val antipodalX = if (centroid.x > 0) centroid.x - 180 else centroid.x + 180
                      Point(antipodalX, centroid.y)
                   } else {
                      centroid
