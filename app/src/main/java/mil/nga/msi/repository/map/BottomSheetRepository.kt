@@ -237,9 +237,8 @@ class BottomSheetRepository @Inject constructor(
 
                   return inputEnvelopes.any { inputEnvelope ->
                      featureEnvelopes.any { featureEnvelope ->
-                        inputEnvelope.intersects(
-                           featureEnvelope
-                        )
+                        inputEnvelope.intersects(featureEnvelope)
+                              || inputEnvelope.contains(featureEnvelope)
                      }
                   }
                }).map { feature ->

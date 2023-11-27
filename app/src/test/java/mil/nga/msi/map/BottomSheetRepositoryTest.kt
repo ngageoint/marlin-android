@@ -143,6 +143,20 @@ class BottomSheetRepositoryTest {
       )
    }
 
+   @Test
+   fun should_return_tapped_points() = runTest {
+      setMockNavWarning(pointNavWarning())
+      val latLng = LatLng(37.0, -25.0)
+      val bounds = buildInputBounds(latLng.latitude, latLng.longitude, 2.5)
+
+      val tappedAnnotationsCount = bottomSheetRepository.setLocation(latLng, bounds)
+      Assert.assertEquals(1, tappedAnnotationsCount)
+      Assert.assertEquals(
+         "2348--2023--HYDROLANT",
+         bottomSheetRepository.mapAnnotations.value?.get(0)?.key?.id
+      )
+   }
+
    private fun setMockNavWarning(navWarning: NavigationalWarning) {
       every {
          navigationalWarningRepository.getNavigationalWarnings(
@@ -229,6 +243,30 @@ class BottomSheetRepositoryTest {
          cancelYear = null
          geoJson = """
             {"type":"FeatureCollection","features":[{"type":"Feature","geometry":{"type":"LineString","coordinates":[[175.11666666666667,20.4],[176.36666666666667,20.416666666666668],[177.03333333333333,20.216666666666665],[178.41666666666666,20.25],[178.78333333333333,20.583333333333332],[179.76666666666668,20.933333333333334],[-179.15,20.966666666666665]]},"properties":{}}]}
+         """.trimIndent()
+      }
+   }
+
+   private fun pointNavWarning(): NavigationalWarning {
+      val dateFormat = SimpleDateFormat("ddHHmm'Z' MMM yyyy", Locale.US)
+      return NavigationalWarning(
+         id = "2348--2023--HYDROLANT",
+         number = 2348,
+         year = 2023,
+         navigationArea = NavigationArea.HYDROLANT,
+         issueDate = dateFormat.parse("162137Z OCT 2023")!!
+      ).apply {
+         subregions = mutableListOf("51")
+         text =
+            "NORTH ATLANTIC.\nAZORES.\nDNC 08.\nNAVTEX STATION SAO MIGUEL (F)\n37-48.50N 025-33.20W OFF AIR.\n"
+         status = "A"
+         authority = "NAVAREA II 293/23 162112Z OCT 23."
+         cancelNumber = null
+         cancelDate = null
+         cancelNavigationArea = null
+         cancelYear = null
+         geoJson = """
+            {"type":"FeatureCollection","features":[{"type":"Feature","geometry":{"type":"Point","coordinates":[-25.553333333333335,37.80833333333333]},"properties":{}}]}
          """.trimIndent()
       }
    }
