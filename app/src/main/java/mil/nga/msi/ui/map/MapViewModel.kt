@@ -33,12 +33,8 @@ import mil.nga.msi.repository.preferences.UserPreferencesRepository
 import mil.nga.msi.repository.radiobeacon.RadioBeaconRepository
 import mil.nga.msi.type.MapLocation
 import mil.nga.msi.ui.map.overlay.*
-import mil.nga.sf.GeometryEnvelope
-import mil.nga.sf.Point
-import mil.nga.sf.geojson.Feature
 import javax.inject.Inject
 import javax.inject.Named
-import kotlin.math.abs
 
 enum class TileProviderType {
    MGRS,

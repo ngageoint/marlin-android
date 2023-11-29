@@ -1,10 +1,10 @@
 package mil.nga.msi
 
+import mil.nga.sf.Geometry
 import mil.nga.sf.GeometryEnvelope
+import mil.nga.sf.LineString
 import mil.nga.sf.Point
-import mil.nga.sf.geojson.Geometry
-import mil.nga.sf.geojson.LineString
-import mil.nga.sf.geojson.Polygon
+import mil.nga.sf.Polygon
 import java.time.Instant
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
@@ -27,17 +27,17 @@ fun buildEnvelopesSpanning180thMeridian(minX: Double, minY: Double, maxX: Double
 
 fun getPointsForGeometry(geometry: Geometry): List<Point> {
    return when (geometry) {
-      is mil.nga.sf.geojson.Point -> {
-         listOf(geometry.point)
+      is Point -> {
+         listOf(geometry)
       }
       is LineString ->{
-         geometry.lineString.points
+         geometry.points
       }
       is Polygon -> {
-         geometry.polygon.rings[0].points
+         geometry.rings[0].points
       }
       else -> {
-         listOf(geometry.geometry.centroid)
+         listOf(geometry.centroid)
       }
    }
 }

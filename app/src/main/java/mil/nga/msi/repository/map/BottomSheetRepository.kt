@@ -204,8 +204,8 @@ class BottomSheetRepository @Inject constructor(
                maxLongitude = bounds.northeast.longitude
             )
             .flatMap { warning ->
-               warning.getFeatures().filter(fun(feature: Feature): Boolean {
-                  val points = getPointsForGeometry(feature.geometry)
+               warning.getFeatures().filter { feature: Feature ->
+                  val points = getPointsForGeometry(feature.geometry.geometry)
                   var featureCrosses180thMeridian = false
                   var leftLong = 180.0
                   var rightLong = -180.0
@@ -235,13 +235,13 @@ class BottomSheetRepository @Inject constructor(
                      listOf(feature.geometry.geometry.envelope)
                   }
 
-                  return inputEnvelopes.any { inputEnvelope ->
+                  inputEnvelopes.any { inputEnvelope ->
                      featureEnvelopes.any { featureEnvelope ->
                         inputEnvelope.intersects(featureEnvelope)
                               || inputEnvelope.contains(featureEnvelope)
                      }
                   }
-               }).map { feature ->
+               }.map { feature ->
                   val key = MapAnnotation.Key(
                      NavigationalWarningKey.fromNavigationWarning(warning).id(),
                      MapAnnotation.Type.NAVIGATIONAL_WARNING
