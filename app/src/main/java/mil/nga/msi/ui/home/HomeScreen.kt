@@ -217,7 +217,8 @@ fun NavGraphBuilder.homeGraph(
    routesGraph(
       appState = appState,
       bottomBarVisibility = { bottomBarVisibility(it) },
-      openNavigationDrawer = openNavigationDrawer
+      openNavigationDrawer = openNavigationDrawer,
+      annotationProvider = annotationProvider
    )
    exportGraph(
       appState = appState,

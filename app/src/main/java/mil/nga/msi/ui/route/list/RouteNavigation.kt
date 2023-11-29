@@ -1,12 +1,17 @@
 package mil.nga.msi.ui.route.list
 
+import androidx.compose.runtime.getValue
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navDeepLink
 import androidx.navigation.navigation
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
+import com.google.accompanist.navigation.material.bottomSheet
+import mil.nga.msi.ui.map.AnnotationProvider
 import mil.nga.msi.ui.navigation.MarlinAppState
 import mil.nga.msi.ui.navigation.Route
+import mil.nga.msi.ui.route.RouteBottomSheet
 import mil.nga.msi.ui.route.create.RouteCreateScreen
 
 sealed class RouteRoute(
@@ -17,13 +22,15 @@ sealed class RouteRoute(
     data object Main: RouteRoute("routes/main", "Routes", "Routes")
     data object List: RouteRoute("routes/list", "Routes", "Routes")
     data object Create: RouteRoute("routes/create", "Create Route", "Create")
+    data object PagerSheet: RouteRoute("routes/annotationPagerSheet", "Routes", "Routes")
 }
 
 @OptIn(ExperimentalMaterialNavigationApi::class)
 fun NavGraphBuilder.routesGraph(
     appState: MarlinAppState,
     bottomBarVisibility: (Boolean) -> Unit,
-    openNavigationDrawer: () -> Unit
+    openNavigationDrawer: () -> Unit,
+    annotationProvider: AnnotationProvider
 ) {
     navigation(
         route = RouteRoute.Main.name,
@@ -50,10 +57,25 @@ fun NavGraphBuilder.routesGraph(
         composable("${RouteRoute.Create.name}") { backstackEntry ->
             bottomBarVisibility(false)
 
+            val navStackBackEntry by appState.navController.currentBackStackEntryAsState()
+            if (navStackBackEntry?.destination?.route?.startsWith(RouteRoute.Create.name) == true) {
+                annotationProvider.setMapAnnotation(null)
+            }
+
             RouteCreateScreen(
                 onBack = { appState.navController.popBackStack() },
+                onMapTap = { appState.navController.navigate(RouteRoute.PagerSheet.name) },
             )
         }
+
+        bottomSheet(RouteRoute.PagerSheet.name) {
+            RouteBottomSheet(
+                onAddToRoute = { key ->
+
+                }
+            )
+        }
+
 
 //        bottomSheet(
 //            route = "${RouteRoute.Notes.name}?route={route}",
