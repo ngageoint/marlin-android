@@ -7,6 +7,7 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -60,7 +61,9 @@ import com.google.maps.android.compose.rememberCameraPositionState
 import kotlinx.coroutines.launch
 import mil.nga.msi.R
 import mil.nga.msi.datasource.route.Route
+import mil.nga.msi.datasource.route.RouteWaypoint
 import mil.nga.msi.type.MapLocation
+import mil.nga.msi.ui.datasource.DataSourceIcon
 import mil.nga.msi.ui.location.LocationPermission
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.BaseMapType
@@ -117,6 +120,8 @@ fun RouteCreateScreen(
         viewModel.setLocationEnabled(true)
     }
 
+    val waypoints by viewModel.waypoints.observeAsState(emptyList())
+
     Column(modifier = Modifier.fillMaxSize()) {
         TopBar(
             title = "Create Route",
@@ -145,6 +150,8 @@ fun RouteCreateScreen(
                         .fillMaxWidth()
                         .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
                 )
+
+                WaypointList(waypoints = waypoints)
 
                 CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
                     Text(
@@ -208,7 +215,6 @@ fun RouteCreateScreen(
                                     updatedTime = Date()
                                 )
                             )
-//                            onClose()
                         }
                     },
                     modifier = Modifier
@@ -221,6 +227,21 @@ fun RouteCreateScreen(
         }
     }
 }
+
+@Composable
+fun WaypointList(waypoints: List<RouteWaypoint>) {
+    Column {
+        waypoints.forEach { waypoint ->
+            Row {
+                DataSourceIcon(
+                    dataSource = waypoint.dataSource
+                )
+                Text(waypoint.itemKey)
+            }
+        }
+    }
+}
+
 
 @Composable
 private fun Map(
@@ -287,27 +308,6 @@ private fun Map(
             modifier = Modifier.weight(1f)
         ) {
             if (isMapLoaded) {
-//                LaunchedEffect(destination) {
-//                    destination?.location?.let { location ->
-//                        scope.launch {
-//                            val update = CameraUpdateFactory.newLatLngZoom(
-//                                LatLng(
-//                                    location.latitude,
-//                                    location.longitude
-//                                ), location.zoom.toFloat()
-//                            )
-//                            cameraPositionState.animate(update)
-//                        }
-//                    }
-//
-//                    destination?.bounds?.let { bounds ->
-//                        scope.launch {
-//                            val update = CameraUpdateFactory.newLatLngBounds(bounds, 0)
-//                            cameraPositionState.animate(update)
-//                        }
-//                    }
-//                }
-
                 osmTileProvider?.let { TileOverlay(tileProvider = it) }
 
                 layers.forEach { TileOverlay(tileProvider = it) }

@@ -7,6 +7,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import mil.nga.msi.datasource.route.Route
 import mil.nga.msi.datasource.route.RouteWaypoint
 import mil.nga.msi.location.LocationPolicy
+import mil.nga.msi.repository.route.RouteCreationRepository
 import mil.nga.msi.repository.route.RouteRepository
 import javax.inject.Inject
 
@@ -18,11 +19,14 @@ data class RouteCreateState(
 @HiltViewModel
 class RouteCreateViewModel @Inject constructor(
     val locationPolicy: LocationPolicy,
-    private val routeRepository: RouteRepository
+    private val routeRepository: RouteRepository,
+    private val routeCreationRepository: RouteCreationRepository
 ): ViewModel() {
 
     private val _routeCreateState = MutableLiveData<RouteCreateState?>()
     val routeCreateState: LiveData<RouteCreateState?> = _routeCreateState
+
+    val waypoints = routeCreationRepository.waypoints
 
     val locationProvider = locationPolicy.bestLocationProvider
 
@@ -33,14 +37,11 @@ class RouteCreateViewModel @Inject constructor(
     }
 
     fun addWaypoint(waypoint: RouteWaypoint) {
-        routeCreateState.value?.let { routeCreateState ->
-            val waypoints = routeCreateState.waypoints.toMutableSet().apply {
-                add(waypoint)
-            }.toList()
-            _routeCreateState.value = routeCreateState.copy(
-                waypoints = waypoints
-            )
-        }
+        routeCreationRepository.addWaypoint(waypoint)
+    }
+
+    fun removeWaypoint(waypoint: RouteWaypoint) {
+        routeCreationRepository.removeWaypoint(waypoint)
     }
 
     fun setName(name: String) {
@@ -51,6 +52,10 @@ class RouteCreateViewModel @Inject constructor(
         }
     }
 
+    fun clearWaypoints() {
+        routeCreationRepository.clearWaypoints()
+    }
+
     suspend fun saveRoute(route: Route?) {
         route?.let { route ->
             if (route.id == 0L) {
@@ -59,5 +64,6 @@ class RouteCreateViewModel @Inject constructor(
 //                routeRepository.update(route)
             }
         }
+        clearWaypoints()
     }
 }

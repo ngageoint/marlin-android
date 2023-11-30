@@ -61,7 +61,6 @@ fun NavGraphBuilder.routesGraph(
             if (navStackBackEntry?.destination?.route?.startsWith(RouteRoute.Create.name) == true) {
                 annotationProvider.setMapAnnotation(null)
             }
-
             RouteCreateScreen(
                 onBack = { appState.navController.popBackStack() },
                 onMapTap = { appState.navController.navigate(RouteRoute.PagerSheet.name) },
@@ -69,26 +68,7 @@ fun NavGraphBuilder.routesGraph(
         }
 
         bottomSheet(RouteRoute.PagerSheet.name) {
-            RouteBottomSheet(
-                onAddToRoute = { key ->
-
-                }
-            )
+            RouteBottomSheet()
         }
-
-
-//        bottomSheet(
-//            route = "${RouteRoute.Notes.name}?route={route}",
-//            arguments = listOf(navArgument("bookmark") { type = NavType.NavTypeBookmark })
-//        ) { backstackEntry ->
-//            backstackEntry.arguments?.let { bundle ->
-//                BundleCompat.getParcelable(bundle, "bookmark", BookmarkKey::class.java)
-//            }?.let { bookmark ->
-//                BookmarkNotesScreen(
-//                    bookmark = bookmark,
-//                    onDone = { navController.popBackStack() }
-//                )
-//            }
-//        }
     }
 }

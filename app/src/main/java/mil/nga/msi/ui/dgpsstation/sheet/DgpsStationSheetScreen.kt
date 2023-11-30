@@ -13,8 +13,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import mil.nga.msi.datasource.DataSource
-import mil.nga.msi.datasource.asam.Asam
-import mil.nga.msi.datasource.asam.AsamWithBookmark
 import mil.nga.msi.datasource.dgpsstation.DgpsStation
 import mil.nga.msi.datasource.dgpsstation.DgpsStationWithBookmark
 import mil.nga.msi.repository.dgpsstation.DgpsStationKey
@@ -27,9 +25,10 @@ import mil.nga.msi.ui.dgpsstation.DgpsStationViewModel
 fun DgpsStationSheetScreen(
    key: DgpsStationKey,
    modifier: Modifier = Modifier,
-   onDetails: () -> Unit,
-   onShare: (DgpsStation) -> Unit,
-   onBookmark: (DgpsStationWithBookmark) -> Unit,
+   onDetails: (() -> Unit)? = null,
+   onShare: ((DgpsStation) -> Unit)? = null,
+   onBookmark: ((DgpsStationWithBookmark) -> Unit)? = null,
+   onRoute: ((DgpsStation) -> Unit)? = null,
    viewModel: DgpsStationViewModel = hiltViewModel()
 ) {
    viewModel.setDgpsStationKey(key)
@@ -40,7 +39,8 @@ fun DgpsStationSheetScreen(
          dgpsStationWithBookmark = dgpsStationWithBookmark,
          onDetails = onDetails,
          onShare = onShare,
-         onBookmark = onBookmark
+         onBookmark = onBookmark,
+         onRoute = onRoute
       )
    }
 }
@@ -48,9 +48,10 @@ fun DgpsStationSheetScreen(
 @Composable
 private fun DgpsStationContent(
    dgpsStationWithBookmark: DgpsStationWithBookmark?,
-   onDetails: () -> Unit,
-   onShare: (DgpsStation) -> Unit,
-   onBookmark: (DgpsStationWithBookmark) -> Unit,
+   onDetails: (() -> Unit)? = null,
+   onShare: ((DgpsStation) -> Unit)? = null,
+   onBookmark: ((DgpsStationWithBookmark) -> Unit)? = null,
+   onRoute: ((DgpsStation) -> Unit)? = null
 ) {
    Column(modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
       DataSourceIcon(
@@ -66,16 +67,26 @@ private fun DgpsStationContent(
       }
 
       Row(horizontalArrangement = Arrangement.SpaceBetween) {
-         TextButton(
-            onClick = onDetails
-         ) {
-            Text("MORE DETAILS")
+         onDetails?.let {
+            TextButton(
+               onClick = onDetails
+            ) {
+               Text("MORE DETAILS")
+            }
+         }
+
+         onRoute?.let {
+            TextButton(
+               onClick = { dgpsStationWithBookmark?.dgpsStation?.let { onRoute(it) }}
+            ) {
+               Text("ADD TO ROUTE")
+            }
          }
 
          DataSourceActions(
             bookmarked = dgpsStationWithBookmark?.bookmark != null,
-            onShare = { dgpsStationWithBookmark?.dgpsStation?.let { onShare(it) } },
-            onBookmark = { dgpsStationWithBookmark?.let { onBookmark(it) } },
+            onShare = onShare?.let { { dgpsStationWithBookmark?.dgpsStation?.let { onShare(it) } } },
+            onBookmark = onBookmark?.let { { dgpsStationWithBookmark?.let { onBookmark(it) } } },
             modifier = Modifier.padding(end = 8.dp, bottom = 8.dp)
          )
       }

@@ -24,9 +24,10 @@ import mil.nga.msi.ui.modu.ModuViewModel
 fun ModuSheetScreen(
    name: String,
    modifier: Modifier = Modifier,
-   onDetails: () -> Unit,
-   onShare: (Modu) -> Unit,
-   onBookmark: (ModuWithBookmark) -> Unit,
+   onDetails: (() -> Unit)? = null,
+   onShare: ((Modu) -> Unit)? = null,
+   onBookmark: ((ModuWithBookmark) -> Unit)? = null,
+   onRoute: ((Modu) -> Unit)? = null,
    viewModel: ModuViewModel = hiltViewModel()
 ) {
    viewModel.setName(name)
@@ -46,16 +47,26 @@ fun ModuSheetScreen(
          }
 
          Row(horizontalArrangement = Arrangement.SpaceBetween) {
-            TextButton(
-               onClick = onDetails
-            ) {
-               Text("MORE DETAILS")
+            onDetails?.let {
+               TextButton(
+                  onClick = onDetails
+               ) {
+                  Text("MORE DETAILS")
+               }
+            }
+
+            onRoute?.let {
+               TextButton(
+                  onClick = { moduWithBookmark?.modu?.let { onRoute(it) }}
+               ) {
+                  Text("ADD TO ROUTE")
+               }
             }
 
             DataSourceActions(
                bookmarked = moduWithBookmark?.bookmark != null,
-               onShare = { moduWithBookmark?.modu?.let { onShare(it) } },
-               onBookmark = { moduWithBookmark?.let { onBookmark(it) } },
+               onShare = onShare?.let { { moduWithBookmark?.modu?.let { onShare(it) } } },
+               onBookmark = onBookmark?.let { { moduWithBookmark?.let { onBookmark(it) } } },
                modifier = Modifier.padding(end = 8.dp, bottom = 8.dp)
             )
          }

@@ -25,9 +25,10 @@ import mil.nga.msi.ui.light.LightViewModel
 fun LightSheetScreen(
    key: LightKey,
    modifier: Modifier = Modifier,
-   onDetails: () -> Unit,
-   onShare: (Light) -> Unit,
-   onBookmark: (LightWithBookmark) -> Unit,
+   onDetails: (() -> Unit)? = null,
+   onShare: ((Light) -> Unit)? = null,
+   onBookmark: ((LightWithBookmark) -> Unit)? = null,
+   onRoute: ((Light) -> Unit)? = null,
    viewModel: LightViewModel = hiltViewModel()
 ) {
    viewModel.setLightKey(key)
@@ -38,7 +39,8 @@ fun LightSheetScreen(
          lightWithBookmark = lightState?.lightWithBookmark,
          onDetails = onDetails,
          onShare = onShare,
-         onBookmark = onBookmark
+         onBookmark = onBookmark,
+         onRoute = onRoute
       )
    }
 }
@@ -46,9 +48,10 @@ fun LightSheetScreen(
 @Composable
 private fun LightContent(
    lightWithBookmark: LightWithBookmark?,
-   onDetails: () -> Unit,
-   onShare: (Light) -> Unit,
-   onBookmark: (LightWithBookmark) -> Unit,
+   onDetails: (() -> Unit)? = null,
+   onShare: ((Light) -> Unit)? = null,
+   onBookmark: ((LightWithBookmark) -> Unit)? = null,
+   onRoute: ((Light) -> Unit)? = null,
 ) {
    Column(
       modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp)
@@ -65,16 +68,26 @@ private fun LightContent(
          )
 
          Row(horizontalArrangement = Arrangement.SpaceBetween) {
-            TextButton(
-               onClick = onDetails
-            ) {
-               Text("MORE DETAILS")
+            onDetails?.let {
+               TextButton(
+                  onClick = onDetails
+               ) {
+                  Text("MORE DETAILS")
+               }
+            }
+
+            onRoute?.let {
+               TextButton(
+                  onClick = { lightWithBookmark?.light?.let { onRoute(it) }}
+               ) {
+                  Text("ADD TO ROUTE")
+               }
             }
 
             DataSourceActions(
                bookmarked = lightWithBookmark.bookmark != null,
-               onShare = { onShare(lightWithBookmark.light) },
-               onBookmark = { onBookmark(lightWithBookmark) },
+               onShare = onShare?.let { { onShare(lightWithBookmark.light) } },
+               onBookmark = onBookmark?.let { { onBookmark(lightWithBookmark) } },
                modifier = Modifier.padding(end = 8.dp, bottom = 8.dp)
             )
          }

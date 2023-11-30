@@ -25,9 +25,10 @@ import mil.nga.msi.ui.navigationalwarning.NavigationalWarningViewModel
 fun NavigationalWarningSheetScreen(
    key: NavigationalWarningKey,
    modifier: Modifier = Modifier,
-   onDetails: () -> Unit,
-   onShare: (NavigationalWarning) -> Unit,
-   onBookmark: (NavigationalWarningWithBookmark) -> Unit,
+   onDetails: (() -> Unit)? = null,
+   onShare: ((NavigationalWarning) -> Unit)? = null,
+   onBookmark: ((NavigationalWarningWithBookmark) -> Unit)? = null,
+   onRoute: ((NavigationalWarning) -> Unit)? = null,
    viewModel: NavigationalWarningViewModel = hiltViewModel()
 ) {
    viewModel.setWarningKey(key)
@@ -38,7 +39,8 @@ fun NavigationalWarningSheetScreen(
          navigationalWarningWithBookmark = warningState?.warningWithBookmark,
          onDetails = onDetails,
          onShare = onShare,
-         onBookmark = onBookmark
+         onBookmark = onBookmark,
+         onRoute = onRoute
       )
    }
 }
@@ -46,9 +48,10 @@ fun NavigationalWarningSheetScreen(
 @Composable
 private fun NavigationalWarningSheetContent(
    navigationalWarningWithBookmark: NavigationalWarningWithBookmark?,
-   onDetails: () -> Unit,
-   onShare: (NavigationalWarning) -> Unit,
-   onBookmark: (NavigationalWarningWithBookmark) -> Unit,
+   onDetails: (() -> Unit)? = null,
+   onShare: ((NavigationalWarning) -> Unit)? = null,
+   onBookmark: ((NavigationalWarningWithBookmark) -> Unit)? = null,
+   onRoute: ((NavigationalWarning) -> Unit)? = null
 ) {
    Column(modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
       DataSourceIcon(
@@ -64,16 +67,26 @@ private fun NavigationalWarningSheetContent(
       }
 
       Row(horizontalArrangement = Arrangement.SpaceBetween) {
-         TextButton(
-            onClick = onDetails
-         ) {
-            Text("MORE DETAILS")
+         onDetails?.let {
+            TextButton(
+               onClick = onDetails
+            ) {
+               Text("MORE DETAILS")
+            }
+         }
+
+         onRoute?.let {
+            TextButton(
+               onClick = { navigationalWarningWithBookmark?.navigationalWarning?.let { onRoute(it) }}
+            ) {
+               Text("ADD TO ROUTE")
+            }
          }
 
          DataSourceActions(
             bookmarked = navigationalWarningWithBookmark?.bookmark != null,
-            onShare = { navigationalWarningWithBookmark?.navigationalWarning?.let { onShare(it) } },
-            onBookmark = { navigationalWarningWithBookmark?.let { onBookmark(it) } },
+            onShare = onShare?.let { { navigationalWarningWithBookmark?.navigationalWarning?.let { onShare(it) } } },
+            onBookmark = onBookmark?.let { { navigationalWarningWithBookmark?.let { onBookmark(it) } } },
             modifier = Modifier.padding(end = 8.dp, bottom = 8.dp)
          )
       }

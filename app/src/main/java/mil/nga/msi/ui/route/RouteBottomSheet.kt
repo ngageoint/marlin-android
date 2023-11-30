@@ -20,7 +20,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -33,39 +32,35 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.launch
-import mil.nga.msi.datasource.DataSource
-import mil.nga.msi.datasource.asam.AsamWithBookmark
-import mil.nga.msi.datasource.bookmark.Bookmark
-import mil.nga.msi.datasource.dgpsstation.DgpsStationWithBookmark
-import mil.nga.msi.datasource.light.LightWithBookmark
-import mil.nga.msi.datasource.modu.ModuWithBookmark
-import mil.nga.msi.datasource.navigationwarning.NavigationalWarningWithBookmark
-import mil.nga.msi.datasource.port.PortWithBookmark
-import mil.nga.msi.datasource.radiobeacon.RadioBeaconWithBookmark
+import mil.nga.msi.datasource.asam.Asam
+import mil.nga.msi.datasource.dgpsstation.DgpsStation
+import mil.nga.msi.datasource.light.Light
+import mil.nga.msi.datasource.modu.Modu
+import mil.nga.msi.datasource.navigationwarning.NavigationalWarning
+import mil.nga.msi.datasource.port.Port
+import mil.nga.msi.datasource.radiobeacon.RadioBeacon
+import mil.nga.msi.datasource.route.RouteWaypoint
 import mil.nga.msi.repository.bookmark.BookmarkKey
 import mil.nga.msi.repository.dgpsstation.DgpsStationKey
-import mil.nga.msi.repository.geopackage.GeoPackageFeatureKey
 import mil.nga.msi.repository.light.LightKey
 import mil.nga.msi.repository.navigationalwarning.NavigationalWarningKey
 import mil.nga.msi.repository.radiobeacon.RadioBeaconKey
-import mil.nga.msi.ui.asam.AsamSummary
-import mil.nga.msi.ui.asam.AsamViewModel
-import mil.nga.msi.ui.datasource.DataSourceIcon
+import mil.nga.msi.ui.asam.sheet.AsamSheetScreen
 import mil.nga.msi.ui.dgpsstation.sheet.DgpsStationSheetScreen
-import mil.nga.msi.ui.geopackage.sheet.GeoPackageFeatureSheetScreen
 import mil.nga.msi.ui.light.sheet.LightSheetScreen
 import mil.nga.msi.ui.map.cluster.MapAnnotation
 import mil.nga.msi.ui.modu.sheet.ModuSheetScreen
 import mil.nga.msi.ui.navigationalwarning.sheet.NavigationalWarningSheetScreen
 import mil.nga.msi.ui.port.sheet.PortSheetScreen
 import mil.nga.msi.ui.radiobeacon.sheet.RadioBeaconSheetScreen
+import mil.nga.msi.ui.route.create.RouteCreateViewModel
 import mil.nga.msi.ui.sheet.DataSourceSheetViewModel
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun RouteBottomSheet(
-    onAddToRoute: (BookmarkKey) -> Unit,
-    viewModel: DataSourceSheetViewModel = hiltViewModel()
+    viewModel: DataSourceSheetViewModel = hiltViewModel(),
+    routeCreateViewModel: RouteCreateViewModel = hiltViewModel(),
 ) {
     val scope = rememberCoroutineScope()
     val mapAnnotations by viewModel.mapAnnotations.observeAsState(emptyList())
@@ -99,118 +94,95 @@ fun RouteBottomSheet(
                         MapAnnotation.Type.ASAM -> {
                             AsamPage(
                                 reference = annotation.key.id,
-                                onAddToRoute = { (asam) ->
-//                                    if (bookmark == null) {
-                                        val key = BookmarkKey.fromAsam(asam)
-                                        onAddToRoute(key)
-//                                    } else {
-//                                        viewModel.deleteBookmark(bookmark)
-//                                    }
+                                onAddToRoute = { asam ->
+                                    val key = BookmarkKey.fromAsam(asam)
+                                    var waypoint = RouteWaypoint(
+                                        dataSource = key.dataSource,
+                                        itemKey = key.id
+                                    )
+                                    routeCreateViewModel.addWaypoint(waypoint)
                                 }
                             )
                         }
                         MapAnnotation.Type.MODU -> {
-//                            ModuPage(
-//                                name = annotation.key.id,
-//                                onDetails = { onDetails(annotation) },
-//                                onShare = { onShare(it) },
-//                                onBookmark = { (modu, bookmark) ->
-//                                    if (bookmark == null) {
-//                                        val key = BookmarkKey.fromModu(modu)
-//                                        onBookmark(key)
-//                                    } else {
-//                                        viewModel.deleteBookmark(bookmark)
-//                                    }
-//                                }
-//                            )
+                            ModuPage(
+                                name = annotation.key.id,
+                                onAddToRoute = { modu ->
+                                    val key = BookmarkKey.fromModu(modu)
+                                    var waypoint = RouteWaypoint(
+                                        dataSource = key.dataSource,
+                                        itemKey = key.id
+                                    )
+                                    routeCreateViewModel.addWaypoint(waypoint)
+                                }
+                            )
                         }
                         MapAnnotation.Type.LIGHT -> {
-//                            LightPage(
-//                                id = annotation.key.id,
-//                                onDetails = { onDetails(annotation) },
-//                                onShare = { onShare(it) },
-//                                onBookmark = { (light, bookmark) ->
-//                                    if (bookmark == null) {
-//                                        val key = BookmarkKey.fromLight(light)
-//                                        onBookmark(key)
-//                                    } else {
-//                                        viewModel.deleteBookmark(bookmark)
-//                                    }
-//                                }
-//                            )
+                            LightPage(
+                                id = annotation.key.id,
+                                onAddToRoute = { light ->
+                                    val key = BookmarkKey.fromLight(light)
+                                    var waypoint = RouteWaypoint(
+                                        dataSource = key.dataSource,
+                                        itemKey = key.id
+                                    )
+                                    routeCreateViewModel.addWaypoint(waypoint)
+                                }
+                            )
                         }
                         MapAnnotation.Type.PORT -> {
-//                            PortPage(
-//                                id = annotation.key.id,
-//                                onDetails = { onDetails(annotation) },
-//                                onShare = { onShare(it) },
-//                                onBookmark = { (port, bookmark)  ->
-//                                    if (bookmark == null) {
-//                                        val key = BookmarkKey.fromPort(port)
-//                                        onBookmark(key)
-//                                    } else {
-//                                        viewModel.deleteBookmark(bookmark)
-//                                    }
-//                                }
-//                            )
+                            PortPage(
+                                id = annotation.key.id,
+                                onAddToRoute = { port ->
+                                    val key = BookmarkKey.fromPort(port)
+                                    var waypoint = RouteWaypoint(
+                                        dataSource = key.dataSource,
+                                        itemKey = key.id
+                                    )
+                                    routeCreateViewModel.addWaypoint(waypoint)
+                                }
+                            )
                         }
                         MapAnnotation.Type.RADIO_BEACON -> {
-//                            RadioBeaconPage(
-//                                id = annotation.key.id,
-//                                onDetails = { onDetails(annotation) },
-//                                onShare = { onShare(it) },
-//                                onBookmark = { (beacon, bookmark)  ->
-//                                    if (bookmark == null) {
-//                                        val key = BookmarkKey.fromRadioBeacon(beacon)
-//                                        onBookmark(key)
-//                                    } else {
-//                                        viewModel.deleteBookmark(bookmark)
-//                                    }
-//                                }
-//                            )
+                            RadioBeaconPage(
+                                id = annotation.key.id,
+                                onAddToRoute = { beacon ->
+                                    val key = BookmarkKey.fromRadioBeacon(beacon)
+                                    var waypoint = RouteWaypoint(
+                                        dataSource = key.dataSource,
+                                        itemKey = key.id
+                                    )
+                                    routeCreateViewModel.addWaypoint(waypoint)
+                                }
+                            )
                         }
                         MapAnnotation.Type.DGPS_STATION -> {
-//                            DgpsStationPage(
-//                                id = annotation.key.id,
-//                                onDetails = { onDetails(annotation) },
-//                                onShare = { onShare(it) },
-//                                onBookmark = { (dgpsStation, bookmark)  ->
-//                                    if (bookmark == null) {
-//                                        val key = BookmarkKey.fromDgpsStation(dgpsStation)
-//                                        onBookmark(key)
-//                                    } else {
-//                                        viewModel.deleteBookmark(bookmark)
-//                                    }
-//                                }
-//                            )
+                            DgpsStationPage(
+                                id = annotation.key.id,
+                                onAddToRoute = { dgps ->
+                                    val key = BookmarkKey.fromDgpsStation(dgps)
+                                    var waypoint = RouteWaypoint(
+                                        dataSource = key.dataSource,
+                                        itemKey = key.id
+                                    )
+                                    routeCreateViewModel.addWaypoint(waypoint)
+                                }
+                            )
                         }
                         MapAnnotation.Type.NAVIGATIONAL_WARNING -> {
-//                            NavigationWarningPage(
-//                                id = annotation.key.id,
-//                                onDetails = { onDetails(annotation) },
-//                                onShare = { onShare(it) },
-//                                onBookmark = { (warning, bookmark)  ->
-//                                    if (bookmark == null) {
-//                                        val key = BookmarkKey.fromNavigationalWarning(warning)
-//                                        onBookmark(key)
-//                                    } else {
-//                                        viewModel.deleteBookmark(bookmark)
-//                                    }
-//                                }
-//                            )
+                            NavigationWarningPage(
+                                id = annotation.key.id,
+                                onAddToRoute = { navWarning ->
+                                    val key = BookmarkKey.fromNavigationalWarning(navWarning)
+                                    var waypoint = RouteWaypoint(
+                                        dataSource = key.dataSource,
+                                        itemKey = key.id
+                                    )
+                                    routeCreateViewModel.addWaypoint(waypoint)
+                                }
+                            )
                         }
                         MapAnnotation.Type.GEOPACKAGE -> {
-//                            GeoPackageFeaturePage(
-//                                annotation.key.id,
-//                                onDetails = { onDetails(annotation) },
-//                                onBookmark = { key, bookmark ->
-//                                    if (bookmark == null) {
-//                                        onBookmark(BookmarkKey(key.id(), DataSource.GEOPACKAGE))
-//                                    } else {
-//                                        viewModel.deleteBookmark(bookmark)
-//                                    }
-//                                }
-//                            )
                         }
                     }
                 }
@@ -269,80 +241,23 @@ fun RouteBottomSheet(
 @Composable
 private fun AsamPage(
     reference: String,
-    onAddToRoute: (AsamWithBookmark) -> Unit
+    onAddToRoute: (Asam) -> Unit
 ) {
-    AsamRouteSheetScreen(
+    AsamSheetScreen(
         reference,
-        onAddToRoute = onAddToRoute,
-        modifier = Modifier.fillMaxHeight()
+        modifier = Modifier.fillMaxHeight(),
+        onRoute = onAddToRoute,
     )
-}
-
-@Composable
-fun AsamRouteSheetScreen(
-    reference: String,
-    modifier: Modifier = Modifier,
-    onAddToRoute: (AsamWithBookmark) -> Unit,
-    viewModel: AsamViewModel = hiltViewModel()
-) {
-    viewModel.setAsamReference(reference)
-    val asamWithBookmark by viewModel.asamWithBookmark.observeAsState()
-
-    Column(modifier = modifier) {
-        AsamRouteSheetContent(
-            asamWithBookmark = asamWithBookmark,
-            onAddToRoute = onAddToRoute
-        )
-    }
-}
-
-@Composable
-private fun AsamRouteSheetContent(
-    asamWithBookmark: AsamWithBookmark?,
-    onAddToRoute: (AsamWithBookmark) -> Unit,
-) {
-    Column(modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
-        DataSourceIcon(
-            dataSource = DataSource.ASAM,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
-
-        asamWithBookmark?.let {
-            AsamSummary(
-                asamWithBookmark = it,
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
-        }
-
-        Row(horizontalArrangement = Arrangement.SpaceBetween) {
-            TextButton(
-                onClick = { asamWithBookmark?.let { onAddToRoute(it) } }
-            ) {
-                Text("ADD TO ROUTE")
-            }
-
-//            DataSourceActions(
-//                bookmarked = asamWithBookmark?.bookmark != null,
-//                onShare = { asamWithBookmark?.asam?.let { onShare(it) } },
-//                onBookmark = { asamWithBookmark?.let { onBookmark(it) } },
-//                modifier = Modifier.padding(end = 8.dp, bottom = 8.dp)
-//            )
-        }
-    }
 }
 
 @Composable
 private fun ModuPage(
     name: String,
-    onDetails: () -> Unit,
-    onShare: (Pair<String, String>) -> Unit,
-    onBookmark: (ModuWithBookmark) -> Unit
+    onAddToRoute: (Modu) -> Unit
 ) {
     ModuSheetScreen(
         name,
-        onDetails = { onDetails() },
-        onShare = { onShare("Share MODU Information" to it.toString()) },
-        onBookmark = onBookmark,
+        onRoute = onAddToRoute,
         modifier = Modifier.fillMaxHeight()
     )
 }
@@ -350,16 +265,12 @@ private fun ModuPage(
 @Composable
 private fun LightPage(
     id: String,
-    onDetails: () -> Unit,
-    onShare: (Pair<String, String>) -> Unit,
-    onBookmark: (LightWithBookmark) -> Unit
+    onAddToRoute: (Light) -> Unit
 ) {
     val key = LightKey.fromId(id)
     LightSheetScreen(
         key,
-        onDetails = { onDetails() },
-        onShare = { onShare("Share Light Information" to it.toString()) },
-        onBookmark = onBookmark,
+        onRoute = onAddToRoute,
         modifier = Modifier.fillMaxHeight()
     )
 }
@@ -367,16 +278,12 @@ private fun LightPage(
 @Composable
 private fun PortPage(
     id: String,
-    onDetails: () -> Unit,
-    onShare: (Pair<String, String>) -> Unit,
-    onBookmark: (PortWithBookmark) -> Unit
+    onAddToRoute: (Port) -> Unit
 ) {
     id.toIntOrNull()?.let { portNumber ->
         PortSheetScreen(
             portNumber,
-            onDetails = { onDetails() },
-            onShare = { onShare("Share Port Information" to it.toString()) },
-            onBookmark = onBookmark,
+            onRoute = onAddToRoute,
             modifier = Modifier.fillMaxHeight()
         )
     }
@@ -385,16 +292,12 @@ private fun PortPage(
 @Composable
 private fun RadioBeaconPage(
     id: String,
-    onDetails: () -> Unit,
-    onShare: (Pair<String, String>) -> Unit,
-    onBookmark: (RadioBeaconWithBookmark) -> Unit
+    onAddToRoute: (RadioBeacon) -> Unit
 ) {
     val key = RadioBeaconKey.fromId(id)
     RadioBeaconSheetScreen(
         key = key,
-        onDetails = { onDetails() },
-        onShare = { onShare("Share Radio Beacon Information" to it.toString()) },
-        onBookmark = onBookmark,
+        onRoute = onAddToRoute,
         modifier = Modifier.fillMaxHeight()
     )
 }
@@ -402,15 +305,11 @@ private fun RadioBeaconPage(
 @Composable
 private fun DgpsStationPage(
     id: String,
-    onDetails: () -> Unit,
-    onShare: (Pair<String, String>) -> Unit,
-    onBookmark: (DgpsStationWithBookmark) -> Unit
+    onAddToRoute: (DgpsStation) -> Unit
 ) {
     DgpsStationSheetScreen(
         key =  DgpsStationKey.fromId(id),
-        onDetails = { onDetails() },
-        onShare = { onShare("Share DGPS Station Information" to it.toString()) },
-        onBookmark = onBookmark,
+        onRoute = onAddToRoute,
         modifier = Modifier.fillMaxHeight()
     )
 }
@@ -418,31 +317,12 @@ private fun DgpsStationPage(
 @Composable
 private fun NavigationWarningPage(
     id: String,
-    onDetails: () -> Unit,
-    onShare: (Pair<String, String>) -> Unit,
-    onBookmark: (NavigationalWarningWithBookmark) -> Unit
+    onAddToRoute: (NavigationalWarning) -> Unit
 ) {
     val key = NavigationalWarningKey.fromId(id)
     NavigationalWarningSheetScreen(
         key,
-        onDetails = { onDetails() },
-        onShare = { onShare("Share Navigational Warning Information" to it.toString()) },
-        onBookmark = onBookmark,
-        modifier = Modifier.fillMaxHeight()
-    )
-}
-
-@Composable
-private fun GeoPackageFeaturePage(
-    id: String,
-    onDetails: () -> Unit,
-    onBookmark: (GeoPackageFeatureKey, Bookmark?) -> Unit
-) {
-    val key = GeoPackageFeatureKey.fromId(id)
-    GeoPackageFeatureSheetScreen(
-        key,
-        onDetails = { onDetails() },
-        onBookmark = onBookmark,
+        onRoute = onAddToRoute,
         modifier = Modifier.fillMaxHeight()
     )
 }
