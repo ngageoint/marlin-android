@@ -25,6 +25,7 @@ import mil.nga.sf.geojson.LineString
 import mil.nga.sf.geojson.Polygon
 import java.io.ByteArrayOutputStream
 import kotlin.math.PI
+import kotlin.math.abs
 import kotlin.math.atan
 import kotlin.math.exp
 import kotlin.math.ln
@@ -141,12 +142,20 @@ interface DataSourceImage {
       val canvas = Canvas(bitmap)
 
       val path = Path()
-      val firstPoint = lineString.lineString.points.first()
-      val firstPixel = toPixel(LatLng(firstPoint.y, firstPoint.x), tileBounds, tileSize)
+      val line = lineString.lineString
+      val firstPoint = line.points.first()
+      var crosses180th = false
+      for(i in 1 until line.points.count()){
+         if(abs(line.points[i].x - line.points[i-1].x) > 180){
+            crosses180th = true
+            break
+         }
+      }
+      val firstPixel = toPixel(LatLng(firstPoint.y, firstPoint.x), tileBounds, tileSize, crosses180th)
       path.moveTo(firstPixel.x.toFloat(), firstPixel.y.toFloat())
 
-      lineString.lineString.points.drop(1).forEach { point ->
-         val pixel = toPixel(LatLng(point.y, point.x), tileBounds, tileSize)
+      line.points.drop(1).forEach { point ->
+         val pixel = toPixel(LatLng(point.y, point.x), tileBounds, tileSize, crosses180th)
          path.lineTo(pixel.x.toFloat(), pixel.y.toFloat())
       }
 
@@ -176,11 +185,19 @@ interface DataSourceImage {
       val path = Path()
       val lineString = polygon.polygon.exteriorRing
       val firstPoint = lineString.points.first()
-      val firstPixel = toPixel(LatLng(firstPoint.y, firstPoint.x), tileBounds, tileSize)
+
+      var crosses180th = false
+      for(i in 1 until lineString.points.count()){
+         if(abs(lineString.points[i].x - lineString.points[i-1].x) > 180){
+            crosses180th = true
+            break
+         }
+      }
+      val firstPixel = toPixel(LatLng(firstPoint.y, firstPoint.x), tileBounds, tileSize, crosses180th)
       path.moveTo(firstPixel.x.toFloat(), firstPixel.y.toFloat())
 
       lineString.points.drop(1).forEach { point ->
-         val pixel = toPixel(LatLng(point.y, point.x), tileBounds, tileSize)
+         val pixel = toPixel(LatLng(point.y, point.x), tileBounds, tileSize, crosses180th)
          path.lineTo(pixel.x.toFloat(), pixel.y.toFloat())
       }
 
@@ -207,17 +224,30 @@ interface DataSourceImage {
       return bitmap
    }
 
-   private fun toPixel(latLng: LatLng, tileBounds3857: Bounds, tileSize: Double): Point {
-      val object3857Location = to3857(latLng)
+   private fun toPixel(latLng: LatLng, tileBounds3857: Bounds, tileSize: Double, crosses180th: Boolean): Point {
+      var object3857Location = to3857(latLng.latitude, latLng.longitude)
+
+      if (crosses180th && (latLng.longitude < -90 || latLng.longitude > 90)) {
+         // if the x location has fallen off the left side and this tile is on the other side of the world
+         if (object3857Location.x > tileBounds3857.minX && tileBounds3857.minX < 0 && object3857Location.x > 0) {
+            object3857Location = to3857(latLng.latitude, latLng.longitude-360)
+         }
+
+         // if the x value has fallen off the right side and this tile is on the other side of the world
+         if (object3857Location.x < tileBounds3857.maxX && tileBounds3857.maxX > 0 && object3857Location.x < 0) {
+            object3857Location = to3857(latLng.latitude, latLng.longitude+360)
+         }
+      }
+
       val xPosition = (((object3857Location.x - tileBounds3857.minX) / (tileBounds3857.maxX - tileBounds3857.minX)) * tileSize)
       val yPosition = tileSize - (((object3857Location.y - tileBounds3857.minY) / (tileBounds3857.maxY - tileBounds3857.minY)) * tileSize)
       return Point(xPosition, yPosition)
    }
 
-   private fun to3857(latLng: LatLng): Point {
+   private fun to3857(lat: Double, long: Double): Point {
       val a = 6378137.0
-      val lambda = latLng.longitude / 180 * Math.PI
-      val phi = latLng.latitude / 180 * Math.PI
+      val lambda = long / 180 * Math.PI
+      val phi = lat / 180 * Math.PI
       val x = a * lambda
       val y = a * ln(tan(Math.PI / 4 + phi / 2))
 

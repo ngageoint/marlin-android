@@ -62,6 +62,7 @@ import mil.nga.msi.ui.location.LocationPermission
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.cluster.MapAnnotation
 import mil.nga.msi.ui.theme.onSurfaceDisabled
+import kotlin.math.abs
 import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.seconds
 
@@ -102,7 +103,7 @@ fun MapScreen(
    val mapped by viewModel.mapped.observeAsState(emptyMap())
    val annotation by viewModel.annotationProvider.annotation.observeAsState()
    val clipboardManager: ClipboardManager = LocalClipboardManager.current
-   
+
    LaunchedEffect(fetching) {
       if(fetching.none { it.value } && fetchingVisibility) {
          delay(1.seconds)
@@ -220,7 +221,16 @@ fun MapScreen(
             },
             onMapTap = { latLng, region ->
                val screenPercentage = 0.04
-               val tolerance = (region.farRight.longitude - region.farLeft.longitude) * screenPercentage
+               val screenRightLong = region.farRight.longitude
+               val screenLeftLong = region.farLeft.longitude
+
+               val tolerance = if(screenRightLong > screenLeftLong) {
+                  (screenRightLong - screenLeftLong) * screenPercentage
+               } else {
+                  // 180th meridian is on screen
+                  (360 - abs(screenRightLong) - abs(screenLeftLong)) * screenPercentage
+               }
+
                val bounds = LatLngBounds(
                   LatLng(latLng.latitude - tolerance, latLng.longitude - tolerance),
                   LatLng(latLng.latitude + tolerance, latLng.longitude + tolerance)
@@ -293,7 +303,7 @@ fun MapScreen(
                         val dataSources = viewModel.mapped.value?.toList()
                            ?.filter { (_, mapped) -> mapped}
                            ?.map { (dataSource, _) -> dataSource } ?: emptyList()
-       
+
                         onExport(dataSources)
                      }
                   ) {

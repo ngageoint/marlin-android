@@ -32,7 +32,7 @@ interface NavigationalWarningDao {
    @Query("SELECT * FROM navigational_warnings")
    suspend fun getNavigationalWarnings(): List<NavigationalWarning>
 
-   @Query("SELECT * FROM navigational_warnings WHERE min_longitude <= :maxLongitude AND max_longitude >= :minLongitude AND min_latitude <= :maxLatitude AND max_latitude >= :minLatitude")
+   @Query("SELECT * FROM navigational_warnings WHERE (min_longitude <= :maxLongitude AND max_longitude >= :minLongitude AND min_latitude <= :maxLatitude AND max_latitude >= :minLatitude) OR max_longitude < min_longitude")
    fun getNavigationalWarnings(
       minLatitude: Double,
       minLongitude: Double,

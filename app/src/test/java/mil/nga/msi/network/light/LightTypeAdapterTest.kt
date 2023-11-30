@@ -1,9 +1,9 @@
 package mil.nga.msi.network.light
 
-import assertLightsEqual
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
 import mil.nga.msi.datasource.light.Light
+import mil.nga.msi.datasource.light.assertLightsEqual
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
