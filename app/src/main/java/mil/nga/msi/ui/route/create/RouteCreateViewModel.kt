@@ -9,6 +9,7 @@ import mil.nga.msi.datasource.route.RouteWaypoint
 import mil.nga.msi.location.LocationPolicy
 import mil.nga.msi.repository.route.RouteCreationRepository
 import mil.nga.msi.repository.route.RouteRepository
+import java.util.Date
 import javax.inject.Inject
 
 data class RouteCreateState(
@@ -56,10 +57,17 @@ class RouteCreateViewModel @Inject constructor(
         routeCreationRepository.clearWaypoints()
     }
 
-    suspend fun saveRoute(route: Route?) {
+    suspend fun saveRoute() {
+        val route = Route(
+            name = routeCreateState.value?.name ?: "Route",
+            createdTime = Date(),
+            updatedTime = Date()
+        )
+
         route?.let { route ->
             if (route.id == 0L) {
-                val routeId = routeRepository.insert(route)
+                val routeId = routeRepository.insert(route, routeCreationRepository.waypoints.value ?: emptyList())
+
             } else {
 //                routeRepository.update(route)
             }

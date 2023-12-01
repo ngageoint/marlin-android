@@ -4,16 +4,20 @@ import android.Manifest
 import android.animation.ValueAnimator
 import android.graphics.Bitmap
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
+import androidx.compose.material3.Divider
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -32,6 +36,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.animation.doOnEnd
 import androidx.core.graphics.drawable.toBitmap
@@ -60,9 +66,10 @@ import com.google.maps.android.compose.TileOverlay
 import com.google.maps.android.compose.rememberCameraPositionState
 import kotlinx.coroutines.launch
 import mil.nga.msi.R
-import mil.nga.msi.datasource.route.Route
+import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.route.RouteWaypoint
 import mil.nga.msi.type.MapLocation
+import mil.nga.msi.ui.coordinate.CoordinateTextButton
 import mil.nga.msi.ui.datasource.DataSourceIcon
 import mil.nga.msi.ui.location.LocationPermission
 import mil.nga.msi.ui.main.TopBar
@@ -71,7 +78,6 @@ import mil.nga.msi.ui.map.MapPosition
 import mil.nga.msi.ui.map.MapViewModel
 import mil.nga.msi.ui.map.TileProviderType
 import mil.nga.msi.ui.map.cluster.MapAnnotation
-import java.util.Date
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalPermissionsApi::class)
@@ -151,11 +157,21 @@ fun RouteCreateScreen(
                         .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
                 )
 
+                CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
+                    Text(
+                        text = "Select a feature to add to the route, long press to add custom point, drag to reorder.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
+                    )
+                }
+
                 WaypointList(waypoints = waypoints)
 
                 CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
                     Text(
-                        text = "Select a feature to add to the route, long press to add custom point, drag to reorder.",
+                        text = "Total Distance: ",
                         style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -208,13 +224,7 @@ fun RouteCreateScreen(
                     enabled = name.isNotEmpty(),
                     onClick = {
                         scope.launch {
-                            viewModel.saveRoute(
-                                route = Route(
-                                    name = name,
-                                    createdTime = Date(),
-                                    updatedTime = Date()
-                                )
-                            )
+                            viewModel.saveRoute()
                         }
                     },
                     modifier = Modifier
@@ -232,13 +242,92 @@ fun RouteCreateScreen(
 fun WaypointList(waypoints: List<RouteWaypoint>) {
     Column {
         waypoints.forEach { waypoint ->
-            Row {
+            WaypointRow(waypoint = waypoint)
+        }
+    }
+}
+
+@Composable
+private fun WaypointRow(
+    waypoint: RouteWaypoint,
+    isDragging: Boolean = false,
+) {
+    val elevation by animateDpAsState(if (isDragging) 4.dp else 0.dp, label = "elevation_animator")
+
+    Surface(
+        tonalElevation = elevation,
+        shadowElevation = elevation
+    ) {
+        Column(
+            Modifier
+                .height(72.dp)
+                .fillMaxWidth()
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(start = 16.dp, end = 16.dp)
+            ) {
                 DataSourceIcon(
-                    dataSource = waypoint.dataSource
+                    dataSource = waypoint.dataSource,
+                    iconSize = 24
                 )
-                Text(waypoint.itemKey)
+                Column(
+                    verticalArrangement = Arrangement.Center,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier
+                            .height(72.dp)
+                            .fillMaxWidth()
+                            .weight(1f)
+                            .padding(horizontal = 8.dp)
+                    ) {
+                        CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
+                            when (waypoint.dataSource) {
+                                DataSource.ASAM -> {
+                                    waypoint.getAsam()?.let { asam ->
+                                        val header = listOfNotNull(asam.hostility, asam.victim)
+                                        if (header.isNotEmpty()) {
+                                            Column {
+                                                Text(
+                                                    text = header.joinToString(": "),
+                                                    style = MaterialTheme.typography.bodyLarge,
+                                                    fontWeight = FontWeight.Medium,
+                                                    maxLines = 1,
+                                                    overflow = TextOverflow.Ellipsis,
+                                                    modifier = Modifier.padding(top = 16.dp)
+                                                )
+                                                CoordinateTextButton(
+                                                    latLng = asam.latLng,
+                                                    onCopiedToClipboard = { text -> }
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                                DataSource.MODU -> TODO()
+                                DataSource.NAVIGATION_WARNING -> TODO()
+                                DataSource.LIGHT -> TODO()
+                                DataSource.PORT -> TODO()
+                                DataSource.RADIO_BEACON -> TODO()
+                                DataSource.DGPS_STATION -> TODO()
+                                DataSource.ELECTRONIC_PUBLICATION -> TODO()
+                                DataSource.NOTICE_TO_MARINERS -> TODO()
+                                DataSource.BOOKMARK -> TODO()
+                                DataSource.ROUTE -> TODO()
+                                DataSource.GEOPACKAGE -> TODO()
+                            }
+                        }
+                    }
+                }
             }
         }
+
+        Divider(Modifier.fillMaxWidth())
     }
 }
 
