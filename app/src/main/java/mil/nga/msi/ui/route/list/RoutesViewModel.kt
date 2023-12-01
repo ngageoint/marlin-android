@@ -10,5 +10,5 @@ import javax.inject.Inject
 class RoutesViewModel @Inject constructor(
     private val repository: RouteRepository
 ): ViewModel() {
-    val routes = repository.observeRoutes().asLiveData()
+    val routes = repository.observeRoutesWithWaypoints().asLiveData()
 }

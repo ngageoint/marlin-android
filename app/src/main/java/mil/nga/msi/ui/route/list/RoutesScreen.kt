@@ -30,7 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import mil.nga.msi.datasource.route.Route
+import mil.nga.msi.datasource.route.RouteWithWaypoints
 import mil.nga.msi.ui.action.Action
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.route.RouteSummary
@@ -115,7 +115,7 @@ private fun EmptyState(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun Routes(
-    routes: List<Route>,
+    routes: List<RouteWithWaypoints>,
     onAction: (Action) -> Unit,
     onCreate: () -> Unit
 ) {
@@ -129,7 +129,7 @@ private fun Routes(
                     count = routes.count(),
                     key = {
                         val route = routes[it]
-                        "${route.id}"
+                        "${route.route.id}"
                     }
                 ) { index ->
                     val route = routes[index]
@@ -162,7 +162,7 @@ private fun Routes(
 
 @Composable
 private fun RouteCard(
-    route: Route,
+    route: RouteWithWaypoints,
 //    onTap: () -> Unit,
     onAction: (Action) -> Unit
 ) {

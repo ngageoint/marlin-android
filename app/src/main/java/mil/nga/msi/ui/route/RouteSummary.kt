@@ -11,17 +11,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import mil.nga.msi.datasource.route.Route
+import mil.nga.msi.datasource.route.RouteWithWaypoints
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 @Composable
 fun RouteSummary(
-    route: Route,
+    route: RouteWithWaypoints,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
-        route.name?.let { name ->
+        route.route.name?.let { name ->
             Text(
                 text = name,
                 style = MaterialTheme.typography.titleLarge,
@@ -31,10 +31,11 @@ fun RouteSummary(
             )
         }
 
+        Text("This many waypoints " + route.waypoints.size)
         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
             val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
             Text(
-                text = "Created " + dateFormat.format(route.createdTime),
+                text = "Created " + dateFormat.format(route.route.createdTime),
                 fontWeight = FontWeight.SemiBold,
                 style = MaterialTheme.typography.labelSmall,
                 maxLines = 1,
@@ -42,7 +43,7 @@ fun RouteSummary(
             )
         }
 
-        val header = listOfNotNull(route.name)
+        val header = listOfNotNull(route.route.name)
 
 
 
