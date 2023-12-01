@@ -32,6 +32,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.launch
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import mil.nga.msi.datasource.asam.Asam
 import mil.nga.msi.datasource.dgpsstation.DgpsStation
 import mil.nga.msi.datasource.light.Light
@@ -95,11 +97,13 @@ fun RouteBottomSheet(
                             AsamPage(
                                 reference = annotation.key.id,
                                 onAddToRoute = { asam ->
+                                    val encoded = Json.encodeToString(value = asam)
                                     val key = BookmarkKey.fromAsam(asam)
                                     var waypoint = RouteWaypoint(
                                         dataSource = key.dataSource,
                                         itemKey = key.id
                                     )
+                                    waypoint.json = encoded
                                     routeCreateViewModel.addWaypoint(waypoint)
                                 }
                             )

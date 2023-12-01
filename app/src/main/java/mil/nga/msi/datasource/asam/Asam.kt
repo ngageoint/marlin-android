@@ -4,16 +4,27 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.google.android.gms.maps.model.LatLng
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
+import kotlinx.serialization.encoding.decodeStructure
+import kotlinx.serialization.encoding.encodeStructure
+import mil.nga.msi.serializer.DateSerializer
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+@Serializable
 @Entity(tableName = "asams")
 data class Asam(
    @PrimaryKey
    @ColumnInfo(name = "reference")
    val reference: String,
 
+   @Serializable(DateSerializer::class)
    @ColumnInfo(name = "date")
    val date: Date,
 
@@ -41,6 +52,7 @@ data class Asam(
    @ColumnInfo(name = "victim")
    var victim: String? = null
 ) {
+   @kotlinx.serialization.Transient
    @Transient
    val latLng = LatLng(latitude, longitude)
 

@@ -3,7 +3,10 @@ package mil.nga.msi.datasource.route
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 import mil.nga.msi.datasource.DataSource
+import mil.nga.msi.datasource.asam.Asam
 
 @Entity(tableName = "route_waypoints")
 data class RouteWaypoint(
@@ -27,4 +30,15 @@ data class RouteWaypoint(
 
     @ColumnInfo(name = "order")
     var order: Int? = null
+
+    fun getAsam(): Asam? {
+        if (dataSource != DataSource.ASAM) {
+            return null
+        }
+        json?.let {
+            val asam = Json.decodeFromString<Asam>(it)
+            return asam
+        }
+        return null
+    }
 }
