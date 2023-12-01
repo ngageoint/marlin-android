@@ -17,12 +17,13 @@ import mil.nga.msi.datasource.DataSource
 @Composable
 fun DataSourceIcon(
    dataSource: DataSource,
-   modifier: Modifier = Modifier
+   modifier: Modifier = Modifier,
+   iconSize: Int = 48
 ) {
    Column(modifier = modifier) {
       Box(
          contentAlignment = Alignment.Center,
-         modifier = Modifier.size(48.dp)
+         modifier = Modifier.size(iconSize.dp)
       ) {
          Canvas(modifier = Modifier.fillMaxSize(), onDraw = {
             drawCircle(color = dataSource.color)
@@ -45,7 +46,7 @@ fun DataSourceIcon(
 
          Image(
             painter = painterResource(id = imageResourceId),
-            modifier = Modifier.size(24.dp),
+            modifier = Modifier.size((iconSize / 2).dp),
             contentDescription = "Data source icon"
          )
       }
