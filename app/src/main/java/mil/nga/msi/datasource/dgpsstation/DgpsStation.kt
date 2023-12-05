@@ -4,7 +4,9 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import com.google.android.gms.maps.model.LatLng
+import kotlinx.serialization.Serializable
 
+@Serializable
 @Entity(
    tableName = "dgps_stations",
    primaryKeys = ["volume_number", "feature_number"],
@@ -80,6 +82,7 @@ data class DgpsStation(
    @ColumnInfo(name = "section_header")
    var sectionHeader: String = ""
 
+   @kotlinx.serialization.Transient
    @Transient
    val latLng = LatLng(latitude, longitude)
 

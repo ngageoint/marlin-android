@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.google.android.gms.maps.model.LatLng
+import kotlinx.serialization.Serializable
 import mil.nga.msi.datasource.port.types.Decision
 import mil.nga.msi.datasource.port.types.HarborType
 import mil.nga.msi.datasource.port.types.HarborUse
@@ -13,6 +14,7 @@ import mil.nga.msi.datasource.port.types.Size
 import mil.nga.msi.datasource.port.types.UnderkeelClearance
 import mil.nga.msi.ui.port.detail.asNonZeroOrNull
 
+@Serializable
 @Entity(tableName = "ports")
 data class Port(
    @PrimaryKey
@@ -346,6 +348,7 @@ data class Port(
    @ColumnInfo(name = "offshore_max_vessel_draft")
    var offshoreMaxVesselDraft: Int? = null
 
+   @kotlinx.serialization.Transient
    @Transient
    val latLng = LatLng(latitude, longitude)
 

@@ -4,18 +4,22 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.google.android.gms.maps.model.LatLng
+import kotlinx.serialization.Serializable
+import mil.nga.msi.serializer.DateSerializer
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
 enum class RigStatus { ACTIVE, INACTIVE }
 
+@Serializable
 @Entity(tableName = "modus")
 data class Modu(
    @PrimaryKey
    @ColumnInfo(name = "name")
    val name: String,
 
+   @Serializable(DateSerializer::class)
    @ColumnInfo(name = "date")
    val date: Date,
 
@@ -47,6 +51,7 @@ data class Modu(
    @ColumnInfo(name = "subregion")
    var subregion: String? = null
 
+   @kotlinx.serialization.Transient
    @Transient
    val latLng = LatLng(latitude, longitude)
 

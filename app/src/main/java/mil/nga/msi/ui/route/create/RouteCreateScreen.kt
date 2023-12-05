@@ -13,7 +13,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
@@ -69,7 +71,7 @@ import mil.nga.msi.R
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.route.RouteWaypoint
 import mil.nga.msi.type.MapLocation
-import mil.nga.msi.ui.coordinate.CoordinateTextButton
+import mil.nga.msi.ui.coordinate.CoordinateText
 import mil.nga.msi.ui.datasource.DataSourceIcon
 import mil.nga.msi.ui.location.LocationPermission
 import mil.nga.msi.ui.main.TopBar
@@ -138,46 +140,57 @@ fun RouteCreateScreen(
             color = MaterialTheme.colorScheme.surface,
             modifier = Modifier.fillMaxSize()
         ) {
-            Column(
+            Column(modifier = Modifier
+                .fillMaxWidth()) {
+            LazyColumn(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
+                    .heightIn(max = 300.dp)
                     .fillMaxWidth()
                     .padding(vertical = 24.dp)
             ) {
-
-                TextField(
-                    value = name,
-                    label = { Text("Route Name") },
-                    onValueChange = { newText ->
-                        name = newText
-                        viewModel.setName(name)
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
-                )
-
-                CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
-                    Text(
-                        text = "Select a feature to add to the route, long press to add custom point, drag to reorder.",
-                        style = MaterialTheme.typography.bodyMedium,
+                item {
+                    TextField(
+                        value = name,
+                        label = { Text("Route Name") },
+                        onValueChange = { newText ->
+                            name = newText
+                            viewModel.setName(name)
+                        },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
                     )
                 }
 
-                WaypointList(waypoints = waypoints)
-
-                CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
-                    Text(
-                        text = "Total Distance: ",
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
-                    )
+                item {
+                    CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
+                        Text(
+                            text = "Select a feature to add to the route, long press to add custom point, drag to reorder.",
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
+                        )
+                    }
                 }
+
+                item {
+                    WaypointList(waypoints = waypoints)
+                }
+
+                item {
+                    CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
+                        Text(
+                            text = "Total Distance: ",
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
+                        )
+                    }
+                }
+            }
 
                 Box(Modifier.weight(1f)) {
                     Map(
@@ -258,76 +271,181 @@ private fun WaypointRow(
         tonalElevation = elevation,
         shadowElevation = elevation
     ) {
-        Column(
-            Modifier
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
                 .height(72.dp)
-                .fillMaxWidth()
+                .fillMaxSize()
+                .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(start = 16.dp, end = 16.dp)
-            ) {
-                DataSourceIcon(
-                    dataSource = waypoint.dataSource,
-                    iconSize = 24
-                )
-                Column(
-                    verticalArrangement = Arrangement.Center,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        modifier = Modifier
-                            .height(72.dp)
-                            .fillMaxWidth()
-                            .weight(1f)
-                            .padding(horizontal = 8.dp)
-                    ) {
-                        CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
-                            when (waypoint.dataSource) {
-                                DataSource.ASAM -> {
-                                    waypoint.getAsam()?.let { asam ->
-                                        val header = listOfNotNull(asam.hostility, asam.victim)
-                                        if (header.isNotEmpty()) {
-                                            Column {
-                                                Text(
-                                                    text = header.joinToString(": "),
-                                                    style = MaterialTheme.typography.bodyLarge,
-                                                    fontWeight = FontWeight.Medium,
-                                                    maxLines = 1,
-                                                    overflow = TextOverflow.Ellipsis,
-                                                    modifier = Modifier.padding(top = 16.dp)
-                                                )
-                                                CoordinateTextButton(
-                                                    latLng = asam.latLng,
-                                                    onCopiedToClipboard = { text -> }
-                                                )
-                                            }
-                                        }
-                                    }
-                                }
-                                DataSource.MODU -> TODO()
-                                DataSource.NAVIGATION_WARNING -> TODO()
-                                DataSource.LIGHT -> TODO()
-                                DataSource.PORT -> TODO()
-                                DataSource.RADIO_BEACON -> TODO()
-                                DataSource.DGPS_STATION -> TODO()
-                                DataSource.ELECTRONIC_PUBLICATION -> TODO()
-                                DataSource.NOTICE_TO_MARINERS -> TODO()
-                                DataSource.BOOKMARK -> TODO()
-                                DataSource.ROUTE -> TODO()
-                                DataSource.GEOPACKAGE -> TODO()
-                            }
-                        }
-                    }
-                }
-            }
+            DataSourceIcon(
+                dataSource = waypoint.dataSource,
+                iconSize = 24
+            )
+            DataSourceWaypoint(waypoint = waypoint)
         }
 
         Divider(Modifier.fillMaxWidth())
+    }
+}
+
+@Composable
+private fun DataSourceWaypoint(
+    waypoint: RouteWaypoint
+) {
+    CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
+        when (waypoint.dataSource) {
+            DataSource.ASAM -> {
+                waypoint.getAsam()?.let { asam ->
+                    Column {
+                        val header = listOfNotNull(asam.hostility, asam.victim)
+                        if (header.isNotEmpty()) {
+                            Text(
+                                text = header.joinToString(": "),
+                                style = MaterialTheme.typography.bodyLarge,
+                                fontWeight = FontWeight.Medium,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        } else {
+                            Text(
+                                text = "ASAM",
+                                style = MaterialTheme.typography.bodyLarge,
+                                fontWeight = FontWeight.Medium,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
+                        CoordinateText(
+                            latLng = asam.latLng,
+                            onCopiedToClipboard = { text -> }
+                        )
+                    }
+                }
+            }
+
+            DataSource.MODU -> {
+                waypoint.getModu()?.let { modu ->
+                    Column {
+                        Text(
+                            text = modu.name,
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.Medium,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        CoordinateText(
+                            latLng = modu.latLng,
+                            onCopiedToClipboard = { text -> }
+                        )
+                    }
+                }
+            }
+
+            DataSource.NAVIGATION_WARNING -> {
+                waypoint.getNavigationalWarning()?.let { warning ->
+                    Column {
+                        val identifier = "${warning.number}/${warning.year}"
+                        val subregions = warning.subregions?.joinToString(",")
+                            ?.let { "($it)" }
+                        val header = listOfNotNull(
+                            warning.navigationArea.title,
+                            identifier,
+                            subregions
+                        ).joinToString(" ")
+                        Text(
+                            text = header,
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.Medium,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                }
+            }
+
+            DataSource.LIGHT -> {
+                waypoint.getLight()?.let { light ->
+                    val name = light.name ?: "Light"
+                    Column {
+                        Text(
+                            text = name,
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.Medium,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        CoordinateText(
+                            latLng = light.latLng,
+                            onCopiedToClipboard = { text -> }
+                        )
+                    }
+                }
+            }
+
+            DataSource.PORT -> {
+                waypoint.getPort()?.let { port ->
+                    Column {
+                        Text(
+                            text = port.portName,
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.Medium,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        CoordinateText(
+                            latLng = port.latLng,
+                            onCopiedToClipboard = { text -> }
+                        )
+                    }
+                }
+            }
+
+            DataSource.RADIO_BEACON -> {
+                waypoint.getRadioBeacon()?.let { beacon ->
+                    val name = beacon.name ?: "Radio Beacon"
+                    Column {
+                        Text(
+                            text = name,
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.Medium,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        CoordinateText(
+                            latLng = beacon.latLng,
+                            onCopiedToClipboard = { text -> }
+                        )
+                    }
+                }
+            }
+
+            DataSource.DGPS_STATION -> {
+                waypoint.getDGPSStation()?.let { dgps ->
+                    val name = dgps.name ?: "DGPS Station"
+                    Column {
+                        Text(
+                            text = name,
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.Medium,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        CoordinateText(
+                            latLng = dgps.latLng,
+                            onCopiedToClipboard = { text -> }
+                        )
+                    }
+                }
+            }
+
+            DataSource.ELECTRONIC_PUBLICATION -> TODO()
+            DataSource.NOTICE_TO_MARINERS -> TODO()
+            DataSource.BOOKMARK -> TODO()
+            DataSource.ROUTE -> TODO()
+            DataSource.GEOPACKAGE -> TODO()
+        }
     }
 }
 

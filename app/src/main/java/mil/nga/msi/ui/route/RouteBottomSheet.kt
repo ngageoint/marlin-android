@@ -34,6 +34,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.asam.Asam
 import mil.nga.msi.datasource.dgpsstation.DgpsStation
 import mil.nga.msi.datasource.light.Light
@@ -42,7 +43,6 @@ import mil.nga.msi.datasource.navigationwarning.NavigationalWarning
 import mil.nga.msi.datasource.port.Port
 import mil.nga.msi.datasource.radiobeacon.RadioBeacon
 import mil.nga.msi.datasource.route.RouteWaypoint
-import mil.nga.msi.repository.bookmark.BookmarkKey
 import mil.nga.msi.repository.dgpsstation.DgpsStationKey
 import mil.nga.msi.repository.light.LightKey
 import mil.nga.msi.repository.navigationalwarning.NavigationalWarningKey
@@ -97,13 +97,11 @@ fun RouteBottomSheet(
                             AsamPage(
                                 reference = annotation.key.id,
                                 onAddToRoute = { asam ->
-                                    val encoded = Json.encodeToString(value = asam)
-                                    val key = BookmarkKey.fromAsam(asam)
                                     var waypoint = RouteWaypoint(
-                                        dataSource = key.dataSource,
-                                        itemKey = key.id
+                                        dataSource = DataSource.ASAM,
+                                        itemKey = asam.reference
                                     )
-                                    waypoint.json = encoded
+                                    waypoint.json = Json.encodeToString(value = asam)
                                     routeCreateViewModel.addWaypoint(waypoint)
                                 }
                             )
@@ -112,11 +110,11 @@ fun RouteBottomSheet(
                             ModuPage(
                                 name = annotation.key.id,
                                 onAddToRoute = { modu ->
-                                    val key = BookmarkKey.fromModu(modu)
                                     var waypoint = RouteWaypoint(
-                                        dataSource = key.dataSource,
-                                        itemKey = key.id
+                                        dataSource = DataSource.MODU,
+                                        itemKey = modu.name
                                     )
+                                    waypoint.json = Json.encodeToString(value = modu)
                                     routeCreateViewModel.addWaypoint(waypoint)
                                 }
                             )
@@ -125,11 +123,11 @@ fun RouteBottomSheet(
                             LightPage(
                                 id = annotation.key.id,
                                 onAddToRoute = { light ->
-                                    val key = BookmarkKey.fromLight(light)
                                     var waypoint = RouteWaypoint(
-                                        dataSource = key.dataSource,
-                                        itemKey = key.id
+                                        dataSource = DataSource.LIGHT,
+                                        itemKey = light.id
                                     )
+                                    waypoint.json = Json.encodeToString(value = light)
                                     routeCreateViewModel.addWaypoint(waypoint)
                                 }
                             )
@@ -138,11 +136,11 @@ fun RouteBottomSheet(
                             PortPage(
                                 id = annotation.key.id,
                                 onAddToRoute = { port ->
-                                    val key = BookmarkKey.fromPort(port)
                                     var waypoint = RouteWaypoint(
-                                        dataSource = key.dataSource,
-                                        itemKey = key.id
+                                        dataSource = DataSource.PORT,
+                                        itemKey = port.portNumber.toString()
                                     )
+                                    waypoint.json = Json.encodeToString(value = port)
                                     routeCreateViewModel.addWaypoint(waypoint)
                                 }
                             )
@@ -151,11 +149,11 @@ fun RouteBottomSheet(
                             RadioBeaconPage(
                                 id = annotation.key.id,
                                 onAddToRoute = { beacon ->
-                                    val key = BookmarkKey.fromRadioBeacon(beacon)
                                     var waypoint = RouteWaypoint(
-                                        dataSource = key.dataSource,
-                                        itemKey = key.id
+                                        dataSource = DataSource.RADIO_BEACON,
+                                        itemKey = beacon.id
                                     )
+                                    waypoint.json = Json.encodeToString(value = beacon)
                                     routeCreateViewModel.addWaypoint(waypoint)
                                 }
                             )
@@ -164,11 +162,11 @@ fun RouteBottomSheet(
                             DgpsStationPage(
                                 id = annotation.key.id,
                                 onAddToRoute = { dgps ->
-                                    val key = BookmarkKey.fromDgpsStation(dgps)
                                     var waypoint = RouteWaypoint(
-                                        dataSource = key.dataSource,
-                                        itemKey = key.id
+                                        dataSource = DataSource.DGPS_STATION,
+                                        itemKey = DgpsStationKey.fromDgpsStation(dgps).id()
                                     )
+                                    waypoint.json = Json.encodeToString(value = dgps)
                                     routeCreateViewModel.addWaypoint(waypoint)
                                 }
                             )
@@ -177,11 +175,11 @@ fun RouteBottomSheet(
                             NavigationWarningPage(
                                 id = annotation.key.id,
                                 onAddToRoute = { navWarning ->
-                                    val key = BookmarkKey.fromNavigationalWarning(navWarning)
                                     var waypoint = RouteWaypoint(
-                                        dataSource = key.dataSource,
-                                        itemKey = key.id
+                                        dataSource = DataSource.NAVIGATION_WARNING,
+                                        itemKey = navWarning.id
                                     )
+                                    waypoint.json = Json.encodeToString(value = navWarning)
                                     routeCreateViewModel.addWaypoint(waypoint)
                                 }
                             )

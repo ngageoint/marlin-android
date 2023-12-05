@@ -3,9 +3,11 @@ package mil.nga.msi.datasource.radiobeacon
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import com.google.android.gms.maps.model.LatLng
+import kotlinx.serialization.Serializable
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.light.LightSector
 
+@Serializable
 @Entity(
    tableName = "radio_beacons",
    primaryKeys = ["volume_number", "feature_number"]
@@ -80,6 +82,7 @@ data class RadioBeacon(
    @ColumnInfo(name = "section_header")
    var sectionHeader: String = ""
 
+   @kotlinx.serialization.Transient
    @Transient
    val latLng = LatLng(latitude, longitude)
 
