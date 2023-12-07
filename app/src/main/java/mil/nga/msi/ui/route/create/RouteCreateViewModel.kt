@@ -1,7 +1,6 @@
 package mil.nga.msi.ui.route.create
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import mil.nga.msi.datasource.route.Route
@@ -12,11 +11,6 @@ import mil.nga.msi.repository.route.RouteRepository
 import java.util.Date
 import javax.inject.Inject
 
-data class RouteCreateState(
-    val name: String? = null,
-    val route: Route? = null,
-    val waypoints: List<RouteWaypoint>
-)
 @HiltViewModel
 class RouteCreateViewModel @Inject constructor(
     val locationPolicy: LocationPolicy,
@@ -24,8 +18,7 @@ class RouteCreateViewModel @Inject constructor(
     private val routeCreationRepository: RouteCreationRepository
 ): ViewModel() {
 
-    private val _routeCreateState = MutableLiveData<RouteCreateState?>()
-    val routeCreateState: LiveData<RouteCreateState?> = _routeCreateState
+    var name = mutableStateOf("")
 
     val waypoints = routeCreationRepository.waypoints
 
@@ -46,11 +39,7 @@ class RouteCreateViewModel @Inject constructor(
     }
 
     fun setName(name: String) {
-        routeCreateState.value?.let { routeCreateState ->
-            _routeCreateState.value = routeCreateState.copy(
-                name = name
-            )
-        }
+        this.name.value = name
     }
 
     fun clearWaypoints() {
@@ -59,7 +48,7 @@ class RouteCreateViewModel @Inject constructor(
 
     suspend fun saveRoute() {
         val route = Route(
-            name = routeCreateState.value?.name ?: "Route",
+            name = name.value,
             createdTime = Date(),
             updatedTime = Date()
         )

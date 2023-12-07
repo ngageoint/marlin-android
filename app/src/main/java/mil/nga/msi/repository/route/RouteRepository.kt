@@ -10,6 +10,7 @@ class RouteRepository @Inject constructor(
     suspend fun insert(route: Route, waypoints: List<RouteWaypoint>) = localDataSource.insert(route, waypoints)
     suspend fun insert(route: Route) = localDataSource.insert(route)
     suspend fun getRoute(id: Long) = localDataSource.getRoute(id)
+    suspend fun delete(route: Route) = localDataSource.delete(route)
 
     fun observeRoutes() = localDataSource.observeRoutes()
     fun observeRoutesWithWaypoints() = localDataSource.observeRoutesWithWaypoints()

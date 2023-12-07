@@ -1,6 +1,8 @@
 package mil.nga.msi.ui.route.list
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -9,10 +11,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.outlined.Directions
 import androidx.compose.material3.Card
+import androidx.compose.material3.DismissDirection
+import androidx.compose.material3.DismissState
+import androidx.compose.material3.DismissValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FloatingActionButton
@@ -20,7 +27,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.SwipeToDismiss
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDismissState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -30,10 +39,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import kotlinx.coroutines.runBlocking
+import mil.nga.msi.datasource.route.Route
 import mil.nga.msi.datasource.route.RouteWithWaypoints
 import mil.nga.msi.ui.action.Action
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.route.RouteSummary
+import mil.nga.msi.ui.theme.remove
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -60,7 +72,10 @@ fun RoutesScreen(
                 onAction = {action ->
 
                 },
-                onCreate = onCreate
+                onCreate = onCreate,
+                onDelete = {
+                    runBlocking { viewModel.delete(it) }
+                }
             )
         }
     }
@@ -112,16 +127,20 @@ private fun EmptyState(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 private fun Routes(
     routes: List<RouteWithWaypoints>,
     onAction: (Action) -> Unit,
-    onCreate: () -> Unit
+    onCreate: () -> Unit,
+    onDelete: (Route) -> Unit
 ) {
+    val listState = rememberLazyListState()
+
     Box(Modifier.fillMaxWidth()) {
         Surface(Modifier.fillMaxSize()) {
             LazyColumn(
+                state = listState,
                 contentPadding = PaddingValues(vertical = 8.dp),
                 modifier = Modifier.padding(8.dp)
             ) {
@@ -133,30 +152,82 @@ private fun Routes(
                     }
                 ) { index ->
                     val route = routes[index]
-                    Box(Modifier.animateItemPlacement()) {
-                        RouteCard(
-                            route = route,
-                            onAction = onAction
-                        )
-                    }
+
+                    val dismissState = rememberDismissState(
+                        confirmValueChange = {
+                            print("delete")
+                            onDelete(route.route)
+                            false
+                        }
+                    )
+
+                    SwipeToDismiss(
+                        state = dismissState,
+                        modifier = Modifier
+                            .animateItemPlacement(),
+                        directions = setOf(DismissDirection.EndToStart),
+                        background = {
+                            DismissBackground(dismissState = dismissState)
+                        },
+                        dismissContent = {
+                            Box() {
+                                RouteCard(
+                                    route = route,
+                                    onAction = onAction
+                                )
+                            }
+                        }
+                    )
                 }
             }
         }
+        Box(
+            Modifier
+                .align(Alignment.BottomEnd)
+                .padding(16.dp)
+        ) {
+            FloatingActionButton(
+                onClick = { onCreate() },
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
+                modifier = Modifier.size(40.dp)
+            ) {
+                Icon(Icons.Outlined.Directions, "Route")
+            }
+        }
+
+    }
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+private fun DismissBackground(dismissState: DismissState) {
+    val color by animateColorAsState(
+        when (dismissState.targetValue) {
+            DismissValue.Default -> MaterialTheme.colorScheme.surface
+            else -> MaterialTheme.colorScheme.remove
+        }, label = "color_state_animator"
+    )
+
+    Card {
+        Surface(
+            color = MaterialTheme.colorScheme.remove
+        ) {
+
             Box(
                 Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(16.dp)
+                    .fillMaxSize()
+                    .background(color)
+                    .padding(horizontal = 16.dp),
+                contentAlignment = Alignment.CenterEnd
             ) {
-                FloatingActionButton(
-                    onClick = { onCreate() },
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onPrimary,
-                    modifier = Modifier.size(40.dp)
-                ) {
-                    Icon(Icons.Outlined.Directions, "Route")
-                }
+                Icon(
+                    Icons.Default.Delete,
+                    tint = MaterialTheme.colorScheme.onPrimary,
+                    contentDescription = "Delete Icon"
+                )
             }
-
+        }
     }
 }
 

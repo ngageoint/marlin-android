@@ -1,17 +1,23 @@
 package mil.nga.msi.ui.route
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.Row
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.MoreHoriz
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import mil.nga.msi.datasource.route.RouteWithWaypoints
+import mil.nga.msi.ui.datasource.DataSourceIcon
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -20,48 +26,75 @@ fun RouteSummary(
     route: RouteWithWaypoints,
     modifier: Modifier = Modifier
 ) {
-    Column(modifier = modifier) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
         route.route.name?.let { name ->
             Text(
                 text = name,
-                style = MaterialTheme.typography.titleLarge,
+                style = MaterialTheme.typography.bodyLarge,
                 maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.padding(bottom = 16.dp)
+                overflow = TextOverflow.Ellipsis
             )
         }
 
-        Text("This many waypoints " + route.waypoints.size)
         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
             val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
             Text(
                 text = "Created " + dateFormat.format(route.route.createdTime),
-                fontWeight = FontWeight.SemiBold,
                 style = MaterialTheme.typography.labelSmall,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
         }
 
-        val header = listOfNotNull(route.route.name)
+        val first = route.waypoints.first()
+        val last = route.waypoints.last()
 
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            DataSourceIcon(
+                dataSource = first.dataSource,
+                iconSize = 24
+            )
+            val (title, latLng) = first.getTitleAndCoordinate()
+            Text(
+                text = title,
+                style = MaterialTheme.typography.bodySmall,
+                fontWeight = FontWeight.Medium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            Icon(
+                Icons.Rounded.MoreHoriz,
+                contentDescription = "more"
+            )
+            DataSourceIcon(
+                dataSource = last.dataSource,
+                iconSize = 24
+            )
+            val (title2, latLng2) = last.getTitleAndCoordinate()
+            Text(
+                text = title2,
+                style = MaterialTheme.typography.bodySmall,
+                fontWeight = FontWeight.Medium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
 
-
-//        CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-//            asam.description?.let {
-//                Text(
-//                    text = it,
-//                    maxLines = 3,
-//                    overflow = TextOverflow.Ellipsis,
-//                    style = MaterialTheme.typography.bodyMedium,
-//                    modifier = Modifier.padding(top = 8.dp)
-//                )
-//            }
-//
-//            BookmarkNotes(
-//                notes = bookmark?.notes,
-//                modifier = Modifier.padding(top = 16.dp)
-//            )
-//        }
+        CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+            route.route.distanceNauticalMiles()?.let {
+                Text(
+                    text = "Total Distance: " + it + "nmi",
+                    style = MaterialTheme.typography.labelSmall,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+        }
     }
 }

@@ -68,7 +68,6 @@ import com.google.maps.android.compose.TileOverlay
 import com.google.maps.android.compose.rememberCameraPositionState
 import kotlinx.coroutines.launch
 import mil.nga.msi.R
-import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.route.RouteWaypoint
 import mil.nga.msi.type.MapLocation
 import mil.nga.msi.ui.coordinate.CoordinateText
@@ -92,7 +91,6 @@ fun RouteCreateScreen(
     onMapTap: () -> Unit,
 ) {
     val scope = rememberCoroutineScope()
-    val createState by viewModel.routeCreateState.observeAsState()
 
     val layers by mapViewModel.layers.observeAsState(emptyList())
     val mapOrigin by mapViewModel.mapLocation.observeAsState()
@@ -153,6 +151,7 @@ fun RouteCreateScreen(
                     TextField(
                         value = name,
                         label = { Text("Route Name") },
+                        placeholder = { Text(text = "Route Name") },
                         onValueChange = { newText ->
                             name = newText
                             viewModel.setName(name)
@@ -295,156 +294,19 @@ private fun DataSourceWaypoint(
     waypoint: RouteWaypoint
 ) {
     CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
-        when (waypoint.dataSource) {
-            DataSource.ASAM -> {
-                waypoint.getAsam()?.let { asam ->
-                    Column {
-                        val header = listOfNotNull(asam.hostility, asam.victim)
-                        if (header.isNotEmpty()) {
-                            Text(
-                                text = header.joinToString(": "),
-                                style = MaterialTheme.typography.bodyLarge,
-                                fontWeight = FontWeight.Medium,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                        } else {
-                            Text(
-                                text = "ASAM",
-                                style = MaterialTheme.typography.bodyLarge,
-                                fontWeight = FontWeight.Medium,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                        }
-                        CoordinateText(
-                            latLng = asam.latLng,
-                            onCopiedToClipboard = { text -> }
-                        )
-                    }
-                }
-            }
-
-            DataSource.MODU -> {
-                waypoint.getModu()?.let { modu ->
-                    Column {
-                        Text(
-                            text = modu.name,
-                            style = MaterialTheme.typography.bodyLarge,
-                            fontWeight = FontWeight.Medium,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                        CoordinateText(
-                            latLng = modu.latLng,
-                            onCopiedToClipboard = { text -> }
-                        )
-                    }
-                }
-            }
-
-            DataSource.NAVIGATION_WARNING -> {
-                waypoint.getNavigationalWarning()?.let { warning ->
-                    Column {
-                        val identifier = "${warning.number}/${warning.year}"
-                        val subregions = warning.subregions?.joinToString(",")
-                            ?.let { "($it)" }
-                        val header = listOfNotNull(
-                            warning.navigationArea.title,
-                            identifier,
-                            subregions
-                        ).joinToString(" ")
-                        Text(
-                            text = header,
-                            style = MaterialTheme.typography.bodyLarge,
-                            fontWeight = FontWeight.Medium,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                    }
-                }
-            }
-
-            DataSource.LIGHT -> {
-                waypoint.getLight()?.let { light ->
-                    val name = light.name ?: "Light"
-                    Column {
-                        Text(
-                            text = name,
-                            style = MaterialTheme.typography.bodyLarge,
-                            fontWeight = FontWeight.Medium,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                        CoordinateText(
-                            latLng = light.latLng,
-                            onCopiedToClipboard = { text -> }
-                        )
-                    }
-                }
-            }
-
-            DataSource.PORT -> {
-                waypoint.getPort()?.let { port ->
-                    Column {
-                        Text(
-                            text = port.portName,
-                            style = MaterialTheme.typography.bodyLarge,
-                            fontWeight = FontWeight.Medium,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                        CoordinateText(
-                            latLng = port.latLng,
-                            onCopiedToClipboard = { text -> }
-                        )
-                    }
-                }
-            }
-
-            DataSource.RADIO_BEACON -> {
-                waypoint.getRadioBeacon()?.let { beacon ->
-                    val name = beacon.name ?: "Radio Beacon"
-                    Column {
-                        Text(
-                            text = name,
-                            style = MaterialTheme.typography.bodyLarge,
-                            fontWeight = FontWeight.Medium,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                        CoordinateText(
-                            latLng = beacon.latLng,
-                            onCopiedToClipboard = { text -> }
-                        )
-                    }
-                }
-            }
-
-            DataSource.DGPS_STATION -> {
-                waypoint.getDGPSStation()?.let { dgps ->
-                    val name = dgps.name ?: "DGPS Station"
-                    Column {
-                        Text(
-                            text = name,
-                            style = MaterialTheme.typography.bodyLarge,
-                            fontWeight = FontWeight.Medium,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                        CoordinateText(
-                            latLng = dgps.latLng,
-                            onCopiedToClipboard = { text -> }
-                        )
-                    }
-                }
-            }
-
-            DataSource.ELECTRONIC_PUBLICATION -> TODO()
-            DataSource.NOTICE_TO_MARINERS -> TODO()
-            DataSource.BOOKMARK -> TODO()
-            DataSource.ROUTE -> TODO()
-            DataSource.GEOPACKAGE -> TODO()
+        val (title, latLng) = waypoint.getTitleAndCoordinate()
+        Text(
+            text = title,
+            style = MaterialTheme.typography.bodyLarge,
+            fontWeight = FontWeight.Medium,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+        latLng?.let {
+            CoordinateText(
+                latLng = latLng,
+                onCopiedToClipboard = { text -> }
+            )
         }
     }
 }

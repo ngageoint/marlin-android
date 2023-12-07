@@ -59,4 +59,12 @@ data class Route(
 
         return try { builder.build() } catch(e: Exception) { null }
     }
+
+    fun distanceNauticalMiles(): Double? {
+        val METERS_IN_NAUTICAL_MILE = 1852
+        distanceMeters?.let {
+            return it / METERS_IN_NAUTICAL_MILE
+        }
+        return null
+    }
 }
