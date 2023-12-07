@@ -311,7 +311,6 @@ private fun DataSourceWaypoint(
     }
 }
 
-
 @Composable
 private fun Map(
     origin: MapLocation?,

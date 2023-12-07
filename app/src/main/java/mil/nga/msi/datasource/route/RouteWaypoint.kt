@@ -80,7 +80,7 @@ data class RouteWaypoint(
                         identifier,
                         subregions
                     ).joinToString(" ")
-                    return WaypointTitleAndCoordinate(header, null)
+                    return WaypointTitleAndCoordinate(header, warning.latLng)
                 }
                 return WaypointTitleAndCoordinate("NAVIGATIONAL WARNING", null)
             }

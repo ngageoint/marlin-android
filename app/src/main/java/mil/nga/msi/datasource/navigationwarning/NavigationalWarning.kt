@@ -107,6 +107,10 @@ data class NavigationalWarning(
    @ColumnInfo(name = "max_longitude")
    var maxLongitude: Double? = null
 
+   @kotlinx.serialization.Transient
+   @Transient
+   val latLng = bounds()?.center
+
    fun getFeatures(): List<Feature> {
       return geoJson?.let {
          FeatureConverter.toFeatureCollection(it)?.features ?: emptyList()
@@ -128,7 +132,11 @@ data class NavigationalWarning(
          builder.include(LatLng(maxY, maxX))
       }
 
-      return try { builder.build() } catch(e: Exception) { null }
+      return try {
+         builder.build()
+      } catch (e: Exception) {
+         null
+      }
    }
 
    override fun toString(): String {
