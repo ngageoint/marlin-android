@@ -28,6 +28,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableIntStateOf
@@ -115,6 +116,7 @@ fun RouteCreateScreen(
     }
 
     var name by remember { mutableStateOf("") }
+    val distance by viewModel.distance.collectAsState()
 
     val locationPermissionState: PermissionState = rememberPermissionState(
         Manifest.permission.ACCESS_FINE_LOCATION
@@ -140,56 +142,56 @@ fun RouteCreateScreen(
         ) {
             Column(modifier = Modifier
                 .fillMaxWidth()) {
-            LazyColumn(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .heightIn(max = 300.dp)
-                    .fillMaxWidth()
-                    .padding(vertical = 24.dp)
-            ) {
-                item {
-                    TextField(
-                        value = name,
-                        label = { Text("Route Name") },
-                        placeholder = { Text(text = "Route Name") },
-                        onValueChange = { newText ->
-                            name = newText
-                            viewModel.setName(name)
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
-                    )
-                }
-
-                item {
-                    CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
-                        Text(
-                            text = "Select a feature to add to the route, long press to add custom point, drag to reorder.",
-                            style = MaterialTheme.typography.bodyMedium,
+                LazyColumn(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier
+                        .heightIn(max = 300.dp)
+                        .fillMaxWidth()
+                        .padding(vertical = 24.dp)
+                ) {
+                    item {
+                        TextField(
+                            value = name,
+                            label = { Text("Route Name") },
+                            placeholder = { Text(text = "Route Name") },
+                            onValueChange = { newText ->
+                                name = newText
+                                viewModel.setName(name)
+                            },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
                         )
                     }
-                }
 
-                item {
-                    WaypointList(waypoints = waypoints)
-                }
+                    item {
+                        CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
+                            Text(
+                                text = "${viewModel.name.value} Select a feature to add to the route, long press to add custom point, drag to reorder.",
+                                style = MaterialTheme.typography.bodyMedium,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
+                            )
+                        }
+                    }
 
-                item {
-                    CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
-                        Text(
-                            text = "Total Distance: ",
-                            style = MaterialTheme.typography.bodyMedium,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
-                        )
+                    item {
+                        WaypointList(waypoints = waypoints)
+                    }
+
+                    item {
+                        CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
+                            Text(
+                                text = "Total Distance: ${viewModel.name.value} $distance",
+                                style = MaterialTheme.typography.bodyMedium,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
+                            )
+                        }
                     }
                 }
-            }
 
                 Box(Modifier.weight(1f)) {
                     Map(
@@ -471,7 +473,7 @@ private fun animateAnnotation(
         val scaled = Bitmap.createScaledBitmap(bitmap, sizeX, sizeY, false)
 
         if (marker?.tag != null) {
-            marker.setIcon(com.google.android.gms.maps.model.BitmapDescriptorFactory.fromBitmap(scaled))
+            marker.setIcon(BitmapDescriptorFactory.fromBitmap(scaled))
         }
     }
 
