@@ -34,7 +34,7 @@ class NavigationalWarningImage(
             if (radius == null) {
                listOf(pointImage(context, zoom))
             } else {
-               listOf(circleImage(context, zoom, radius))
+               listOf(circleImage(context, zoom, radius, feature.simpleGeometry.centroid))
             }
          }
          GeometryType.LINESTRING -> {
