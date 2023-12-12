@@ -254,7 +254,7 @@ class NavTextParser {
          val range = line.ranges("(?!=\\.)[^\\.]*? BERTH")
          distance = range.map { line.substring(it) }.firstOrNull()?.trim()
       } else if (line.ranges("WITHIN").isNotEmpty()) {
-         val range = line.ranges("(?<=WITHIN ).*(?= OF)")
+         val range = line.ranges("(?:(?<=WITHIN )|(?<=WITHIN\\n)).*(?:(?= OF)|(?=\\nOF))")
          distance = range.map { line.substring(it) }.firstOrNull()
       }
 
