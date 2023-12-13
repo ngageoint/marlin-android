@@ -1,4 +1,4 @@
-package mil.nga.msi.ui.route
+package mil.nga.msi.ui.route.sheet
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -55,14 +55,13 @@ import mil.nga.msi.ui.modu.sheet.ModuSheetScreen
 import mil.nga.msi.ui.navigationalwarning.sheet.NavigationalWarningSheetScreen
 import mil.nga.msi.ui.port.sheet.PortSheetScreen
 import mil.nga.msi.ui.radiobeacon.sheet.RadioBeaconSheetScreen
-import mil.nga.msi.ui.route.create.RouteCreateViewModel
 import mil.nga.msi.ui.sheet.DataSourceSheetViewModel
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun RouteBottomSheet(
     viewModel: DataSourceSheetViewModel = hiltViewModel(),
-    routeCreateViewModel: RouteCreateViewModel = hiltViewModel(),
+    routeSheetViewModel: RouteBottomSheetViewModel = hiltViewModel(),
 ) {
     val scope = rememberCoroutineScope()
     val mapAnnotations by viewModel.mapAnnotations.observeAsState(emptyList())
@@ -102,7 +101,7 @@ fun RouteBottomSheet(
                                         itemKey = asam.reference
                                     )
                                     waypoint.json = Json.encodeToString(value = asam)
-                                    routeCreateViewModel.addWaypoint(waypoint)
+                                    routeSheetViewModel.addWaypoint(waypoint)
                                 }
                             )
                         }
@@ -115,7 +114,7 @@ fun RouteBottomSheet(
                                         itemKey = modu.name
                                     )
                                     waypoint.json = Json.encodeToString(value = modu)
-                                    routeCreateViewModel.addWaypoint(waypoint)
+                                    routeSheetViewModel.addWaypoint(waypoint)
                                 }
                             )
                         }
@@ -128,7 +127,7 @@ fun RouteBottomSheet(
                                         itemKey = light.id
                                     )
                                     waypoint.json = Json.encodeToString(value = light)
-                                    routeCreateViewModel.addWaypoint(waypoint)
+                                    routeSheetViewModel.addWaypoint(waypoint)
                                 }
                             )
                         }
@@ -141,7 +140,7 @@ fun RouteBottomSheet(
                                         itemKey = port.portNumber.toString()
                                     )
                                     waypoint.json = Json.encodeToString(value = port)
-                                    routeCreateViewModel.addWaypoint(waypoint)
+                                    routeSheetViewModel.addWaypoint(waypoint)
                                 }
                             )
                         }
@@ -154,7 +153,7 @@ fun RouteBottomSheet(
                                         itemKey = beacon.id
                                     )
                                     waypoint.json = Json.encodeToString(value = beacon)
-                                    routeCreateViewModel.addWaypoint(waypoint)
+                                    routeSheetViewModel.addWaypoint(waypoint)
                                 }
                             )
                         }
@@ -167,7 +166,7 @@ fun RouteBottomSheet(
                                         itemKey = DgpsStationKey.fromDgpsStation(dgps).id()
                                     )
                                     waypoint.json = Json.encodeToString(value = dgps)
-                                    routeCreateViewModel.addWaypoint(waypoint)
+                                    routeSheetViewModel.addWaypoint(waypoint)
                                 }
                             )
                         }
@@ -180,7 +179,7 @@ fun RouteBottomSheet(
                                         itemKey = navWarning.id
                                     )
                                     waypoint.json = Json.encodeToString(value = navWarning)
-                                    routeCreateViewModel.addWaypoint(waypoint)
+                                    routeSheetViewModel.addWaypoint(waypoint)
                                 }
                             )
                         }

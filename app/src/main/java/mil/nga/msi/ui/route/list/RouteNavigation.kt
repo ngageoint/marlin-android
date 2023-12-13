@@ -11,7 +11,7 @@ import com.google.accompanist.navigation.material.bottomSheet
 import mil.nga.msi.ui.map.AnnotationProvider
 import mil.nga.msi.ui.navigation.MarlinAppState
 import mil.nga.msi.ui.navigation.Route
-import mil.nga.msi.ui.route.RouteBottomSheet
+import mil.nga.msi.ui.route.sheet.RouteBottomSheet
 import mil.nga.msi.ui.route.create.RouteCreateScreen
 
 sealed class RouteRoute(

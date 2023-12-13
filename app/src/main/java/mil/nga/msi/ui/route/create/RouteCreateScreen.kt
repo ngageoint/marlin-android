@@ -4,7 +4,9 @@ import android.Manifest
 import android.animation.ValueAnimator
 import android.graphics.Bitmap
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,17 +20,24 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
-import androidx.compose.material3.Divider
+import androidx.compose.material3.Card
+import androidx.compose.material3.DismissDirection
+import androidx.compose.material3.DismissState
+import androidx.compose.material3.DismissValue
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.SwipeToDismiss
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.rememberDismissState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableIntStateOf
@@ -80,6 +89,7 @@ import mil.nga.msi.ui.map.MapPosition
 import mil.nga.msi.ui.map.MapViewModel
 import mil.nga.msi.ui.map.TileProviderType
 import mil.nga.msi.ui.map.cluster.MapAnnotation
+import mil.nga.msi.ui.theme.remove
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalPermissionsApi::class)
@@ -116,7 +126,7 @@ fun RouteCreateScreen(
     }
 
     var name by remember { mutableStateOf("") }
-    val distance by viewModel.distance.collectAsState()
+    val distance by viewModel.distance.observeAsState()
 
     val locationPermissionState: PermissionState = rememberPermissionState(
         Manifest.permission.ACCESS_FINE_LOCATION
@@ -141,55 +151,41 @@ fun RouteCreateScreen(
             modifier = Modifier.fillMaxSize()
         ) {
             Column(modifier = Modifier
-                .fillMaxWidth()) {
-                LazyColumn(
-                    horizontalAlignment = Alignment.CenterHorizontally,
+                .fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                TextField(
+                    value = name,
+                    label = { Text("Route Name") },
+                    placeholder = { Text(text = "Route Name") },
+                    onValueChange = { newText ->
+                        name = newText
+                        viewModel.setName(name)
+                    },
                     modifier = Modifier
-                        .heightIn(max = 300.dp)
                         .fillMaxWidth()
-                        .padding(vertical = 24.dp)
-                ) {
-                    item {
-                        TextField(
-                            value = name,
-                            label = { Text("Route Name") },
-                            placeholder = { Text(text = "Route Name") },
-                            onValueChange = { newText ->
-                                name = newText
-                                viewModel.setName(name)
-                            },
+                        .padding(start = 16.dp, end = 16.dp, top = 8.dp)
+                )
+                CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
+                    Text(
+                        text = "${viewModel.name.value} Select a feature to add to the route, long press to add custom point, drag to reorder.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 16.dp, end = 16.dp)
+                    )
+                }
+
+                WaypointList(waypoints = waypoints, viewModel = viewModel)
+
+                if (waypoints.count() > 1) {
+                    CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
+                        Text(
+                            text = "Total Distance: $distance",
+                            style = MaterialTheme.typography.bodySmall,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
+                                .padding(start = 16.dp, end = 16.dp)
                         )
-                    }
-
-                    item {
-                        CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
-                            Text(
-                                text = "${viewModel.name.value} Select a feature to add to the route, long press to add custom point, drag to reorder.",
-                                style = MaterialTheme.typography.bodyMedium,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
-                            )
-                        }
-                    }
-
-                    item {
-                        WaypointList(waypoints = waypoints)
-                    }
-
-                    item {
-                        CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
-                            Text(
-                                text = "Total Distance: ${viewModel.name.value} $distance",
-                                style = MaterialTheme.typography.bodyMedium,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
-                            )
-                        }
                     }
                 }
 
@@ -252,11 +248,77 @@ fun RouteCreateScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun WaypointList(waypoints: List<RouteWaypoint>) {
-    Column {
-        waypoints.forEach { waypoint ->
-            WaypointRow(waypoint = waypoint)
+fun WaypointList(waypoints: List<RouteWaypoint>, viewModel: RouteCreateViewModel) {
+    LazyColumn(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .heightIn(max = 175.dp)
+            .fillMaxWidth()
+            .padding(vertical = 0.dp)
+            .padding(start = 16.dp, end = 16.dp)
+    ) {
+        items(
+            count = waypoints.count(),
+            key = {
+                val waypoint = waypoints[it]
+                "${waypoint.order}"
+            }
+        ) { index ->
+            val waypoint = waypoints[index]
+
+            val dismissState = rememberDismissState(
+                confirmValueChange = {
+                    print("delete")
+                    viewModel.removeWaypoint(waypoint)
+                    false
+                }
+            )
+            SwipeToDismiss(
+                state = dismissState,
+                modifier = Modifier
+                    .animateItemPlacement(),
+                directions = setOf(DismissDirection.EndToStart),
+                background = {
+                    DismissBackground(dismissState = dismissState)
+                },
+                dismissContent = {
+                    WaypointRow(waypoint = waypoint)
+                }
+            )
+        }
+    }
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+private fun DismissBackground(dismissState: DismissState) {
+    val color by animateColorAsState(
+        when (dismissState.targetValue) {
+            DismissValue.Default -> MaterialTheme.colorScheme.surface
+            else -> MaterialTheme.colorScheme.remove
+        }, label = "color_state_animator"
+    )
+
+    Card {
+        Surface(
+            color = MaterialTheme.colorScheme.remove
+        ) {
+
+            Box(
+                Modifier
+                    .fillMaxSize()
+                    .background(color)
+                    .padding(horizontal = 16.dp),
+                contentAlignment = Alignment.CenterEnd
+            ) {
+                Icon(
+                    Icons.Default.Delete,
+                    tint = MaterialTheme.colorScheme.onPrimary,
+                    contentDescription = "Delete Icon"
+                )
+            }
         }
     }
 }
@@ -266,11 +328,10 @@ private fun WaypointRow(
     waypoint: RouteWaypoint,
     isDragging: Boolean = false,
 ) {
-    val elevation by animateDpAsState(if (isDragging) 4.dp else 0.dp, label = "elevation_animator")
-
-    Surface(
-        tonalElevation = elevation,
-        shadowElevation = elevation
+    Card(
+        Modifier
+            .fillMaxWidth()
+            .padding(bottom = 8.dp)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -286,8 +347,6 @@ private fun WaypointRow(
             )
             DataSourceWaypoint(waypoint = waypoint)
         }
-
-        Divider(Modifier.fillMaxWidth())
     }
 }
 
@@ -295,20 +354,22 @@ private fun WaypointRow(
 private fun DataSourceWaypoint(
     waypoint: RouteWaypoint
 ) {
-    CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
-        val (title, latLng) = waypoint.getTitleAndCoordinate()
-        Text(
-            text = title,
-            style = MaterialTheme.typography.bodyLarge,
-            fontWeight = FontWeight.Medium,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
-        latLng?.let {
-            CoordinateText(
-                latLng = latLng,
-                onCopiedToClipboard = { text -> }
+    Column {
+        CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
+            val (title, latLng) = waypoint.getTitleAndCoordinate()
+            Text(
+                text = title,
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Medium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
+            latLng?.let {
+                CoordinateText(
+                    latLng = latLng,
+                    onCopiedToClipboard = { text -> }
+                )
+            }
         }
     }
 }

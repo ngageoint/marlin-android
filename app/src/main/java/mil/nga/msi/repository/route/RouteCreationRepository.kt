@@ -14,6 +14,7 @@ class RouteCreationRepository @Inject constructor(
 
     fun addWaypoint(waypoint: RouteWaypoint) {
         val value = waypoints.value?.toMutableList() ?: mutableListOf()
+        waypoint.order = value.size
         value.add(waypoint)
         _waypoints.value = value
     }

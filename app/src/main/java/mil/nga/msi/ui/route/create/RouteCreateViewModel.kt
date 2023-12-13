@@ -1,12 +1,11 @@
 package mil.nga.msi.ui.route.create
 
-import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.map
 import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.ktx.utils.sphericalDistance
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import mil.nga.msi.datasource.route.Route
 import mil.nga.msi.datasource.route.RouteWaypoint
 import mil.nga.msi.location.LocationPolicy
@@ -24,19 +23,23 @@ class RouteCreateViewModel @Inject constructor(
 
     var name = mutableStateOf("")
 
-//    var distance = mutableDoubleStateOf(0.0)
-//    val distance = _distance.asDoubleState()
+    val distance = routeCreationRepository.waypoints.map { waypoints ->
+        var distance = 0.0
+        var lastCoordinate: LatLng? = null
+        waypoints.forEach { waypoint ->
+            val (title, coordinate) = waypoint.getTitleAndCoordinate()
+            if (lastCoordinate == null) {
+                lastCoordinate = coordinate
+            }
 
-//    val _distance = MutableLiveData(0.0)
-//    val distance: LiveData<Double> = _distance
-//    fun setDistance(distance: Double) {
-//        _distance.postValue(distance)
-//    }
+            lastCoordinate?.let { last ->
+                coordinate?.let { current ->
+                    distance += last.sphericalDistance(current)
+                }
+            }
+        }
 
-    private val _distance = MutableStateFlow(0.0)
-    val distance: StateFlow<Double> = _distance
-    fun setDistance(distance: Double) {
-        _distance.value = distance
+        distance
     }
 
     val waypoints = routeCreationRepository.waypoints
@@ -49,39 +52,13 @@ class RouteCreateViewModel @Inject constructor(
         }
     }
 
-    fun addWaypoint(waypoint: RouteWaypoint) {
-        var currentDistance = 5.0
-        routeCreationRepository.addWaypoint(waypoint)
-        routeCreationRepository.waypoints.value?.let {
-            var lastCoordinate: LatLng? = null
-            for (waypoint in it) {
-                val (title, coordinate) = waypoint.getTitleAndCoordinate()
-                if (lastCoordinate == null) {
-                    lastCoordinate = coordinate
-                }
-                lastCoordinate?.let {
-                    coordinate?.let {
-                        // nothing for right now
-//                        currentDistance += lastCoordinate.sphericalDistance(coordinate)
-                    }
-                }
-            }
-        }
-        Log.d("Dan", "setting distance to ${currentDistance}")
-        setDistance(currentDistance)
-    }
-
-    fun removeWaypoint(waypoint: RouteWaypoint) {
-        routeCreationRepository.removeWaypoint(waypoint)
-    }
+    fun removeWaypoint(waypoint: RouteWaypoint) = routeCreationRepository.removeWaypoint(waypoint)
 
     fun setName(name: String) {
         this.name.value = name
     }
 
-    private fun clearWaypoints() {
-        routeCreationRepository.clearWaypoints()
-    }
+    private fun clearWaypoints() = routeCreationRepository.clearWaypoints()
 
     suspend fun saveRoute() {
         val route = Route(
