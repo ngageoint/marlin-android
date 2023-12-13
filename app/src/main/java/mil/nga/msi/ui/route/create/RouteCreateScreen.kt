@@ -270,7 +270,6 @@ fun WaypointList(waypoints: List<RouteWaypoint>, viewModel: RouteCreateViewModel
 
             val dismissState = rememberDismissState(
                 confirmValueChange = {
-                    print("delete")
                     viewModel.removeWaypoint(waypoint)
                     false
                 }
