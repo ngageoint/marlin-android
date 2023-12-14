@@ -270,9 +270,11 @@ fun WaypointList(waypoints: List<RouteWaypoint>, viewModel: RouteCreateViewModel
 
             val dismissState = rememberDismissState(
                 confirmValueChange = {
-                    viewModel.removeWaypoint(waypoint)
-                    false
-                }
+                    if (it == DismissValue.DismissedToStart) {
+                        viewModel.removeWaypoint(waypoint)
+                        true
+                    } else false
+                }, positionalThreshold = { 150.dp.toPx() }
             )
             SwipeToDismiss(
                 state = dismissState,
@@ -300,7 +302,11 @@ private fun DismissBackground(dismissState: DismissState) {
         }, label = "color_state_animator"
     )
 
-    Card {
+    Card(
+        Modifier
+            .fillMaxWidth()
+            .padding(bottom = 8.dp)
+    ) {
         Surface(
             color = MaterialTheme.colorScheme.remove
         ) {

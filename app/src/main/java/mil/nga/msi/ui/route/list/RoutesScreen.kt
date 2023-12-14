@@ -155,10 +155,11 @@ private fun Routes(
 
                     val dismissState = rememberDismissState(
                         confirmValueChange = {
-                            print("delete")
-                            onDelete(route.route)
-                            false
-                        }
+                            if (it == DismissValue.DismissedToStart) {
+                                onDelete(route.route)
+                                true
+                            } else false
+                        }, positionalThreshold = { 150.dp.toPx() }
                     )
 
                     SwipeToDismiss(
@@ -209,7 +210,11 @@ private fun DismissBackground(dismissState: DismissState) {
         }, label = "color_state_animator"
     )
 
-    Card {
+    Card(
+        Modifier
+            .fillMaxWidth()
+            .padding(bottom = 8.dp)
+    ) {
         Surface(
             color = MaterialTheme.colorScheme.remove
         ) {
