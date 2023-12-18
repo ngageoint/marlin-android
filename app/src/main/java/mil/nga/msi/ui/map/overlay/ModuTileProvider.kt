@@ -18,7 +18,7 @@ class ModuTileProvider @Inject constructor(
 ) : DataSourceTileProvider(application, repository)
 
 class ModuImage(
-   modu: Modu
+   val modu: Modu
 ): DataSourceImage {
    override val dataSource = DataSource.MODU
    override val feature: Feature =
@@ -34,6 +34,13 @@ class ModuImage(
       tileBounds: Bounds,
       tileSize: Double
    ): List<Bitmap> {
-      return listOf(pointImage(context, zoom))
+      val images = mutableListOf<Bitmap>()
+      val radius = modu.distance
+      if(radius != null){
+         images.add(circleImage(context, zoom, radius * 1852, mil.nga.sf.Point(modu.longitude,modu.latitude)))
+      }
+      images.add(pointImage(context, zoom))
+
+      return images
    }
 }

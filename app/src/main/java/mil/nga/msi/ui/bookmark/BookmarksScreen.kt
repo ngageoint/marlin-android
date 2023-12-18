@@ -346,7 +346,7 @@ private fun Bookmark(
       dataSource = DataSource.MODU,
       location = modu.latLng,
       onTap = { onAction(ModuAction.Tap(modu)) },
-      onZoom = { onAction(ModuAction.Zoom(modu.latLng)) },
+      onZoom = { onAction(ModuAction.Zoom(modu)) },
       onShare = { onAction(ModuAction.Share(modu)) },
       onBookmark = { onAction(Action.Bookmark(BookmarkKey.fromModu(modu))) },
       onCopyLocation = { onAction(ModuAction.Location(it)) }
