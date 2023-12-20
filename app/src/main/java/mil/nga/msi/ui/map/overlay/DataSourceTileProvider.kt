@@ -27,10 +27,12 @@ import java.io.ByteArrayOutputStream
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.atan
+import kotlin.math.cos
 import kotlin.math.exp
 import kotlin.math.ln
 import kotlin.math.max
 import kotlin.math.pow
+import kotlin.math.roundToInt
 import kotlin.math.tan
 
 interface TileRepository {
@@ -98,17 +100,21 @@ interface DataSourceImage {
    fun circleImage(
       context: Context,
       mapZoom: Int,
-      radius: Double
+      radius: Double,
+      center: Point
    ): Bitmap {
-      val size = (context.resources.displayMetrics.density * 10).toInt()
-      val stroke = (context.resources.displayMetrics.density * 1)
-      val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
+      val metersPerMapPx = 156543.03392 * cos(Math.toRadians(center.y)) / 2.0.pow(mapZoom.toDouble())
+      val diameterInMapPx = (2*radius) / metersPerMapPx
+      val minDiameter = max(diameterInMapPx.toFloat(), context.resources.displayMetrics.density)
+      val stroke = (context.resources.displayMetrics.density)
+      val bitmap = Bitmap.createBitmap(minDiameter.roundToInt(), minDiameter.roundToInt(), Bitmap.Config.ARGB_8888)
       val canvas = Canvas(bitmap)
 
+      // border
       canvas.drawCircle(
-         size / 2f,
-         size / 2f,
-         (size / 2f) - stroke,
+         minDiameter / 2f,
+         minDiameter / 2f,
+         (minDiameter / 2f) - stroke,
          Paint().apply {
             color = dataSource.color.toArgb()
             style = Paint.Style.STROKE
@@ -116,10 +122,11 @@ interface DataSourceImage {
          }
       )
 
+      // fill
       canvas.drawCircle(
-         size / 2f,
-         size / 2f,
-         (size / 2f) - stroke,
+         minDiameter / 2f,
+         minDiameter / 2f,
+         (minDiameter / 2f) - stroke,
          Paint().apply {
             color = dataSource.color.copy(alpha = .2f).toArgb()
             style = Paint.Style.FILL

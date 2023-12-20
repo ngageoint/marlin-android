@@ -48,6 +48,18 @@ class NavTextParserTest {
       var distance = parser.parseDistance("IN AREA WITHIN 150 MILES OF 37-35.15N 045-40.37W.")
       Assert.assertEquals("150 MILES", distance)
 
+      distance = parser.parseDistance("IN AREA WITHIN 400 METERS OF 24-45.44N 141-19.60E AT 100428Z NOV.")
+      Assert.assertEquals("400 METERS", distance)
+
+      distance = parser.parseDistance("IN AREA WITHIN\n401 METERS OF 24-45.44N 141-19.60E AT 100428Z NOV.")
+      Assert.assertEquals("401 METERS", distance)
+
+      distance = parser.parseDistance("IN AREA WITHIN 402 METERS\nOF 24-45.44N 141-19.60E AT 100428Z NOV.")
+      Assert.assertEquals("402 METERS", distance)
+
+      distance = parser.parseDistance("IN AREA WITHIN\n403 METERS\nOF 24-45.44N 141-19.60E AT 100428Z NOV.")
+      Assert.assertEquals("403 METERS", distance)
+
       distance = parser.parseDistance("WESTERN NORTH ATLANTIC.\nTRINIDAD AND TOBAGO.\n1. UNDERWATER OPERATIONS 12 THRU 25 APR\n   BY M/V BOURBON EVOLUTION 802 IN 10-15.89N 060-33.25W.\n   500 METER BERTH REQUESTED.\n2. CANCEL THIS MSG 260001Z APR 23.\n")
       Assert.assertEquals("500 METER BERTH", distance)
 
