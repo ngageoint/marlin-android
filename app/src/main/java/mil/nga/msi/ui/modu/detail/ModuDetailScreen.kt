@@ -58,7 +58,7 @@ fun ModuDetailScreen(
       ModuDetailContent(
          moduWithBookmark,
          tileProvider = viewModel.tileProvider,
-         onZoom = { onAction(ModuAction.Zoom(it.latLng)) },
+         onZoom = { onAction(ModuAction.Zoom(it)) },
          onShare = { onAction(ModuAction.Share(it)) },
          onBookmark = { (modu, bookmark) ->
             if (bookmark ==  null) {
