@@ -28,4 +28,14 @@ class RouteCreationRepository @Inject constructor(
     fun clearWaypoints() {
         _waypoints.value = emptyList()
     }
+
+    fun moveWaypoint(fromIndex: Int, toIndex: Int): List<RouteWaypoint> {
+        val list = waypoints.value?.toMutableList() ?: mutableListOf()
+        list.apply { add(toIndex, removeAt(fromIndex)) }
+        list.forEachIndexed { index, waypoint ->
+            waypoint.order = index
+        }
+        _waypoints.value = list
+        return list
+    }
 }

@@ -18,6 +18,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
@@ -82,6 +84,9 @@ import mil.nga.msi.datasource.route.RouteWaypoint
 import mil.nga.msi.type.MapLocation
 import mil.nga.msi.ui.coordinate.CoordinateText
 import mil.nga.msi.ui.datasource.DataSourceIcon
+import mil.nga.msi.ui.drag.DraggableItem
+import mil.nga.msi.ui.drag.dragContainer
+import mil.nga.msi.ui.drag.rememberDragDropState
 import mil.nga.msi.ui.location.LocationPermission
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.BaseMapType
@@ -139,7 +144,6 @@ fun RouteCreateScreen(
     }
 
     val waypoints by viewModel.waypoints.observeAsState(emptyList())
-
     Column(modifier = Modifier.fillMaxSize()) {
         TopBar(
             title = "Create Route",
@@ -251,43 +255,51 @@ fun RouteCreateScreen(
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun WaypointList(waypoints: List<RouteWaypoint>, viewModel: RouteCreateViewModel) {
+    var previousWaypoints = waypoints
+
+    val listState = rememberLazyListState()
+    val dragDropState = rememberDragDropState(listState) { fromIndex, toIndex ->
+        previousWaypoints = viewModel.moveWaypoint(fromIndex, toIndex)
+    }
+
     LazyColumn(
+        state = listState,
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .heightIn(max = 175.dp)
             .fillMaxWidth()
+            .dragContainer(dragDropState)
             .padding(vertical = 0.dp)
             .padding(start = 16.dp, end = 16.dp)
     ) {
-        items(
-            count = waypoints.count(),
-            key = {
-                val waypoint = waypoints[it]
+        itemsIndexed(
+            previousWaypoints,
+            key = { _, waypoint ->
                 "${waypoint.order}"
             }
-        ) { index ->
-            val waypoint = waypoints[index]
-
-            val dismissState = rememberDismissState(
-                confirmValueChange = {
-                    if (it == DismissValue.DismissedToStart) {
-                        viewModel.removeWaypoint(waypoint)
-                        true
-                    } else false
-                }, positionalThreshold = { 150.dp.toPx() }
-            )
-            SwipeToDismiss(
-                state = dismissState,
-                modifier = Modifier
-                    .animateItemPlacement(),
-                directions = setOf(DismissDirection.EndToStart),
-                background = {
-                    DismissBackground(dismissState = dismissState)
-                },
-                dismissContent = {
-                    WaypointRow(waypoint = waypoint)
-                }
-            )
+        ) { index, waypoint ->
+            DraggableItem(dragDropState, index) { isDragging ->
+                val dismissState = rememberDismissState(
+                    confirmValueChange = {
+                        if (it == DismissValue.DismissedToStart) {
+                            viewModel.removeWaypoint(waypoint)
+                            true
+                        } else false
+                    }, positionalThreshold = { 150.dp.toPx() }
+                )
+                SwipeToDismiss(
+                    state = dismissState,
+                    modifier = Modifier
+                        .animateItemPlacement(),
+                    directions = setOf(DismissDirection.EndToStart),
+                    background = {
+                        DismissBackground(dismissState = dismissState)
+                    },
+                    dismissContent = {
+                        WaypointRow(waypoint = waypoint)
+                    }
+                )
+            }
         }
     }
 }

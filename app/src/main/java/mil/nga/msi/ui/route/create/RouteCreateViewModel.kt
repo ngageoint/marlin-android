@@ -72,6 +72,7 @@ class RouteCreateViewModel @Inject constructor(
     }
 
     fun removeWaypoint(waypoint: RouteWaypoint) = routeCreationRepository.removeWaypoint(waypoint)
+    fun moveWaypoint(fromIndex: Int, toIndex: Int): List<RouteWaypoint> = routeCreationRepository.moveWaypoint(fromIndex, toIndex)
 
     fun setName(name: String) {
         this.name.value = name
