@@ -126,7 +126,7 @@ fun RouteCreateScreen(
     }
 
     var name by remember { mutableStateOf("") }
-    val distance by viewModel.distance.observeAsState()
+    val distance by viewModel.distanceNauticalMiles.observeAsState()
 
     val locationPermissionState: PermissionState = rememberPermissionState(
         Manifest.permission.ACCESS_FINE_LOCATION
@@ -167,7 +167,7 @@ fun RouteCreateScreen(
                 )
                 CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
                     Text(
-                        text = "${viewModel.name.value} Select a feature to add to the route, long press to add custom point, drag to reorder.",
+                        text = "Select a feature to add to the route, long press to add custom point, drag to reorder.",
                         style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -180,7 +180,7 @@ fun RouteCreateScreen(
                 if (waypoints.count() > 1) {
                     CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
                         Text(
-                            text = "Total Distance: $distance",
+                            text = "Total Distance: ${"%.2f".format(distance)} nmi",
                             style = MaterialTheme.typography.bodySmall,
                             modifier = Modifier
                                 .fillMaxWidth()

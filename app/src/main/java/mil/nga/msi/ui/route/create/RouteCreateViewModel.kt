@@ -42,6 +42,25 @@ class RouteCreateViewModel @Inject constructor(
         distance
     }
 
+    val distanceNauticalMiles = routeCreationRepository.waypoints.map { waypoints ->
+        val METERS_IN_NAUTICAL_MILE = 1852
+        var distance = 0.0
+        var lastCoordinate: LatLng? = null
+        waypoints.forEach { waypoint ->
+            val (title, coordinate) = waypoint.getTitleAndCoordinate()
+            if (lastCoordinate == null) {
+                lastCoordinate = coordinate
+            }
+
+            lastCoordinate?.let { last ->
+                coordinate?.let { current ->
+                    distance += last.sphericalDistance(current)
+                }
+            }
+        }
+        distance / METERS_IN_NAUTICAL_MILE
+    }
+
     val waypoints = routeCreationRepository.waypoints
 
     val locationProvider = locationPolicy.bestLocationProvider
@@ -66,6 +85,7 @@ class RouteCreateViewModel @Inject constructor(
             createdTime = Date(),
             updatedTime = Date()
         )
+        route.distanceMeters = distance.value
 
         route?.let { route ->
             if (route.id == 0L) {
