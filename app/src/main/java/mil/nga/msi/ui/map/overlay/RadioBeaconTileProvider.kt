@@ -16,7 +16,7 @@ import androidx.compose.ui.graphics.toArgb
 import com.google.maps.android.geometry.Bounds
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.radiobeacon.RadioBeacon
-import mil.nga.msi.repository.map.RadioBeaconTileRepository
+import mil.nga.msi.repository.map.RadioBeaconsTileRepository
 import mil.nga.sf.geojson.Feature
 import mil.nga.sf.geojson.Point
 import mil.nga.sf.geojson.Position
@@ -24,7 +24,7 @@ import javax.inject.Inject
 
 class RadioBeaconTileProvider @Inject constructor(
    val application: Application,
-   val repository: RadioBeaconTileRepository
+   val repository: TileRepository
 ) : DataSourceTileProvider(application, repository)
 
 class RadioBeaconImage(

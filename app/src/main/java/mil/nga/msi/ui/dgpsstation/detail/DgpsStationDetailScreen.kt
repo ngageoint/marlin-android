@@ -15,6 +15,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
@@ -44,7 +45,11 @@ fun DgpsStationDetailScreen(
    onAction: (Action) -> Unit,
    viewModel: DgpsStationViewModel = hiltViewModel()
 ) {
-   viewModel.setDgpsStationKey(key)
+   LaunchedEffect(key) {
+      viewModel.setDgpsStationKey(key)
+   }
+
+   val tileProvider by viewModel.tileProvider.observeAsState()
    val dgpsStationWithBookmark by viewModel.dgpsStationWithBookmark.observeAsState()
 
    Column {
@@ -56,7 +61,7 @@ fun DgpsStationDetailScreen(
 
       DgpsStationContent(
          dgpsStationWithBookmark = dgpsStationWithBookmark,
-         tileProvider = viewModel.tileProvider,
+         tileProvider = tileProvider,
          onZoom = { onAction(DgpsStationAction.Zoom(it.latLng)) },
          onShare = { onAction(DgpsStationAction.Share(it)) },
          onBookmark = { (dgpsStation, bookmark) ->
@@ -74,7 +79,7 @@ fun DgpsStationDetailScreen(
 @Composable
 private fun DgpsStationContent(
    dgpsStationWithBookmark: DgpsStationWithBookmark?,
-   tileProvider: TileProvider,
+   tileProvider: TileProvider?,
    onZoom: (DgpsStation) -> Unit,
    onShare: (DgpsStation) -> Unit,
    onBookmark: (DgpsStationWithBookmark) -> Unit,
@@ -106,7 +111,7 @@ private fun DgpsStationContent(
 @Composable
 private fun DgpsStationHeader(
    dgpsStationWithBookmark: DgpsStationWithBookmark,
-   tileProvider: TileProvider,
+   tileProvider: TileProvider?,
    onZoom: () -> Unit,
    onShare: () -> Unit,
    onBookmark: () -> Unit,

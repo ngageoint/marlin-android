@@ -17,6 +17,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
@@ -51,9 +52,13 @@ fun PortDetailScreen(
    onAction: (Action) -> Unit,
    viewModel: PortViewModel = hiltViewModel()
 ) {
+   LaunchedEffect(portNumber) {
+      viewModel.setPortNumber(portNumber)
+   }
+
    val location by viewModel.locationProvider.observeAsState()
+   val tileProvider by viewModel.tileProvider.observeAsState()
    val portWithBookmark by viewModel.portWithBookmark.observeAsState()
-   viewModel.setPortNumber(portNumber)
 
    Column {
       TopBar(
@@ -64,7 +69,7 @@ fun PortDetailScreen(
 
       PortDetailContent(
          portWithBookmark = portWithBookmark,
-         tileProvider = viewModel.tileProvider,
+         tileProvider = tileProvider,
          location = location,
          onZoom = { onAction(PortAction.Zoom(it.latLng)) },
          onShare = { onAction(PortAction.Share(it)) },
@@ -83,7 +88,7 @@ fun PortDetailScreen(
 @Composable
 private fun PortDetailContent(
    portWithBookmark: PortWithBookmark?,
-   tileProvider: TileProvider,
+   tileProvider: TileProvider?,
    location: Location?,
    onZoom: (Port) -> Unit,
    onShare: (Port) -> Unit,
@@ -118,7 +123,7 @@ private fun PortDetailContent(
 @Composable
 private fun PortHeader(
    portWithBookmark: PortWithBookmark,
-   tileProvider: TileProvider,
+   tileProvider: TileProvider?,
    location: Location?,
    onZoom: () -> Unit,
    onShare: () -> Unit,

@@ -12,6 +12,24 @@ import mil.nga.msi.ui.map.overlay.TileRepository
 import javax.inject.Inject
 
 class AsamTileRepository @Inject constructor(
+   private val reference: String,
+   private val localDataSource: AsamLocalDataSource
+): TileRepository {
+   override suspend fun getTileableItems(
+      minLatitude: Double,
+      maxLatitude: Double,
+      minLongitude: Double,
+      maxLongitude: Double
+   ): List<DataSourceImage> {
+      return localDataSource.getAsam(reference)?.let { asam ->
+         if (asam.latitude in minLatitude..maxLatitude && asam.longitude in minLongitude..maxLongitude) {
+            listOf(AsamImage(asam))
+         } else emptyList()
+      } ?: emptyList()
+   }
+}
+
+class AsamsTileRepository @Inject constructor(
    private val localDataSource: AsamLocalDataSource,
    private val filterRepository: FilterRepository
 ): TileRepository {

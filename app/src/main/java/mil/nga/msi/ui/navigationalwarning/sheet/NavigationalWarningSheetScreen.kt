@@ -31,11 +31,11 @@ fun NavigationalWarningSheetScreen(
    viewModel: NavigationalWarningViewModel = hiltViewModel()
 ) {
    viewModel.setWarningKey(key)
-   val warningState by viewModel.warningState.observeAsState()
+   val warningWithBookmark by viewModel.warningWithBookmark.observeAsState()
 
    Column(modifier = modifier) {
       NavigationalWarningSheetContent(
-         navigationalWarningWithBookmark = warningState?.warningWithBookmark,
+         navigationalWarningWithBookmark = warningWithBookmark,
          onDetails = onDetails,
          onShare = onShare,
          onBookmark = onBookmark

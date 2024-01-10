@@ -15,6 +15,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
@@ -44,8 +45,12 @@ fun AsamDetailScreen(
    onAction: (Action) -> Unit,
    viewModel: AsamViewModel = hiltViewModel()
 ) {
+   LaunchedEffect(reference) {
+      viewModel.setAsamReference(reference)
+   }
+
+   val tileProvider by viewModel.tileProvider.observeAsState()
    val asamWithBookmark by viewModel.asamWithBookmark.observeAsState()
-   viewModel.setAsamReference(reference)
 
    Column {
       TopBar(
@@ -56,7 +61,7 @@ fun AsamDetailScreen(
 
       AsamDetailContent(
          asamWithBookmark = asamWithBookmark,
-         tileProvider = viewModel.tileProvider,
+         tileProvider = tileProvider,
          onZoom = { onAction(AsamAction.Zoom(it.latLng)) },
          onShare = { onAction(AsamAction.Share(it)) },
          onBookmark = { (asam, bookmark) ->
@@ -74,7 +79,7 @@ fun AsamDetailScreen(
 @Composable
 private fun AsamDetailContent(
    asamWithBookmark: AsamWithBookmark?,
-   tileProvider: TileProvider,
+   tileProvider: TileProvider?,
    onZoom: (Asam) -> Unit,
    onShare: (Asam) -> Unit,
    onBookmark: (AsamWithBookmark) -> Unit,
@@ -107,7 +112,7 @@ private fun AsamDetailContent(
 @Composable
 private fun AsamHeader(
    asamWithBookmark: AsamWithBookmark,
-   tileProvider: TileProvider,
+   tileProvider: TileProvider?,
    onZoom: () -> Unit,
    onShare: () -> Unit,
    onBookmark: () -> Unit,

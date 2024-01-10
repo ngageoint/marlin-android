@@ -8,7 +8,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.light.Light
-import mil.nga.msi.repository.map.LightTileRepository
 import mil.nga.msi.repository.preferences.MapRepository
 import mil.nga.msi.ui.map.overlay.images.buoyImage
 import mil.nga.msi.ui.map.overlay.images.colorImage
@@ -24,7 +23,7 @@ import javax.inject.Inject
 
 class LightTileProvider @Inject constructor(
    val application: Application,
-   repository: LightTileRepository,
+   repository: TileRepository,
 ) : DataSourceTileProvider(application, repository)
 
 class LightImage(

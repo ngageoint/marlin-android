@@ -25,6 +25,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -67,8 +68,13 @@ fun LightDetailScreen(
    onAction: (Action) -> Unit,
    viewModel: LightViewModel = hiltViewModel()
 ) {
-   viewModel.setLightKey(key)
+
+   LaunchedEffect(key) {
+      viewModel.setLightKey(key)
+   }
+
    val lightState by viewModel.lightState.observeAsState()
+   val tileProvider by viewModel.tileProvider.observeAsState()
 
    Column {
       TopBar(
@@ -79,7 +85,7 @@ fun LightDetailScreen(
 
       LightDetailContent(
          lightState = lightState,
-         tileProvider = viewModel.tileProvider,
+         tileProvider = tileProvider,
          onZoom = { onAction(LightAction.Zoom(it.latLng)) },
          onShare = { onAction(LightAction.Share(it)) },
          onBookmark = { (light, bookmark) ->
@@ -97,7 +103,7 @@ fun LightDetailScreen(
 @Composable
 private fun LightDetailContent(
    lightState: LightState?,
-   tileProvider: TileProvider,
+   tileProvider: TileProvider?,
    onZoom: (Light) -> Unit,
    onShare: (Light) -> Unit,
    onBookmark: (LightWithBookmark) -> Unit,
@@ -131,7 +137,7 @@ private fun LightDetailContent(
 @Composable
 private fun LightHeader(
    lightWithBookmark: LightWithBookmark,
-   lightTileProvider: TileProvider,
+   lightTileProvider: TileProvider?,
    onZoom: () -> Unit,
    onShare: () -> Unit,
    onBookmark: () -> Unit,

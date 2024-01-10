@@ -5,6 +5,7 @@ import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.filter.MapBoundsFilter
 import mil.nga.msi.datasource.filter.QueryBuilder
 import mil.nga.msi.repository.preferences.FilterRepository
+import mil.nga.msi.repository.radiobeacon.RadioBeaconKey
 import mil.nga.msi.repository.radiobeacon.RadioBeaconLocalDataSource
 import mil.nga.msi.ui.map.overlay.DataSourceImage
 import mil.nga.msi.ui.map.overlay.RadioBeaconImage
@@ -12,6 +13,24 @@ import mil.nga.msi.ui.map.overlay.TileRepository
 import javax.inject.Inject
 
 class RadioBeaconTileRepository @Inject constructor(
+   private val key: RadioBeaconKey,
+   private val localDataSource: RadioBeaconLocalDataSource
+): TileRepository {
+   override suspend fun getTileableItems(
+      minLatitude: Double,
+      maxLatitude: Double,
+      minLongitude: Double,
+      maxLongitude: Double
+   ): List<DataSourceImage> {
+      return localDataSource.getRadioBeacon(key)?.let { radioBeacon ->
+         if (radioBeacon.latitude in minLatitude..maxLatitude && radioBeacon.longitude in minLongitude..maxLongitude) {
+            listOf(RadioBeaconImage(radioBeacon))
+         } else emptyList()
+      } ?: emptyList()
+   }
+}
+
+class RadioBeaconsTileRepository @Inject constructor(
    private val localDataSource: RadioBeaconLocalDataSource,
    private val filterRepository: FilterRepository,
 ): TileRepository {

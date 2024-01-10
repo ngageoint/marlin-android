@@ -12,6 +12,24 @@ import mil.nga.msi.ui.map.overlay.TileRepository
 import javax.inject.Inject
 
 class ModuTileRepository @Inject constructor(
+   private val name: String,
+   private val localDataSource: ModuLocalDataSource
+): TileRepository {
+   override suspend fun getTileableItems(
+      minLatitude: Double,
+      maxLatitude: Double,
+      minLongitude: Double,
+      maxLongitude: Double
+   ): List<DataSourceImage> {
+      return localDataSource.getModu(name)?.let { modu ->
+         if (modu.latitude in minLatitude..maxLatitude && modu.longitude in minLongitude..maxLongitude) {
+            listOf(ModuImage(modu))
+         } else emptyList()
+      } ?: emptyList()
+   }
+}
+
+class ModusTileRepository @Inject constructor(
    private val localDataSource: ModuLocalDataSource,
    private val filterRepository: FilterRepository
 ): TileRepository {
