@@ -107,10 +107,6 @@ class MapViewModel @Inject constructor(
       return bottomSheetRepository.setLocation(point, bounds)
    }
 
-   fun clearTapLocation() {
-      bottomSheetRepository.clearLocation()
-   }
-
    private var asamTileProvider = AsamTileProvider(application, asamsTileRepository)
    private var moduTileProvider = ModuTileProvider(application, modusTileRepository)
    private var portTileProvider = PortTileProvider(application, portsTileRepository)

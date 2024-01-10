@@ -129,7 +129,7 @@ private fun Map(
                .padding(vertical = 8.dp)
                .weight(1f)
          ) {
-            items(DataSource.values().filter { it.mappable }) { dataSource ->
+            items(DataSource.entries.filter { it.mappable }) { dataSource ->
                Box(contentAlignment = Alignment.TopEnd) {
                   Card(
                      colors = CardDefaults.cardColors(

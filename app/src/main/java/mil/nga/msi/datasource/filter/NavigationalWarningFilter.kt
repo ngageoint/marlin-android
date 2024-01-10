@@ -11,7 +11,7 @@ class NavigationalWarningFilter {
             title = "Navigation Area",
             parameter = "navigation_area",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = NavigationArea.values().toList()
+            enumerationValues = NavigationArea.entries
          )
       )
    }

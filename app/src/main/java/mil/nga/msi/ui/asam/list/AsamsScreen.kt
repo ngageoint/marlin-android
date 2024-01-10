@@ -1,6 +1,5 @@
 package mil.nga.msi.ui.asam.list
 
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -31,7 +30,6 @@ import mil.nga.msi.ui.asam.AsamSummary
 import mil.nga.msi.ui.datasource.DataSourceActions
 import mil.nga.msi.ui.export.ExportDataSource
 import mil.nga.msi.ui.main.TopBar
-import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

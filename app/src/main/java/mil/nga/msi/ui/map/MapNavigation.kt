@@ -3,7 +3,6 @@ package mil.nga.msi.ui.map
 import android.net.Uri
 import androidx.compose.runtime.getValue
 import androidx.core.os.BundleCompat
-import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable

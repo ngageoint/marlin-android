@@ -24,7 +24,7 @@ enum class BaseMapType(val title: String, val value: Int) {
 
    companion object {
       fun fromValue(value: Int?): BaseMapType {
-         return values().find { it.value == value } ?: NORMAL
+         return entries.find { it.value == value } ?: NORMAL
       }
    }
 }

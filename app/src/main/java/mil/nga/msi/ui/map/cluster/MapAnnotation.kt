@@ -6,15 +6,6 @@ import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 import mil.nga.msi.R
 import mil.nga.msi.datasource.DataSource
-import mil.nga.msi.ui.asam.AsamRoute
-import mil.nga.msi.ui.dgpsstation.DgpsStationRoute
-import mil.nga.msi.ui.geopackage.GeoPackageRoute
-import mil.nga.msi.ui.light.LightRoute
-import mil.nga.msi.ui.modu.ModuRoute
-import mil.nga.msi.ui.navigation.Route
-import mil.nga.msi.ui.navigationalwarning.NavigationWarningRoute
-import mil.nga.msi.ui.port.PortRoute
-import mil.nga.msi.ui.radiobeacon.RadioBeaconRoute
 
 @Serializable
 @Parcelize
@@ -23,7 +14,7 @@ data class MapAnnotation(
    val latitude: Double,
    val longitude: Double
 ) : Parcelable {
-   enum class Type constructor(val color: Color, val icon : Int) {
+   enum class Type(val color: Color, val icon : Int) {
       ASAM(DataSource.ASAM.color, R.drawable.ic_asam_marker_24dp),
       MODU(DataSource.MODU.color, R.drawable.ic_modu_marker_24dp),
       LIGHT(DataSource.LIGHT.color, R.drawable.ic_light_marker_24dp),

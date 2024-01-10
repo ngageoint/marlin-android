@@ -4,7 +4,6 @@ import android.Manifest
 import android.animation.ValueAnimator
 import android.content.res.Configuration
 import android.graphics.Bitmap
-import android.util.Log
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.fadeOut
@@ -772,7 +771,7 @@ private fun DataSources(
          verticalArrangement = Arrangement.spacedBy(12.dp),
          modifier = Modifier.padding(bottom = 8.dp)
       ) {
-         DataSource.values().filter { it.mappable }.forEach { dataSource ->
+         DataSource.entries.filter { it.mappable }.forEach { dataSource ->
             DataSourceItem(dataSource = dataSource, mapped = mapped[dataSource]) {
                onDataSourceToggle(dataSource)
             }
@@ -782,7 +781,7 @@ private fun DataSources(
       Row(
          horizontalArrangement = Arrangement.spacedBy(12.dp),
       ) {
-         DataSource.values().filter { it.mappable }.forEach { dataSource ->
+         DataSource.entries.filter { it.mappable }.forEach { dataSource ->
             DataSourceItem(dataSource = dataSource, mapped = mapped[dataSource]) {
                onDataSourceToggle(dataSource)
             }

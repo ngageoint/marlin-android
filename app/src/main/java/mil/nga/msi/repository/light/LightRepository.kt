@@ -85,7 +85,7 @@ class LightRepository @Inject constructor(
          val newLights = mutableListOf<Light>()
          val fetched = userPreferencesRepository.fetched(DataSource.LIGHT)
 
-         PublicationVolume.values().forEach { volume ->
+         PublicationVolume.entries.forEach { volume ->
             val lights = remoteDataSource.fetchLights(volume)
 
             if (fetched != null) {

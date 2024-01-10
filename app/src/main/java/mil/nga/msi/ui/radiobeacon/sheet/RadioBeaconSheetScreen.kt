@@ -13,8 +13,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import mil.nga.msi.datasource.DataSource
-import mil.nga.msi.datasource.asam.Asam
-import mil.nga.msi.datasource.asam.AsamWithBookmark
 import mil.nga.msi.datasource.radiobeacon.RadioBeacon
 import mil.nga.msi.datasource.radiobeacon.RadioBeaconWithBookmark
 import mil.nga.msi.repository.radiobeacon.RadioBeaconKey

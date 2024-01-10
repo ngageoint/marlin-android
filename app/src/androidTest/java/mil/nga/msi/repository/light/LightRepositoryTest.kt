@@ -81,7 +81,7 @@ class LightRepositoryTest {
 
       viewModel.fetchLights(refresh = true)
 
-      val difference = PublicationVolume.values().flatMap { _ ->
+      val difference = PublicationVolume.entries.flatMap { _ ->
          remoteLights.minus(localLights.toSet())
       }
 
@@ -129,7 +129,7 @@ class LightRepositoryTest {
 
       viewModel.fetchLights(refresh = true)
 
-      coVerify(exactly = PublicationVolume.values().size) {
+      coVerify(exactly = PublicationVolume.entries.size) {
          localDataSource.insert(remoteLights)
       }
    }

@@ -79,5 +79,5 @@ fun ElectronicPublicationTypeList(pubTypes: List<PublicationTypeListItem>, onPub
 @Preview
 fun PreviewElectronicPublicationTypeList() {
     ElectronicPublicationTypeList(onPubTypeTap = {},
-        pubTypes = ElectronicPublicationType.values().map { PublicationTypeListItem(it, 2 * it.typeId) })
+        pubTypes = ElectronicPublicationType.entries.map { PublicationTypeListItem(it, 2 * it.typeId) })
 }

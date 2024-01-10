@@ -139,7 +139,7 @@ class GeoPackageExportViewModel @Inject constructor(
                      title = "Navigation Area",
                      parameter = "navigation_area",
                      type = FilterParameterType.ENUMERATION,
-                     enumerationValues = NavigationArea.values().toList()
+                     enumerationValues = NavigationArea.entries
                   ),
                   comparator = ComparatorType.EQUALS,
                   value = dataSource.navigationArea
