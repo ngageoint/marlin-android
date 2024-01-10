@@ -129,7 +129,7 @@ private fun Map(
                .padding(vertical = 8.dp)
                .weight(1f)
          ) {
-            items(DataSource.entries.filter { it.mappable }) { dataSource ->
+            items(DataSource.entries.filter { it.tab != null && it.mappable }) { dataSource ->
                Box(contentAlignment = Alignment.TopEnd) {
                   Card(
                      colors = CardDefaults.cardColors(
@@ -160,7 +160,7 @@ private fun Map(
                         }
 
                         Text(
-                           text = DataSource.ASAM.labelPlural,
+                           text = dataSource.tab?.title ?: "",
                            style = MaterialTheme.typography.titleMedium,
                            textAlign = TextAlign.Center,
                            modifier = Modifier

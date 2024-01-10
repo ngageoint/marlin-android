@@ -160,7 +160,7 @@ private fun Tabs(
                         }
 
                         Text(
-                           text = dataSource.labelPlural,
+                           text = dataSource.tab?.title ?: "",
                            style = MaterialTheme.typography.titleMedium,
                            textAlign = TextAlign.Center,
                            modifier = Modifier

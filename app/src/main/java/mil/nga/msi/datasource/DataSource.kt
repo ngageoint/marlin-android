@@ -14,7 +14,10 @@ import mil.nga.msi.ui.noticetomariners.NoticeToMarinersRoute
 import mil.nga.msi.ui.port.PortRoute
 import mil.nga.msi.ui.radiobeacon.RadioBeaconRoute
 
-data class Tab(val route: Route)
+data class Tab(
+   val route: Route,
+   val title: String
+)
 
 enum class DataSource(
    val tab: Tab? = null,
@@ -27,7 +30,7 @@ enum class DataSource(
    val route: Route? = null
 ) {
    ASAM(
-      tab = Tab(AsamRoute.Main),
+      tab = Tab(AsamRoute.Main, "ASAMs"),
       mappable = true,
       color = Color(0xFF000000),
       icon = R.drawable.ic_asam_24dp,
@@ -37,7 +40,7 @@ enum class DataSource(
    ),
 
    MODU(
-      tab = Tab(ModuRoute.Main),
+      tab = Tab(ModuRoute.Main, "MODUs"),
       mappable = true,
       color = Color(0xFF0042A4),
       icon = R.drawable.ic_modu_24dp,
@@ -46,7 +49,7 @@ enum class DataSource(
    ),
 
    NAVIGATION_WARNING(
-      tab = Tab(NavigationWarningRoute.Main),
+      tab = Tab(NavigationWarningRoute.Main, "Warnings"),
       mappable = true,
       color = Color(0xFFD32F2F),
       icon = R.drawable.ic_round_warning_24,
@@ -55,7 +58,7 @@ enum class DataSource(
    ),
 
    LIGHT(
-      tab = Tab(LightRoute.Main),
+      tab = Tab(LightRoute.Main, "Lights"),
       mappable = true,
       color = Color(0xFFFFC500),
       icon = R.drawable.ic_baseline_lightbulb_24,
@@ -64,7 +67,7 @@ enum class DataSource(
    ),
 
    PORT(
-      tab = Tab(PortRoute.Main),
+      tab = Tab(PortRoute.Main, "Ports"),
       mappable = true,
       color = Color(0xFF5856D6),
       icon = R.drawable.ic_baseline_anchor_24,
@@ -73,7 +76,7 @@ enum class DataSource(
    ),
 
    RADIO_BEACON(
-      tab = Tab(RadioBeaconRoute.Main),
+      tab = Tab(RadioBeaconRoute.Main, "Beacons"),
       mappable = true,
       color = Color(0xFF007BFF),
       icon = R.drawable.ic_baseline_settings_input_antenna_24,
@@ -82,7 +85,7 @@ enum class DataSource(
    ),
 
    DGPS_STATION(
-      tab = Tab(DgpsStationRoute.Main),
+      tab = Tab(DgpsStationRoute.Main, "DGPS"),
       mappable = true,
       color = Color(0xFF00E676),
       icon = R.drawable.ic_dgps_icon_24,
@@ -91,7 +94,7 @@ enum class DataSource(
    ),
 
    ELECTRONIC_PUBLICATION(
-      tab = Tab(ElectronicPublicationRoute.Main),
+      tab = Tab(ElectronicPublicationRoute.Main, "EPUB"),
       mappable = false,
       color = Color(0xFF30B0C7),
       icon = R.drawable.ic_description_24dp,
@@ -100,7 +103,7 @@ enum class DataSource(
    ),
 
    NOTICE_TO_MARINERS(
-      tab = Tab(NoticeToMarinersRoute.Main),
+      tab = Tab(NoticeToMarinersRoute.Main, "NTM"),
       mappable = false,
       color = Color(0xFFFF0000),
       icon = R.drawable.ic_baseline_campaign_24,
@@ -109,7 +112,7 @@ enum class DataSource(
    ),
 
    BOOKMARK(
-      tab = Tab(BookmarkRoute.Main),
+      tab = Tab(BookmarkRoute.Main, "Bookmarks"),
       mappable = false,
       color = Color(0xFFFF9500),
       icon = R.drawable.ic_outline_bookmark_border_24,
