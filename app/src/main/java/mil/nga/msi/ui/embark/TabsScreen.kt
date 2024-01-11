@@ -129,7 +129,7 @@ private fun Tabs(
                .padding(vertical = 8.dp)
                .weight(1f)
          ) {
-            items(DataSource.values().asList().filter { it.tab != null }) { dataSource ->
+            items(DataSource.entries.filter { it.tab != null }) { dataSource ->
                Box(contentAlignment = Alignment.TopEnd) {
                   Card(
                      colors = CardDefaults.cardColors(
@@ -160,7 +160,7 @@ private fun Tabs(
                         }
 
                         Text(
-                           text = dataSource.labelPlural,
+                           text = dataSource.tab?.title ?: "",
                            style = MaterialTheme.typography.titleMedium,
                            textAlign = TextAlign.Center,
                            modifier = Modifier

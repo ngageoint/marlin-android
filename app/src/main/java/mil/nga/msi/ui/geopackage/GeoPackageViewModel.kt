@@ -36,15 +36,6 @@ class GeoPackageViewModel @Inject constructor(
    private val bookmarkRepository: BookmarkRepository,
    private val geoPackageManager: GeoPackageManager
 ): ViewModel() {
-   private val _layer = MutableLiveData<Layer>()
-   val layer: LiveData<Layer> = _layer
-
-   fun setLayer(layerId: Long) {
-      viewModelScope.launch {
-         _layer.postValue(layerRepository.getLayer(layerId))
-      }
-   }
-
    private val _keyFlow = MutableSharedFlow<GeoPackageFeatureKey>(replay = 1)
    fun setGeoPackageFeatureKey(key: GeoPackageFeatureKey) {
       viewModelScope.launch {

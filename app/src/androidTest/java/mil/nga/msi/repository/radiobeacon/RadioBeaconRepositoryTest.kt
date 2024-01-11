@@ -81,7 +81,7 @@ class RadioBeaconRepositoryTest {
 
       viewModel.fetchRadioBeacons(refresh = true)
 
-      val difference = PublicationVolume.values().flatMap { _ ->
+      val difference = PublicationVolume.entries.flatMap { _ ->
          remoteBeacons.minus(localBeacons.toSet())
       }
 

@@ -53,6 +53,9 @@ interface LightDao {
    @Query("SELECT * FROM lights WHERE volume_number = :volumeNumber ORDER BY notice_number DESC LIMIT 1")
    suspend fun getLatestLight(volumeNumber: String): Light?
 
+   @Query("SELECT * FROM lights WHERE volume_number = :volumeNumber AND feature_number = :featureNumber")
+   suspend fun getLight(volumeNumber: String, featureNumber: String): List<Light>
+
    @Query("SELECT * FROM lights WHERE volume_number = :volumeNumber AND feature_number = :featureNumber AND characteristic_number = :characteristicNumber")
    suspend fun getLight(volumeNumber: String, featureNumber: String, characteristicNumber: Int): Light?
 

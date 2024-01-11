@@ -12,6 +12,24 @@ import mil.nga.msi.ui.map.overlay.TileRepository
 import javax.inject.Inject
 
 class PortTileRepository @Inject constructor(
+   private val portNumber: Int,
+   private val localDataSource: PortLocalDataSource
+): TileRepository {
+   override suspend fun getTileableItems(
+      minLatitude: Double,
+      maxLatitude: Double,
+      minLongitude: Double,
+      maxLongitude: Double
+   ): List<DataSourceImage> {
+      return localDataSource.getPort(portNumber)?.let { port ->
+         if (port.latitude in minLatitude..maxLatitude && port.longitude in minLongitude..maxLongitude) {
+            listOf(PortImage(port))
+         } else emptyList()
+      } ?: emptyList()
+   }
+}
+
+class PortsTileRepository @Inject constructor(
    private val localDataSource: PortLocalDataSource,
    private val filterRepository: FilterRepository
 ): TileRepository {

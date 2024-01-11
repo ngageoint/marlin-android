@@ -76,7 +76,7 @@ class DgpsStationRepository @Inject constructor(
          val newStations = mutableListOf<DgpsStation>()
 
          val fetched = userPreferencesRepository.fetched(DataSource.DGPS_STATION)
-         PublicationVolume.values().forEach { volume ->
+         PublicationVolume.entries.forEach { volume ->
             val stations = remoteDataSource.fetchDgpsStations(volume)
 
             if (fetched != null) {

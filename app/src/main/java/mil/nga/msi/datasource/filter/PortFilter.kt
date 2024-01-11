@@ -168,200 +168,200 @@ class PortFilter {
             title = "Harbor Size",
             parameter = "harbor_size",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Size.values().toList()
+            enumerationValues = Size.entries
          ),
 
          FilterParameter(
             title = "Harbor Type",
             parameter = "harbor_type",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = HarborType.values().toList()
+            enumerationValues = HarborType.entries
          ),
          FilterParameter(
             title = "Harbor Use",
             parameter = "harbor_use",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = HarborUse.values().toList()
+            enumerationValues = HarborUse.entries
          ),
          FilterParameter(
             title = "Shelter",
             parameter = "shelter",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Shelter.values().toList()
+            enumerationValues = Shelter.entries
          ),
          FilterParameter(
             title = "Entrance Restriction - Tide",
             parameter = "entrance_restriction_tide",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Entrance Restriction - Heavy Swell",
             parameter = "entrance_restriction_swell",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Entrance Restriction - Ice",
             parameter = "entrance_restriction_ice",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Entrance Restriction - Other",
             parameter = "entrance_restriction_other",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Overhead Limits",
             parameter = "overhead_limits",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Underkeel Clearance Management System",
             parameter = "ukc_management_system",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = UnderkeelClearance.values().toList()
+            enumerationValues = UnderkeelClearance.entries
          ),
          FilterParameter(
             title = "Good Holding Ground",
             parameter = "good_holding_ground",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Turning Area",
             parameter = "turning_area",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Port Security",
             parameter = "port_security",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Estimated Time Of Arrival Message",
             parameter = "eta_message",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Quarantine - Pratique",
             parameter = "quarantine_pratique",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Quarantine - Sanitation",
             parameter = "quarantine_sanitation",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Quarantine - Other",
             parameter = "quarantine_other",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Traffic Separation Scheme",
             parameter = "traffic_separation_scheme",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Vessel Traffic Service",
             parameter = "vessel_traffic_service",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "First Port Of Entry",
             parameter = "first_port_of_entry",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Pilotage - Compulsory",
             parameter = "pilotage_compulsory",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Pilotage - Available",
             parameter = "pilotage_available",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Pilotage - Local Assistance",
             parameter = "pilotage_local_assist",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Pilotage - Advisable",
             parameter = "pilotage_advisable",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Tugs - Salvage",
             parameter = "tugs_salvage",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Tugs - Assistance",
             parameter = "tugs_assist",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Communications - Telephone",
             parameter = "communications_telephone",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Communications - Telefax",
             parameter = "communications_telegraph",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Communications - Radio",
             parameter = "communications_radio",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Communications - Radiotelephone",
             parameter = "communications_radio_telephone",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Communications - Airport",
             parameter = "communications_air",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Communications - Rail",
             parameter = "communications_rail",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Search and Rescue",
             parameter = "search_and_rescue",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "NAVAREA",
@@ -372,265 +372,265 @@ class PortFilter {
             title = "Facilities - Wharves",
             parameter = "facilities_wharves",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Facilities - Anchorage",
             parameter = "facilities_anchor",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Facilities - Dangerous Cargo Anchorage",
             parameter = "facilities_dangerous_cargo",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Facilities - Med Mooring",
             parameter = "facilities_med_moor",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Facilities - Beach Mooring",
             parameter = "facilities_beach_moor",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Facilities - Ice Mooring",
             parameter = "facilities_ice_moor",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Facilities - RoRo",
             parameter = "facilities_roro",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Facilities - Solid Bulk",
             parameter = "facilities_solid_bulk",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Facilities - Liquid Bulk",
             parameter = "facilities_liquid_bulk",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Facilities - Container",
             parameter = "facilities_container",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Facilities - Breakbulk",
             parameter = "facilities_break_bulk",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Facilities - Oil Terminal",
             parameter = "facilities_oil_terminal",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Facilities - LNG Terminal",
             parameter = "facilities_long_terminal",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Facilities - Other",
             parameter = "facilities_other",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Medical Facilities",
             parameter = "medical_facilities",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Garbage Disposal",
             parameter = "garbage_disposal",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Chemical Holding Tank",
             parameter = "chemical_holding_tank_disposal",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Degaussing",
             parameter = "degauss",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Dirty Ballast Disposal",
             parameter = "dirty_ballast",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Cranes - Fixed",
             parameter = "cranes_fixed",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Cranes - Mobile",
             parameter = "cranes_mobile",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Cranes - Floating",
             parameter = "cranes_floating",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Cranes - Container",
             parameter = "cranes_container",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Lifts - 100+ Tons",
             parameter = "lifts_100",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Lifts - 50-100 Tons",
             parameter = "lifts_50",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Lifts - 25-49 Tons",
             parameter = "lifts_25",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Lifts - 0-24 Tons",
             parameter = "lifts_0",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Services - Longshoremen",
             parameter = "services_longshore",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Services - Electricity",
             parameter = "services_electrical",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Services - Steam",
             parameter = "services_steam",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Services - Navigational Equipment",
             parameter = "services_navigational_equipment",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Services - Electrical Repair",
             parameter = "services_electrical_repair",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Services - Ice Breaking",
             parameter = "services_ice_breaking",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Services - Diving",
             parameter = "services_diving",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Supplies - Provisions",
             parameter = "supplies_provisions",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Supplies - Potable Water",
             parameter = "supplies_water",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Supplies - Fuel Oil",
             parameter = "supplies_fuel",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Supplies - Diesel Oil",
             parameter = "supplies_diesel",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Supplies - Aviation Fuel",
             parameter = "supplies_aviation_fuel",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Supplies - Deck",
             parameter = "supplies_deck",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Supplies - Engine",
             parameter = "supplies_engine",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Repair Code",
             parameter = "repair_code",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = RepairCode.values().toList()
+            enumerationValues = RepairCode.entries
          ),
          FilterParameter(
             title = "Dry Dock",
             parameter = "dry_dock",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "Railway",
             parameter = "railway",
             type = FilterParameterType.ENUMERATION,
-            enumerationValues = Decision.values().toList()
+            enumerationValues = Decision.entries
          ),
          FilterParameter(
             title = "US Representative",

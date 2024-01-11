@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.first
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.filter.MapBoundsFilter
 import mil.nga.msi.datasource.filter.QueryBuilder
+import mil.nga.msi.repository.dgpsstation.DgpsStationKey
 import mil.nga.msi.repository.dgpsstation.DgpsStationLocalDataSource
 import mil.nga.msi.repository.preferences.FilterRepository
 import mil.nga.msi.ui.map.overlay.DataSourceImage
@@ -12,6 +13,26 @@ import mil.nga.msi.ui.map.overlay.TileRepository
 import javax.inject.Inject
 
 class DgpsStationTileRepository @Inject constructor(
+   private val key: DgpsStationKey,
+   private val localDataSource: DgpsStationLocalDataSource
+): TileRepository {
+   override suspend fun getTileableItems(
+      minLatitude: Double,
+      maxLatitude: Double,
+      minLongitude: Double,
+      maxLongitude: Double
+   ): List<DataSourceImage> {
+      return localDataSource.getDgpsStation(
+         volumeNumber = key.volumeNumber, featureNumber = key.featureNumber
+      )?.let { dgpsStation ->
+         if (dgpsStation.latitude in minLatitude..maxLatitude && dgpsStation.longitude in minLongitude..maxLongitude) {
+            listOf(DgpsStationImage(dgpsStation))
+         } else emptyList()
+      } ?: emptyList()
+   }
+}
+
+class DgpsStationsTileRepository @Inject constructor(
    private val localDataSource: DgpsStationLocalDataSource,
    private val filterRepository: FilterRepository,
 ): TileRepository {

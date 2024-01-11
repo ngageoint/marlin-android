@@ -1,6 +1,5 @@
 package mil.nga.msi.ui.navigationalwarning.detail
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
@@ -14,19 +13,12 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.LatLngBounds
-import com.google.android.gms.maps.model.MapStyleOptions
-import com.google.maps.android.compose.GoogleMap
-import com.google.maps.android.compose.MapProperties
-import com.google.maps.android.compose.MapUiSettings
-import com.google.maps.android.compose.rememberCameraPositionState
-import mil.nga.msi.R
+import com.google.android.gms.maps.model.TileProvider
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarning
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarningWithBookmark
@@ -34,13 +26,10 @@ import mil.nga.msi.repository.bookmark.BookmarkKey
 import mil.nga.msi.repository.navigationalwarning.NavigationalWarningKey
 import mil.nga.msi.ui.action.Action
 import mil.nga.msi.ui.main.TopBar
-import mil.nga.msi.ui.map.BaseMapType
-import mil.nga.msi.ui.map.MapShape
-import mil.nga.msi.ui.navigationalwarning.MapAnnotations
 import mil.nga.msi.ui.action.NavigationalWarningAction
 import mil.nga.msi.ui.bookmark.BookmarkNotes
 import mil.nga.msi.ui.datasource.DataSourceActions
-import mil.nga.msi.ui.navigationalwarning.NavigationalWarningState
+import mil.nga.msi.ui.map.MapClip
 import mil.nga.msi.ui.navigationalwarning.NavigationalWarningViewModel
 import java.text.SimpleDateFormat
 import java.util.*
@@ -52,9 +41,12 @@ fun NavigationalWarningDetailScreen(
    onAction: (Action) -> Unit,
    viewModel: NavigationalWarningViewModel = hiltViewModel()
 ) {
-   viewModel.setWarningKey(key)
-   val state by viewModel.warningState.observeAsState()
-   val baseMap by viewModel.baseMap.observeAsState()
+   LaunchedEffect(key) {
+      viewModel.setWarningKey(key)
+   }
+
+   val warningWithBookmark by viewModel.warningWithBookmark.observeAsState()
+   val tileProvider by viewModel.tileProvider.observeAsState()
 
    Column {
       TopBar(
@@ -64,8 +56,8 @@ fun NavigationalWarningDetailScreen(
       )
 
       NavigationalWarningDetailContent(
-         baseMap = baseMap,
-         state = state,
+         tileProvider = tileProvider,
+         warningWithBookmark = warningWithBookmark,
          onShare = { warning ->
             onAction(NavigationalWarningAction.Share(warning))
          },
@@ -87,14 +79,14 @@ fun NavigationalWarningDetailScreen(
 
 @Composable
 private fun NavigationalWarningDetailContent(
-   state: NavigationalWarningState?,
-   baseMap: BaseMapType?,
+   warningWithBookmark: NavigationalWarningWithBookmark?,
+   tileProvider: TileProvider?,
    onZoom: (NavigationalWarning) -> Unit,
    onShare: (NavigationalWarning) -> Unit,
    onBookmark: (NavigationalWarningWithBookmark) -> Unit,
 ) {
-   if (state != null) {
-      val (warning, bookmark) = state.warningWithBookmark
+   if (warningWithBookmark != null) {
+      val (warning, bookmark) = warningWithBookmark
 
       val mapBounds = warning.bounds()
 
@@ -108,15 +100,15 @@ private fun NavigationalWarningDetailContent(
          ) {
             Card {
                NavigationalWarningHeader(
-                  baseMap = baseMap,
+                  tileProvider = tileProvider,
                   mapBounds = mapBounds,
-                  state = state
+                  warningWithBookmark = warningWithBookmark
                )
 
                DataSourceActions(
                   bookmarked = bookmark != null,
                   onShare = { onShare(warning) },
-                  onBookmark = { onBookmark(state.warningWithBookmark) },
+                  onBookmark = { onBookmark(warningWithBookmark) },
                   onZoom = if (warning.geoJson != null) {
                      { onZoom(warning) }
                   } else null
@@ -130,13 +122,11 @@ private fun NavigationalWarningDetailContent(
 
 @Composable
 private fun NavigationalWarningHeader(
-   state: NavigationalWarningState,
-   showMap: Boolean = true,
-   mapBounds: LatLngBounds? = null,
-   baseMap: BaseMapType? = null
+   warningWithBookmark: NavigationalWarningWithBookmark,
+   tileProvider: TileProvider?,
+   mapBounds: LatLngBounds? = null
 ) {
    val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.US)
-   val (warningWithBookmark, annotations) = state
    val (warning, bookmark) = warningWithBookmark
 
    Column {
@@ -155,11 +145,10 @@ private fun NavigationalWarningHeader(
          )
       }
 
-      if (showMap && annotations.isNotEmpty()) {
-         Map(
-            baseMap = baseMap,
-            mapBounds = mapBounds,
-            annotations = annotations
+      if (mapBounds != null) {
+         MapClip(
+            latLngBounds = mapBounds,
+            tileProvider = tileProvider
          )
       }
 
@@ -184,54 +173,6 @@ private fun NavigationalWarningHeader(
             modifier = Modifier.padding(top = 8.dp)
          )
       }
-   }
-}
-
-@Composable
-private fun Map(
-   baseMap: BaseMapType?,
-   mapBounds: LatLngBounds?,
-   annotations: List<MapShape>
-) {
-   val cameraPositionState = rememberCameraPositionState()
-
-   LaunchedEffect(mapBounds) {
-      mapBounds?.let { bounds ->
-         cameraPositionState.animate(
-            update = CameraUpdateFactory.newLatLngBounds(bounds, 20),
-            durationMs = 1000
-         )
-      }
-   }
-
-   val uiSettings = MapUiSettings(
-      zoomControlsEnabled = false,
-      zoomGesturesEnabled = false,
-      compassEnabled = false
-   )
-
-   val mapStyleOptions = if (isSystemInDarkTheme()) {
-      MapStyleOptions.loadRawResourceStyle(LocalContext.current, R.raw.map_theme_night)
-   } else null
-
-   val properties = baseMap?.let {
-      MapProperties(
-         mapType = it.asMapType(),
-         mapStyleOptions = mapStyleOptions
-      )
-   } ?: MapProperties()
-
-   GoogleMap(
-      cameraPositionState = cameraPositionState,
-      properties = properties,
-      uiSettings = uiSettings,
-      modifier = Modifier
-         .fillMaxWidth()
-         .height(200.dp)
-   ) {
-      MapAnnotations(
-         annotations = annotations
-      )
    }
 }
 

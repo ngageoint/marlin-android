@@ -30,7 +30,7 @@ enum class NavigationArea(
 
    companion object {
       fun fromCode(code: String): NavigationArea? {
-         return values().find { it.code == code }
+         return entries.find { it.code == code }
       }
 
       fun fromValue(value: String?): NavigationArea? {

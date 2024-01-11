@@ -1,9 +1,7 @@
 package mil.nga.msi.ui.map.settings.layers
 
 import android.net.Uri
-import androidx.compose.ui.graphics.Color
 import androidx.core.os.BundleCompat
-import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable

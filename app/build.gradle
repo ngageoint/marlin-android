@@ -197,7 +197,7 @@ dependencies {
 
     implementation 'com.google.android.gms:play-services-location:21.0.1'
 
-    implementation 'mil.nga.geopackage.map:geopackage-android-map:6.7.2'
+    implementation 'mil.nga.geopackage.map:geopackage-android-map:6.7.3'
 
     implementation('edu.stanford.nlp:stanford-corenlp:4.5.4') {
         exclude group: 'org.hamcrest'
@@ -227,9 +227,9 @@ dependencies {
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_version"
 
     testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.1'
-    testImplementation "io.mockk:mockk:1.13.2"
+    testImplementation "io.mockk:mockk:1.13.8"
 
-    androidTestImplementation "io.mockk:mockk-android:1.13.2"
+    androidTestImplementation "io.mockk:mockk-android:1.13.8"
     androidTestImplementation 'androidx.paging:paging-testing:3.2.1'
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
     androidTestImplementation "androidx.work:work-testing:$work_version"

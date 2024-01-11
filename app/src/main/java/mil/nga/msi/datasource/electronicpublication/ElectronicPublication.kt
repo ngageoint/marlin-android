@@ -41,7 +41,7 @@ enum class ElectronicPublicationType(
 
     companion object {
         private val typeCodeToType = buildMap {
-            putAll(values().map { x -> x.typeId to x })
+            putAll(ElectronicPublicationType.entries.map { x -> x.typeId to x })
         }
         fun fromTypeCode(x: Int?): ElectronicPublicationType = typeCodeToType[x ?: Unknown.typeId] ?: Unknown
     }

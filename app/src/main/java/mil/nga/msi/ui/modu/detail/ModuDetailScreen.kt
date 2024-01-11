@@ -15,6 +15,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
@@ -45,7 +46,11 @@ fun ModuDetailScreen(
    onAction: (Action) -> Unit,
    viewModel: ModuViewModel = hiltViewModel()
 ) {
-   viewModel.setName(name)
+   LaunchedEffect(name) {
+      viewModel.setName(name)
+   }
+
+   val tileProvider by viewModel.tileProvider.observeAsState()
    val moduWithBookmark by viewModel.moduWithBookmark.observeAsState()
 
    Column {
@@ -57,8 +62,8 @@ fun ModuDetailScreen(
 
       ModuDetailContent(
          moduWithBookmark,
-         tileProvider = viewModel.tileProvider,
-         onZoom = { onAction(ModuAction.Zoom(it.latLng)) },
+         tileProvider = tileProvider,
+         onZoom = { onAction(ModuAction.Zoom(it)) },
          onShare = { onAction(ModuAction.Share(it)) },
          onBookmark = { (modu, bookmark) ->
             if (bookmark ==  null) {
@@ -75,7 +80,7 @@ fun ModuDetailScreen(
 @Composable
 private fun ModuDetailContent(
    moduWithBookmark: ModuWithBookmark?,
-   tileProvider: TileProvider,
+   tileProvider: TileProvider?,
    onZoom: (Modu) -> Unit,
    onShare: (Modu) -> Unit,
    onBookmark: (ModuWithBookmark) -> Unit,
@@ -107,7 +112,7 @@ private fun ModuDetailContent(
 @Composable
 private fun ModuHeader(
    moduWithBookmark: ModuWithBookmark,
-   tileProvider: TileProvider,
+   tileProvider: TileProvider?,
    onZoom: () -> Unit,
    onShare: () -> Unit,
    onBookmark: () -> Unit,

@@ -1,10 +1,10 @@
 package mil.nga.msi.network.navigationalwarning
 
-import assertNavigationWarningsEqual
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
 import mil.nga.msi.datasource.navigationwarning.NavigationArea
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarning
+import mil.nga.msi.datasource.navigationwarning.assertNavigationWarningsEqual
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test

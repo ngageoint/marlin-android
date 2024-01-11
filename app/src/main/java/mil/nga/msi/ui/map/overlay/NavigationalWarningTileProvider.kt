@@ -5,7 +5,6 @@ import android.content.Context
 import android.graphics.Bitmap
 import com.google.maps.android.geometry.Bounds
 import mil.nga.msi.datasource.DataSource
-import mil.nga.msi.repository.map.NavigationalWarningTileRepository
 import mil.nga.sf.geojson.Feature
 import mil.nga.sf.geojson.GeometryType
 import mil.nga.sf.geojson.LineString
@@ -14,7 +13,7 @@ import javax.inject.Inject
 
 class NavigationalWarningTileProvider @Inject constructor(
    val application: Application,
-   val repository: NavigationalWarningTileRepository
+   val repository: TileRepository
 ) : DataSourceTileProvider(application, repository)
 
 class NavigationalWarningImage(
@@ -34,7 +33,7 @@ class NavigationalWarningImage(
             if (radius == null) {
                listOf(pointImage(context, zoom))
             } else {
-               listOf(circleImage(context, zoom, radius))
+               listOf(circleImage(context, zoom, radius, feature.simpleGeometry.centroid))
             }
          }
          GeometryType.LINESTRING -> {

@@ -20,6 +20,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
@@ -51,8 +52,12 @@ fun RadioBeaconDetailScreen(
    onAction: (Action) -> Unit,
    viewModel: RadioBeaconViewModel = hiltViewModel()
 ) {
+   LaunchedEffect(key) {
+      viewModel.setRadioBeaconKey(key)
+   }
+
+   val tileProvider by viewModel.tileProvider.observeAsState()
    val beaconWithBookmark by viewModel.radioBeaconWithBookmark.observeAsState()
-   viewModel.setRadioBeaconKey(key)
 
    Column {
       TopBar(
@@ -63,7 +68,7 @@ fun RadioBeaconDetailScreen(
 
       RadioBeaconDetailContent(
          beaconWithBookmark = beaconWithBookmark,
-         tileProvider = viewModel.tileProvider,
+         tileProvider = tileProvider,
          onZoom = { onAction(RadioBeaconAction.Zoom(it.latLng)) },
          onShare = { onAction(RadioBeaconAction.Share(it)) },
          onBookmark = { (beacon, bookmark) ->
@@ -81,7 +86,7 @@ fun RadioBeaconDetailScreen(
 @Composable
 private fun RadioBeaconDetailContent(
    beaconWithBookmark: RadioBeaconWithBookmark?,
-   tileProvider: TileProvider,
+   tileProvider: TileProvider?,
    onZoom: (RadioBeacon) -> Unit,
    onShare: (RadioBeacon) -> Unit,
    onBookmark: (RadioBeaconWithBookmark) -> Unit,
@@ -114,7 +119,7 @@ private fun RadioBeaconDetailContent(
 @Composable
 private fun RadioBeaconHeader(
    beaconWithBookmark: RadioBeaconWithBookmark,
-   tileProvider: TileProvider,
+   tileProvider: TileProvider?,
    onZoom: () -> Unit,
    onShare: () -> Unit,
    onBookmark: () -> Unit,

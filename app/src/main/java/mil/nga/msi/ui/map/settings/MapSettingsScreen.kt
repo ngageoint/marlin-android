@@ -171,7 +171,7 @@ fun MapLayerDialog(
                )
             }
 
-            BaseMapType.values().forEach { mapType ->
+            BaseMapType.entries.forEach { mapType ->
                Row(
                   verticalAlignment = Alignment.CenterVertically,
                   modifier = Modifier.fillMaxWidth()
@@ -495,7 +495,7 @@ fun CoordinateSystemDialog(
                )
             }
 
-            CoordinateSystem.values().forEach { row ->
+            CoordinateSystem.entries.forEach { row ->
                Row(
                   verticalAlignment = Alignment.CenterVertically,
                   modifier = Modifier

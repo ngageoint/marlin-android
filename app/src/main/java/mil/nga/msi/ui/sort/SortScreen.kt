@@ -263,7 +263,7 @@ private fun SortPicker(
    addSort: (SortParameter) -> Unit
 ) {
    var parameter by remember { mutableStateOf(sortParameters.first()) }
-   var direction by remember { mutableStateOf(SortDirection.values().first()) }
+   var direction by remember { mutableStateOf(SortDirection.entries.first()) }
 
    Row(
       verticalAlignment = Alignment.CenterVertically,
@@ -403,7 +403,7 @@ private fun DirectionSelection(
          expanded = expanded,
          onDismissRequest = { expanded = false }
       ) {
-         SortDirection.values().forEach { direction ->
+         SortDirection.entries.forEach { direction ->
             DropdownMenuItem(
                onClick = {
                   onSelectDirection(direction)

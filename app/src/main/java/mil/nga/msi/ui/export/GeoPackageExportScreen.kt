@@ -200,7 +200,7 @@ private fun DataSources(
          horizontalArrangement = Arrangement.spacedBy(12.dp),
          modifier = Modifier.padding(horizontal = 16.dp)
       ) {
-         DataSource.values().filter { it.mappable }.forEach { dataSource ->
+         DataSource.entries.filter { it.mappable }.forEach { dataSource ->
             DataSourceItem(
                dataSource = dataSource,
                selected = dataSources.contains(dataSource)

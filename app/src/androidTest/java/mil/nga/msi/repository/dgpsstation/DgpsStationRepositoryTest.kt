@@ -81,7 +81,7 @@ class DgpsStationRepositoryTest {
 
       viewModel.fetchDgpsStations(refresh = true)
 
-      val difference = PublicationVolume.values().flatMap { _ ->
+      val difference = PublicationVolume.entries.flatMap { _ ->
          remoteStations.minus(localStations.toSet())
       }
 
@@ -129,7 +129,7 @@ class DgpsStationRepositoryTest {
 
       viewModel.fetchDgpsStations(refresh = true)
 
-      coVerify(exactly = PublicationVolume.values().size) {
+      coVerify(exactly = PublicationVolume.entries.size) {
          localDataSource.insert(remoteStations)
       }
    }
