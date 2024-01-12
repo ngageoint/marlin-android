@@ -1,6 +1,5 @@
 package mil.nga.msi.ui.map.overlay
 
-import android.app.Application
 import android.content.Context
 import android.graphics.Bitmap
 import com.google.maps.android.geometry.Bounds
@@ -9,12 +8,6 @@ import mil.nga.msi.datasource.modu.Modu
 import mil.nga.sf.geojson.Feature
 import mil.nga.sf.geojson.Point
 import mil.nga.sf.geojson.Position
-import javax.inject.Inject
-
-class ModuTileProvider @Inject constructor(
-   val application: Application,
-   val repository: TileRepository
-) : DataSourceTileProvider(application, repository)
 
 class ModuImage(
    val modu: Modu

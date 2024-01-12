@@ -18,7 +18,7 @@ import mil.nga.msi.repository.bookmark.BookmarkRepository
 import mil.nga.msi.repository.map.ModuTileRepository
 import mil.nga.msi.repository.modu.ModuLocalDataSource
 import mil.nga.msi.repository.modu.ModuRepository
-import mil.nga.msi.ui.map.overlay.ModuTileProvider
+import mil.nga.msi.ui.map.overlay.DataSourceTileProvider
 import javax.inject.Inject
 
 @HiltViewModel
@@ -37,7 +37,7 @@ class ModuViewModel @Inject constructor(
 
    val tileProvider = nameFlow.map { name ->
       val tileRepository = ModuTileRepository(name, dataSource)
-      ModuTileProvider(application, tileRepository)
+      DataSourceTileProvider(application, tileRepository)
    }.asLiveData()
 
    @OptIn(ExperimentalCoroutinesApi::class)

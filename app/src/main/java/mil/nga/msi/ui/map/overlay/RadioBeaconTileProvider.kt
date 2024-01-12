@@ -1,6 +1,5 @@
 package mil.nga.msi.ui.map.overlay
 
-import android.app.Application
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -19,12 +18,6 @@ import mil.nga.msi.datasource.radiobeacon.RadioBeacon
 import mil.nga.sf.geojson.Feature
 import mil.nga.sf.geojson.Point
 import mil.nga.sf.geojson.Position
-import javax.inject.Inject
-
-class RadioBeaconTileProvider @Inject constructor(
-   val application: Application,
-   val repository: TileRepository
-) : DataSourceTileProvider(application, repository)
 
 class RadioBeaconImage(
    private val beacon: RadioBeacon

@@ -19,7 +19,7 @@ import mil.nga.msi.repository.dgpsstation.DgpsStationKey
 import mil.nga.msi.repository.dgpsstation.DgpsStationLocalDataSource
 import mil.nga.msi.repository.dgpsstation.DgpsStationRepository
 import mil.nga.msi.repository.map.DgpsStationTileRepository
-import mil.nga.msi.ui.map.overlay.DgpsStationTileProvider
+import mil.nga.msi.ui.map.overlay.DataSourceTileProvider
 import javax.inject.Inject
 
 @HiltViewModel
@@ -38,7 +38,7 @@ class DgpsStationViewModel @Inject constructor(
 
    val tileProvider = keyFlow.map { key ->
       val tileRepository = DgpsStationTileRepository(key, dataSource)
-      DgpsStationTileProvider(application, tileRepository)
+      DataSourceTileProvider(application, tileRepository)
    }.asLiveData()
 
    @OptIn(ExperimentalCoroutinesApi::class)

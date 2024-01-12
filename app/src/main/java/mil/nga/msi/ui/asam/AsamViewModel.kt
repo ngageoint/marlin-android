@@ -18,7 +18,7 @@ import mil.nga.msi.repository.asam.AsamLocalDataSource
 import mil.nga.msi.repository.asam.AsamRepository
 import mil.nga.msi.repository.bookmark.BookmarkRepository
 import mil.nga.msi.repository.map.AsamTileRepository
-import mil.nga.msi.ui.map.overlay.AsamTileProvider
+import mil.nga.msi.ui.map.overlay.DataSourceTileProvider
 import javax.inject.Inject
 
 @HiltViewModel
@@ -37,7 +37,7 @@ class AsamViewModel @Inject constructor(
 
    val tileProvider = referenceFlow.map { reference ->
       val tileRepository = AsamTileRepository(reference, dataSource)
-      AsamTileProvider(application, tileRepository)
+      DataSourceTileProvider(application, tileRepository)
    }.asLiveData()
 
    @OptIn(ExperimentalCoroutinesApi::class)

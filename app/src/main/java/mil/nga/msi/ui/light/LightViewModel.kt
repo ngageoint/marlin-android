@@ -21,7 +21,7 @@ import mil.nga.msi.repository.light.LightLocalDataSource
 import mil.nga.msi.repository.light.LightRepository
 import mil.nga.msi.repository.map.LightTileRepository
 import mil.nga.msi.repository.preferences.MapRepository
-import mil.nga.msi.ui.map.overlay.LightTileProvider
+import mil.nga.msi.ui.map.overlay.DataSourceTileProvider
 import javax.inject.Inject
 
 @HiltViewModel
@@ -42,7 +42,7 @@ class LightViewModel @Inject constructor(
 
    val tileProvider = keyFlow.map { key ->
       val tileRepository = LightTileRepository(key, mapRepository, dataSource)
-      LightTileProvider(application, tileRepository)
+      DataSourceTileProvider(application, tileRepository)
    }.asLiveData()
 
    @OptIn(ExperimentalCoroutinesApi::class)
