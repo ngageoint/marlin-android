@@ -64,6 +64,7 @@ import mil.nga.msi.ui.location.LocationPermission
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.cluster.MapAnnotation
 import mil.nga.msi.ui.theme.onSurfaceDisabled
+import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.roundToInt
 import kotlin.math.sin

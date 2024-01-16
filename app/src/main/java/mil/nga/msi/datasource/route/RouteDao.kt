@@ -5,8 +5,11 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.RawQuery
+import androidx.room.RewriteQueriesToDropUnusedColumns
 import androidx.room.Transaction
 import androidx.room.Update
+import androidx.sqlite.db.SupportSQLiteQuery
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -18,6 +21,10 @@ interface RouteDao {
 
     @Query("SELECT * from routes ORDER BY createdTime DESC")
     fun observeRoutes(): Flow<List<Route>>
+
+    @RawQuery(observedEntities = [Route::class])
+    @RewriteQueriesToDropUnusedColumns
+    fun getRoutes(query: SupportSQLiteQuery): List<Route>
 
     @Query("SELECT * from routes WHERE id = :id")
     suspend fun getRoute(id: Long): Route?

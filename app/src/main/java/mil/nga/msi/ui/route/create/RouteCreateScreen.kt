@@ -61,7 +61,6 @@ import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.LocationSource
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -77,7 +76,9 @@ import com.google.maps.android.compose.MapEffect
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.TileOverlay
+import com.google.maps.android.compose.TileOverlayState
 import com.google.maps.android.compose.rememberCameraPositionState
+import com.google.maps.android.compose.rememberTileOverlayState
 import kotlinx.coroutines.launch
 import mil.nga.msi.R
 import mil.nga.msi.datasource.route.RouteWaypoint
@@ -121,17 +122,12 @@ fun RouteCreateScreen(
     }
     val baseMap by mapViewModel.baseMap.observeAsState()
 
-    val location by mapViewModel.locationPolicy.bestLocationProvider.observeAsState()
-    val locationSource = object : LocationSource {
-        override fun activate(listener: LocationSource.OnLocationChangedListener) {
-            location?.let { listener.onLocationChanged(it) }
-        }
-
-        override fun deactivate() {}
-    }
+    val routeTileProvider = viewModel.tileProvider
+    val routeTileOverlayState = rememberTileOverlayState()
+    viewModel.tileOverlayState = routeTileOverlayState
 
     var name by remember { mutableStateOf("") }
-    val distance by viewModel.distanceNauticalMiles.observeAsState()
+    val route by viewModel.route.observeAsState()
 
     val locationPermissionState: PermissionState = rememberPermissionState(
         Manifest.permission.ACCESS_FINE_LOCATION
@@ -184,7 +180,7 @@ fun RouteCreateScreen(
                 if (waypoints.count() > 1) {
                     CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
                         Text(
-                            text = "Total Distance: ${"%.2f".format(distance)} nmi",
+                            text = "Total Distance: ${"%.2f".format(route?.distanceNauticalMiles())} nmi",
                             style = MaterialTheme.typography.bodySmall,
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -200,9 +196,10 @@ fun RouteCreateScreen(
                         baseMap = baseMap,
                         layers = layers,
                         cameraPositionState = cameraPositionState,
-                        locationSource = locationSource,
                         locationEnabled = locationPermissionState.status.isGranted,
                         tileProviders = tileProviders,
+                        routeTileProvider = routeTileProvider,
+                        routeTileOverlayState = routeTileOverlayState,
                         annotation = annotation,
                         onMapMove = { position, reason ->
                             if (reason == com.google.android.gms.maps.GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE) {
@@ -398,9 +395,10 @@ private fun Map(
     baseMap: BaseMapType?,
     layers: List<TileProvider>,
     cameraPositionState: CameraPositionState,
-    locationSource: LocationSource,
     locationEnabled: Boolean,
     tileProviders: Map<TileProviderType, TileProvider>,
+    routeTileProvider: TileProvider?,
+    routeTileOverlayState: TileOverlayState,
     annotation: MapAnnotation?,
     onMapMove: (CameraPosition, Int) -> Unit,
     onMapTap: (LatLng, VisibleRegion) -> Unit
@@ -470,6 +468,7 @@ private fun Map(
                 beaconTileProvider?.let { TileOverlay(tileProvider = it) }
                 dgpsStationTileProvider?.let { TileOverlay(tileProvider = it) }
                 navigationalWarningTileProvider?.let { TileOverlay(tileProvider = it) }
+                routeTileProvider?.let { TileOverlay(tileProvider = it, state = routeTileOverlayState) }
             }
             MapEffect(destination, annotation) { map ->
                 map.setOnCameraMoveStartedListener { reason ->

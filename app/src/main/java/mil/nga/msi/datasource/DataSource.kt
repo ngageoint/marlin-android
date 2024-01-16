@@ -121,7 +121,7 @@ enum class DataSource(
    ),
 
    ROUTE(
-      tab = Tab(RouteRoute.Main),
+      tab = Tab(RouteRoute.Main, "Routes"),
       mappable = false,
       color = Color(0xFF000000),
       icon = R.drawable.ic_outline_directions_24dp,

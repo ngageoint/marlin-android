@@ -5,6 +5,8 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
+import mil.nga.sf.geojson.Feature
+import mil.nga.sf.geojson.FeatureConverter
 import java.util.Date
 
 @Entity(tableName = "routes")
@@ -41,6 +43,12 @@ data class Route(
 
     @ColumnInfo(name = "minLongitude")
     var minLongitude: Double? = null
+
+    fun getFeatures(): List<Feature> {
+        return geoJson?.let {
+            FeatureConverter.toFeatureCollection(it)?.features ?: emptyList()
+        } ?: emptyList()
+    }
 
     fun bounds(): LatLngBounds? {
         val builder = LatLngBounds.builder()

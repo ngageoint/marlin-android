@@ -1,5 +1,6 @@
 package mil.nga.msi.repository.route
 
+import androidx.sqlite.db.SimpleSQLiteQuery
 import mil.nga.msi.datasource.route.Route
 import mil.nga.msi.datasource.route.RouteDao
 import mil.nga.msi.datasource.route.RouteWaypoint
@@ -10,6 +11,8 @@ class RouteLocalDataSource @Inject constructor(
 ) {
     fun observeRoutesWithWaypoints() = dao.observeRoutesWithWaypoints()
     fun observeRoutes() = dao.observeRoutes()
+    fun getRoutes(query: SimpleSQLiteQuery) = dao.getRoutes(query)
+
     suspend fun getRoute(id: Long) = dao.getRoute(id)
     suspend fun getRouteWithWaypoints(id: Long) = dao.getRouteWithWaypoints(id)
 

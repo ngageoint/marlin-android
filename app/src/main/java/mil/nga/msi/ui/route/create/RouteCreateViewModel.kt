@@ -1,67 +1,48 @@
 package mil.nga.msi.ui.route.create
 
+import android.app.Application
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.map
-import com.google.android.gms.maps.model.LatLng
-import com.google.maps.android.ktx.utils.sphericalDistance
+import com.google.maps.android.compose.TileOverlayState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import mil.nga.msi.datasource.route.Route
 import mil.nga.msi.datasource.route.RouteWaypoint
 import mil.nga.msi.location.LocationPolicy
+import mil.nga.msi.repository.map.RouteCreationTileRepository
 import mil.nga.msi.repository.route.RouteCreationRepository
-import mil.nga.msi.repository.route.RouteRepository
+import mil.nga.msi.ui.map.overlay.RouteTileProvider
 import java.util.Date
 import javax.inject.Inject
 
+
 @HiltViewModel
 class RouteCreateViewModel @Inject constructor(
+    private val application: Application,
     val locationPolicy: LocationPolicy,
-    private val routeRepository: RouteRepository,
     private val routeCreationRepository: RouteCreationRepository
 ): ViewModel() {
 
     var name = mutableStateOf("")
-
-    val distance = routeCreationRepository.waypoints.map { waypoints ->
-        var distance = 0.0
-        var lastCoordinate: LatLng? = null
-        waypoints.forEach { waypoint ->
-            val (title, coordinate) = waypoint.getTitleAndCoordinate()
-            if (lastCoordinate == null) {
-                lastCoordinate = coordinate
-            }
-
-            lastCoordinate?.let { last ->
-                coordinate?.let { current ->
-                    distance += last.sphericalDistance(current)
-                }
-            }
-        }
-
-        distance
-    }
-
-    val distanceNauticalMiles = routeCreationRepository.waypoints.map { waypoints ->
-        val METERS_IN_NAUTICAL_MILE = 1852
-        var distance = 0.0
-        var lastCoordinate: LatLng? = null
-        waypoints.forEach { waypoint ->
-            val (title, coordinate) = waypoint.getTitleAndCoordinate()
-            if (lastCoordinate == null) {
-                lastCoordinate = coordinate
-            }
-
-            lastCoordinate?.let { last ->
-                coordinate?.let { current ->
-                    distance += last.sphericalDistance(current)
-                }
-            }
-        }
-        distance / METERS_IN_NAUTICAL_MILE
-    }
-
     val waypoints = routeCreationRepository.waypoints
+    val route = routeCreationRepository.route
+
+    var tileOverlayState: TileOverlayState?
+        get() = routeCreationRepository.tileOverlayState
+        set(value) {
+            routeCreationRepository.tileOverlayState = value
+        }
+
+    val tileProvider = RouteTileProvider(application, RouteCreationTileRepository(routeCreationRepository))
+
+    init {
+
+        val newRoute = Route(
+            name = name.value,
+            createdTime = Date(),
+            updatedTime = Date()
+        )
+        routeCreationRepository.setRoute(newRoute)
+    }
 
     val locationProvider = locationPolicy.bestLocationProvider
 
@@ -76,26 +57,10 @@ class RouteCreateViewModel @Inject constructor(
 
     fun setName(name: String) {
         this.name.value = name
+        route.value?.name = name
     }
 
     private fun clearWaypoints() = routeCreationRepository.clearWaypoints()
 
-    suspend fun saveRoute() {
-        val route = Route(
-            name = name.value,
-            createdTime = Date(),
-            updatedTime = Date()
-        )
-        route.distanceMeters = distance.value
-
-        route?.let { route ->
-            if (route.id == 0L) {
-                val routeId = routeRepository.insert(route, routeCreationRepository.waypoints.value ?: emptyList())
-
-            } else {
-//                routeRepository.update(route)
-            }
-        }
-        clearWaypoints()
-    }
+    suspend fun saveRoute() = routeCreationRepository.saveRoute()
 }
