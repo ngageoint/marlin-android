@@ -14,4 +14,6 @@ class RouteRepository @Inject constructor(
 
     fun observeRoutes() = localDataSource.observeRoutes()
     fun observeRoutesWithWaypoints() = localDataSource.observeRoutesWithWaypoints()
+
+    fun observeRouteMapItems() = localDataSource.observeRouteMapItems()
 }

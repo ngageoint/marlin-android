@@ -1,6 +1,8 @@
 package mil.nga.msi.repository.map
 
+import mil.nga.msi.repository.preferences.FilterRepository
 import mil.nga.msi.repository.route.RouteCreationRepository
+import mil.nga.msi.repository.route.RouteLocalDataSource
 import mil.nga.msi.ui.map.overlay.DataSourceImage
 import mil.nga.msi.ui.map.overlay.RouteImage
 import mil.nga.msi.ui.map.overlay.TileRepository
@@ -32,5 +34,27 @@ class RouteCreationTileRepository @Inject constructor(
                 emptyList()
             }
         } ?: emptyList()
+    }
+}
+
+class RoutesTileRepository @Inject constructor(
+    private val localDataSource: RouteLocalDataSource,
+    private val filterRepository: FilterRepository
+): TileRepository {
+
+    override suspend fun getTileableItems(
+        minLatitude: Double,
+        maxLatitude: Double,
+        minLongitude: Double,
+        maxLongitude: Double
+    ): List<DataSourceImage> {
+        return localDataSource.getRoutes(
+            minLatitude = minLatitude,
+            minLongitude = minLongitude,
+            maxLatitude = maxLatitude,
+            maxLongitude = maxLongitude
+        ).flatMap { route ->
+            route.getFeatures().map { RouteImage(it) }
+        }
     }
 }

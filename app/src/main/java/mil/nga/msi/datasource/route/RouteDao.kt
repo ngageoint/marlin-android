@@ -22,9 +22,21 @@ interface RouteDao {
     @Query("SELECT * from routes ORDER BY createdTime DESC")
     fun observeRoutes(): Flow<List<Route>>
 
+    @RewriteQueriesToDropUnusedColumns
+    @Query("SELECT * FROM routes WHERE geoJson IS NOT NULL")
+    fun observeRouteMapItems(): Flow<List<RouteMapItem>>
+
     @RawQuery(observedEntities = [Route::class])
     @RewriteQueriesToDropUnusedColumns
     fun getRoutes(query: SupportSQLiteQuery): List<Route>
+
+    @Query("SELECT * FROM routes WHERE (minLongitude <= :maxLongitude AND maxLongitude >= :minLongitude AND minLatitude <= :maxLatitude AND maxLatitude >= :minLatitude) OR maxLongitude < minLongitude")
+    fun getRoutes(
+        minLatitude: Double,
+        minLongitude: Double,
+        maxLatitude: Double,
+        maxLongitude: Double
+    ): List<Route>
 
     @Query("SELECT * from routes WHERE id = :id")
     suspend fun getRoute(id: Long): Route?

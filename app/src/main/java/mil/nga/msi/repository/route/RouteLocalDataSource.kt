@@ -11,7 +11,16 @@ class RouteLocalDataSource @Inject constructor(
 ) {
     fun observeRoutesWithWaypoints() = dao.observeRoutesWithWaypoints()
     fun observeRoutes() = dao.observeRoutes()
+    fun observeRouteMapItems() = dao.observeRouteMapItems()
+
     fun getRoutes(query: SimpleSQLiteQuery) = dao.getRoutes(query)
+
+    fun getRoutes(
+        minLatitude: Double,
+        minLongitude: Double,
+        maxLatitude: Double,
+        maxLongitude: Double
+    ) = dao.getRoutes(minLatitude, minLongitude, maxLatitude, maxLongitude)
 
     suspend fun getRoute(id: Long) = dao.getRoute(id)
     suspend fun getRouteWithWaypoints(id: Long) = dao.getRouteWithWaypoints(id)

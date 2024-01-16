@@ -435,6 +435,7 @@ private fun Map(
    val beaconTileProvider = tileProviders[TileProviderType.RADIO_BEACON]
    val dgpsStationTileProvider = tileProviders[TileProviderType.DGPS_STATION]
    val navigationalWarningTileProvider = tileProviders[TileProviderType.NAVIGATIONAL_WARNING]
+   val routeTileProvider = tileProviders[TileProviderType.ROUTE]
 
    val mapStyleOptions = if (isSystemInDarkTheme()) {
       MapStyleOptions.loadRawResourceStyle(context, R.raw.map_theme_night)
@@ -494,6 +495,7 @@ private fun Map(
          beaconTileProvider?.let { TileOverlay(tileProvider = it) }
          dgpsStationTileProvider?.let { TileOverlay(tileProvider = it) }
          navigationalWarningTileProvider?.let { TileOverlay(tileProvider = it) }
+         routeTileProvider?.let { TileOverlay(tileProvider = it) }
       }
 
       searchResults.forEach { result ->
