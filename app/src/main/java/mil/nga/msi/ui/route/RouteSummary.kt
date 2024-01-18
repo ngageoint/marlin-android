@@ -89,7 +89,7 @@ fun RouteSummary(
         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
             route.route.distanceNauticalMiles()?.let {
                 Text(
-                    text = "Total Distance: " + it + "nmi",
+                    text = "Total Distance: ${"%.2f".format(it)} nmi",
                     style = MaterialTheme.typography.labelSmall,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
