@@ -74,7 +74,7 @@ class RouteCreationRepository @Inject constructor(
         return list
     }
 
-    fun updateRoute() {
+    private fun updateRoute() {
         var distance = 0.0
         var lastCoordinate: LatLng? = null
 
@@ -111,6 +111,8 @@ class RouteCreationRepository @Inject constructor(
             var fc = FeatureCollection()
             fc.addFeature(FeatureConverter.toFeature(LineString(points)))
             _route.value?.geoJson = FeatureConverter.toStringValue(fc)
+        } else {
+            _route.value?.geoJson = null
         }
         _route.value?.distanceMeters = distance
         _route.value?.minLatitude = minLatitude
