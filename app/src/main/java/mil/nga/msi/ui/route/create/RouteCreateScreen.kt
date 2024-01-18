@@ -239,6 +239,7 @@ fun RouteCreateScreen(
                     onClick = {
                         scope.launch {
                             viewModel.saveRoute()
+                            onBack()
                         }
                     },
                     modifier = Modifier
