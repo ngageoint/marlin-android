@@ -3,8 +3,10 @@ package mil.nga.msi.ui.route.create
 import android.app.Application
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.TileOverlayState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.route.Route
 import mil.nga.msi.datasource.route.RouteWaypoint
 import mil.nga.msi.location.LocationPolicy
@@ -33,6 +35,7 @@ class RouteCreateViewModel @Inject constructor(
         }
 
     val tileProvider = RouteTileProvider(application, RouteCreationTileRepository(routeCreationRepository))
+    val location = locationPolicy.bestLocationProvider.value
 
     init {
 
@@ -42,14 +45,27 @@ class RouteCreateViewModel @Inject constructor(
             updatedTime = Date()
         )
         routeCreationRepository.setRoute(newRoute)
+        location?.let { location2 ->
+            val waypoint = RouteWaypoint(
+                dataSource = DataSource.ROUTE_WAYPOINT,
+                itemKey = "Current Location;${location2.latitude};${location2.longitude}"
+            )
+            routeCreationRepository.addFirstWaypointIfEmpty(waypoint)
+        }
     }
-
-    val locationProvider = locationPolicy.bestLocationProvider
 
     fun setLocationEnabled(enabled: Boolean) {
         if (enabled) {
             locationPolicy.requestLocationUpdates()
         }
+    }
+
+    fun addUserWaypoint(latLng: LatLng) {
+        val waypoint = RouteWaypoint(
+            dataSource = DataSource.ROUTE_WAYPOINT,
+            itemKey = "User Created;${latLng.latitude};${latLng.longitude}"
+        )
+        routeCreationRepository.addWaypoint(waypoint)
     }
 
     fun removeWaypoint(waypoint: RouteWaypoint) = routeCreationRepository.removeWaypoint(waypoint)

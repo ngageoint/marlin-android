@@ -178,6 +178,7 @@ class MarlinNotification @Inject constructor(
          DataSource.GEOPACKAGE -> -1
          DataSource.BOOKMARK -> -1
          DataSource.ROUTE -> 1
+         DataSource.ROUTE_WAYPOINT -> 1
       }
    }
 

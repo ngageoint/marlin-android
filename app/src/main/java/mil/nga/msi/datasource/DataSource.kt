@@ -128,6 +128,13 @@ enum class DataSource(
       label = "Routes"
    ),
 
+   ROUTE_WAYPOINT(
+      mappable = false,
+      color = Color(0xFF000000),
+      icon = R.drawable.ic_outline_directions_24dp,
+      label = "Route Waypoint"
+   ),
+
    GEOPACKAGE(
       mappable = false,
       color = Color(0xFFA2855E),

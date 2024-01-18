@@ -228,6 +228,9 @@ fun RouteCreateScreen(
                                 val count = mapViewModel.setTapLocation(latLng, bounds)
                                 if (count > 0) { onMapTap() }
                             }
+                        },
+                        onMapLongClick = { latLng ->
+                            viewModel.addUserWaypoint(latLng)
                         }
                     )
                 }
@@ -401,7 +404,8 @@ private fun Map(
     routeTileOverlayState: TileOverlayState,
     annotation: MapAnnotation?,
     onMapMove: (CameraPosition, Int) -> Unit,
-    onMapTap: (LatLng, VisibleRegion) -> Unit
+    onMapTap: (LatLng, VisibleRegion) -> Unit,
+    onMapLongClick: (LatLng) -> Unit
 ) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -481,6 +485,10 @@ private fun Map(
 
                 map.setOnMapClickListener { latLng ->
                     onMapTap(latLng, map.projection.visibleRegion)
+                }
+
+                map.setOnMapLongClickListener { latLng ->
+                    onMapLongClick(latLng)
                 }
 
                 if (annotation != null) {

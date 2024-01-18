@@ -113,6 +113,13 @@ data class RouteWaypoint(
                     return WaypointTitleAndCoordinate(name, dgps.latLng)
                 }
             }
+            DataSource.ROUTE_WAYPOINT -> {
+                val split = itemKey.split(";")
+                val title = split.get(0)
+                val latitude = split.get(1).toDoubleOrNull() ?: 0.0
+                val longitude = split.get(2).toDoubleOrNull() ?: 0.0
+                return WaypointTitleAndCoordinate(title, LatLng(latitude,longitude))
+            }
 
             DataSource.ELECTRONIC_PUBLICATION -> TODO()
             DataSource.NOTICE_TO_MARINERS -> TODO()

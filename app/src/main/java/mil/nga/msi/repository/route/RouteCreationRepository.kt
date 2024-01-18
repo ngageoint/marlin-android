@@ -28,8 +28,19 @@ class RouteCreationRepository @Inject constructor(
         tileOverlayState?.clearTileCache()
     }
 
-    private val _waypoints = MutableLiveData<List<RouteWaypoint>>()
+    private val _waypoints = MutableLiveData<List<RouteWaypoint>>(emptyList())
     val waypoints: LiveData<List<RouteWaypoint>> = _waypoints
+
+    fun addFirstWaypointIfEmpty(waypoint: RouteWaypoint) {
+        val value = waypoints.value?.toMutableList() ?: mutableListOf()
+        if (value.isEmpty()) {
+            waypoint.order = value.size
+            value.add(waypoint)
+            _waypoints.value = value
+
+            updateRoute()
+        }
+    }
 
     fun addWaypoint(waypoint: RouteWaypoint) {
         val value = waypoints.value?.toMutableList() ?: mutableListOf()
