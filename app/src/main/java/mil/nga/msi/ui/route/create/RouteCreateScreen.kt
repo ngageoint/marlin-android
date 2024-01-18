@@ -275,7 +275,7 @@ fun WaypointList(waypoints: List<RouteWaypoint>, viewModel: RouteCreateViewModel
         itemsIndexed(
             previousWaypoints,
             key = { _, waypoint ->
-                "${waypoint.order}"
+                waypoint.itemKey
             }
         ) { index, waypoint ->
             DraggableItem(dragDropState, index) { isDragging ->
