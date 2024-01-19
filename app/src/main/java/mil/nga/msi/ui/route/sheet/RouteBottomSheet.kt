@@ -185,6 +185,8 @@ fun RouteBottomSheet(
                         }
                         MapAnnotation.Type.GEOPACKAGE -> {
                         }
+                        MapAnnotation.Type.ROUTE -> {
+                        }
                     }
                 }
             }

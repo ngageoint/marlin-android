@@ -3,6 +3,7 @@ package mil.nga.msi.ui.route.list
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -43,6 +44,7 @@ import kotlinx.coroutines.runBlocking
 import mil.nga.msi.datasource.route.Route
 import mil.nga.msi.datasource.route.RouteWithWaypoints
 import mil.nga.msi.ui.action.Action
+import mil.nga.msi.ui.action.RouteAction
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.route.RouteSummary
 import mil.nga.msi.ui.theme.remove
@@ -69,6 +71,7 @@ fun RoutesScreen(
         } else {
             Routes(
                 routes = routes,
+                onTap = { onAction(RouteAction.Tap(it))},
                 onAction = {action ->
 
                 },
@@ -131,6 +134,7 @@ private fun EmptyState(
 @Composable
 private fun Routes(
     routes: List<RouteWithWaypoints>,
+    onTap: (Route) -> Unit,
     onAction: (Action) -> Unit,
     onCreate: () -> Unit,
     onDelete: (Route) -> Unit
@@ -174,6 +178,7 @@ private fun Routes(
                             Box() {
                                 RouteCard(
                                     route = route,
+                                    onTap = { onTap(route.route) },
                                     onAction = onAction
                                 )
                             }
@@ -239,14 +244,16 @@ private fun DismissBackground(dismissState: DismissState) {
 @Composable
 private fun RouteCard(
     route: RouteWithWaypoints,
-//    onTap: () -> Unit,
+    onTap: () -> Unit,
     onAction: (Action) -> Unit
 ) {
     Card(
         Modifier
             .fillMaxWidth()
             .padding(bottom = 8.dp)
-//            .clickable { onTap() }
+            .clickable {
+                onTap()
+            }
     ) {
         Column(Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
             RouteSummary(

@@ -23,22 +23,27 @@ class RouteCreationRepository @Inject constructor(
 
     var tileOverlayState: TileOverlayState? = null
 
+    suspend fun setRouteId(routeId: Long): Route? {
+        val routeWithWaypoints = routeRepository.getRouteWithWaypoints(routeId)
+        _route.value = routeWithWaypoints?.route
+        _waypoints.value = routeWithWaypoints?.getSortedWaypoints()
+        return routeWithWaypoints?.route
+    }
+
     fun setRoute(route: Route) {
         _route.value = route
-        tileOverlayState?.clearTileCache()
     }
 
     private val _waypoints = MutableLiveData<List<RouteWaypoint>>(emptyList())
     val waypoints: LiveData<List<RouteWaypoint>> = _waypoints
 
     fun addFirstWaypointIfEmpty(waypoint: RouteWaypoint) {
+        if (_route.value == null) { return }
         val value = waypoints.value?.toMutableList() ?: mutableListOf()
         if (value.isEmpty()) {
             waypoint.order = value.size
             value.add(waypoint)
             _waypoints.value = value
-
-            updateRoute()
         }
     }
 
@@ -130,9 +135,8 @@ class RouteCreationRepository @Inject constructor(
                     route,
                     waypoints.value ?: emptyList()
                 )
-
             } else {
-//                routeRepository.update(route)
+                routeRepository.update(route, waypoints.value ?: emptyList())
             }
         }
         clearWaypoints()

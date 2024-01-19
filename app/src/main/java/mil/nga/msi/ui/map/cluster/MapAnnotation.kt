@@ -22,7 +22,8 @@ data class MapAnnotation(
       RADIO_BEACON(DataSource.RADIO_BEACON.color, R.drawable.ic_beacon_marker_24dp),
       DGPS_STATION(DataSource.DGPS_STATION.color, R.drawable.ic_dgps_marker_24dp),
       NAVIGATIONAL_WARNING(DataSource.NAVIGATION_WARNING.color, R.drawable.ic_navigationwarning_marker_24dp),
-      GEOPACKAGE(DataSource.GEOPACKAGE.color, R.drawable.ic_feature_marker_24dp)
+      GEOPACKAGE(DataSource.GEOPACKAGE.color, R.drawable.ic_feature_marker_24dp),
+      ROUTE(DataSource.ROUTE.color, DataSource.ROUTE.icon)
    }
 
    @Serializable

@@ -33,6 +33,7 @@ import mil.nga.msi.ui.navigation.*
 import mil.nga.msi.ui.navigationalwarning.NavigationWarningRoute
 import mil.nga.msi.ui.port.PortRoute
 import mil.nga.msi.ui.radiobeacon.RadioBeaconRoute
+import mil.nga.msi.ui.route.list.RouteRoute
 import mil.nga.msi.ui.sheet.BottomSheet
 
 sealed class MapRoute(
@@ -161,6 +162,9 @@ fun NavGraphBuilder.mapGraph(
                   val key = GeoPackageFeatureKey.fromId(annotation.key.id)
                   val encoded = Uri.encode(Json.encodeToString(key))
                   appState.navController.navigate(GeoPackageRoute.Detail.name + "?key=${encoded}")
+               }
+               MapAnnotation.Type.ROUTE -> {
+                  appState.navController.navigate(RouteRoute.Detail.name + "?routeId=${annotation.key.id}")
                }
             }
          },

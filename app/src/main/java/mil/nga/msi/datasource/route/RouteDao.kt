@@ -46,6 +46,10 @@ interface RouteDao {
     suspend fun getRouteWithWaypoints(id: Long): RouteWithWaypoints?
 
     @Transaction
+    @Query("SELECT * FROM routes WHERE id = :id")
+    fun observeRouteWithWaypoints(id: Long): Flow<RouteWithWaypoints>
+
+    @Transaction
     suspend fun insert(route: Route, waypoints: List<RouteWaypoint>): Long {
         val routeId: Long = insert(route)
 
@@ -55,6 +59,24 @@ interface RouteDao {
             insertWaypoint(waypointEntity)
         }
         return routeId
+    }
+
+    @Transaction
+    @Update(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun update(route: Route, waypoints: List<RouteWaypoint>): Int {
+        getRouteWithWaypoints(route.id)?.let { routeWithWaypoints ->
+            for (waypoint in routeWithWaypoints.waypoints) {
+                deleteWaypoint(waypoint)
+            }
+        }
+
+        val updates: Int = update(route)
+        // Set routeId for all related routeWaypoints
+        for (waypointEntity in waypoints) {
+            waypointEntity.routeId = route.id
+            insertWaypoint(waypointEntity)
+        }
+        return updates
     }
 
     @Insert

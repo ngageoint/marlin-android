@@ -24,6 +24,7 @@ class RouteLocalDataSource @Inject constructor(
 
     suspend fun getRoute(id: Long) = dao.getRoute(id)
     suspend fun getRouteWithWaypoints(id: Long) = dao.getRouteWithWaypoints(id)
+    fun observeRouteWithWaypoints(id: Long) = dao.observeRouteWithWaypoints(id)
 
     suspend fun insert(route: Route, waypoints: List<RouteWaypoint>) = dao.insert(route, waypoints)
     suspend fun insert(route: Route) = dao.insert(route)
@@ -31,4 +32,7 @@ class RouteLocalDataSource @Inject constructor(
 
     suspend fun delete(route: Route) = dao.delete(route)
     suspend fun deleteWaypoint(waypoint: RouteWaypoint) = dao.deleteWaypoint(waypoint)
+
+    suspend fun update(route: Route) = dao.update(route)
+    suspend fun update(route: Route, waypoints: List<RouteWaypoint>) = dao.update(route, waypoints)
 }

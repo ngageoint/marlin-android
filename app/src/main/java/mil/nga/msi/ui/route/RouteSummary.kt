@@ -49,8 +49,8 @@ fun RouteSummary(
             )
         }
 
-        val first = route.waypoints.first()
-        val last = route.waypoints.last()
+        val first = route.getSortedWaypoints().first()
+        val last = route.getSortedWaypoints().last()
 
         Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp),

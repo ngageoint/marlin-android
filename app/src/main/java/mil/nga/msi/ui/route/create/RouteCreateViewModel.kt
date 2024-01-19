@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.TileOverlayState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.runBlocking
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.route.Route
 import mil.nga.msi.datasource.route.RouteWaypoint
@@ -37,20 +38,28 @@ class RouteCreateViewModel @Inject constructor(
     val tileProvider = RouteTileProvider(application, RouteCreationTileRepository(routeCreationRepository))
     val location = locationPolicy.bestLocationProvider.value
 
-    init {
+    fun setRouteId(routeId: Long?) {
+        if (routeId != null) {
+            runBlocking {
+                val route = routeCreationRepository.setRouteId(routeId)
+                name.value = route?.name ?: ""
+            }
 
-        val newRoute = Route(
-            name = name.value,
-            createdTime = Date(),
-            updatedTime = Date()
-        )
-        routeCreationRepository.setRoute(newRoute)
-        location?.let { location2 ->
-            val waypoint = RouteWaypoint(
-                dataSource = DataSource.ROUTE_WAYPOINT,
-                itemKey = "Current Location;${location2.latitude};${location2.longitude}"
+        } else {
+            val newRoute = Route(
+                name = name.value,
+                createdTime = Date(),
+                updatedTime = Date()
             )
-            routeCreationRepository.addFirstWaypointIfEmpty(waypoint)
+            routeCreationRepository.setRoute(newRoute)
+
+            location?.let { location2 ->
+                val waypoint = RouteWaypoint(
+                    dataSource = DataSource.ROUTE_WAYPOINT,
+                    itemKey = "Current Location;${location2.latitude};${location2.longitude}"
+                )
+                routeCreationRepository.addFirstWaypointIfEmpty(waypoint)
+            }
         }
     }
 

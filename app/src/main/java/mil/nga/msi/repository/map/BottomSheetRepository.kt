@@ -35,6 +35,7 @@ import mil.nga.msi.repository.preferences.FilterRepository
 import mil.nga.msi.repository.preferences.UserPreferencesRepository
 import mil.nga.msi.repository.radiobeacon.RadioBeaconKey
 import mil.nga.msi.repository.radiobeacon.RadioBeaconRepository
+import mil.nga.msi.repository.route.RouteRepository
 import mil.nga.msi.ui.map.AnnotationProvider
 import mil.nga.msi.ui.map.cluster.MapAnnotation
 import mil.nga.sf.GeometryEnvelope
@@ -60,6 +61,7 @@ class BottomSheetRepository @Inject constructor(
    private val beaconRepository: RadioBeaconRepository,
    private val dgpsStationRepository: DgpsStationRepository,
    private val navigationalWarningRepository: NavigationalWarningRepository,
+   private val routeRepository: RouteRepository,
    private val userPreferencesRepository: UserPreferencesRepository
 ) {
    private val _mapAnnotations = MutableLiveData<List<MapAnnotation>>()
@@ -262,6 +264,87 @@ class BottomSheetRepository @Inject constructor(
             }
       } else emptyList()
 
+      val routes = if (dataSources[DataSource.ROUTE] == true) {
+         val inputEnvelopes = if (bounds.southwest.longitude > bounds.northeast.longitude) {
+            buildEnvelopesSpanning180thMeridian(
+               bounds.southwest.longitude,
+               bounds.southwest.latitude,
+               bounds.northeast.longitude,
+               bounds.northeast.latitude
+            )
+         } else {
+            listOf(
+               GeometryEnvelope(
+                  bounds.southwest.longitude,
+                  bounds.southwest.latitude,
+                  bounds.northeast.longitude,
+                  bounds.northeast.latitude
+               )
+            )
+         }
+         routeRepository
+            .getRoutes(
+               minLatitude = bounds.southwest.latitude,
+               minLongitude = bounds.southwest.longitude,
+               maxLatitude = bounds.northeast.latitude,
+               maxLongitude = bounds.northeast.longitude
+            )
+            .flatMap { route ->
+               route.getFeatures().filter { feature: Feature ->
+                  val points = getPointsForGeometry(feature.geometry.geometry)
+                  var featureCrosses180thMeridian = false
+                  var leftLong = 180.0
+                  var rightLong = -180.0
+
+                  // check if the feature crosses the 180th meridian and track the left/right bounds for that case
+                  // this assumes a route won't cross both the prime and 180th meridians
+                  for (i in 0..<points.count()) {
+                     val currentLong = points[i].x
+                     when {
+                        currentLong == 0.0 -> break
+                        currentLong > 0.0 -> leftLong = min(leftLong, currentLong)
+                        currentLong < 0.0 -> rightLong = max(rightLong, currentLong)
+                     }
+                     if (i > 0 && abs(currentLong - points[i - 1].x) > 180) {
+                        featureCrosses180thMeridian = true
+                     }
+                  }
+
+                  val featureEnvelopes = if (featureCrosses180thMeridian) {
+                     buildEnvelopesSpanning180thMeridian(
+                        leftLong,
+                        feature.geometry.geometry.envelope.minY,
+                        rightLong,
+                        feature.geometry.geometry.envelope.maxY
+                     )
+                  } else {
+                     listOf(feature.geometry.geometry.envelope)
+                  }
+
+                  inputEnvelopes.any { inputEnvelope ->
+                     featureEnvelopes.any { featureEnvelope ->
+                        inputEnvelope.intersects(featureEnvelope)
+                                || inputEnvelope.contains(featureEnvelope)
+                     }
+                  }
+               }.map { feature ->
+                  val key = MapAnnotation.Key(route.id.toString(), MapAnnotation.Type.ROUTE)
+                  val envelope = feature.geometry.geometry.envelope
+                  val centroid = envelope.centroid
+
+                  // shift center longitude 180 degrees if the shape crosses the 180th meridian
+                  val center = if (abs(envelope.maxX - envelope.minX) > 180) {
+                     val antipodalX = if (centroid.x > 0) centroid.x - 180 else centroid.x + 180
+                     Point(antipodalX, centroid.y)
+                  } else {
+                     centroid
+                  }
+
+                  MapAnnotation(key, center.y, center.x)
+               }
+            }
+      } else emptyList()
+
       val boundingBox = BoundingBox(
          bounds.southwest.latitude,
          bounds.southwest.longitude,
@@ -292,6 +375,6 @@ class BottomSheetRepository @Inject constructor(
             } catch (_: Exception) { emptyList() }
          }
 
-      asams + modus + lights + ports + beacons + dgps + navigationalWarnings + features
+      asams + modus + lights + ports + beacons + dgps + navigationalWarnings + features + routes
    }
 }

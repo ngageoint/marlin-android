@@ -44,6 +44,7 @@ import mil.nga.msi.ui.modu.sheet.ModuSheetScreen
 import mil.nga.msi.ui.navigationalwarning.sheet.NavigationalWarningSheetScreen
 import mil.nga.msi.ui.port.sheet.PortSheetScreen
 import mil.nga.msi.ui.radiobeacon.sheet.RadioBeaconSheetScreen
+import mil.nga.msi.ui.route.sheet.RouteSheetScreen
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -198,6 +199,12 @@ fun BottomSheet(
                               viewModel.deleteBookmark(bookmark)
                            }
                         }
+                     )
+                  }
+                  MapAnnotation.Type.ROUTE -> {
+                     RoutePage(
+                        annotation.key.id,
+                        onDetails = { onDetails(annotation) },
                      )
                   }
                }
@@ -384,4 +391,18 @@ private fun GeoPackageFeaturePage(
       onBookmark = onBookmark,
       modifier = Modifier.fillMaxHeight()
    )
+}
+
+@Composable
+private fun RoutePage(
+   id: String,
+   onDetails: () -> Unit,
+) {
+   id.toLongOrNull()?.let { routeId ->
+      RouteSheetScreen(
+         routeId,
+         onDetails = { onDetails() },
+         modifier = Modifier.fillMaxHeight()
+      )
+   }
 }

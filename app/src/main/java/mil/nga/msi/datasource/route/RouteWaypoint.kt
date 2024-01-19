@@ -15,6 +15,7 @@ import mil.nga.msi.datasource.navigationwarning.NavigationalWarning
 import mil.nga.msi.datasource.port.Port
 import mil.nga.msi.datasource.radiobeacon.RadioBeacon
 
+
 data class WaypointTitleAndCoordinate(val title: String, val coordinate: LatLng?)
 
 @Entity(tableName = "route_waypoints")
@@ -31,7 +32,7 @@ data class RouteWaypoint(
 
     @ColumnInfo(name = "item_key")
     val itemKey: String
-) {
+): Comparable<RouteWaypoint> {
     constructor(dataSource: DataSource, itemKey: String) : this(0, 0, dataSource, itemKey)
 
     @ColumnInfo(name = "json")
@@ -39,6 +40,12 @@ data class RouteWaypoint(
 
     @ColumnInfo(name = "order")
     var order: Int? = null
+
+    override operator fun compareTo(waypoint: RouteWaypoint): Int {
+        val otherOrder: Int = waypoint.order ?: -1
+
+        return this.order?.minus(otherOrder) ?: 0
+    }
 
     fun getTitleAndCoordinate(): WaypointTitleAndCoordinate {
         when (dataSource) {

@@ -11,8 +11,8 @@ import com.google.accompanist.navigation.material.bottomSheet
 import mil.nga.msi.ui.map.AnnotationProvider
 import mil.nga.msi.ui.navigation.MarlinAppState
 import mil.nga.msi.ui.navigation.Route
-import mil.nga.msi.ui.route.sheet.RouteBottomSheet
 import mil.nga.msi.ui.route.create.RouteCreateScreen
+import mil.nga.msi.ui.route.sheet.RouteBottomSheet
 
 sealed class RouteRoute(
     override val name: String,
@@ -21,6 +21,7 @@ sealed class RouteRoute(
 ): Route {
     data object Main: RouteRoute("routes/main", "Routes", "Routes")
     data object List: RouteRoute("routes/list", "Routes", "Routes")
+    data object Detail: RouteRoute("routes/detail", "Route", "Route")
     data object Create: RouteRoute("routes/create", "Create Route", "Create")
     data object PagerSheet: RouteRoute("routes/annotationPagerSheet", "Routes", "Routes")
 }
@@ -48,8 +49,8 @@ fun NavGraphBuilder.routesGraph(
                     appState.navController.navigate(RouteRoute.Create.name)
                 },
                 onAction = { action ->
-                    when (action) {
-                        else -> {}
+                    when(action) {
+                        else -> { action.navigate(appState.navController) }
                     }
                 }
             )
@@ -65,6 +66,18 @@ fun NavGraphBuilder.routesGraph(
                 onBack = { appState.navController.popBackStack() },
                 onMapTap = { appState.navController.navigate(RouteRoute.PagerSheet.name) },
             )
+        }
+
+        composable("${RouteRoute.Detail.name}?routeId={routeId}") { backstackEntry ->
+            bottomBarVisibility(false)
+
+            backstackEntry.arguments?.getString("routeId")?.toLongOrNull()?.let { routeId ->
+                RouteCreateScreen(
+                    routeId = routeId,
+                    onBack = { appState.navController.popBackStack() },
+                    onMapTap = { appState.navController.navigate(RouteRoute.PagerSheet.name) }
+                )
+            }
         }
 
         bottomSheet(RouteRoute.PagerSheet.name) {

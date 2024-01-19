@@ -101,6 +101,7 @@ import kotlin.math.roundToInt
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun RouteCreateScreen(
+    routeId: Long? = null,
     onBack: () -> Unit,
     viewModel: RouteCreateViewModel = hiltViewModel(),
     mapViewModel: MapViewModel = hiltViewModel(),
@@ -126,7 +127,6 @@ fun RouteCreateScreen(
     val routeTileOverlayState = rememberTileOverlayState()
     viewModel.tileOverlayState = routeTileOverlayState
 
-    var name by remember { mutableStateOf("") }
     val route by viewModel.route.observeAsState()
 
     val locationPermissionState: PermissionState = rememberPermissionState(
@@ -137,6 +137,12 @@ fun RouteCreateScreen(
 
     if (locationPermissionState.status.isGranted) {
         viewModel.setLocationEnabled(true)
+    }
+    var name by remember { mutableStateOf("") }
+
+    LaunchedEffect(routeId) {
+        viewModel.setRouteId(routeId)
+        name = viewModel.name.value
     }
 
     val waypoints by viewModel.waypoints.observeAsState(emptyList())
