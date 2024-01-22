@@ -1,7 +1,6 @@
 package mil.nga.msi.ui.map
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.*
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
@@ -114,7 +113,7 @@ class MapViewModel @Inject constructor(
    private var lightTileProvider = DataSourceTileProvider(application, lightsTileRepository)
    private var dgpsTileProvider = DataSourceTileProvider(application, dgpsStationsTileRepository)
    private var navigationWarningTileProvider = DataSourceTileProvider(application, navigationalWarningsTileRepository)
-   private var routeTileProvider = RouteTileProvider(application, routesTileRepository)
+   private var routeTileProvider = DataSourceTileProvider(application, routesTileRepository)
 
    private val searchText = MutableStateFlow("")
    fun search(text: String) {
@@ -254,7 +253,7 @@ class MapViewModel @Inject constructor(
          }
 
          if (mapped[DataSource.ROUTE] == true) {
-            routeTileProvider = RouteTileProvider(application, routesTileRepository)
+            routeTileProvider = DataSourceTileProvider(application, routesTileRepository)
             providers[TileProviderType.ROUTE] = routeTileProvider
          } else {
             providers.remove(TileProviderType.ROUTE)
@@ -331,7 +330,7 @@ class MapViewModel @Inject constructor(
       addSource(routeRepository.observeRouteMapItems().distinctUntilChanged().asLiveData()) {
          if (mapped.value?.get(DataSource.ROUTE) == true) {
             val providers = value?.toMutableMap() ?: mutableMapOf()
-            routeTileProvider = RouteTileProvider(application, routesTileRepository)
+            routeTileProvider = DataSourceTileProvider(application, routesTileRepository)
             providers[TileProviderType.ROUTE] = routeTileProvider
             value = providers
          }

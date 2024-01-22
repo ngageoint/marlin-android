@@ -13,7 +13,7 @@ import mil.nga.msi.datasource.route.RouteWaypoint
 import mil.nga.msi.location.LocationPolicy
 import mil.nga.msi.repository.map.RouteCreationTileRepository
 import mil.nga.msi.repository.route.RouteCreationRepository
-import mil.nga.msi.ui.map.overlay.RouteTileProvider
+import mil.nga.msi.ui.map.overlay.DataSourceTileProvider
 import java.util.Date
 import javax.inject.Inject
 
@@ -35,7 +35,7 @@ class RouteCreateViewModel @Inject constructor(
             routeCreationRepository.tileOverlayState = value
         }
 
-    val tileProvider = RouteTileProvider(application, RouteCreationTileRepository(routeCreationRepository))
+    val tileProvider = DataSourceTileProvider(application, RouteCreationTileRepository(routeCreationRepository))
     val location = locationPolicy.bestLocationProvider.value
 
     fun setRouteId(routeId: Long?) {

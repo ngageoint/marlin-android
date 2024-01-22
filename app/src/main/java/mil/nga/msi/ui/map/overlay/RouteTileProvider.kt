@@ -11,11 +11,6 @@ import mil.nga.sf.geojson.LineString
 import mil.nga.sf.geojson.Polygon
 import javax.inject.Inject
 
-class RouteTileProvider @Inject constructor(
-    val application: Application,
-    val repository: TileRepository
-) : DataSourceTileProvider(application, repository)
-
 class RouteImage(
     override val feature: Feature
 ): DataSourceImage {
