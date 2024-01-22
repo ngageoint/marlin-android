@@ -22,7 +22,7 @@ import mil.nga.msi.repository.map.NavigationalWarningTileRepository
 import mil.nga.msi.repository.navigationalwarning.NavigationalWarningKey
 import mil.nga.msi.repository.navigationalwarning.NavigationalWarningLocalDataSource
 import mil.nga.msi.repository.navigationalwarning.NavigationalWarningRepository
-import mil.nga.msi.ui.map.overlay.NavigationalWarningTileProvider
+import mil.nga.msi.ui.map.overlay.DataSourceTileProvider
 import javax.inject.Inject
 
 @HiltViewModel
@@ -41,7 +41,7 @@ class NavigationalWarningViewModel @Inject constructor(
 
    val tileProvider = keyFlow.map { name ->
       val tileRepository = NavigationalWarningTileRepository(name, dataSource)
-      NavigationalWarningTileProvider(application, tileRepository)
+      DataSourceTileProvider(application, tileRepository)
    }.asLiveData()
 
    @OptIn(ExperimentalCoroutinesApi::class)

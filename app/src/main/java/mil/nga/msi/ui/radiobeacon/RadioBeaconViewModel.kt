@@ -19,7 +19,7 @@ import mil.nga.msi.repository.map.RadioBeaconTileRepository
 import mil.nga.msi.repository.radiobeacon.RadioBeaconKey
 import mil.nga.msi.repository.radiobeacon.RadioBeaconLocalDataSource
 import mil.nga.msi.repository.radiobeacon.RadioBeaconRepository
-import mil.nga.msi.ui.map.overlay.RadioBeaconTileProvider
+import mil.nga.msi.ui.map.overlay.DataSourceTileProvider
 import javax.inject.Inject
 
 @HiltViewModel
@@ -39,7 +39,7 @@ class RadioBeaconViewModel @Inject constructor(
 
    val tileProvider = keyFlow.map { key ->
       val tileRepository = RadioBeaconTileRepository(key, dataSource)
-      RadioBeaconTileProvider(application, tileRepository)
+      DataSourceTileProvider(application, tileRepository)
    }.asLiveData()
 
    @OptIn(ExperimentalCoroutinesApi::class)

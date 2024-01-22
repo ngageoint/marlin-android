@@ -19,7 +19,7 @@ import mil.nga.msi.repository.bookmark.BookmarkRepository
 import mil.nga.msi.repository.map.PortTileRepository
 import mil.nga.msi.repository.port.PortLocalDataSource
 import mil.nga.msi.repository.port.PortRepository
-import mil.nga.msi.ui.map.overlay.PortTileProvider
+import mil.nga.msi.ui.map.overlay.DataSourceTileProvider
 import javax.inject.Inject
 
 @HiltViewModel
@@ -41,7 +41,7 @@ class PortViewModel @Inject constructor(
 
    val tileProvider = portNumberFlow.map { name ->
       val tileRepository = PortTileRepository(name, dataSource)
-      PortTileProvider(application, tileRepository)
+      DataSourceTileProvider(application, tileRepository)
    }.asLiveData()
 
    @OptIn(ExperimentalCoroutinesApi::class)
