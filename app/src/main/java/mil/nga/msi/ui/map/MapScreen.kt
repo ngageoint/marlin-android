@@ -2,10 +2,10 @@ package mil.nga.msi.ui.map
 
 import android.Manifest
 import android.animation.ValueAnimator
-import android.content.res.Configuration
 import android.graphics.Bitmap
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -28,14 +28,17 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.animation.doOnEnd
 import androidx.core.graphics.drawable.toBitmap
@@ -62,7 +65,9 @@ import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.cluster.MapAnnotation
 import mil.nga.msi.ui.theme.onSurfaceDisabled
 import kotlin.math.abs
+import kotlin.math.cos
 import kotlin.math.roundToInt
+import kotlin.math.sin
 import kotlin.time.Duration.Companion.seconds
 
 data class MapPosition(
@@ -87,6 +92,7 @@ fun MapScreen(
    val coordinateSystem by viewModel.coordinateSystem.observeAsState(CoordinateSystem.DMS)
    val showLocation by viewModel.showLocation.observeAsState(false)
    val showScale by viewModel.showScale.observeAsState(false)
+   var mapDataSourcesExpanded by remember { mutableStateOf(false) }
    var searchExpanded by remember { mutableStateOf(false) }
    val searchResults by viewModel.searchResults.observeAsState(emptyList())
    val filterCount by viewModel.filterCount.observeAsState(0)
@@ -374,7 +380,11 @@ fun MapScreen(
                .padding(start = 8.dp, bottom = 32.dp)
          ) {
             DataSources(
-               mapped = mapped
+               mapped = mapped,
+               expanded = mapDataSourcesExpanded,
+               onExpand = {
+                  mapDataSourcesExpanded = !mapDataSourcesExpanded
+               }
             ) {
                viewModel.toggleOnMap(it)
             }
@@ -425,6 +435,7 @@ private fun Map(
    val beaconTileProvider = tileProviders[TileProviderType.RADIO_BEACON]
    val dgpsStationTileProvider = tileProviders[TileProviderType.DGPS_STATION]
    val navigationalWarningTileProvider = tileProviders[TileProviderType.NAVIGATIONAL_WARNING]
+   val routeTileProvider = tileProviders[TileProviderType.ROUTE]
 
    val mapStyleOptions = if (isSystemInDarkTheme()) {
       MapStyleOptions.loadRawResourceStyle(context, R.raw.map_theme_night)
@@ -484,6 +495,7 @@ private fun Map(
          beaconTileProvider?.let { TileOverlay(tileProvider = it) }
          dgpsStationTileProvider?.let { TileOverlay(tileProvider = it) }
          navigationalWarningTileProvider?.let { TileOverlay(tileProvider = it) }
+         routeTileProvider?.let { TileOverlay(tileProvider = it) }
       }
 
       searchResults.forEach { result ->
@@ -759,33 +771,107 @@ private fun Search(
       }
    }
 }
-
+private fun dataSourcePosition(position: Int, arcSize: Int, radius: Float): Pair<Dp, Dp> {
+   val rangeStart = -Math.PI / 2
+   val rangeEnd = 0.0
+   val angle = rangeStart + position / (arcSize - 1).toFloat() * (rangeEnd - rangeStart)
+   return Pair((radius * cos(angle).toFloat() + 8.0f).dp, (radius * sin(angle).toFloat()).dp)
+}
 
 @Composable
 private fun DataSources(
    mapped: Map<DataSource, Boolean>,
+   expanded: Boolean,
+   onExpand: () -> Unit,
    onDataSourceToggle: (DataSource) -> Unit
 ) {
-   if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT) {
-      Column(
-         verticalArrangement = Arrangement.spacedBy(12.dp),
-         modifier = Modifier.padding(bottom = 8.dp)
-      ) {
-         DataSource.entries.filter { it.mappable }.forEach { dataSource ->
+   val alpha: Float by animateFloatAsState(if (expanded) 1f else 0f, label = "alpha animation")
+
+   Box {
+      // two arcs
+      // outer arc
+      DataSource.values().filter { it.mappable }.take(5).forEachIndexed { index, dataSource ->
+         val pair = dataSourcePosition(index, 5, 120.0f)
+         val pxToMoveX: Float by animateFloatAsState(if (expanded) with(LocalDensity.current) {
+            pair.first.toPx()
+         } else 0f, label = "x translation")
+         val pxToMoveY: Float by animateFloatAsState(if (expanded) with(LocalDensity.current) {
+            pair.second.toPx()
+         } else 0f, label = "y translation")
+         Box(
+            modifier = Modifier
+               .align(Alignment.BottomStart)
+               .graphicsLayer(
+                  alpha = alpha,
+                  translationX = pxToMoveX,
+                  translationY = pxToMoveY
+               )
+         ) {
+            DataSourceItem(dataSource = dataSource, mapped = mapped[dataSource]) {
+               if (expanded) {
+                  onDataSourceToggle(dataSource)
+               }
+            }
+         }
+      }
+      // inner arc
+      DataSource.values().filter { it.mappable }.drop(5).forEachIndexed { index, dataSource ->
+         val pair = dataSourcePosition(index, 3, 65.0f)
+         val pxToMoveX: Float by animateFloatAsState(if (expanded) with(LocalDensity.current) {
+            pair.first.toPx()
+         } else 0f, label = "x translation")
+         val pxToMoveY: Float by animateFloatAsState(if (expanded) with(LocalDensity.current) {
+            pair.second.toPx()
+         } else 0f, label = "y translation")
+         Box(
+            modifier = Modifier
+               .align(Alignment.BottomStart)
+               .graphicsLayer(
+                  alpha = alpha,
+                  translationX = pxToMoveX,
+                  translationY = pxToMoveY
+               )
+         ) {
             DataSourceItem(dataSource = dataSource, mapped = mapped[dataSource]) {
                onDataSourceToggle(dataSource)
             }
          }
       }
-   } else {
-      Row(
-         horizontalArrangement = Arrangement.spacedBy(12.dp),
-      ) {
-         DataSource.entries.filter { it.mappable }.forEach { dataSource ->
-            DataSourceItem(dataSource = dataSource, mapped = mapped[dataSource]) {
-               onDataSourceToggle(dataSource)
-            }
-         }
+
+      ExpandButton(expanded = expanded) {
+         onExpand()
+      }
+   }
+}
+
+@Composable
+private fun ExpandButton(
+   expanded: Boolean,
+   onToggle: () -> Unit
+) {
+   val tint =  MaterialTheme.colorScheme.onPrimary
+   val background = MaterialTheme.colorScheme.primary
+   val close = Icons.Default.Close
+   val bitmap = AppCompatResources.getDrawable(LocalContext.current, R.drawable.ic_marlin_600dp)!!.toBitmap().asImageBitmap()
+
+   FloatingActionButton(
+      onClick = { onToggle() },
+      containerColor = if(expanded) tint else background,
+      modifier = if (expanded) Modifier.size(40.dp) else Modifier.size(56.dp)
+   ) {
+      if (expanded) {
+         Icon(
+            imageVector = close,
+            tint = background,
+            modifier = Modifier.size(24.dp),
+            contentDescription = "Collapse map toggle")
+      } else {
+         Icon(
+            bitmap = bitmap,
+            tint = tint,
+            modifier = Modifier.size(36.dp),
+            contentDescription = "Expand map toggle"
+         )
       }
    }
 }

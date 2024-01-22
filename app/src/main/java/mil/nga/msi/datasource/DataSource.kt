@@ -13,6 +13,7 @@ import mil.nga.msi.ui.navigationalwarning.NavigationWarningRoute
 import mil.nga.msi.ui.noticetomariners.NoticeToMarinersRoute
 import mil.nga.msi.ui.port.PortRoute
 import mil.nga.msi.ui.radiobeacon.RadioBeaconRoute
+import mil.nga.msi.ui.route.list.RouteRoute
 
 data class Tab(
    val route: Route,
@@ -117,6 +118,21 @@ enum class DataSource(
       color = Color(0xFFFF9500),
       icon = R.drawable.ic_outline_bookmark_border_24,
       label = "Bookmarks",
+   ),
+
+   ROUTE(
+      tab = Tab(RouteRoute.Main, "Routes"),
+      mappable = true,
+      color = Color(0xFF000000),
+      icon = R.drawable.ic_outline_directions_24dp,
+      label = "Routes"
+   ),
+
+   ROUTE_WAYPOINT(
+      mappable = false,
+      color = Color(0xFF000000),
+      icon = R.drawable.ic_outline_directions_24dp,
+      label = "Route Waypoint"
    ),
 
    GEOPACKAGE(

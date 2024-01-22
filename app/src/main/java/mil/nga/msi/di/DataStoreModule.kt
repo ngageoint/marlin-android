@@ -18,6 +18,7 @@ import mil.nga.msi.datasource.filter.ModuFilter
 import mil.nga.msi.datasource.navigationwarning.NavigationArea
 import mil.nga.msi.di.migrations.dataStoreMigration_1_2
 import mil.nga.msi.di.migrations.dataStoreMigration_2_3
+import mil.nga.msi.di.migrations.dataStoreMigration_3_4
 import mil.nga.msi.filter.ComparatorType
 import mil.nga.msi.sort.SortDirection
 import mil.nga.msi.type.*
@@ -79,7 +80,8 @@ class DataStoreModule {
                      DataSource.DGPS_STATION,
                      DataSource.ELECTRONIC_PUBLICATION,
                      DataSource.NOTICE_TO_MARINERS,
-                     DataSource.BOOKMARK
+                     DataSource.BOOKMARK,
+                     DataSource.ROUTE
                   ).map { it.name })
                .putAllSort(sortDefaults)
                .putAllFilters(filterDefaults)
@@ -104,14 +106,15 @@ class DataStoreModule {
          produceFile = { application.applicationContext.dataStoreFile("user_preferences.pb") },
          migrations = listOf(
             dataStoreMigration_1_2,
-            dataStoreMigration_2_3
+            dataStoreMigration_2_3,
+            dataStoreMigration_3_4,
          ),
          corruptionHandler = null
       )
    }
 
    companion object {
-      const val VERSION = 3
+      const val VERSION = 4
 
       val filterDefaults = mapOf(
          DataSource.ASAM.name to Filters.newBuilder()

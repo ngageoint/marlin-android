@@ -23,11 +23,6 @@ import mil.nga.msi.repository.geocoder.GeocoderRemoteDataSource
 import mil.nga.msi.repository.layer.LayerRepository
 import mil.nga.msi.repository.light.LightRepository
 import mil.nga.msi.repository.map.*
-import mil.nga.msi.repository.map.AsamsTileRepository
-import mil.nga.msi.repository.map.DgpsStationsTileRepository
-import mil.nga.msi.repository.map.LightsTileRepository
-import mil.nga.msi.repository.map.ModusTileRepository
-import mil.nga.msi.repository.map.PortsTileRepository
 import mil.nga.msi.repository.modu.ModuRepository
 import mil.nga.msi.repository.navigationalwarning.NavigationalWarningRepository
 import mil.nga.msi.repository.port.PortRepository
@@ -36,6 +31,7 @@ import mil.nga.msi.repository.preferences.MapRepository
 import mil.nga.msi.repository.preferences.SharedPreferencesRepository
 import mil.nga.msi.repository.preferences.UserPreferencesRepository
 import mil.nga.msi.repository.radiobeacon.RadioBeaconRepository
+import mil.nga.msi.repository.route.RouteRepository
 import mil.nga.msi.type.MapLocation
 import mil.nga.msi.ui.map.overlay.*
 import javax.inject.Inject
@@ -51,7 +47,8 @@ enum class TileProviderType {
    PORT,
    RADIO_BEACON,
    DGPS_STATION,
-   NAVIGATIONAL_WARNING
+   NAVIGATIONAL_WARNING,
+   ROUTE
 }
 
 @HiltViewModel
@@ -76,6 +73,8 @@ class MapViewModel @Inject constructor(
    private val dgpsStationsTileRepository: DgpsStationsTileRepository,
    private val navigationalWarningRepository: NavigationalWarningRepository,
    private val navigationalWarningsTileRepository: NavigationalWarningsTileRepository,
+   private val routeRepository: RouteRepository,
+   private val routesTileRepository: RoutesTileRepository,
    dataSourceRepository: DataSourceRepository,
    val locationPolicy: LocationPolicy,
    private val preferencesRepository: SharedPreferencesRepository,
@@ -114,6 +113,7 @@ class MapViewModel @Inject constructor(
    private var lightTileProvider = DataSourceTileProvider(application, lightsTileRepository)
    private var dgpsTileProvider = DataSourceTileProvider(application, dgpsStationsTileRepository)
    private var navigationWarningTileProvider = DataSourceTileProvider(application, navigationalWarningsTileRepository)
+   private var routeTileProvider = DataSourceTileProvider(application, routesTileRepository)
 
    private val searchText = MutableStateFlow("")
    fun search(text: String) {
@@ -252,6 +252,13 @@ class MapViewModel @Inject constructor(
             providers.remove(TileProviderType.NAVIGATIONAL_WARNING)
          }
 
+         if (mapped[DataSource.ROUTE] == true) {
+            routeTileProvider = DataSourceTileProvider(application, routesTileRepository)
+            providers[TileProviderType.ROUTE] = routeTileProvider
+         } else {
+            providers.remove(TileProviderType.ROUTE)
+         }
+
          value = providers
       }
 
@@ -316,6 +323,15 @@ class MapViewModel @Inject constructor(
             val providers = value?.toMutableMap() ?: mutableMapOf()
             navigationWarningTileProvider = DataSourceTileProvider(application, navigationalWarningsTileRepository)
             providers[TileProviderType.NAVIGATIONAL_WARNING] = navigationWarningTileProvider
+            value = providers
+         }
+      }
+
+      addSource(routeRepository.observeRouteMapItems().distinctUntilChanged().asLiveData()) {
+         if (mapped.value?.get(DataSource.ROUTE) == true) {
+            val providers = value?.toMutableMap() ?: mutableMapOf()
+            routeTileProvider = DataSourceTileProvider(application, routesTileRepository)
+            providers[TileProviderType.ROUTE] = routeTileProvider
             value = providers
          }
       }

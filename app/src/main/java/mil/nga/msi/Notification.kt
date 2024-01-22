@@ -177,6 +177,8 @@ class MarlinNotification @Inject constructor(
          DataSource.NOTICE_TO_MARINERS -> NoticeToMarinersFetchNotificationId
          DataSource.GEOPACKAGE -> -1
          DataSource.BOOKMARK -> -1
+         DataSource.ROUTE -> 1
+         DataSource.ROUTE_WAYPOINT -> 1
       }
    }
 

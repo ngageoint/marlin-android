@@ -24,9 +24,10 @@ import mil.nga.msi.ui.port.PortViewModel
 fun PortSheetScreen(
    portNumber: Int,
    modifier: Modifier = Modifier,
-   onDetails: () -> Unit,
-   onShare: (Port) -> Unit,
-   onBookmark: (PortWithBookmark) -> Unit,
+   onDetails: (() -> Unit)? = null,
+   onShare: ((Port) -> Unit)? = null,
+   onBookmark: ((PortWithBookmark) -> Unit)? = null,
+   onRoute: ((Port) -> Unit)? = null,
    viewModel: PortViewModel = hiltViewModel()
 ) {
    viewModel.setPortNumber(portNumber)
@@ -49,16 +50,26 @@ fun PortSheetScreen(
          }
 
          Row(horizontalArrangement = Arrangement.SpaceBetween) {
-            TextButton(
-               onClick = onDetails
-            ) {
-               Text("MORE DETAILS")
+            onDetails?.let {
+               TextButton(
+                  onClick = onDetails
+               ) {
+                  Text("MORE DETAILS")
+               }
+            }
+
+            onRoute?.let {
+               TextButton(
+                  onClick = { portWithBookmark?.port?.let { onRoute(it) }}
+               ) {
+                  Text("ADD TO ROUTE")
+               }
             }
 
             DataSourceActions(
                bookmarked = portWithBookmark?.bookmark != null,
-               onShare = { portWithBookmark?.port?.let { onShare(it) } },
-               onBookmark = { portWithBookmark?.let { onBookmark(it) } },
+               onShare = onShare?.let { { portWithBookmark?.port?.let { onShare(it) } } },
+               onBookmark = onBookmark?.let { { portWithBookmark?.let { onBookmark(it) } } },
                modifier = Modifier.padding(end = 8.dp, bottom = 8.dp)
             )
          }

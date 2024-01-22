@@ -5,6 +5,12 @@ Marlin adheres to [Semantic Versioning](http://semver.org/).
 ---
 ## Pending on [`develop`](https://github.com/ngageoint/mage-server/tree/develop)
 
+## 1.4.0
+
+##### Features
+* Create routes between points
+* MODU berths are now displayed
+
 ## 1.1.2
 
 ##### Bug Fixes

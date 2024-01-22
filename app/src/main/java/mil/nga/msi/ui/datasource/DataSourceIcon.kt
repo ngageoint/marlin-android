@@ -17,12 +17,13 @@ import mil.nga.msi.datasource.DataSource
 @Composable
 fun DataSourceIcon(
    dataSource: DataSource,
-   modifier: Modifier = Modifier
+   modifier: Modifier = Modifier,
+   iconSize: Int = 48
 ) {
    Column(modifier = modifier) {
       Box(
          contentAlignment = Alignment.Center,
-         modifier = Modifier.size(48.dp)
+         modifier = Modifier.size(iconSize.dp)
       ) {
          Canvas(modifier = Modifier.fillMaxSize(), onDraw = {
             drawCircle(color = dataSource.color)
@@ -40,11 +41,13 @@ fun DataSourceIcon(
             DataSource.NOTICE_TO_MARINERS -> R.drawable.ic_baseline_campaign_24
             DataSource.PORT -> R.drawable.ic_baseline_anchor_24
             DataSource.RADIO_BEACON -> R.drawable.ic_baseline_settings_input_antenna_24
+            DataSource.ROUTE -> R.drawable.ic_outline_directions_24dp
+            DataSource.ROUTE_WAYPOINT -> R.drawable.ic_outline_directions_24dp
          }
 
          Image(
             painter = painterResource(id = imageResourceId),
-            modifier = Modifier.size(24.dp),
+            modifier = Modifier.size((iconSize / 2).dp),
             contentDescription = "Data source icon"
          )
       }

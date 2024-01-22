@@ -5,6 +5,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import com.google.android.gms.maps.model.LatLng
+import kotlinx.serialization.Serializable
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
@@ -20,6 +21,7 @@ enum class LightColor(val color: Color) {
    RACON(Color(0xFFB52BB5))
 }
 
+@Serializable
 @Entity(
    tableName = "lights",
    primaryKeys = ["volume_number", "feature_number", "characteristic_number"],
@@ -110,14 +112,17 @@ data class Light(
    @ColumnInfo(name = "section_header")
    var sectionHeader: String = ""
 
+   @kotlinx.serialization.Transient
    @Transient
    val latLng = LatLng(latitude, longitude)
 
+   @kotlinx.serialization.Transient
    @Transient
    val isFogSignal = {
       remarks?.contains("bl.", ignoreCase = true) ?: false
    }
 
+   @kotlinx.serialization.Transient
    @Transient
    val isBuoy = {
       structure?.contains("pillar", ignoreCase = true) == true ||
@@ -126,6 +131,7 @@ data class Light(
       structure?.contains("can", ignoreCase = true) == true
    }
 
+   @kotlinx.serialization.Transient
    @Transient
    val isRacon = {
       name?.let {
@@ -133,6 +139,7 @@ data class Light(
       } ?: false
    }
 
+   @kotlinx.serialization.Transient
    @Transient
    val morseCode = {
       val firstIndex = characteristic?.indexOfFirst { it == '(' }?.takeIf { it >= 0 }
@@ -292,6 +299,7 @@ data class Light(
       sectors
    }
 
+   @kotlinx.serialization.Transient
    @Transient
    val expandedCharacteristic = {
       var expanded = characteristic

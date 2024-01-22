@@ -19,6 +19,7 @@ import mil.nga.msi.datasource.navigationwarning.NavigationalWarningDao
 import mil.nga.msi.datasource.noticetomariners.NoticeToMarinersDao
 import mil.nga.msi.datasource.port.PortDao
 import mil.nga.msi.datasource.radiobeacon.RadioBeaconDao
+import mil.nga.msi.datasource.route.RouteDao
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
@@ -105,5 +106,11 @@ class RoomModule {
    @Singleton
    fun provideBookmarkDao(database: UserDatabase): BookmarkDao {
       return database.bookmarkDao()
+   }
+
+   @Provides
+   @Singleton
+   fun provideRouteDao(database: UserDatabase): RouteDao {
+      return database.routeDao()
    }
 }

@@ -6,7 +6,9 @@ import androidx.room.Entity
 import androidx.room.Index
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
+import kotlinx.serialization.Serializable
 import mil.nga.msi.datasource.port.types.EnumerationType
+import mil.nga.msi.serializer.DateSerializer
 import mil.nga.sf.geojson.Feature
 import mil.nga.sf.geojson.FeatureConverter
 import java.text.SimpleDateFormat
@@ -41,6 +43,7 @@ enum class NavigationArea(
    }
 }
 
+@Serializable
 @Entity(
    tableName = "navigational_warnings",
    primaryKeys = ["number", "year", "navigation_area"],
@@ -59,6 +62,7 @@ data class NavigationalWarning(
    @ColumnInfo(name = "navigation_area")
    var navigationArea: NavigationArea,
 
+   @Serializable(DateSerializer::class)
    @ColumnInfo(name = "issue_date")
    var issueDate: Date
 ) {
@@ -78,6 +82,7 @@ data class NavigationalWarning(
    @ColumnInfo(name = "cancel_number")
    var cancelNumber: Int? = null
 
+   @Serializable(DateSerializer::class)
    @ColumnInfo(name = "cancelDate")
    var cancelDate: Date? = null
 
@@ -102,6 +107,10 @@ data class NavigationalWarning(
    @ColumnInfo(name = "max_longitude")
    var maxLongitude: Double? = null
 
+   @kotlinx.serialization.Transient
+   @Transient
+   val latLng = bounds()?.center
+
    fun getFeatures(): List<Feature> {
       return geoJson?.let {
          FeatureConverter.toFeatureCollection(it)?.features ?: emptyList()
@@ -123,7 +132,11 @@ data class NavigationalWarning(
          builder.include(LatLng(maxY, maxX))
       }
 
-      return try { builder.build() } catch(e: Exception) { null }
+      return try {
+         builder.build()
+      } catch (e: Exception) {
+         null
+      }
    }
 
    override fun toString(): String {

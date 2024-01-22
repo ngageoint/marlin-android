@@ -15,18 +15,19 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.asam.Asam
 import mil.nga.msi.datasource.asam.AsamWithBookmark
-import mil.nga.msi.ui.datasource.DataSourceIcon
 import mil.nga.msi.ui.asam.AsamSummary
 import mil.nga.msi.ui.asam.AsamViewModel
 import mil.nga.msi.ui.datasource.DataSourceActions
+import mil.nga.msi.ui.datasource.DataSourceIcon
 
 @Composable
 fun AsamSheetScreen(
    reference: String,
    modifier: Modifier = Modifier,
-   onDetails: () -> Unit,
-   onShare: (Asam) -> Unit,
-   onBookmark: (AsamWithBookmark) -> Unit,
+   onDetails: (() -> Unit)? = null,
+   onShare: ((Asam) -> Unit)? = null,
+   onBookmark: ((AsamWithBookmark) -> Unit)? = null,
+   onRoute: ((Asam) -> Unit)? = null,
    viewModel: AsamViewModel = hiltViewModel()
 ) {
    viewModel.setAsamReference(reference)
@@ -37,7 +38,8 @@ fun AsamSheetScreen(
          asamWithBookmark = asamWithBookmark,
          onDetails = onDetails,
          onShare = onShare,
-         onBookmark = onBookmark
+         onBookmark = onBookmark,
+         onRoute = onRoute,
       )
    }
 }
@@ -45,9 +47,10 @@ fun AsamSheetScreen(
 @Composable
 private fun AsamSheetContent(
    asamWithBookmark: AsamWithBookmark?,
-   onDetails: () -> Unit,
-   onShare: (Asam) -> Unit,
-   onBookmark: (AsamWithBookmark) -> Unit,
+   onDetails: (() -> Unit)? = null,
+   onShare: ((Asam) -> Unit)? = null,
+   onBookmark: ((AsamWithBookmark) -> Unit)? = null,
+   onRoute: ((Asam) -> Unit)? = null
 ) {
    Column(modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
       DataSourceIcon(
@@ -63,16 +66,26 @@ private fun AsamSheetContent(
       }
 
       Row(horizontalArrangement = Arrangement.SpaceBetween) {
-         TextButton(
-            onClick = onDetails
-         ) {
-            Text("MORE DETAILS")
+         onDetails?.let {
+            TextButton(
+               onClick = onDetails
+            ) {
+               Text("MORE DETAILS")
+            }
+         }
+
+         onRoute?.let {
+            TextButton(
+               onClick = { asamWithBookmark?.asam?.let { onRoute(it) }}
+            ) {
+               Text("ADD TO ROUTE")
+            }
          }
 
          DataSourceActions(
             bookmarked = asamWithBookmark?.bookmark != null,
-            onShare = { asamWithBookmark?.asam?.let { onShare(it) } },
-            onBookmark = { asamWithBookmark?.let { onBookmark(it) } },
+            onShare = onShare?.let { { asamWithBookmark?.asam?.let { onShare(it) } } },
+            onBookmark = onBookmark?.let { { asamWithBookmark?.let { onBookmark(it) } } },
             modifier = Modifier.padding(end = 8.dp, bottom = 8.dp)
          )
       }

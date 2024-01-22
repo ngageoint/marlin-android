@@ -5,11 +5,16 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import mil.nga.msi.datasource.bookmark.Bookmark
 import mil.nga.msi.datasource.bookmark.BookmarkDao
+import mil.nga.msi.datasource.route.Route
+import mil.nga.msi.datasource.route.RouteDao
+import mil.nga.msi.datasource.route.RouteWaypoint
 
 @Database(
    version = UserDatabase.VERSION,
    entities = [
-      Bookmark::class
+      Bookmark::class,
+      Route::class,
+      RouteWaypoint::class
    ]
 )
 @TypeConverters(
@@ -22,4 +27,5 @@ abstract class UserDatabase : RoomDatabase() {
    }
 
    abstract fun bookmarkDao(): BookmarkDao
+   abstract fun routeDao(): RouteDao
 }
