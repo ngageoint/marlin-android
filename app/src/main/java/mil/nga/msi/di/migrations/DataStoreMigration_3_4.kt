@@ -16,6 +16,7 @@ val dataStoreMigration_3_4 = object : DataMigration<UserPreferences> {
             .toBuilder()
             .clearNonTabs()
             .addAllNonTabs(nonTabs)
+            .putMapped(DataSource.ROUTE.name, true)
             .setVersion(4)
             .build()
     }

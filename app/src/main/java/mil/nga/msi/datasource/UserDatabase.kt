@@ -23,7 +23,7 @@ import mil.nga.msi.datasource.route.RouteWaypoint
 abstract class UserDatabase : RoomDatabase() {
 
    companion object {
-      const val VERSION = 1
+      const val VERSION = 2
    }
 
    abstract fun bookmarkDao(): BookmarkDao
