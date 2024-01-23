@@ -109,6 +109,7 @@ enum class DataSource(
       color = Color(0xFFFF0000),
       icon = R.drawable.ic_baseline_campaign_24,
       label = "Notice To Mariners",
+      labelPlural = "Notice To Mariners",
       tableName = "notice_to_mariners"
    ),
 
@@ -117,7 +118,7 @@ enum class DataSource(
       mappable = false,
       color = Color(0xFFFF9500),
       icon = R.drawable.ic_outline_bookmark_border_24,
-      label = "Bookmarks",
+      label = "Bookmark",
    ),
 
    ROUTE(
@@ -125,7 +126,7 @@ enum class DataSource(
       mappable = true,
       color = Color(0xFF000000),
       icon = R.drawable.ic_outline_directions_24dp,
-      label = "Routes"
+      label = "Route"
    ),
 
    ROUTE_WAYPOINT(

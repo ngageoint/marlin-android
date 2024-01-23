@@ -9,26 +9,20 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.LocationOff
-import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.NoteAdd
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.drawable.toBitmap
 import androidx.hilt.navigation.compose.hiltViewModel
-import kotlinx.coroutines.launch
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.repository.preferences.UserPreferencesRepository.Companion.MAX_TABS
 import mil.nga.msi.ui.about.AboutRoute
@@ -139,16 +133,11 @@ fun NavigationDrawer(
                key = { _, tab -> tab.dataSource.name }
             ) { index, tab ->
                DraggableItem(dragDropState, index + 1) { isDragging ->
-                  val isMapped = mapped?.get(tab.dataSource) ?: false
 
                   NavigationRow(
                      dataSource = tab.dataSource,
                      loading = loadingState[tab.dataSource],
-                     isMapped = isMapped,
                      isDragging = isDragging,
-                     onMapClicked = {
-                        viewModel.toggleOnMap(tab.dataSource)
-                     },
                      onDestinationClicked = {
                         onDestinationClicked(tab.route.name)
                      }
@@ -177,13 +166,7 @@ fun NavigationDrawer(
                   NavigationRow(
                      dataSource = tab.dataSource,
                      loading = loadingState[tab.dataSource],
-                     isMapped = isMapped,
                      isDragging = isDragging,
-                     onMapClicked = {
-                        scope.launch {
-                           viewModel.toggleOnMap(tab.dataSource)
-                        }
-                     },
                      onDestinationClicked = {
                         onDestinationClicked(tab.route.name)
                      }
@@ -302,8 +285,6 @@ private fun NavigationRow(
    dataSource: DataSource,
    loading: Boolean?,
    isDragging: Boolean = false,
-   isMapped: Boolean,
-   onMapClicked: (() -> Unit)? = null,
    onDestinationClicked: () -> Unit
 ) {
    val elevation by animateDpAsState(if (isDragging) 4.dp else 0.dp, label = "elevation_animator")
@@ -370,36 +351,6 @@ private fun NavigationRow(
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Medium
                      )
-                  }
-
-                  if (dataSource.mappable) {
-                     var icon = Icons.Default.LocationOff
-                     var iconColor = Color.Black.copy(alpha = 0.38f)
-                     if (isMapped) {
-                        icon = Icons.Default.LocationOn
-                        iconColor = MaterialTheme.colorScheme.primary
-                     }
-
-                     IconButton(
-                        onClick = { onMapClicked?.invoke() },
-                     ) {
-                        Box(
-                           Modifier
-                              .width(24.dp)
-                              .height(24.dp)
-                              .clip(CircleShape)
-                              .background(iconColor)
-                        )
-
-                        Icon(
-                           icon,
-                           contentDescription = "Toggle On Map",
-                           tint = Color.White,
-                           modifier = Modifier
-                              .height(16.dp)
-                              .width(16.dp)
-                        )
-                     }
                   }
                }
             }
