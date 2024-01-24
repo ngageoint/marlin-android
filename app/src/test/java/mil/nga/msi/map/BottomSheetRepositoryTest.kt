@@ -83,6 +83,7 @@ class BottomSheetRepositoryTest {
          dgpsStationRepository = mockk(),
          navigationalWarningRepository = navigationalWarningRepository,
          userPreferencesRepository = userPreferencesRepository,
+         routeRepository = mockk()
       )
    }
 

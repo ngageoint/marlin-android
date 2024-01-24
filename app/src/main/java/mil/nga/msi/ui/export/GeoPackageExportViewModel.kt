@@ -124,6 +124,7 @@ class GeoPackageExportViewModel @Inject constructor(
    init {
       viewModelScope.launch {
          _commonFilters.value = emptyList()
+         @Suppress("NullSafeMutableLiveData")
          _dataSourceFilters.value = filterRepository.filters.first()
       }
    }

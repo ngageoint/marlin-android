@@ -89,8 +89,8 @@ class GeoPackageViewModel @Inject constructor(
       }
    }
 
-   private val _media = MutableLiveData<GeoPackageMediaProperty>()
-   val media: LiveData<GeoPackageMediaProperty> = _media
+   private val _media = MutableLiveData<GeoPackageMediaProperty?>()
+   val media: LiveData<GeoPackageMediaProperty?> = _media
 
    private fun getMedia(
       geoPackage: GeoPackage,

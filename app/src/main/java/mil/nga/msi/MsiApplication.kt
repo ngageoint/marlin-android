@@ -20,8 +20,8 @@ class MsiApplication: Application(), Configuration.Provider {
    @Inject lateinit var locationPolicy: LocationPolicy
    @Inject lateinit var locationFilterService: LocationFilterService
 
-   override fun getWorkManagerConfiguration() =
-      Configuration.Builder()
+   override val workManagerConfiguration: Configuration
+      get() = Configuration.Builder()
          .setWorkerFactory(workerFactory)
          .build()
 
