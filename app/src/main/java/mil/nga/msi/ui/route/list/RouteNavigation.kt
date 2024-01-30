@@ -81,7 +81,9 @@ fun NavGraphBuilder.routesGraph(
         }
 
         bottomSheet(RouteRoute.PagerSheet.name) {
-            RouteBottomSheet()
+            RouteBottomSheet(
+                close = { appState.navController.popBackStack() }
+            )
         }
     }
 }

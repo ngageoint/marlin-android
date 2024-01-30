@@ -62,6 +62,7 @@ import mil.nga.msi.ui.sheet.DataSourceSheetViewModel
 fun RouteBottomSheet(
     viewModel: DataSourceSheetViewModel = hiltViewModel(),
     routeSheetViewModel: RouteBottomSheetViewModel = hiltViewModel(),
+    close: () -> Unit,
 ) {
     val scope = rememberCoroutineScope()
     val mapAnnotations by viewModel.mapAnnotations.observeAsState(emptyList())
@@ -102,6 +103,7 @@ fun RouteBottomSheet(
                                     )
                                     waypoint.json = Json.encodeToString(value = asam)
                                     routeSheetViewModel.addWaypoint(waypoint)
+                                    close()
                                 }
                             )
                         }
@@ -115,6 +117,7 @@ fun RouteBottomSheet(
                                     )
                                     waypoint.json = Json.encodeToString(value = modu)
                                     routeSheetViewModel.addWaypoint(waypoint)
+                                    close()
                                 }
                             )
                         }
@@ -128,6 +131,7 @@ fun RouteBottomSheet(
                                     )
                                     waypoint.json = Json.encodeToString(value = light)
                                     routeSheetViewModel.addWaypoint(waypoint)
+                                    close()
                                 }
                             )
                         }
@@ -141,6 +145,7 @@ fun RouteBottomSheet(
                                     )
                                     waypoint.json = Json.encodeToString(value = port)
                                     routeSheetViewModel.addWaypoint(waypoint)
+                                    close()
                                 }
                             )
                         }
@@ -154,6 +159,7 @@ fun RouteBottomSheet(
                                     )
                                     waypoint.json = Json.encodeToString(value = beacon)
                                     routeSheetViewModel.addWaypoint(waypoint)
+                                    close()
                                 }
                             )
                         }
@@ -167,6 +173,7 @@ fun RouteBottomSheet(
                                     )
                                     waypoint.json = Json.encodeToString(value = dgps)
                                     routeSheetViewModel.addWaypoint(waypoint)
+                                    close()
                                 }
                             )
                         }
@@ -180,6 +187,7 @@ fun RouteBottomSheet(
                                     )
                                     waypoint.json = Json.encodeToString(value = navWarning)
                                     routeSheetViewModel.addWaypoint(waypoint)
+                                    close()
                                 }
                             )
                         }

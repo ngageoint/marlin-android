@@ -269,6 +269,10 @@ fun WaypointList(waypoints: List<RouteWaypoint>, viewModel: RouteCreateViewModel
         previousWaypoints = viewModel.moveWaypoint(fromIndex, toIndex)
     }
 
+    LaunchedEffect(waypoints){
+        listState.animateScrollToItem(listState.layoutInfo.totalItemsCount)
+    }
+
     LazyColumn(
         state = listState,
         horizontalAlignment = Alignment.CenterHorizontally,
