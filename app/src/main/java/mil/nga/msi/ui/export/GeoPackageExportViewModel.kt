@@ -31,10 +31,10 @@ import mil.nga.msi.filter.ComparatorType
 import mil.nga.msi.filter.Filter
 import mil.nga.msi.filter.FilterParameter
 import mil.nga.msi.filter.FilterParameterType
-import mil.nga.msi.geopackage.export.definition.AsamFeature
-import mil.nga.msi.geopackage.export.definition.DgpsStationFeature
 import mil.nga.msi.geopackage.export.Export
 import mil.nga.msi.geopackage.export.ExportStatus
+import mil.nga.msi.geopackage.export.definition.AsamFeature
+import mil.nga.msi.geopackage.export.definition.DgpsStationFeature
 import mil.nga.msi.geopackage.export.definition.LightFeature
 import mil.nga.msi.geopackage.export.definition.ModuFeature
 import mil.nga.msi.geopackage.export.definition.NavigationalWarningFeature
@@ -90,6 +90,13 @@ class GeoPackageExportViewModel @Inject constructor(
 
    private val _exportStatus = MutableLiveData<ExportState>()
    val exportState: LiveData<ExportState> = _exportStatus
+
+   val orderedDataSources = combine(
+      userPreferencesRepository.tabs,
+      userPreferencesRepository.nonTabs
+   ) { tabs, nonTabs ->
+      tabs + nonTabs
+   }.asLiveData()
 
    private val _dataSources = MutableLiveData<Set<DataSource>>()
    val dataSources: LiveData<Set<DataSource>> = _dataSources

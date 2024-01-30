@@ -12,6 +12,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -84,6 +86,7 @@ fun GeoPackageExportScreen(
    val commonFilters by viewModel.commonFilters.observeAsState(emptyList())
    val dataSourceFilters by viewModel.dataSourceFilters.observeAsState(emptyMap())
    val dataSources by viewModel.dataSources.observeAsState(emptySet())
+   val orderedDataSources by viewModel.orderedDataSources.observeAsState(emptyList())
    val exportState by viewModel.exportState.observeAsState(ExportState.None)
    var showErrorDialog by remember { mutableStateOf(false) }
    val location by viewModel.locationPolicy.bestLocationProvider.observeAsState()
@@ -122,6 +125,7 @@ fun GeoPackageExportScreen(
                   .padding(bottom = 16.dp)
             ) {
                DataSources(
+                  orderedDataSources = orderedDataSources,
                   dataSources = dataSources,
                   onDataSourceToggle = {
                      viewModel.toggleDataSource(it)
@@ -143,6 +147,7 @@ fun GeoPackageExportScreen(
                   }
                )
                DataSourceFilters(
+                  orderedDataSources = orderedDataSources,
                   dataSources = dataSources,
                   filters = dataSourceFilters,
                   filterParameters = viewModel.filterParameters,
@@ -182,8 +187,10 @@ fun GeoPackageExportScreen(
    }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun DataSources(
+   orderedDataSources: List<DataSource>,
    dataSources: Set<DataSource>,
    onDataSourceToggle: (DataSource) -> Unit
 ) {
@@ -196,11 +203,12 @@ private fun DataSources(
          )
       }
 
-      Row(
+      FlowRow(
          horizontalArrangement = Arrangement.spacedBy(12.dp),
+         verticalArrangement = Arrangement.spacedBy(12.dp),
          modifier = Modifier.padding(horizontal = 16.dp)
       ) {
-         DataSource.entries.filter { it.mappable }.forEach { dataSource ->
+         orderedDataSources.filter { it.mappable }.forEach { dataSource ->
             DataSourceItem(
                dataSource = dataSource,
                selected = dataSources.contains(dataSource)
@@ -281,6 +289,7 @@ private fun CommonFilters(
 
 @Composable
 private fun DataSourceFilters(
+   orderedDataSources: List<DataSource>,
    dataSources: Set<DataSource>,
    filters: Map<DataSource, List<Filter>>,
    filterParameters: Map<DataSource, List<FilterParameter>>,
@@ -301,7 +310,7 @@ private fun DataSourceFilters(
          )
       }
 
-      dataSources.forEach { dataSource ->
+      orderedDataSources.filter { dataSources.contains(it) }.forEach { dataSource ->
          val exportStatus = when(exportState) {
             is ExportState.Creating -> exportState.status
             is ExportState.Complete -> exportState.status
@@ -521,7 +530,7 @@ private fun DataSourceFilter(
                   ) {
                      CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
                         Text(
-                           text = "GeoPackage Detail",
+                           text = dataSource.labelPlural,
                            style = MaterialTheme.typography.bodyMedium,
                            fontWeight = FontWeight.Medium
                         )
