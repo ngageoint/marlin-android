@@ -93,6 +93,7 @@ fun MapScreen(
    val showLocation by viewModel.showLocation.observeAsState(false)
    val showScale by viewModel.showScale.observeAsState(false)
    var mapDataSourcesExpanded by remember { mutableStateOf(false) }
+   val orderedDataSources by viewModel.orderedDataSources.observeAsState(emptyList())
    var searchExpanded by remember { mutableStateOf(false) }
    val searchResults by viewModel.searchResults.observeAsState(emptyList())
    val filterCount by viewModel.filterCount.observeAsState(0)
@@ -380,6 +381,7 @@ fun MapScreen(
                .padding(start = 8.dp, bottom = 32.dp)
          ) {
             DataSources(
+               dataSources = orderedDataSources,
                mapped = mapped,
                expanded = mapDataSourcesExpanded,
                onExpand = {
@@ -780,6 +782,7 @@ private fun dataSourcePosition(position: Int, arcSize: Int, radius: Float): Pair
 
 @Composable
 private fun DataSources(
+   dataSources: List<DataSource>,
    mapped: Map<DataSource, Boolean>,
    expanded: Boolean,
    onExpand: () -> Unit,
@@ -790,7 +793,7 @@ private fun DataSources(
    Box {
       // two arcs
       // outer arc
-      DataSource.values().filter { it.mappable }.take(5).forEachIndexed { index, dataSource ->
+      dataSources.filter { it.mappable }.take(5).forEachIndexed { index, dataSource ->
          val pair = dataSourcePosition(index, 5, 120.0f)
          val pxToMoveX: Float by animateFloatAsState(if (expanded) with(LocalDensity.current) {
             pair.first.toPx()
@@ -815,7 +818,7 @@ private fun DataSources(
          }
       }
       // inner arc
-      DataSource.values().filter { it.mappable }.drop(5).forEachIndexed { index, dataSource ->
+      dataSources.filter { it.mappable }.drop(5).forEachIndexed { index, dataSource ->
          val pair = dataSourcePosition(index, 3, 65.0f)
          val pxToMoveX: Float by animateFloatAsState(if (expanded) with(LocalDensity.current) {
             pair.first.toPx()

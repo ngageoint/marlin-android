@@ -95,6 +95,13 @@ class MapViewModel @Inject constructor(
    val mapped = userPreferencesRepository.mapped.asLiveData()
    val coordinateSystem = mapRepository.coordinateSystem.asLiveData()
 
+   val orderedDataSources = combine(
+      userPreferencesRepository.tabs,
+      userPreferencesRepository.nonTabs
+   ) { tabs, nonTabs ->
+      tabs + nonTabs
+   }.asLiveData()
+
    private val _zoom = MutableLiveData<Int>()
 
    suspend fun setMapLocation(mapLocation: MapLocation, zoom: Int) {
