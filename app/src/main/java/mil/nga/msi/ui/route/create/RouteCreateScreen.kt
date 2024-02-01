@@ -150,7 +150,10 @@ fun RouteCreateScreen(
         TopBar(
             title = "Create Route",
             navigationIcon = Icons.Default.ArrowBack,
-            onNavigationClicked = { onBack() }
+            onNavigationClicked = {
+                viewModel.clearWaypoints()
+                onBack()
+            }
         )
         Surface(
             color = MaterialTheme.colorScheme.surface,

@@ -85,7 +85,7 @@ class RouteCreateViewModel @Inject constructor(
         route.value?.name = name
     }
 
-    private fun clearWaypoints() = routeCreationRepository.clearWaypoints()
+    fun clearWaypoints() = routeCreationRepository.clearWaypoints()
 
     suspend fun saveRoute() = routeCreationRepository.saveRoute()
 }
