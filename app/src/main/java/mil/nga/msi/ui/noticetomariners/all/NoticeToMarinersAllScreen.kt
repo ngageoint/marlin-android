@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material3.*
@@ -38,7 +38,7 @@ fun NoticeToMarinersAllScreen(
    Column {
       TopBar(
          title = NoticeToMarinersRoute.All.title,
-         navigationIcon = Icons.Default.ArrowBack,
+         navigationIcon = Icons.AutoMirrored.Default.ArrowBack,
          onNavigationClicked = { close() }
       )
 

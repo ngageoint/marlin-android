@@ -18,7 +18,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material3.Card
@@ -76,7 +76,7 @@ fun NavigationalWarningsScreen(
    Column(modifier = Modifier.fillMaxSize()) {
       TopBar(
          title = NavigationWarningRoute.List.title,
-         navigationIcon = Icons.Default.ArrowBack,
+         navigationIcon = Icons.AutoMirrored.Default.ArrowBack,
          onNavigationClicked = { close() }
       )
 

@@ -11,10 +11,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -47,7 +47,7 @@ fun GeoPackageMediaScreen(
    Column {
       TopBar(
          title = "GeoPackage Media",
-         navigationIcon = Icons.Default.ArrowBack,
+         navigationIcon = Icons.AutoMirrored.Default.ArrowBack,
          onNavigationClicked = { close() }
       )
 
@@ -72,7 +72,7 @@ private fun GeoPackageMedia(
          GeoPackageMediaIcon(Icons.Default.PlayArrow)
       }
       media.contentType.contains("audio/") -> {
-         GeoPackageMediaIcon(Icons.Default.VolumeUp)
+         GeoPackageMediaIcon(Icons.AutoMirrored.Default.VolumeUp)
       }
       else -> {
          GeoPackageMediaIcon(Icons.Default.AttachFile)

@@ -3,7 +3,6 @@ package mil.nga.msi.repository.radiobeacon
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.asLiveData
 import androidx.paging.testing.asPagingSourceFactory
-import androidx.work.Data
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import io.mockk.clearAllMocks

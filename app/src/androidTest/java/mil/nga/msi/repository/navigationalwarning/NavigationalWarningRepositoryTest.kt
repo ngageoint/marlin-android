@@ -2,7 +2,6 @@ package mil.nga.msi.repository.navigationalwarning
 
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.asLiveData
-import androidx.work.Data
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import io.mockk.clearAllMocks

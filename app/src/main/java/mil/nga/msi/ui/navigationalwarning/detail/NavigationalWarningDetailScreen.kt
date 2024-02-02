@@ -5,7 +5,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -51,7 +51,7 @@ fun NavigationalWarningDetailScreen(
    Column {
       TopBar(
          title = "Navigational Warning",
-         navigationIcon = Icons.Default.ArrowBack,
+         navigationIcon = Icons.AutoMirrored.Default.ArrowBack,
          onNavigationClicked = { close() }
       )
 

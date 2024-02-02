@@ -14,7 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material3.ButtonDefaults
@@ -88,7 +88,7 @@ fun NoticeToMarinersDetailScreen(
    Column(modifier = Modifier) {
       TopBar(
          title = NoticeToMarinersRoute.All.title,
-         navigationIcon = Icons.Default.ArrowBack,
+         navigationIcon = Icons.AutoMirrored.Default.ArrowBack,
          onNavigationClicked = { close() }
       )
 

@@ -9,7 +9,6 @@ class RouteLocalDataSource @Inject constructor(
     private val dao: RouteDao
 ) {
     fun observeRoutesWithWaypoints() = dao.observeRoutesWithWaypoints()
-    fun observeRoutes() = dao.observeRoutes()
     fun observeRouteMapItems() = dao.observeRouteMapItems()
 
     fun getRoutes(
@@ -19,7 +18,6 @@ class RouteLocalDataSource @Inject constructor(
         maxLongitude: Double
     ) = dao.getRoutes(minLatitude, minLongitude, maxLatitude, maxLongitude)
 
-    suspend fun getRoute(id: Long) = dao.getRoute(id)
     suspend fun getRouteWithWaypoints(id: Long) = dao.getRouteWithWaypoints(id)
     fun observeRouteWithWaypoints(id: Long) = dao.observeRouteWithWaypoints(id)
 

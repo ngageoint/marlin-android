@@ -11,7 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ModeStandby
 import androidx.compose.material.icons.outlined.Stream
 import androidx.compose.material3.Divider
@@ -57,7 +57,7 @@ fun MapLightSettingsScreen(
    Column {
       TopBar(
          title = "Light Settings",
-         navigationIcon = Icons.Default.ArrowBack,
+         navigationIcon = Icons.AutoMirrored.Default.ArrowBack,
          onNavigationClicked = { onClose() }
       )
 

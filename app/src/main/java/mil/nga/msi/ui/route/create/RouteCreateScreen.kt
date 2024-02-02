@@ -21,6 +21,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
@@ -150,7 +151,7 @@ fun RouteCreateScreen(
     Column(modifier = Modifier.fillMaxSize()) {
         TopBar(
             title = "Create Route",
-            navigationIcon = Icons.Default.ArrowBack,
+            navigationIcon = Icons.AutoMirrored.Default.ArrowBack,
             onNavigationClicked = {
                 viewModel.clearWaypoints()
                 onBack()

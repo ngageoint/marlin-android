@@ -10,8 +10,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.NoteAdd
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.NoteAdd
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -189,7 +189,7 @@ fun NavigationDrawer(
 
                         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                            Icon(
-                              Icons.Filled.NoteAdd,
+                              Icons.AutoMirrored.Filled.NoteAdd,
                               modifier = Modifier.padding(start = 8.dp),
                               contentDescription = "Submit Report to NGA"
                            )
