@@ -75,6 +75,7 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapEffect
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
+import com.google.maps.android.compose.MapsComposeExperimentalApi
 import com.google.maps.android.compose.TileOverlay
 import com.google.maps.android.compose.TileOverlayState
 import com.google.maps.android.compose.rememberCameraPositionState
@@ -292,7 +293,7 @@ fun WaypointList(waypoints: List<RouteWaypoint>, viewModel: RouteCreateViewModel
                 waypoint.itemKey
             }
         ) { index, waypoint ->
-            DraggableItem(dragDropState, index) { isDragging ->
+            DraggableItem(dragDropState, index) {
                 val dismissState = rememberDismissState(
                     confirmValueChange = {
                         if (it == DismissValue.DismissedToStart) {
@@ -355,10 +356,7 @@ private fun DismissBackground(dismissState: DismissState) {
 }
 
 @Composable
-private fun WaypointRow(
-    waypoint: RouteWaypoint,
-    isDragging: Boolean = false,
-) {
+private fun WaypointRow(waypoint: RouteWaypoint) {
     Card(
         Modifier
             .fillMaxWidth()
@@ -398,13 +396,14 @@ private fun DataSourceWaypoint(
             latLng?.let {
                 CoordinateText(
                     latLng = latLng,
-                    onCopiedToClipboard = { text -> }
+                    onCopiedToClipboard = { }
                 )
             }
         }
     }
 }
 
+@OptIn(MapsComposeExperimentalApi::class)
 @Composable
 private fun Map(
     origin: MapLocation?,

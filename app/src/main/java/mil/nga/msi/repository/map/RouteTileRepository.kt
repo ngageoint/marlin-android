@@ -1,6 +1,5 @@
 package mil.nga.msi.repository.map
 
-import mil.nga.msi.repository.preferences.FilterRepository
 import mil.nga.msi.repository.route.RouteCreationRepository
 import mil.nga.msi.repository.route.RouteLocalDataSource
 import mil.nga.msi.ui.map.overlay.DataSourceImage
@@ -30,16 +29,13 @@ class RouteCreationTileRepository @Inject constructor(
                 route.getFeatures().map {
                     RouteImage(it)
                 }
-            } else {
-                emptyList()
-            }
+            } else emptyList()
         } ?: emptyList()
     }
 }
 
 class RoutesTileRepository @Inject constructor(
-    private val localDataSource: RouteLocalDataSource,
-    private val filterRepository: FilterRepository
+    private val localDataSource: RouteLocalDataSource
 ): TileRepository {
 
     override suspend fun getTileableItems(

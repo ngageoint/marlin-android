@@ -2,8 +2,6 @@ package mil.nga.msi.di
 
 import android.app.Application
 import androidx.room.Room
-import androidx.room.migration.Migration
-import androidx.sqlite.db.SupportSQLiteDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -22,6 +20,7 @@ import mil.nga.msi.datasource.noticetomariners.NoticeToMarinersDao
 import mil.nga.msi.datasource.port.PortDao
 import mil.nga.msi.datasource.radiobeacon.RadioBeaconDao
 import mil.nga.msi.datasource.route.RouteDao
+import mil.nga.msi.di.migrations.room.roomMigration_1_2
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
@@ -36,34 +35,13 @@ class RoomModule {
          .build()
    }
 
-   private val MIGRATION_1_2 = object : Migration(1, 2) {
-      override fun migrate(database: SupportSQLiteDatabase) {
-         database.execSQL("CREATE TABLE IF NOT EXISTS `routes` " +
-                 "(`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
-                 "`createdTime` INTEGER NOT NULL, " +
-                 "`name` TEXT NOT NULL, " +
-                 "`updatedTime` INTEGER NOT NULL, " +
-                 "`distanceMeters` REAL, " +
-                 "`geoJson` TEXT, " +
-                 "`maxLatitude` REAL, " +
-                 "`maxLongitude` REAL, " +
-                 "`minLatitude` REAL, " +
-                 "`minLongitude` REAL)")
-         database.execSQL("CREATE TABLE IF NOT EXISTS `route_waypoints` " +
-                 "(`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
-                 "`route_id` INTEGER NOT NULL, " +
-                 "`data_source` TEXT NOT NULL, " +
-                 "`item_key` TEXT NOT NULL, " +
-                 "`json` TEXT, " +
-                 "`order` INTEGER)");
-      }
-   }
+
 
    @Provides
    @Singleton
    fun provideUserDatabase(application: Application): UserDatabase {
       return Room.databaseBuilder(application.applicationContext, UserDatabase::class.java, "user")
-         .addMigrations(MIGRATION_1_2)
+         .addMigrations(roomMigration_1_2)
          .build()
    }
 

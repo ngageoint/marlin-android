@@ -49,7 +49,6 @@ import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.route.RouteSummary
 import mil.nga.msi.ui.theme.remove
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RoutesScreen(
     openDrawer: () -> Unit,
@@ -72,9 +71,6 @@ fun RoutesScreen(
             Routes(
                 routes = routes,
                 onTap = { onAction(RouteAction.Tap(it))},
-                onAction = {action ->
-
-                },
                 onCreate = onCreate,
                 onDelete = {
                     runBlocking { viewModel.delete(it) }
@@ -135,7 +131,6 @@ private fun EmptyState(
 private fun Routes(
     routes: List<RouteWithWaypoints>,
     onTap: (Route) -> Unit,
-    onAction: (Action) -> Unit,
     onCreate: () -> Unit,
     onDelete: (Route) -> Unit
 ) {
@@ -175,11 +170,10 @@ private fun Routes(
                             DismissBackground(dismissState = dismissState)
                         },
                         dismissContent = {
-                            Box() {
+                            Box {
                                 RouteCard(
                                     route = route,
-                                    onTap = { onTap(route.route) },
-                                    onAction = onAction
+                                    onTap = { onTap(route.route) }
                                 )
                             }
                         }
@@ -245,15 +239,12 @@ private fun DismissBackground(dismissState: DismissState) {
 private fun RouteCard(
     route: RouteWithWaypoints,
     onTap: () -> Unit,
-    onAction: (Action) -> Unit
 ) {
     Card(
         Modifier
             .fillMaxWidth()
             .padding(bottom = 8.dp)
-            .clickable {
-                onTap()
-            }
+            .clickable { onTap() }
     ) {
         Column(Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
             RouteSummary(

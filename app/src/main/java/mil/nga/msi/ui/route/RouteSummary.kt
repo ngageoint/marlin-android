@@ -30,14 +30,13 @@ fun RouteSummary(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        route.route.name?.let { name ->
-            Text(
-                text = name,
-                style = MaterialTheme.typography.bodyLarge,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-        }
+
+        Text(
+            text = route.route.name,
+            style = MaterialTheme.typography.bodyLarge,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
 
         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
             val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
@@ -60,9 +59,9 @@ fun RouteSummary(
                 dataSource = first.dataSource,
                 iconSize = 24
             )
-            val (title, latLng) = first.getTitleAndCoordinate()
+            val firstRouteTitle = first.getTitleAndCoordinate().title
             Text(
-                text = title,
+                text = firstRouteTitle,
                 style = MaterialTheme.typography.bodySmall,
                 fontWeight = FontWeight.Medium,
                 maxLines = 1,
@@ -76,9 +75,9 @@ fun RouteSummary(
                 dataSource = last.dataSource,
                 iconSize = 24
             )
-            val (title2, latLng2) = last.getTitleAndCoordinate()
+            val lastRouteTitle = last.getTitleAndCoordinate().title
             Text(
-                text = title2,
+                text = lastRouteTitle,
                 style = MaterialTheme.typography.bodySmall,
                 fontWeight = FontWeight.Medium,
                 maxLines = 1,

@@ -77,10 +77,6 @@ class BottomSheetRepository @Inject constructor(
       return annotations.size
    }
 
-   fun clearLocation() {
-      _mapAnnotations.value = emptyList()
-   }
-
    private suspend fun getMapAnnotations(
       point: LatLng,
       bounds: LatLngBounds

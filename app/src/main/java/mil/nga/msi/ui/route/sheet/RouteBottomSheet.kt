@@ -97,7 +97,7 @@ fun RouteBottomSheet(
                             AsamPage(
                                 reference = annotation.key.id,
                                 onAddToRoute = { asam ->
-                                    var waypoint = RouteWaypoint(
+                                    val waypoint = RouteWaypoint(
                                         dataSource = DataSource.ASAM,
                                         itemKey = asam.reference
                                     )
@@ -111,7 +111,7 @@ fun RouteBottomSheet(
                             ModuPage(
                                 name = annotation.key.id,
                                 onAddToRoute = { modu ->
-                                    var waypoint = RouteWaypoint(
+                                    val waypoint = RouteWaypoint(
                                         dataSource = DataSource.MODU,
                                         itemKey = modu.name
                                     )
@@ -125,7 +125,7 @@ fun RouteBottomSheet(
                             LightPage(
                                 id = annotation.key.id,
                                 onAddToRoute = { light ->
-                                    var waypoint = RouteWaypoint(
+                                    val waypoint = RouteWaypoint(
                                         dataSource = DataSource.LIGHT,
                                         itemKey = light.id
                                     )
@@ -139,7 +139,7 @@ fun RouteBottomSheet(
                             PortPage(
                                 id = annotation.key.id,
                                 onAddToRoute = { port ->
-                                    var waypoint = RouteWaypoint(
+                                    val waypoint = RouteWaypoint(
                                         dataSource = DataSource.PORT,
                                         itemKey = port.portNumber.toString()
                                     )
@@ -153,7 +153,7 @@ fun RouteBottomSheet(
                             RadioBeaconPage(
                                 id = annotation.key.id,
                                 onAddToRoute = { beacon ->
-                                    var waypoint = RouteWaypoint(
+                                    val waypoint = RouteWaypoint(
                                         dataSource = DataSource.RADIO_BEACON,
                                         itemKey = beacon.id
                                     )
@@ -167,7 +167,7 @@ fun RouteBottomSheet(
                             DgpsStationPage(
                                 id = annotation.key.id,
                                 onAddToRoute = { dgps ->
-                                    var waypoint = RouteWaypoint(
+                                    val waypoint = RouteWaypoint(
                                         dataSource = DataSource.DGPS_STATION,
                                         itemKey = DgpsStationKey.fromDgpsStation(dgps).id()
                                     )
@@ -181,7 +181,7 @@ fun RouteBottomSheet(
                             NavigationWarningPage(
                                 id = annotation.key.id,
                                 onAddToRoute = { navWarning ->
-                                    var waypoint = RouteWaypoint(
+                                    val waypoint = RouteWaypoint(
                                         dataSource = DataSource.NAVIGATION_WARNING,
                                         itemKey = navWarning.id
                                     )
@@ -191,10 +191,8 @@ fun RouteBottomSheet(
                                 }
                             )
                         }
-                        MapAnnotation.Type.GEOPACKAGE -> {
-                        }
-                        MapAnnotation.Type.ROUTE -> {
-                        }
+                        MapAnnotation.Type.GEOPACKAGE -> {}
+                        MapAnnotation.Type.ROUTE -> {}
                     }
                 }
             }

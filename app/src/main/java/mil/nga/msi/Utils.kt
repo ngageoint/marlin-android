@@ -15,7 +15,7 @@ val ISO_OFFSET_DATE_TIME_MOD: DateTimeFormatter = DateTimeFormatter.ofPattern("u
 
 fun String.parseAsInstant() = try { Instant.from(ISO_OFFSET_DATE_TIME_MOD.parse(this)) } catch (e: DateTimeParseException) { null }
 
-fun buildEnvelopesSpanning180thMeridian(minX: Double, minY: Double, maxX: Double, maxY: Double,): List<GeometryEnvelope> {
+fun buildEnvelopesSpanning180thMeridian(minX: Double, minY: Double, maxX: Double, maxY: Double): List<GeometryEnvelope> {
    val farLeft = max(minX, maxX)
    val farRight = min(minX, maxX)
 

@@ -78,7 +78,7 @@ private fun LightContent(
 
             onRoute?.let {
                TextButton(
-                  onClick = { lightWithBookmark?.light?.let { onRoute(it) }}
+                  onClick = { onRoute(lightWithBookmark.light) }
                ) {
                   Text("ADD TO ROUTE")
                }

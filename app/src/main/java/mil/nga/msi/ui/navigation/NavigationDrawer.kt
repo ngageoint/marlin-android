@@ -38,8 +38,6 @@ fun NavigationDrawer(
    onDestinationClicked: (route: String) -> Unit,
    viewModel: NavigationViewModel = hiltViewModel()
 ) {
-   val scope = rememberCoroutineScope()
-   val mapped by viewModel.mapped.observeAsState()
    val loadingState by viewModel.fetching.observeAsState(emptyMap())
 
    val tabsPreference by viewModel.tabs.observeAsState()
@@ -161,8 +159,6 @@ fun NavigationDrawer(
                key = { _, tab -> tab.dataSource.name }
             ) { index, tab ->
                DraggableItem(dragDropState, tabs.size + index + 2) { isDragging ->
-                  val isMapped = mapped?.get(tab.dataSource) ?: false
-
                   NavigationRow(
                      dataSource = tab.dataSource,
                      loading = loadingState[tab.dataSource],

@@ -41,7 +41,7 @@ class RouteCreationRepository @Inject constructor(
         if (_route.value == null) { return }
         val value = waypoints.value?.toMutableList() ?: mutableListOf()
         if (value.isEmpty()) {
-            waypoint.order = value.size
+            waypoint.order = 0
             value.add(waypoint)
             _waypoints.value = value
         }
@@ -91,13 +91,13 @@ class RouteCreationRepository @Inject constructor(
         var distance = 0.0
         var lastCoordinate: LatLng? = null
 
-        var minLatitude: Double = 90.0
-        var minLongitude: Double = 180.0
-        var maxLatitude: Double = -90.0
-        var maxLongitude: Double = -180.0
+        var minLatitude = 90.0
+        var minLongitude = 180.0
+        var maxLatitude = -90.0
+        var maxLongitude = -180.0
 
         val points = _waypoints.value?.mapNotNull { waypoint ->
-            val (title, coordinate) = waypoint.getTitleAndCoordinate()
+            val coordinate = waypoint.getTitleAndCoordinate().coordinate
             coordinate?.let {
                 minLatitude = minOf(minLatitude, coordinate.latitude)
                 minLongitude = minOf(minLongitude, coordinate.longitude)
@@ -121,7 +121,7 @@ class RouteCreationRepository @Inject constructor(
         }
 
         if (points != null && points.size > 1) {
-            var fc = FeatureCollection()
+            val fc = FeatureCollection()
             fc.addFeature(FeatureConverter.toFeature(LineString(points)))
             _route.value?.geoJson = FeatureConverter.toStringValue(fc)
         } else {
@@ -139,10 +139,7 @@ class RouteCreationRepository @Inject constructor(
     suspend fun saveRoute() {
         route.value?.let { route ->
             if (route.id == 0L) {
-                val routeId = routeRepository.insert(
-                    route,
-                    waypoints.value ?: emptyList()
-                )
+                routeRepository.insert(route, waypoints.value ?: emptyList())
             } else {
                 routeRepository.update(route, waypoints.value ?: emptyList())
             }

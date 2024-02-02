@@ -1,8 +1,7 @@
 package mil.nga.msi.ui.navigationalwarning
 
 import android.content.Context
-import android.location.Location
-import androidx.appcompat.content.res.AppCompatResources
+import android.location.Location import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*

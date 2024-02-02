@@ -1,6 +1,5 @@
 package mil.nga.msi.ui.map.overlay
 
-import android.app.Application
 import android.content.Context
 import android.graphics.Bitmap
 import com.google.maps.android.geometry.Bounds
@@ -9,7 +8,6 @@ import mil.nga.sf.geojson.Feature
 import mil.nga.sf.geojson.GeometryType
 import mil.nga.sf.geojson.LineString
 import mil.nga.sf.geojson.Polygon
-import javax.inject.Inject
 
 class RouteImage(
     override val feature: Feature

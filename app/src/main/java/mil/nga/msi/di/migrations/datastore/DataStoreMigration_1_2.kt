@@ -1,4 +1,4 @@
-package mil.nga.msi.di.migrations
+package mil.nga.msi.di.migrations.datastore
 
 import androidx.datastore.core.DataMigration
 import mil.nga.msi.datasource.DataSource

@@ -48,14 +48,10 @@ fun NavGraphBuilder.routesGraph(
                 onCreate = {
                     appState.navController.navigate(RouteRoute.Create.name)
                 },
-                onAction = { action ->
-                    when(action) {
-                        else -> { action.navigate(appState.navController) }
-                    }
-                }
+                onAction = { it.navigate(appState.navController) }
             )
         }
-        composable("${RouteRoute.Create.name}") { backstackEntry ->
+        composable(RouteRoute.Create.name) {
             bottomBarVisibility(false)
 
             val navStackBackEntry by appState.navController.currentBackStackEntryAsState()

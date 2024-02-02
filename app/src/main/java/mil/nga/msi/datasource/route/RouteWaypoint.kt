@@ -15,7 +15,6 @@ import mil.nga.msi.datasource.navigationwarning.NavigationalWarning
 import mil.nga.msi.datasource.port.Port
 import mil.nga.msi.datasource.radiobeacon.RadioBeacon
 
-
 data class WaypointTitleAndCoordinate(val title: String, val coordinate: LatLng?)
 
 @Entity(tableName = "route_waypoints")
@@ -41,8 +40,8 @@ data class RouteWaypoint(
     @ColumnInfo(name = "order")
     var order: Int? = null
 
-    override operator fun compareTo(waypoint: RouteWaypoint): Int {
-        val otherOrder: Int = waypoint.order ?: -1
+    override operator fun compareTo(other: RouteWaypoint): Int {
+        val otherOrder: Int = other.order ?: -1
 
         return this.order?.minus(otherOrder) ?: 0
     }
@@ -122,22 +121,17 @@ data class RouteWaypoint(
             }
             DataSource.ROUTE_WAYPOINT -> {
                 val split = itemKey.split(";")
-                val title = split.get(0)
-                val latitude = split.get(1).toDoubleOrNull() ?: 0.0
-                val longitude = split.get(2).toDoubleOrNull() ?: 0.0
+                val title = split[0]
+                val latitude = split[1].toDoubleOrNull() ?: 0.0
+                val longitude = split[2].toDoubleOrNull() ?: 0.0
                 return WaypointTitleAndCoordinate(title, LatLng(latitude,longitude))
             }
-
-            DataSource.ELECTRONIC_PUBLICATION -> TODO()
-            DataSource.NOTICE_TO_MARINERS -> TODO()
-            DataSource.BOOKMARK -> TODO()
-            DataSource.ROUTE -> TODO()
-            DataSource.GEOPACKAGE -> TODO()
+            else -> {}
         }
         return WaypointTitleAndCoordinate("Marlin", null)
     }
 
-    fun getAsam(): Asam? {
+    private fun getAsam(): Asam? {
         if (dataSource != DataSource.ASAM) {
             return null
         }
@@ -147,7 +141,7 @@ data class RouteWaypoint(
         return null
     }
 
-    fun getModu(): Modu? {
+    private fun getModu(): Modu? {
         if (dataSource != DataSource.MODU) {
             return null
         }
@@ -167,7 +161,7 @@ data class RouteWaypoint(
         return null
     }
 
-    fun getLight(): Light? {
+    private fun getLight(): Light? {
         if (dataSource != DataSource.LIGHT) {
             return null
         }
@@ -177,7 +171,7 @@ data class RouteWaypoint(
         return null
     }
 
-    fun getPort(): Port? {
+    private fun getPort(): Port? {
         if (dataSource != DataSource.PORT) {
             return null
         }
@@ -187,7 +181,7 @@ data class RouteWaypoint(
         return null
     }
 
-    fun getRadioBeacon(): RadioBeacon? {
+    private fun getRadioBeacon(): RadioBeacon? {
         if (dataSource != DataSource.RADIO_BEACON) {
             return null
         }
@@ -197,7 +191,7 @@ data class RouteWaypoint(
         return null
     }
 
-    fun getDGPSStation(): DgpsStation? {
+    private fun getDGPSStation(): DgpsStation? {
         if (dataSource != DataSource.DGPS_STATION) {
             return null
         }

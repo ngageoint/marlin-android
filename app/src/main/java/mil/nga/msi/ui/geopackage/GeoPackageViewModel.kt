@@ -20,7 +20,6 @@ import mil.nga.geopackage.extension.related.RelatedTablesExtension
 import mil.nga.geopackage.map.tiles.overlay.FeatureOverlay
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.bookmark.Bookmark
-import mil.nga.msi.datasource.layer.Layer
 import mil.nga.msi.geopackage.GeoPackageMediaProperty
 import mil.nga.msi.geopackage.getFeature
 import mil.nga.msi.repository.bookmark.BookmarkRepository

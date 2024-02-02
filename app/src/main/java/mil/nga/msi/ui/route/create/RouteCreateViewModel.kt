@@ -17,10 +17,9 @@ import mil.nga.msi.ui.map.overlay.DataSourceTileProvider
 import java.util.Date
 import javax.inject.Inject
 
-
 @HiltViewModel
 class RouteCreateViewModel @Inject constructor(
-    private val application: Application,
+    application: Application,
     val locationPolicy: LocationPolicy,
     private val routeCreationRepository: RouteCreationRepository
 ): ViewModel() {

@@ -78,7 +78,7 @@ class RouteEntityTest {
 
         val updated = dao.getRoute(id)
         assertNotNull(updated)
-        assertRoutesEqual(id, route!!, updated!!)
+        assertRoutesEqual(id, route, updated!!)
     }
 
     @Test

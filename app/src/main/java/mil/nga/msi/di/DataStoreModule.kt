@@ -16,9 +16,9 @@ import mil.nga.msi.datasource.filter.AsamFilter
 import mil.nga.msi.datasource.filter.LightFilter
 import mil.nga.msi.datasource.filter.ModuFilter
 import mil.nga.msi.datasource.navigationwarning.NavigationArea
-import mil.nga.msi.di.migrations.dataStoreMigration_1_2
-import mil.nga.msi.di.migrations.dataStoreMigration_2_3
-import mil.nga.msi.di.migrations.dataStoreMigration_3_4
+import mil.nga.msi.di.migrations.datastore.dataStoreMigration_1_2
+import mil.nga.msi.di.migrations.datastore.dataStoreMigration_2_3
+import mil.nga.msi.di.migrations.datastore.dataStoreMigration_3_4
 import mil.nga.msi.filter.ComparatorType
 import mil.nga.msi.sort.SortDirection
 import mil.nga.msi.type.*

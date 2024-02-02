@@ -37,12 +37,6 @@ class NavigationViewModel @Inject constructor(
 
    val fetching = dataSourceRepository.fetching
 
-   fun toggleOnMap(dataSource: DataSource) {
-      viewModelScope.launch {
-         userPreferencesRepository.setMapped(dataSource)
-      }
-   }
-
    fun setTabs(tabs: List<Tab>) {
       viewModelScope.launch {
          userPreferencesRepository.setTabs(tabs.map { it.dataSource })
