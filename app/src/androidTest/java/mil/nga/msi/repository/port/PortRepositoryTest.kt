@@ -136,13 +136,9 @@ class PortRepositoryTest {
          workManager.getWorkInfosForUniqueWorkLiveData(any())
       } answers  {
          val workInfo = WorkInfo(
-            UUID.randomUUID(),
-            WorkInfo.State.RUNNING,
-            Data(emptyMap<String, String>()),
-            emptyList(),
-            Data(emptyMap<String, String>()),
-            0,
-            0
+            id = UUID.randomUUID(),
+            state = WorkInfo.State.RUNNING,
+            tags = emptySet()
          )
          flowOf(listOf(workInfo)).asLiveData()
       }
@@ -173,13 +169,9 @@ class PortRepositoryTest {
          workManager.getWorkInfosForUniqueWorkLiveData(any())
       } answers {
          val workInfo = WorkInfo(
-            UUID.randomUUID(),
-            WorkInfo.State.SUCCEEDED,
-            Data(emptyMap<String, String>()),
-            emptyList(),
-            Data(emptyMap<String, String>()),
-            0,
-            0
+            id = UUID.randomUUID(),
+            state = WorkInfo.State.SUCCEEDED,
+            tags = emptySet()
          )
          flowOf(listOf(workInfo)).asLiveData()
       }
