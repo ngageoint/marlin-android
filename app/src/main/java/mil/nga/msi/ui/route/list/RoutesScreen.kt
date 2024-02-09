@@ -1,6 +1,5 @@
 package mil.nga.msi.ui.route.list
 
-import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -18,9 +17,6 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.outlined.Directions
 import androidx.compose.material3.Card
-import androidx.compose.material3.DismissDirection
-import androidx.compose.material3.DismissState
-import androidx.compose.material3.DismissValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FloatingActionButton
@@ -28,15 +24,17 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.SwipeToDismiss
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberDismissState
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -152,30 +150,30 @@ private fun Routes(
                 ) { index ->
                     val route = routes[index]
 
-                    val dismissState = rememberDismissState(
+                    val positionalThreshold = with(LocalDensity.current) { 150.dp.toPx() }
+                    val dismissState = rememberSwipeToDismissBoxState(
                         confirmValueChange = {
-                            if (it == DismissValue.DismissedToStart) {
+                            if (it == SwipeToDismissBoxValue.EndToStart) {
                                 onDelete(route.route)
                                 true
                             } else false
-                        }, positionalThreshold = { 150.dp.toPx() }
+                        },
+                        positionalThreshold = { positionalThreshold }
                     )
 
-                    SwipeToDismiss(
+                    SwipeToDismissBox(
                         state = dismissState,
-                        modifier = Modifier
-                            .animateItemPlacement(),
-                        directions = setOf(DismissDirection.EndToStart),
-                        background = {
-                            DismissBackground(dismissState = dismissState)
+                        modifier = Modifier.animateItemPlacement(),
+                        enableDismissFromStartToEnd = false,
+                        enableDismissFromEndToStart = true,
+                        backgroundContent = {
+                            DismissBackground()
                         },
-                        dismissContent = {
-                            Box {
-                                RouteCard(
-                                    route = route,
-                                    onTap = { onTap(route.route) }
-                                )
-                            }
+                        content = {
+                            RouteCard(
+                                route = route,
+                                onTap = { onTap(route.route) }
+                            )
                         }
                     )
                 }
@@ -200,37 +198,24 @@ private fun Routes(
 }
 
 @Composable
-@OptIn(ExperimentalMaterial3Api::class)
-private fun DismissBackground(dismissState: DismissState) {
-    val color by animateColorAsState(
-        when (dismissState.targetValue) {
-            DismissValue.Default -> MaterialTheme.colorScheme.surface
-            else -> MaterialTheme.colorScheme.remove
-        }, label = "color_state_animator"
-    )
-
+private fun DismissBackground() {
     Card(
         Modifier
             .fillMaxWidth()
             .padding(bottom = 8.dp)
     ) {
-        Surface(
-            color = MaterialTheme.colorScheme.remove
+        Box(
+            Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.remove)
+                .padding(horizontal = 16.dp),
+            contentAlignment = Alignment.CenterEnd
         ) {
-
-            Box(
-                Modifier
-                    .fillMaxSize()
-                    .background(color)
-                    .padding(horizontal = 16.dp),
-                contentAlignment = Alignment.CenterEnd
-            ) {
-                Icon(
-                    Icons.Default.Delete,
-                    tint = MaterialTheme.colorScheme.onPrimary,
-                    contentDescription = "Delete Icon"
-                )
-            }
+            Icon(
+                Icons.Default.Delete,
+                tint = MaterialTheme.colorScheme.onPrimary,
+                contentDescription = "Delete Icon"
+            )
         }
     }
 }

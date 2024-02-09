@@ -147,7 +147,7 @@ fun NavigationalWarningGroupScreen(
                         onGroupTap(group.navigationArea)
                      }
 
-                     Divider()
+                     HorizontalDivider()
                   }
 
                   if (unparsedWarnings.isNotEmpty()) {
@@ -418,7 +418,6 @@ fun MapAnnotations(
    }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun NavigationalWarnings(
    title: String,

@@ -33,7 +33,6 @@ import mil.nga.msi.ui.export.ExportDataSource
 import mil.nga.msi.ui.port.PortRoute
 import mil.nga.msi.ui.port.PortSummary
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PortsScreen(
    openDrawer: () -> Unit,

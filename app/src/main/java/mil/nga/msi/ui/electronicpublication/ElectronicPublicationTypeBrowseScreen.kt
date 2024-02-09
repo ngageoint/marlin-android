@@ -7,8 +7,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ListItem
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ChevronRight
@@ -150,7 +148,7 @@ fun PublicationSectionsList(
                     onAction = onAction,
                 )
                 if (pubLink != section.publications.last()) {
-                    Divider(
+                    HorizontalDivider(
                         modifier = Modifier
                             .padding(start = 16.dp)
                             .background(MaterialTheme.colorScheme.background)
@@ -159,7 +157,7 @@ fun PublicationSectionsList(
             }
         }
         item {
-            Divider()
+            HorizontalDivider()
         }
     }
 }
@@ -193,7 +191,7 @@ fun PublicationList(
                         onAction = onAction
                     )
                     if (index < publicationLinks.publications.size - 1) {
-                        Divider(
+                        HorizontalDivider(
                             modifier = Modifier
                                 .padding(start = 16.dp)
                                 .background(MaterialTheme.colorScheme.background)
@@ -201,12 +199,11 @@ fun PublicationList(
                     }
                 }
             }
-            item { Divider() }
+            item { HorizontalDivider() }
         }
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun PublicationFolderList(
     folderLinks: PublicationFolders,
@@ -217,15 +214,15 @@ fun PublicationFolderList(
             items(count = folderLinks.folders.size) {
                 val folderLink = folderLinks.folders[it]
                 ListItem(
-                    text = { Text(folderLink.title) },
-                    secondaryText = { Text("${folderLink.fileCount} files") },
-                    icon = {
+                    headlineContent = { Text(folderLink.title) },
+                    supportingContent = { Text("${folderLink.fileCount} files") },
+                    leadingContent = {
                         Icon(
                             imageVector = Icons.Default.Folder,
                             contentDescription = folderLink.title
                         )
                     },
-                    trailing = {
+                    trailingContent = {
                         Icon(
                             imageVector = Icons.Default.ChevronRight,
                             contentDescription = folderLink.title
@@ -237,7 +234,7 @@ fun PublicationFolderList(
                         )
                         .padding(bottom = 8.dp)
                 )
-                Divider(Modifier.padding(start = 16.dp))
+                HorizontalDivider(Modifier.padding(start = 16.dp))
             }
         }
     }

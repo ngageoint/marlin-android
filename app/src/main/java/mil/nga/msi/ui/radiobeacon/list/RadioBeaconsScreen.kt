@@ -32,7 +32,6 @@ import mil.nga.msi.ui.export.ExportDataSource
 import mil.nga.msi.ui.radiobeacon.RadioBeaconRoute
 import mil.nga.msi.ui.radiobeacon.RadioBeaconSummary
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RadioBeaconsScreen(
    openDrawer: () -> Unit,

@@ -76,7 +76,7 @@ data class MapPosition(
    val name: String? = null
 )
 
-@OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun MapScreen(
    mapDestination : MapPosition? = null,
@@ -301,7 +301,8 @@ fun MapScreen(
                .padding(16.dp)
          ) {
             Column(
-               verticalArrangement = Arrangement.spacedBy(16.dp)
+               verticalArrangement = Arrangement.spacedBy(16.dp),
+               horizontalAlignment = Alignment.End
             ) {
                Box {
                   FloatingActionButton(
@@ -727,7 +728,7 @@ private fun Search(
                   .verticalScroll(scrollState)
             ) {
                results.forEach { result ->
-                  Divider(Modifier.padding(horizontal = 8.dp))
+                  HorizontalDivider(Modifier.padding(horizontal = 8.dp))
 
                   Row(
                      verticalAlignment = Alignment.CenterVertically,

@@ -59,8 +59,8 @@ fun ElectronicPublicationFooter(
          } ?: -1.0
          if (progress > -1) {
             LinearProgressIndicator(
-               progress = progress.toFloat(),
-               modifier = Modifier.align(Alignment.CenterVertically)
+               progress = { progress.toFloat() },
+               modifier = Modifier.align(Alignment.CenterVertically),
             )
          } else {
             LinearProgressIndicator(

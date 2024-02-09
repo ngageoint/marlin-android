@@ -12,7 +12,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -186,7 +185,7 @@ private fun Filters(
          }
       }
 
-      Divider()
+      HorizontalDivider()
    }
 }
 
@@ -653,8 +652,7 @@ private fun DateValue(
             onValueChange = { },
             enabled = false,
             colors = TextFieldDefaults.colors(
-               disabledTrailingIconColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
-               disabledTextColor = LocalContentColor.current.copy(LocalContentAlpha.current)
+               disabledTextColor = MaterialTheme.colorScheme.onSurface
             ),
             modifier = Modifier
                .fillMaxWidth()

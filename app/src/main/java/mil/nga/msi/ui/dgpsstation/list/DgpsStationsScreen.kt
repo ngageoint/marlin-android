@@ -32,7 +32,6 @@ import mil.nga.msi.ui.dgpsstation.DgpsStationSummary
 import mil.nga.msi.ui.export.ExportDataSource
 import mil.nga.msi.ui.main.TopBar
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DgpsStationsScreen(
    openDrawer: () -> Unit,

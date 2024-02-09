@@ -34,9 +34,9 @@ import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.LocalContentColor
@@ -583,12 +583,12 @@ private fun DataSourceFilter(
 
          exportStatus?.let { (total, complete) ->
             LinearProgressIndicator(
+               progress = { complete / total.toFloat() },
                modifier = Modifier.fillMaxWidth(),
-               progress = complete / total.toFloat()
             )
          }
 
-         Divider(modifier = Modifier.fillMaxWidth())
+         HorizontalDivider(modifier = Modifier.fillMaxWidth())
       }
    }
 }

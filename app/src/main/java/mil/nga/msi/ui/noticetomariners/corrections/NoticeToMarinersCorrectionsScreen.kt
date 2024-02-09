@@ -19,7 +19,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
@@ -246,7 +246,7 @@ private fun Notices(
       Column(
          modifier = Modifier.padding(horizontal = 16.dp)
       ) {
-         Divider(Modifier.padding(bottom = 16.dp))
+         HorizontalDivider(Modifier.padding(bottom = 16.dp))
 
          CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
             Text(

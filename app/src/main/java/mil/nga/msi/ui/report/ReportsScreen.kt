@@ -14,7 +14,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
@@ -69,25 +69,25 @@ fun ReportsScreen(
                onTap(ReportRoute.ASAM)
             }
 
-            Divider()
+            HorizontalDivider()
 
             Reports(ReportRoute.Observer) {
                onTap(ReportRoute.Observer)
             }
 
-            Divider()
+            HorizontalDivider()
 
             Reports(ReportRoute.MODU) {
                onTap(ReportRoute.MODU)
             }
 
-            Divider()
+            HorizontalDivider()
 
             Reports(ReportRoute.PortVisit) {
                onTap(ReportRoute.PortVisit)
             }
 
-            Divider()
+            HorizontalDivider()
 
             Reports(ReportRoute.HostileShip) {
                onTap(ReportRoute.HostileShip)

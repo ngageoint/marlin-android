@@ -3,8 +3,6 @@ package mil.nga.msi.ui.electronicpublication
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ListItem
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -36,7 +34,6 @@ fun ElectronicPublicationsScreen(
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ElectronicPublicationTypeList(pubTypes: List<PublicationTypeListItem>, onPubTypeTap: (ElectronicPublicationType) -> Unit) {
     Surface {
@@ -44,9 +41,9 @@ fun ElectronicPublicationTypeList(pubTypes: List<PublicationTypeListItem>, onPub
             pubTypes.forEach {
                 item {
                     ListItem(
-                        text = { Text(it.pubType.label) },
-                        secondaryText = { Text("${it.fileCount} files") },
-                        icon = {
+                        headlineContent = { Text(it.pubType.label) },
+                        supportingContent = { Text("${it.fileCount} files") },
+                        leadingContent = {
                             CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                                 Icon(
                                     imageVector = Icons.Default.Folder,
@@ -54,7 +51,7 @@ fun ElectronicPublicationTypeList(pubTypes: List<PublicationTypeListItem>, onPub
                                 )
                             }
                         },
-                        trailing = {
+                        trailingContent = {
                             CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                                 Icon(
                                     imageVector = Icons.Default.ChevronRight,
@@ -66,7 +63,7 @@ fun ElectronicPublicationTypeList(pubTypes: List<PublicationTypeListItem>, onPub
                             .clickable(onClick = { onPubTypeTap(it.pubType) })
                             .padding(bottom = 8.dp)
                     )
-                    Divider(Modifier.padding(start = 16.dp))
+                    HorizontalDivider(Modifier.padding(start = 16.dp))
                 }
             }
         }

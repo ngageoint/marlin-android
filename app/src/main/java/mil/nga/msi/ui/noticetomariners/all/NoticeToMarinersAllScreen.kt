@@ -78,7 +78,7 @@ private fun NoticeToMarinersItems(
                onBookmark = { onBookmark(noticeWithBookmark) }
             )
 
-            Divider(Modifier.padding(horizontal = 16.dp))
+            HorizontalDivider(Modifier.padding(horizontal = 16.dp))
          }
       }
    }

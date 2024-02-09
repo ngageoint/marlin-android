@@ -1,7 +1,6 @@
 package mil.nga.msi.ui.map.settings.layers
 
 import android.content.res.Configuration
-import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -28,20 +27,19 @@ import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.outlined.AddBox
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.DismissDirection
-import androidx.compose.material3.DismissValue
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.SwipeToDismiss
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberDismissState
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -49,6 +47,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -217,45 +216,41 @@ private fun Layers(
                items = layers,
                key = { _, state -> state.layer.id }
             ) { index, state ->
-               val dismissState = rememberDismissState(
-                  confirmValueChange = {
-                     onDelete(state.layer)
-                     true
-                  }
+               val positionalThreshold = with(LocalDensity.current) { 150.dp.toPx() }
+               val dismissState = rememberSwipeToDismissBoxState(
+                  confirmValueChange = { value ->
+                     when (value) {
+                        SwipeToDismissBoxValue.EndToStart -> {
+                           onDelete(state.layer)
+                           true
+                        }
+                        else -> false
+                     }
+                  },
+                  positionalThreshold = { positionalThreshold }
                )
 
                DraggableItem(dragDropState, index) { isDragging ->
-                  SwipeToDismiss(
+                  SwipeToDismissBox(
                      state = dismissState,
-                     directions = setOf(DismissDirection.EndToStart),
-                     background = {
-                        val color by animateColorAsState(
-                           when (dismissState.targetValue) {
-                              DismissValue.Default -> MaterialTheme.colorScheme.surface
-                              else -> MaterialTheme.colorScheme.remove
-                           }, label = "color_state_animator"
-                        )
-
-                        Surface(
-                           color = MaterialTheme.colorScheme.remove
+                     enableDismissFromStartToEnd = false,
+                     enableDismissFromEndToStart = true,
+                     backgroundContent = {
+                        Box(
+                           Modifier
+                              .fillMaxSize()
+                              .background(MaterialTheme.colorScheme.remove)
+                              .padding(horizontal = 16.dp),
+                           contentAlignment = Alignment.CenterEnd
                         ) {
-                           Box(
-                              Modifier
-                                 .fillMaxSize()
-                                 .background(color)
-                                 .padding(horizontal = 16.dp),
-                              contentAlignment = Alignment.CenterEnd
-                           ) {
-                              Icon(
-                                 Icons.Default.Delete,
-                                 tint = MaterialTheme.colorScheme.onPrimary,
-                                 contentDescription = "Delete Icon"
-                              )
-                           }
+                           Icon(
+                              Icons.Default.Delete,
+                              tint = MaterialTheme.colorScheme.onPrimary,
+                              contentDescription = "Delete Icon"
+                           )
                         }
-
                      },
-                     dismissContent = {
+                     content = {
                         Layer(
                            state = state,
                            isDragging = isDragging,
@@ -336,5 +331,5 @@ private fun Layer(
       modifier = Modifier.clickable { onTap() }
    )
 
-   Divider()
+   HorizontalDivider()
 }

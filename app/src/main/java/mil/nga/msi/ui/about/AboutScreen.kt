@@ -22,7 +22,7 @@ import androidx.compose.material.icons.filled.LocationOff
 import androidx.compose.material.icons.filled.Mail
 import androidx.compose.material.icons.filled.Policy
 import androidx.compose.material.icons.filled.PrivacyTip
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
@@ -102,15 +102,15 @@ private fun About(
             .verticalScroll(scrollState)
       ) {
          Disclaimer { onDisclaimer() }
-         Divider(Modifier.padding(start = 16.dp))
+         HorizontalDivider(Modifier.padding(start = 16.dp))
          Privacy { onPrivacy() }
-         Divider(Modifier.padding(start = 16.dp))
+         HorizontalDivider(Modifier.padding(start = 16.dp))
          Acknowledgements {
             context.startActivity(Intent(context, OssLicensesMenuActivity::class.java))
          }
-         Divider(Modifier.padding(start = 16.dp))
+         HorizontalDivider(Modifier.padding(start = 16.dp))
          Contact { onContact() }
-         Divider(Modifier.padding(start = 16.dp))
+         HorizontalDivider(Modifier.padding(start = 16.dp))
          Version(
             developer = developer,
             onDeveloperMode = onDeveloperMode

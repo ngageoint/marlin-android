@@ -4,7 +4,6 @@ import android.Manifest
 import android.animation.ValueAnimator
 import android.graphics.Bitmap
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -22,22 +21,19 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.DismissDirection
-import androidx.compose.material3.DismissState
-import androidx.compose.material3.DismissValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.SwipeToDismiss
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.rememberDismissState
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -51,6 +47,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -295,23 +292,26 @@ fun WaypointList(waypoints: List<RouteWaypoint>, viewModel: RouteCreateViewModel
             }
         ) { index, waypoint ->
             DraggableItem(dragDropState, index) {
-                val dismissState = rememberDismissState(
+
+                val positionalThreshold = with(LocalDensity.current) { 150.dp.toPx() }
+                val dismissState = rememberSwipeToDismissBoxState(
                     confirmValueChange = {
-                        if (it == DismissValue.DismissedToStart) {
+                        if (it == SwipeToDismissBoxValue.EndToStart) {
                             viewModel.removeWaypoint(waypoint)
                             true
                         } else false
-                    }, positionalThreshold = { 150.dp.toPx() }
-                )
-                SwipeToDismiss(
-                    state = dismissState,
-                    modifier = Modifier
-                        .animateItemPlacement(),
-                    directions = setOf(DismissDirection.EndToStart),
-                    background = {
-                        DismissBackground(dismissState = dismissState)
                     },
-                    dismissContent = {
+                    positionalThreshold = { positionalThreshold }
+                )
+                SwipeToDismissBox(
+                    state = dismissState,
+                    modifier = Modifier.animateItemPlacement(),
+                    enableDismissFromStartToEnd = false,
+                    enableDismissFromEndToStart = true,
+                    backgroundContent = {
+                        DismissBackground()
+                    },
+                    content = {
                         WaypointRow(waypoint = waypoint)
                     }
                 )
@@ -321,37 +321,24 @@ fun WaypointList(waypoints: List<RouteWaypoint>, viewModel: RouteCreateViewModel
 }
 
 @Composable
-@OptIn(ExperimentalMaterial3Api::class)
-private fun DismissBackground(dismissState: DismissState) {
-    val color by animateColorAsState(
-        when (dismissState.targetValue) {
-            DismissValue.Default -> MaterialTheme.colorScheme.surface
-            else -> MaterialTheme.colorScheme.remove
-        }, label = "color_state_animator"
-    )
-
+private fun DismissBackground() {
     Card(
         Modifier
             .fillMaxWidth()
             .padding(bottom = 8.dp)
     ) {
-        Surface(
-            color = MaterialTheme.colorScheme.remove
+        Box(
+            Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.remove)
+                .padding(horizontal = 16.dp),
+            contentAlignment = Alignment.CenterEnd
         ) {
-
-            Box(
-                Modifier
-                    .fillMaxSize()
-                    .background(color)
-                    .padding(horizontal = 16.dp),
-                contentAlignment = Alignment.CenterEnd
-            ) {
-                Icon(
-                    Icons.Default.Delete,
-                    tint = MaterialTheme.colorScheme.onPrimary,
-                    contentDescription = "Delete Icon"
-                )
-            }
+            Icon(
+                Icons.Default.Delete,
+                tint = MaterialTheme.colorScheme.onPrimary,
+                contentDescription = "Delete Icon"
+            )
         }
     }
 }

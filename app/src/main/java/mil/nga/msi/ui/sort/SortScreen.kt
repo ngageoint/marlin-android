@@ -19,9 +19,9 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.RemoveCircle
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
@@ -137,7 +137,7 @@ private fun Sort(
 
          Column(Modifier.animateContentSize()) {
             if (parameters.isNotEmpty()) {
-               Divider(Modifier.fillMaxWidth())
+               HorizontalDivider(Modifier.fillMaxWidth())
 
                SortField(
                   title = "Secondary Sort Field",

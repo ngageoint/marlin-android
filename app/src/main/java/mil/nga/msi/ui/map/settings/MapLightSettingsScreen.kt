@@ -14,7 +14,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ModeStandby
 import androidx.compose.material.icons.outlined.Stream
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
@@ -182,7 +182,7 @@ private fun Options(
          }
       }
 
-      Divider(
+      HorizontalDivider(
          modifier = Modifier
             .padding(start = 64.dp)
             .background(MaterialTheme.colorScheme.background)

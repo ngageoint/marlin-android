@@ -353,6 +353,6 @@ private fun NavigationRow(
          }
       }
 
-      Divider(Modifier.fillMaxWidth())
+      HorizontalDivider(Modifier.fillMaxWidth())
    }
 }

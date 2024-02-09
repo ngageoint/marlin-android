@@ -1,14 +1,13 @@
 package mil.nga.msi.ui.location
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.AlertDialog
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.TextButton
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Place
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -61,29 +60,29 @@ fun LocationPermissionDeniedDialog(
 
    if (openDialog) {
       AlertDialog(
-         onDismissRequest = { },
+         onDismissRequest = {
+            openDialog = false
+         },
+         icon = {
+            Icon(imageVector = Icons.Default.Place, contentDescription = "Place icon")
+         },
          title = {
             Text(
                text = "Marlin Location Services",
-               style = MaterialTheme.typography.h6
+               style = MaterialTheme.typography.titleLarge
             )
          },
          text = {
             Text(text = "Marlin will use your location to determine the navigation area you currently reside to show you the most relevant navigational warnings")
          },
-         buttons = {
-            Row(
-               horizontalArrangement = Arrangement.End,
-               modifier = Modifier.fillMaxWidth()
-            ) {
-               TextButton(
-                  onClick = {
-                     openDialog = false
-                     onConfirm?.invoke()
-                  }
-               ) {
-                  Text("OK")
+         confirmButton = {
+            TextButton(
+               onClick = {
+                  openDialog = false
+                  onConfirm?.invoke()
                }
+            ) {
+               Text("OK")
             }
          }
       )

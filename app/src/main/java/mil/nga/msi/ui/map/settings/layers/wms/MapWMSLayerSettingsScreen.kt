@@ -10,11 +10,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Checkbox
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.ListItem
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ExpandMore
@@ -22,6 +18,10 @@ import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material.icons.outlined.Layers
 import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -217,7 +217,6 @@ private fun WMSLayer(
    }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun WMSCapabilitiesLayer(
    layer: mil.nga.msi.network.layer.wms.Layer,
@@ -227,14 +226,14 @@ private fun WMSCapabilitiesLayer(
 ) {
    if (layer.layers.isNotEmpty()) {
       ListItem(
-         text = {
+         headlineContent = {
             Text(
                text = layer.title ?: "Folder",
                maxLines = 1,
                overflow = TextOverflow.Ellipsis
             )
          },
-         secondaryText = {
+         supportingContent = {
             layer.abstract?.let {
                Text(
                   text = it,
@@ -243,13 +242,13 @@ private fun WMSCapabilitiesLayer(
                )
             }
          },
-         icon = {
+         leadingContent = {
             Icon(
                Icons.Outlined.Folder,
                contentDescription = "Folder"
             )
          },
-         trailing = {
+         trailingContent = {
             IconButton(
                onClick = { onZoom(layer) }
             ) {
@@ -271,14 +270,14 @@ private fun WMSCapabilitiesLayer(
       }
    } else if (layer.hasTiles()) {
       ListItem(
-         text = {
+         headlineContent = {
             Text(
                text = layer.title ?: "Layer",
                maxLines = 1,
                overflow = TextOverflow.Ellipsis
             )
          },
-         secondaryText = {
+         supportingContent = {
             layer.abstract?.let {
                Text(
                   text = it,
@@ -287,13 +286,13 @@ private fun WMSCapabilitiesLayer(
                )
             }
          },
-         icon = {
+         leadingContent = {
             Icon(
                Icons.Outlined.Layers,
                contentDescription = "Layer"
             )
          },
-         trailing = {
+         trailingContent = {
             Row {
                IconButton(onClick = { onZoom(layer) }) {
                   Icon(Icons.Default.MyLocation, contentDescription = "Zoom to GeoPackage Bounds")

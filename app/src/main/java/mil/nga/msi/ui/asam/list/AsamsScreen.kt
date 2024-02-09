@@ -31,7 +31,6 @@ import mil.nga.msi.ui.datasource.DataSourceActions
 import mil.nga.msi.ui.export.ExportDataSource
 import mil.nga.msi.ui.main.TopBar
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AsamsScreen(
    openDrawer: () -> Unit,

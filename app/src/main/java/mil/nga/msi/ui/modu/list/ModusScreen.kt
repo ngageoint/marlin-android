@@ -32,7 +32,6 @@ import mil.nga.msi.ui.export.ExportDataSource
 import mil.nga.msi.ui.modu.ModuRoute
 import mil.nga.msi.ui.modu.ModuSummary
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ModusScreen(
    openDrawer: () -> Unit,
