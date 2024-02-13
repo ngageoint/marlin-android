@@ -31,7 +31,8 @@ data class GeocoderState(
 }
 
 class GeocoderRemoteDataSource @Inject constructor(
-   private val geocoder: Geocoder
+   private val geocoder: Geocoder,
+   private val nominatimSearchProvider: NominatimSearchProvider
 ) {
    suspend fun geocode(text: String, searchType: SearchType): List<GeocoderState> { // make this take in searchType
       val dms = DMS.from(text)
@@ -76,17 +77,17 @@ class GeocoderRemoteDataSource @Inject constructor(
    private suspend fun fetchAddresses(
       text: String,
       searchType: SearchType
-   ) = suspendCoroutine { continuation ->
-      when(searchType) {
+   ): List<GeocoderState> {
+      return when (searchType) {
          SearchType.NATIVE -> {
-            geocoder.getFromLocationName(text) {
-               continuation.resumeWith(Result.success(it))
+            suspendCoroutine { continuation ->
+               geocoder.getFromLocationName(text) {
+                  continuation.resumeWith(Result.success(it))
+               }
             }
          }
          SearchType.NOMINATIM -> {
-            NominatimSearchProvider.search(text){
-               continuation.resumeWith(Result.success(it))
-            }
+            nominatimSearchProvider.search(text)
          }
       }
    }

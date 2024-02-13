@@ -1,15 +1,16 @@
-package mil.nga.msi.repository.geocoder
+package mil.nga.msi.search
 
 import android.location.Geocoder
 import com.google.android.gms.maps.model.LatLng
-import io.mockk.every
+import io.mockk.coEvery
 import io.mockk.mockk
-import io.mockk.mockkObject
 import io.mockk.mockkStatic
 import io.mockk.unmockkAll
 import io.mockk.verify
 import kotlinx.coroutines.test.runTest
 import mil.nga.msi.geocoder.getFromLocationName
+import mil.nga.msi.repository.geocoder.GeocoderRemoteDataSource
+import mil.nga.msi.repository.geocoder.GeocoderState
 import mil.nga.msi.ui.map.search.NominatimSearchProvider
 import mil.nga.msi.ui.map.search.SearchType
 import org.junit.After
@@ -21,13 +22,14 @@ class GeocoderRemoteDataSourceTest {
 
    private lateinit var mockGeocoder: Geocoder
    private lateinit var geocoderRemoteDataSource: GeocoderRemoteDataSource
+   private lateinit var mockNominatimSearchProvider: NominatimSearchProvider
 
    @Before
    fun setUp() {
       mockkStatic("mil.nga.msi.geocoder.GeocoderKt")
-      mockkObject(NominatimSearchProvider.Companion)
+      mockNominatimSearchProvider = mockk<NominatimSearchProvider>()
       mockGeocoder = mockk<Geocoder>()
-      geocoderRemoteDataSource = GeocoderRemoteDataSource(mockGeocoder)
+      geocoderRemoteDataSource = GeocoderRemoteDataSource(mockGeocoder, mockNominatimSearchProvider)
    }
 
    @After
@@ -44,14 +46,12 @@ class GeocoderRemoteDataSourceTest {
    @Test
    fun should_search_nominatim_api() = runTest {
       // mock response from search provider
-      every { NominatimSearchProvider.search(any(), any()) } answers {
-         secondArg<(List<GeocoderState>) -> Unit>().invoke(
-            listOf(
-               GeocoderState(
-                  name = "Test Location",
-                  location = LatLng(5.0, 5.0),
-                  address = "123 Test Street"
-               )
+      coEvery { mockNominatimSearchProvider.search("Test") } answers {
+         listOf(
+            GeocoderState(
+               name = "Test Location",
+               location = LatLng(5.0, 5.0),
+               address = "123 Test Street"
             )
          )
       }
