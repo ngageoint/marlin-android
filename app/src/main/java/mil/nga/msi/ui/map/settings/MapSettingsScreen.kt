@@ -44,6 +44,7 @@ import mil.nga.msi.R
 import mil.nga.msi.coordinate.CoordinateSystem
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.BaseMapType
+import mil.nga.msi.ui.map.search.SearchType
 
 @Composable
 fun MapSettingsScreen(
@@ -60,6 +61,7 @@ fun MapSettingsScreen(
    val showLocation by viewModel.showLocation.observeAsState(false)
    val showScale by viewModel.showScale.observeAsState(false)
    val coordinateSystem by viewModel.coordinateSystem.observeAsState()
+   val searchType by viewModel.searchType.observeAsState()
 
    Column {
       TopBar(
@@ -91,6 +93,12 @@ fun MapSettingsScreen(
             Layers { onLayers() }
 
             DataSourceSettings(onLightSettings)
+
+            searchType?.let { searchType ->
+               SearchType(searchType) {
+                  viewModel.setSearchType(it)
+               }
+            }
 
             DisplaySettings(
                showLocation = showLocation,
@@ -344,6 +352,94 @@ private fun LightSettings(
                text = "Light Settings",
                style = MaterialTheme.typography.bodyLarge
             )
+         }
+      }
+   }
+}
+
+@Composable
+private fun SearchType(
+   searchType: SearchType,
+   onSearchTypeSelected: (SearchType) -> Unit
+) {
+   var openDialog by remember { mutableStateOf(false)  }
+
+   Column(Modifier.padding(bottom = 16.dp)) {
+      Text(
+         text = "Search",
+         style = MaterialTheme.typography.titleMedium,
+         fontWeight = FontWeight.Medium,
+         modifier = Modifier.padding(top = 32.dp, bottom = 16.dp, start = 32.dp, end = 32.dp)
+      )
+
+      Row(
+         verticalAlignment = Alignment.CenterVertically,
+         modifier = Modifier
+            .fillMaxWidth()
+            .clickable { openDialog = true }
+            .padding(vertical = 8.dp, horizontal = 32.dp)
+      ) {
+         Column {
+            Text(
+               text = "Search Type",
+               style = MaterialTheme.typography.bodyLarge
+            )
+
+            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+               Text(
+                  text = searchType.title,
+                  style = MaterialTheme.typography.bodyMedium
+               )
+            }
+         }
+      }
+
+      if (openDialog) {
+         SearchTypeDialog(searchType) {
+            onSearchTypeSelected(it)
+            openDialog = false
+         }
+      }
+   }
+}
+
+@Composable
+fun SearchTypeDialog(
+   currentSearchType: SearchType,
+   onSearchTypeSelected: (SearchType) -> Unit
+) {
+   Dialog(onDismissRequest = { onSearchTypeSelected(currentSearchType) }) {
+      Surface(
+         shape = RoundedCornerShape(4.dp)
+      ) {
+         Column(Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp)) {
+            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
+               Text(
+                  text = "Search Type",
+                  style = MaterialTheme.typography.titleLarge,
+                  modifier = Modifier
+                     .height(64.dp)
+                     .wrapContentHeight(align = Alignment.CenterVertically)
+               )
+            }
+
+            SearchType.entries.forEach { searchType ->
+               Row(
+                  verticalAlignment = Alignment.CenterVertically,
+                  modifier = Modifier.fillMaxWidth()
+               ) {
+                  RadioButton(
+                     selected = searchType == currentSearchType,
+                     onClick = {
+                        onSearchTypeSelected(searchType)
+                     }
+                  )
+                  Text(
+                     text = searchType.title,
+                     modifier = Modifier.fillMaxWidth()
+                  )
+               }
+            }
          }
       }
    }

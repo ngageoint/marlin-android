@@ -123,6 +123,8 @@ class MapViewModel @Inject constructor(
    private var navigationWarningTileProvider = DataSourceTileProvider(application, navigationalWarningsTileRepository)
    private var routeTileProvider = DataSourceTileProvider(application, routesTileRepository)
 
+   val searchType = mapRepository.searchType.asLiveData()
+
    private val searchText = MutableStateFlow("")
    fun search(text: String) {
       searchText.value = text
@@ -131,7 +133,7 @@ class MapViewModel @Inject constructor(
    val searchResults = searchText
       .map {
          if (it.isNotEmpty()) {
-            geocoderRemoteDataSource.geocode(it, SearchType.NATIVE)
+            geocoderRemoteDataSource.geocode(it, searchType.value ?: SearchType.NATIVE)
          } else emptyList()
       }.flowOn(Dispatchers.IO)
       .asLiveData()

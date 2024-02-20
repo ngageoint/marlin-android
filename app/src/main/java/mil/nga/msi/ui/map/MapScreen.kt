@@ -11,6 +11,8 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.Download
@@ -37,6 +39,8 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -63,6 +67,7 @@ import mil.nga.msi.ui.coordinate.CoordinateText
 import mil.nga.msi.ui.location.LocationPermission
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.cluster.MapAnnotation
+import mil.nga.msi.ui.map.search.SearchType
 import mil.nga.msi.ui.theme.onSurfaceDisabled
 import kotlin.math.abs
 import kotlin.math.cos
@@ -96,6 +101,7 @@ fun MapScreen(
    val orderedDataSources by viewModel.orderedDataSources.observeAsState(emptyList())
    var searchExpanded by remember { mutableStateOf(false) }
    val searchResults by viewModel.searchResults.observeAsState(emptyList())
+   val searchType by viewModel.searchType.observeAsState(SearchType.NATIVE)
    val filterCount by viewModel.filterCount.observeAsState(0)
    val fetching by viewModel.fetching.observeAsState(emptyMap())
    var fetchingVisibility by rememberSaveable { mutableStateOf(true) }
@@ -360,7 +366,9 @@ fun MapScreen(
                   searchExpanded = !searchExpanded
                },
                onTextChanged = {
-                  viewModel.search(it)
+                  if(searchType == SearchType.NATIVE){
+                     viewModel.search(it)
+                  }
                },
                onLocationTap = {
                   destination = MapPosition(
@@ -372,7 +380,10 @@ fun MapScreen(
                         .build()
                   )
                },
-               onLocationCopy = locationCopy
+               onLocationCopy = locationCopy,
+               onSubmit = {
+                  viewModel.search(it)
+               }
             )
          }
 
@@ -623,7 +634,8 @@ private fun Search(
    onExpand: () -> Unit,
    onTextChanged: (String) -> Unit,
    onLocationTap: (LatLng) -> Unit,
-   onLocationCopy: (String) -> Unit
+   onLocationCopy: (String) -> Unit,
+   onSubmit: (String) -> Unit
 ) {
    val focusRequester = remember { FocusRequester() }
    val configuration = LocalConfiguration.current
@@ -665,7 +677,12 @@ private fun Search(
                )
                .height(40.dp)
                .width(width)
-               .focusRequester(focusRequester)
+               .focusRequester(focusRequester),
+            keyboardOptions = KeyboardOptions(
+               keyboardType = KeyboardType.Text,
+               imeAction = ImeAction.Search
+            ),
+            keyboardActions = KeyboardActions(onSearch = { onSubmit(text) }),
          ) {
             TextFieldDefaults.DecorationBox(
                value = text,
@@ -690,7 +707,7 @@ private fun Search(
                   IconButton(
                      onClick = {
                         text = ""
-                        onTextChanged("")
+                        onSubmit("")
                      }
                   ) {
                      Icon(
