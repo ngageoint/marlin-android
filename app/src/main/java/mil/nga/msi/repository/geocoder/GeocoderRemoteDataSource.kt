@@ -34,7 +34,7 @@ class GeocoderRemoteDataSource @Inject constructor(
    private val geocoder: Geocoder,
    private val nominatimSearchProvider: NominatimSearchProvider
 ) {
-   suspend fun geocode(text: String, searchType: SearchType): List<GeocoderState> { // make this take in searchType
+   suspend fun geocode(text: String, searchType: SearchType): List<GeocoderState> {
       val dms = DMS.from(text)
       return if (dms != null) {
          val state = GeocoderState(
