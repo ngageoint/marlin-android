@@ -1,6 +1,7 @@
 package mil.nga.msi.ui.map.settings
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -35,10 +37,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import mil.nga.msi.R
 import mil.nga.msi.coordinate.CoordinateSystem
@@ -408,6 +414,16 @@ fun SearchTypeDialog(
    currentSearchType: SearchType,
    onSearchTypeSelected: (SearchType) -> Unit
 ) {
+   val context = LocalContext.current
+   val attribution = buildAnnotatedString {
+      append("Nominatim data is provided by ")
+      pushStringAnnotation(tag = "osmLink", annotation = "https://www.openstreetmap.org/copyright/")
+      withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary)) {
+         append("OpenStreetMap")
+      }
+      pop()
+      append(".")
+   }
    Dialog(onDismissRequest = { onSearchTypeSelected(currentSearchType) }) {
       Surface(
          shape = RoundedCornerShape(4.dp)
@@ -440,6 +456,17 @@ fun SearchTypeDialog(
                   )
                }
             }
+            ClickableText(
+               text = attribution,
+               onClick = { clickedOffset ->
+                  attribution.getStringAnnotations(tag = "osmLink", start = clickedOffset, end = clickedOffset)
+                     .firstOrNull()?.let {
+                        val intent = Intent(Intent.ACTION_VIEW)
+                        intent.setData(it.item.toUri())
+                        context.startActivity(intent)
+                     }
+               }
+            )
          }
       }
    }
