@@ -168,7 +168,7 @@ class NetworkModule {
    @Singleton
    fun provideNominatimSearchService(retrofit: Retrofit): NominatimSearchService {
       return retrofit.newBuilder()
-         .baseUrl("https://nominatim.openstreetmap.org/")
+         .baseUrl("https://osm-nominatim.gs.mil/")
          .build()
          .create(NominatimSearchService::class.java)
    }

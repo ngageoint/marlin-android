@@ -37,46 +37,42 @@ class NominatimSearchServiceTest {
       val mockResponse = """
          [
              {
-                 "place_id": 4238259,
-                 "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+                 "place_id": 294586699,
+                 "licence": "Data © OpenStreetMap contributors, ODbL 1.0. https://osm.org/copyright",
                  "osm_type": "relation",
                  "osm_id": 5396194,
-                 "lat": "38.8950368",
-                 "lon": "-77.0365427",
-                 "class": "boundary",
-                 "type": "administrative",
-                 "place_rank": 12,
-                 "importance": 0.7492888986115819,
-                 "addresstype": "city",
-                 "name": "Washington",
-                 "display_name": "Washington, District of Columbia, United States",
                  "boundingbox": [
                      "38.7916303",
-                     "38.9959680",
+                     "38.995968",
                      "-77.1197949",
-                     "-76.9093660"
-                 ]
-             },
-             {
-                 "place_id": 313430381,
-                 "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
-                 "osm_type": "relation",
-                 "osm_id": 165479,
-                 "lat": "38.3662806",
-                 "lon": "89.4201902",
+                     "-76.909366"
+                 ],
+                 "lat": "38.8950368",
+                 "lon": "-77.0365427",
+                 "display_name": "Washington, District of Columbia, United States",
                  "class": "boundary",
                  "type": "administrative",
-                 "place_rank": 8,
-                 "importance": 0.7129297923155674,
-                 "addresstype": "state",
-                 "name": "Washington",
-                 "display_name": "Washington, United States",
+                 "importance": 0.8492888986115819,
+                 "icon": "/poi_boundary_administrative.p.20.png"
+             },
+             {
+                 "place_id": 293979722,
+                 "licence": "Data © OpenStreetMap contributors, ODbL 1.0. https://osm.org/copyright",
+                 "osm_type": "relation",
+                 "osm_id": 165479,
                  "boundingbox": [
-                     "45.5437314",
+                     "45.5437226",
                      "49.0024392",
                      "-124.8360916",
                      "-116.9159938"
-                 ]
+                 ],
+                 "lat": "invalid lat test",
+                 "lon": "invalid lon test",
+                 "display_name": "Washington, United States",
+                 "class": "boundary",
+                 "type": "administrative",
+                 "importance": 0.8129297923155674,
+                 "icon": "/poi_boundary_administrative.p.20.png"
              }
          ]
       """.trimIndent()

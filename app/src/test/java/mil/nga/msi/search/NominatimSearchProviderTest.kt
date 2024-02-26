@@ -36,13 +36,11 @@ class NominatimSearchProviderTest {
       val mockResponse =
          listOf(
             NominatimResultItem(
-               "Washington",
                "Washington, District of Columbia, United States",
                "38.8950368",
                "-77.0365427"
             ),
             NominatimResultItem(
-               "Washington",
                "Washington, United States",
                "47.2868352",
                "-120.212613"
@@ -64,13 +62,11 @@ class NominatimSearchProviderTest {
       val mockResponse =
          listOf(
             NominatimResultItem(
-               "Washington",
                "Washington, District of Columbia, United States",
                "38.8950368",
                "-77.0365427"
             ),
             NominatimResultItem(
-               "Washington",
                "Washington, United States",
                "invalid lat",
                "invalid lon"
