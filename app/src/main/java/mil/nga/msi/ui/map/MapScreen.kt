@@ -101,7 +101,6 @@ fun MapScreen(
    val orderedDataSources by viewModel.orderedDataSources.observeAsState(emptyList())
    var searchExpanded by remember { mutableStateOf(false) }
    val searchResults by viewModel.searchResults.observeAsState(emptyList())
-   val searchType by viewModel.searchType.observeAsState(SearchType.NATIVE)
    val filterCount by viewModel.filterCount.observeAsState(0)
    val fetching by viewModel.fetching.observeAsState(emptyMap())
    var fetchingVisibility by rememberSaveable { mutableStateOf(true) }
@@ -366,9 +365,7 @@ fun MapScreen(
                   searchExpanded = !searchExpanded
                },
                onTextChanged = {
-                  if(searchType == SearchType.NATIVE){
-                     viewModel.search(it)
-                  }
+                  viewModel.search(it)
                },
                onLocationTap = {
                   destination = MapPosition(
@@ -380,10 +377,7 @@ fun MapScreen(
                         .build()
                   )
                },
-               onLocationCopy = locationCopy,
-               onSubmit = {
-                  viewModel.search(it)
-               }
+               onLocationCopy = locationCopy
             )
          }
 
@@ -634,8 +628,7 @@ private fun Search(
    onExpand: () -> Unit,
    onTextChanged: (String) -> Unit,
    onLocationTap: (LatLng) -> Unit,
-   onLocationCopy: (String) -> Unit,
-   onSubmit: (String) -> Unit
+   onLocationCopy: (String) -> Unit
 ) {
    val focusRequester = remember { FocusRequester() }
    val configuration = LocalConfiguration.current
@@ -677,12 +670,7 @@ private fun Search(
                )
                .height(40.dp)
                .width(width)
-               .focusRequester(focusRequester),
-            keyboardOptions = KeyboardOptions(
-               keyboardType = KeyboardType.Text,
-               imeAction = ImeAction.Search
-            ),
-            keyboardActions = KeyboardActions(onSearch = { onSubmit(text) }),
+               .focusRequester(focusRequester)
          ) {
             TextFieldDefaults.DecorationBox(
                value = text,
@@ -707,7 +695,7 @@ private fun Search(
                   IconButton(
                      onClick = {
                         text = ""
-                        onSubmit("")
+                        onTextChanged("")
                      }
                   ) {
                      Icon(

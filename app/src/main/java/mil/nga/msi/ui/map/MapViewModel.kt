@@ -7,6 +7,7 @@ import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.TileProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import mil.nga.geopackage.GeoPackageManager
@@ -130,7 +131,9 @@ class MapViewModel @Inject constructor(
       searchText.value = text
    }
 
+   @OptIn(FlowPreview::class)
    val searchResults = searchText
+      .debounce(500)
       .map {
          if (it.isNotEmpty()) {
             geocoderRemoteDataSource.geocode(it, searchType.value ?: SearchType.NATIVE)
