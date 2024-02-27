@@ -124,7 +124,7 @@ class MapViewModel @Inject constructor(
    private var navigationWarningTileProvider = DataSourceTileProvider(application, navigationalWarningsTileRepository)
    private var routeTileProvider = DataSourceTileProvider(application, routesTileRepository)
 
-   val searchType = mapRepository.searchType.asLiveData()
+   private val searchType = mapRepository.searchType.asLiveData()
 
    private val searchText = MutableStateFlow("")
    fun search(text: String) {

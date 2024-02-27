@@ -6,8 +6,8 @@ import io.mockk.mockk
 import io.mockk.unmockkAll
 import kotlinx.coroutines.test.runTest
 import mil.nga.msi.network.nominatim.NominatimSearchService
-import mil.nga.msi.ui.map.search.NominatimSearchProvider
 import mil.nga.msi.ui.map.search.NominatimResultItem
+import mil.nga.msi.ui.map.search.NominatimSearchProvider
 import org.junit.After
 import org.junit.Assert
 import org.junit.Before
