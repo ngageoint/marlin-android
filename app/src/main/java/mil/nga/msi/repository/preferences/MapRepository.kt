@@ -8,7 +8,7 @@ import mil.nga.msi.coordinate.CoordinateSystem
 import mil.nga.msi.type.MapLocation
 import mil.nga.msi.type.UserPreferences
 import mil.nga.msi.ui.map.BaseMapType
-import mil.nga.msi.ui.map.search.SearchType
+import mil.nga.msi.ui.map.search.SearchProvider
 import javax.inject.Inject
 
 class MapRepository @Inject constructor(
@@ -162,15 +162,15 @@ class MapRepository @Inject constructor(
       }
    }
 
-   val searchType: Flow<SearchType> = preferencesDataStore.data.map {
-      SearchType.fromValue(it.map.searchType)
+   val searchProvider: Flow<SearchProvider> = preferencesDataStore.data.map {
+      SearchProvider.fromValue(it.map.searchProvider)
    }.distinctUntilChanged()
 
-   suspend fun setSearchType(searchType: SearchType) {
+   suspend fun setSearchProvider(searchProvider: SearchProvider) {
       preferencesDataStore.updateData {
          val builder = it.toBuilder()
          builder.map = builder.map.toBuilder()
-            .setSearchType(searchType.value)
+            .setSearchProvider(searchProvider.value)
             .build()
 
          builder.build()

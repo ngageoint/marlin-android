@@ -23,7 +23,7 @@ import mil.nga.msi.filter.ComparatorType
 import mil.nga.msi.sort.SortDirection
 import mil.nga.msi.type.*
 import mil.nga.msi.ui.map.BaseMapType
-import mil.nga.msi.ui.map.search.SearchType
+import mil.nga.msi.ui.map.search.SearchProvider
 import java.io.InputStream
 import java.io.OutputStream
 import javax.inject.Singleton
@@ -44,7 +44,7 @@ class DataStoreModule {
                      .setMapLocation(MapLocation.getDefaultInstance())
                      .setMgrs(false)
                      .setGars(false)
-                     .setSearchType(SearchType.NATIVE.value)
+                     .setSearchProvider(SearchProvider.GOOGLE.value)
                )
                .putAllLastReadNavigationWarnings(
                   mapOf<String, NavigationalWarningKey>(

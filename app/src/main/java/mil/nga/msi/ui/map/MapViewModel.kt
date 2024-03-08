@@ -20,7 +20,7 @@ import mil.nga.msi.network.layer.LayerService
 import mil.nga.msi.repository.DataSourceRepository
 import mil.nga.msi.repository.asam.AsamRepository
 import mil.nga.msi.repository.dgpsstation.DgpsStationRepository
-import mil.nga.msi.repository.geocoder.GeocoderRemoteDataSource
+import mil.nga.msi.repository.geocoder.SearchRepository
 import mil.nga.msi.repository.layer.LayerRepository
 import mil.nga.msi.repository.light.LightRepository
 import mil.nga.msi.repository.map.*
@@ -35,7 +35,7 @@ import mil.nga.msi.repository.radiobeacon.RadioBeaconRepository
 import mil.nga.msi.repository.route.RouteRepository
 import mil.nga.msi.type.MapLocation
 import mil.nga.msi.ui.map.overlay.*
-import mil.nga.msi.ui.map.search.SearchType
+import mil.nga.msi.ui.map.search.SearchProvider
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -83,7 +83,7 @@ class MapViewModel @Inject constructor(
    val mapRepository: MapRepository,
    val userPreferencesRepository: UserPreferencesRepository,
    val annotationProvider: AnnotationProvider,
-   private val geocoderRemoteDataSource: GeocoderRemoteDataSource,
+   private val searchRepository: SearchRepository,
    @Named("osmTileProvider") private val osmTileProvider: TileProvider,
    @Named("mgrsTileProvider") private val mgrsTileProvider: TileProvider,
    @Named("garsTileProvider") private val garsTileProvider: TileProvider
@@ -130,13 +130,13 @@ class MapViewModel @Inject constructor(
    }
 
    @OptIn(FlowPreview::class)
-   val searchResults = searchText
+   val searchResult = searchText
       .debounce {
          if(it.isEmpty()) 0L else 500L
       }.map {
          if (it.isNotEmpty()) {
-            geocoderRemoteDataSource.geocode(it,  mapRepository.searchType.firstOrNull() ?: SearchType.NATIVE)
-         } else emptyList()
+            searchRepository.search(it,  mapRepository.searchProvider.firstOrNull() ?: SearchProvider.GOOGLE)
+         } else null
       }.flowOn(Dispatchers.IO)
       .asLiveData()
 

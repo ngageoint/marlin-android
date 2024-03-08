@@ -50,7 +50,8 @@ import mil.nga.msi.R
 import mil.nga.msi.coordinate.CoordinateSystem
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.BaseMapType
-import mil.nga.msi.ui.map.search.SearchType
+import mil.nga.msi.ui.map.search.SearchProvider
+import mil.nga.msi.ui.theme.onSurfaceDisabled
 
 @Composable
 fun MapSettingsScreen(
@@ -67,7 +68,7 @@ fun MapSettingsScreen(
    val showLocation by viewModel.showLocation.observeAsState(false)
    val showScale by viewModel.showScale.observeAsState(false)
    val coordinateSystem by viewModel.coordinateSystem.observeAsState()
-   val searchType by viewModel.searchType.observeAsState()
+   val searchProvider by viewModel.searchProvider.observeAsState()
 
    Column {
       TopBar(
@@ -100,9 +101,9 @@ fun MapSettingsScreen(
 
             DataSourceSettings(onLightSettings)
 
-            searchType?.let { searchType ->
-               SearchType(searchType) {
-                  viewModel.setSearchType(it)
+            searchProvider?.let { searchProvider ->
+               SearchProvider(searchProvider) {
+                  viewModel.setSearchProvider(it)
                }
             }
 
@@ -328,9 +329,7 @@ private fun DataSourceSettings(
 private fun LightSettings(
    onSettings: () -> Unit
 ) {
-   Column(
-      Modifier.padding(bottom = 16.dp)
-   ) {
+   Column {
       Text(
          text = "Data Source",
          style = MaterialTheme.typography.titleMedium,
@@ -342,6 +341,7 @@ private fun LightSettings(
          verticalAlignment = Alignment.CenterVertically,
          modifier = Modifier
             .fillMaxWidth()
+            .clickable { onSettings() }
             .clickable { onSettings() }
             .padding(vertical = 16.dp, horizontal = 32.dp)
       ) {
@@ -364,9 +364,9 @@ private fun LightSettings(
 }
 
 @Composable
-private fun SearchType(
-   searchType: SearchType,
-   onSearchTypeSelected: (SearchType) -> Unit
+private fun SearchProvider(
+   searchProvider: SearchProvider,
+   onSearchProviderSelected: (SearchProvider) -> Unit
 ) {
    var openDialog by remember { mutableStateOf(false)  }
 
@@ -387,13 +387,13 @@ private fun SearchType(
       ) {
          Column {
             Text(
-               text = "Search Type",
+               text = "Search Provider",
                style = MaterialTheme.typography.bodyLarge
             )
 
             CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                Text(
-                  text = searchType.title,
+                  text = searchProvider.title,
                   style = MaterialTheme.typography.bodyMedium
                )
             }
@@ -401,8 +401,8 @@ private fun SearchType(
       }
 
       if (openDialog) {
-         SearchTypeDialog(searchType) {
-            onSearchTypeSelected(it)
+         SearchProviderDialog(searchProvider) {
+            onSearchProviderSelected(it)
             openDialog = false
          }
       }
@@ -410,9 +410,9 @@ private fun SearchType(
 }
 
 @Composable
-fun SearchTypeDialog(
-   currentSearchType: SearchType,
-   onSearchTypeSelected: (SearchType) -> Unit
+private fun SearchProviderDialog(
+   searchProvider: SearchProvider,
+   onSearchProviderSelected: (SearchProvider) -> Unit
 ) {
    val context = LocalContext.current
    val attribution = buildAnnotatedString {
@@ -424,49 +424,64 @@ fun SearchTypeDialog(
       pop()
       append(".")
    }
-   Dialog(onDismissRequest = { onSearchTypeSelected(currentSearchType) }) {
+   Dialog(onDismissRequest = { onSearchProviderSelected(searchProvider) }) {
       Surface(
          shape = RoundedCornerShape(4.dp)
       ) {
-         Column(Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp)) {
+         Column(Modifier
+            .padding(16.dp)
+            .fillMaxWidth()
+         ) {
             CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
                Text(
-                  text = "Search Type",
+                  text = "Search Provider",
                   style = MaterialTheme.typography.titleLarge,
-                  modifier = Modifier
-                     .height(64.dp)
-                     .wrapContentHeight(align = Alignment.CenterVertically)
+                  modifier = Modifier.padding(bottom = 4.dp)
                )
             }
 
-            SearchType.entries.forEach { searchType ->
+            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceDisabled) {
+               Text(
+                  text = "Provider used when searching for places and/or addresses.",
+                  style = MaterialTheme.typography.bodyMedium,
+                  modifier = Modifier.padding(top = 4.dp, bottom = 16.dp)
+               )
+            }
+
+            SearchProvider.entries.forEach { provider ->
                Row(
                   verticalAlignment = Alignment.CenterVertically,
-                  modifier = Modifier.fillMaxWidth()
+                  modifier = Modifier
+                     .fillMaxWidth()
                ) {
                   RadioButton(
-                     selected = searchType == currentSearchType,
+                     selected = provider == searchProvider,
                      onClick = {
-                        onSearchTypeSelected(searchType)
+                        onSearchProviderSelected(provider)
                      }
                   )
                   Text(
-                     text = searchType.title,
+                     text = provider.title,
                      modifier = Modifier.fillMaxWidth()
                   )
                }
             }
-            ClickableText(
-               text = attribution,
-               onClick = { clickedOffset ->
-                  attribution.getStringAnnotations(tag = "osmLink", start = clickedOffset, end = clickedOffset)
-                     .firstOrNull()?.let {
-                        val intent = Intent(Intent.ACTION_VIEW)
-                        intent.setData(it.item.toUri())
-                        context.startActivity(intent)
-                     }
-               }
-            )
+
+            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceDisabled) {
+               ClickableText(
+                  text = attribution,
+                  style = MaterialTheme.typography.bodySmall.copy(color = LocalContentColor.current),
+                  onClick = { clickedOffset ->
+                     attribution.getStringAnnotations(tag = "osmLink", start = clickedOffset, end = clickedOffset)
+                        .firstOrNull()?.let {
+                           val intent = Intent(Intent.ACTION_VIEW)
+                           intent.setData(it.item.toUri())
+                           context.startActivity(intent)
+                        }
+                  },
+                  modifier = Modifier.padding(top = 16.dp)
+               )
+            }
          }
       }
    }
@@ -595,7 +610,7 @@ private fun DisplaySettings(
 }
 
 @Composable
-fun CoordinateSystemDialog(
+private fun CoordinateSystemDialog(
    coordinateSystem: CoordinateSystem?,
    onCoordinateSystemSelected: (CoordinateSystem) -> Unit
 ) {

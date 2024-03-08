@@ -2,22 +2,24 @@ package mil.nga.msi.geocoder
 
 import android.location.Geocoder
 import android.os.Build
-import mil.nga.msi.repository.geocoder.GeocoderState
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
-fun Geocoder.getFromLocationName(
-   text: String,
-   result: (List<GeocoderState>) -> Unit
-) {
+suspend fun Geocoder.getFromLocationName(text: String): List<Place> = suspendCoroutine { continuation ->
    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-      getFromLocationName(text, 10) { addresses ->
-         result(addresses.map { GeocoderState.fromAddress(it) })
-      }
+      try {
+         getFromLocationName(text, 10) { addresses ->
+            val places = addresses.map { Place.fromAddress(it) }
+            continuation.resumeWith(Result.success(places))
+         }
+      } catch(e: Exception) { continuation.resumeWithException(e) }
    } else {
       try {
          @Suppress("DEPRECATION")
-         getFromLocationName(text, 10)?.map {
-            GeocoderState.fromAddress(it)
-         }?.let { result(it) }
-      } catch(e: Exception) { result(emptyList()) }
+         val places = getFromLocationName(text, 10)?.map {
+            Place.fromAddress(it)
+         } ?: emptyList()
+         continuation.resumeWith(Result.success(places))
+      } catch(e: Exception) { continuation.resumeWithException(e) }
    }
 }

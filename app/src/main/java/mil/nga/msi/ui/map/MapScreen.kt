@@ -3,6 +3,7 @@ package mil.nga.msi.ui.map
 import android.Manifest
 import android.animation.ValueAnimator
 import android.graphics.Bitmap
+import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateFloatAsState
@@ -57,7 +58,8 @@ import kotlinx.coroutines.launch
 import mil.nga.msi.R
 import mil.nga.msi.coordinate.CoordinateSystem
 import mil.nga.msi.datasource.DataSource
-import mil.nga.msi.repository.geocoder.GeocoderState
+import mil.nga.msi.datasource.map.SearchResult
+import mil.nga.msi.geocoder.Place
 import mil.nga.msi.type.MapLocation
 import mil.nga.msi.ui.coordinate.CoordinateText
 import mil.nga.msi.ui.location.LocationPermission
@@ -89,13 +91,14 @@ fun MapScreen(
    viewModel: MapViewModel = hiltViewModel()
 ) {
    val scope = rememberCoroutineScope()
+   val context = LocalContext.current
    val coordinateSystem by viewModel.coordinateSystem.observeAsState(CoordinateSystem.DMS)
    val showLocation by viewModel.showLocation.observeAsState(false)
    val showScale by viewModel.showScale.observeAsState(false)
    var mapDataSourcesExpanded by remember { mutableStateOf(false) }
    val orderedDataSources by viewModel.orderedDataSources.observeAsState(emptyList())
    var searchExpanded by remember { mutableStateOf(false) }
-   val searchResults by viewModel.searchResults.observeAsState(emptyList())
+   val searchResult by viewModel.searchResult.observeAsState()
    val filterCount by viewModel.filterCount.observeAsState(0)
    val fetching by viewModel.fetching.observeAsState(emptyMap())
    var fetchingVisibility by rememberSaveable { mutableStateOf(true) }
@@ -109,6 +112,14 @@ fun MapScreen(
    val mapped by viewModel.mapped.observeAsState(emptyMap())
    val annotation by viewModel.annotationProvider.annotation.observeAsState()
    val clipboardManager: ClipboardManager = LocalClipboardManager.current
+   val searchPlaces = (searchResult as? SearchResult.Success)?.places ?: emptyList()
+
+   LaunchedEffect(searchResult) {
+      val error = searchResult as? SearchResult.Error
+      error?.let {
+         Toast.makeText(context, it.message, Toast.LENGTH_LONG).show()
+      }
+   }
 
    LaunchedEffect(fetching) {
       if(fetching.none { it.value } && fetchingVisibility) {
@@ -207,7 +218,7 @@ fun MapScreen(
             locationSource = locationSource,
             locationEnabled = locationPermissionState.status.isGranted,
             tileProviders = tileProviders,
-            searchResults = searchResults,
+            searchPlaces = searchPlaces,
             annotation = annotation,
             cameraPositionState = cameraPositionState,
             onMapMove = { position, reason ->
@@ -355,7 +366,7 @@ fun MapScreen(
          ) {
             Search(
                expanded = searchExpanded,
-               results = searchResults,
+               places = searchPlaces,
                onExpand = {
                   searchExpanded = !searchExpanded
                },
@@ -406,7 +417,7 @@ private fun Map(
    locationSource: LocationSource,
    locationEnabled: Boolean,
    tileProviders: Map<TileProviderType, TileProvider>,
-   searchResults: List<GeocoderState>,
+   searchPlaces: List<Place>,
    annotation: MapAnnotation?,
    cameraPositionState: CameraPositionState,
    onMapMove: (CameraPosition, Int) -> Unit,
@@ -501,12 +512,15 @@ private fun Map(
          routeTileProvider?.let { TileOverlay(tileProvider = it) }
       }
 
-      searchResults.forEach { result ->
-         Marker(
-            state = MarkerState(LatLng(result.location.latitude, result.location.longitude)),
-            icon = BitmapDescriptorFactory.fromResource(context, R.drawable.ic_round_location_on_24, result.name)
-         )
+      if (searchPlaces.isNotEmpty()) {
+         searchPlaces.forEach { place ->
+            Marker(
+               state = MarkerState(LatLng(place.location.latitude, place.location.longitude)),
+               icon = BitmapDescriptorFactory.fromResource(context, R.drawable.ic_round_location_on_24, place.name)
+            )
+         }
       }
+
 
       MapEffect(destination, annotation) { map ->
          map.setOnCameraMoveStartedListener { reason ->
@@ -619,7 +633,7 @@ private fun Zoom(
 @Composable
 private fun Search(
    expanded: Boolean,
-   results: List<GeocoderState> = emptyList(),
+   places: List<Place> = emptyList(),
    onExpand: () -> Unit,
    onTextChanged: (String) -> Unit,
    onLocationTap: (LatLng) -> Unit,
@@ -717,7 +731,7 @@ private fun Search(
             )
          }
 
-         if (results.isNotEmpty()) {
+         if (places.isNotEmpty()) {
             val scrollState = rememberScrollState()
             val searchHeight = configuration.screenHeightDp.dp.div(3)
 
@@ -727,7 +741,7 @@ private fun Search(
                   .heightIn(0.dp, searchHeight)
                   .verticalScroll(scrollState)
             ) {
-               results.forEach { result ->
+               places.forEach { place ->
                   HorizontalDivider(Modifier.padding(horizontal = 8.dp))
 
                   Row(
@@ -737,7 +751,7 @@ private fun Search(
                      Column(Modifier.weight(1f)) {
                         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
                            Text(
-                              text = result.name,
+                              text = place.name,
                               style = MaterialTheme.typography.titleMedium,
                               fontWeight = FontWeight.Medium
                            )
@@ -745,18 +759,18 @@ private fun Search(
 
                         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                            Text(
-                              text = result.address ?: "",
+                              text = place.address ?: "",
                               style = MaterialTheme.typography.titleSmall
                            )
                         }
 
                         CoordinateText(
-                           latLng = LatLng(result.location.latitude, result.location.longitude),
+                           latLng = LatLng(place.location.latitude, place.location.longitude),
                            onCopiedToClipboard = { onLocationCopy(it) }
                         )
                      }
 
-                     result.location.let {
+                     place.location.let {
                         IconButton(
                            onClick = { onLocationTap(it) }
                         ) {
