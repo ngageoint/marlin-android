@@ -9,6 +9,8 @@ import mil.nga.msi.coordinate.DMS
 import mil.nga.msi.coordinate.WGS84
 import mil.nga.msi.geocoder.getFromLocationName
 import mil.nga.msi.ui.map.TileProviderType
+import mil.nga.msi.ui.map.search.NominatimSearchProvider
+import mil.nga.msi.ui.map.search.SearchType
 import javax.inject.Inject
 import kotlin.coroutines.suspendCoroutine
 
@@ -29,9 +31,10 @@ data class GeocoderState(
 }
 
 class GeocoderRemoteDataSource @Inject constructor(
-   private val geocoder: Geocoder
+   private val geocoder: Geocoder,
+   private val nominatimSearchProvider: NominatimSearchProvider
 ) {
-   suspend fun geocode(text: String): List<GeocoderState> {
+   suspend fun geocode(text: String, searchType: SearchType): List<GeocoderState> {
       val dms = DMS.from(text)
       return if (dms != null) {
          val state = GeocoderState(
@@ -55,7 +58,7 @@ class GeocoderRemoteDataSource @Inject constructor(
          listOf(state)
       } else {
          val addresses = try {
-            fetchAddresses(text)
+            fetchAddresses(text, searchType)
          } catch (e: Exception) { emptyList() }
 
          val location = WGS84.from(text)?.let { latLng ->
@@ -71,9 +74,21 @@ class GeocoderRemoteDataSource @Inject constructor(
       }
    }
 
-   private suspend fun fetchAddresses(text: String) = suspendCoroutine { continuation ->
-      geocoder.getFromLocationName(text) {
-         continuation.resumeWith(Result.success(it))
+   private suspend fun fetchAddresses(
+      text: String,
+      searchType: SearchType
+   ): List<GeocoderState> {
+      return when (searchType) {
+         SearchType.NATIVE -> {
+            suspendCoroutine { continuation ->
+               geocoder.getFromLocationName(text) {
+                  continuation.resumeWith(Result.success(it))
+               }
+            }
+         }
+         SearchType.NOMINATIM -> {
+            nominatimSearchProvider.search(text)
+         }
       }
    }
 }

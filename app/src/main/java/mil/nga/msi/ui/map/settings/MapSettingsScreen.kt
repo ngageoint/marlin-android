@@ -1,6 +1,7 @@
 package mil.nga.msi.ui.map.settings
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -35,15 +37,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import mil.nga.msi.R
 import mil.nga.msi.coordinate.CoordinateSystem
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.map.BaseMapType
+import mil.nga.msi.ui.map.search.SearchType
 
 @Composable
 fun MapSettingsScreen(
@@ -60,6 +67,7 @@ fun MapSettingsScreen(
    val showLocation by viewModel.showLocation.observeAsState(false)
    val showScale by viewModel.showScale.observeAsState(false)
    val coordinateSystem by viewModel.coordinateSystem.observeAsState()
+   val searchType by viewModel.searchType.observeAsState()
 
    Column {
       TopBar(
@@ -91,6 +99,12 @@ fun MapSettingsScreen(
             Layers { onLayers() }
 
             DataSourceSettings(onLightSettings)
+
+            searchType?.let { searchType ->
+               SearchType(searchType) {
+                  viewModel.setSearchType(it)
+               }
+            }
 
             DisplaySettings(
                showLocation = showLocation,
@@ -343,6 +357,115 @@ private fun LightSettings(
             Text(
                text = "Light Settings",
                style = MaterialTheme.typography.bodyLarge
+            )
+         }
+      }
+   }
+}
+
+@Composable
+private fun SearchType(
+   searchType: SearchType,
+   onSearchTypeSelected: (SearchType) -> Unit
+) {
+   var openDialog by remember { mutableStateOf(false)  }
+
+   Column(Modifier.padding(bottom = 16.dp)) {
+      Text(
+         text = "Search",
+         style = MaterialTheme.typography.titleMedium,
+         fontWeight = FontWeight.Medium,
+         modifier = Modifier.padding(top = 32.dp, bottom = 16.dp, start = 32.dp, end = 32.dp)
+      )
+
+      Row(
+         verticalAlignment = Alignment.CenterVertically,
+         modifier = Modifier
+            .fillMaxWidth()
+            .clickable { openDialog = true }
+            .padding(vertical = 8.dp, horizontal = 32.dp)
+      ) {
+         Column {
+            Text(
+               text = "Search Type",
+               style = MaterialTheme.typography.bodyLarge
+            )
+
+            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+               Text(
+                  text = searchType.title,
+                  style = MaterialTheme.typography.bodyMedium
+               )
+            }
+         }
+      }
+
+      if (openDialog) {
+         SearchTypeDialog(searchType) {
+            onSearchTypeSelected(it)
+            openDialog = false
+         }
+      }
+   }
+}
+
+@Composable
+fun SearchTypeDialog(
+   currentSearchType: SearchType,
+   onSearchTypeSelected: (SearchType) -> Unit
+) {
+   val context = LocalContext.current
+   val attribution = buildAnnotatedString {
+      append("Nominatim data is provided by ")
+      pushStringAnnotation(tag = "osmLink", annotation = "https://www.openstreetmap.org/copyright/")
+      withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary)) {
+         append("OpenStreetMap")
+      }
+      pop()
+      append(".")
+   }
+   Dialog(onDismissRequest = { onSearchTypeSelected(currentSearchType) }) {
+      Surface(
+         shape = RoundedCornerShape(4.dp)
+      ) {
+         Column(Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp)) {
+            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
+               Text(
+                  text = "Search Type",
+                  style = MaterialTheme.typography.titleLarge,
+                  modifier = Modifier
+                     .height(64.dp)
+                     .wrapContentHeight(align = Alignment.CenterVertically)
+               )
+            }
+
+            SearchType.entries.forEach { searchType ->
+               Row(
+                  verticalAlignment = Alignment.CenterVertically,
+                  modifier = Modifier.fillMaxWidth()
+               ) {
+                  RadioButton(
+                     selected = searchType == currentSearchType,
+                     onClick = {
+                        onSearchTypeSelected(searchType)
+                     }
+                  )
+                  Text(
+                     text = searchType.title,
+                     modifier = Modifier.fillMaxWidth()
+                  )
+               }
+            }
+            ClickableText(
+               text = attribution,
+               onClick = { clickedOffset ->
+                  attribution.getStringAnnotations(tag = "osmLink", start = clickedOffset, end = clickedOffset)
+                     .firstOrNull()?.let {
+                        val intent = Intent(Intent.ACTION_VIEW)
+                        intent.setData(it.item.toUri())
+                        context.startActivity(intent)
+                     }
+               }
             )
          }
       }

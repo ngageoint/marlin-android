@@ -7,6 +7,7 @@ import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.TileProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import mil.nga.geopackage.GeoPackageManager
@@ -34,6 +35,7 @@ import mil.nga.msi.repository.radiobeacon.RadioBeaconRepository
 import mil.nga.msi.repository.route.RouteRepository
 import mil.nga.msi.type.MapLocation
 import mil.nga.msi.ui.map.overlay.*
+import mil.nga.msi.ui.map.search.SearchType
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -127,10 +129,13 @@ class MapViewModel @Inject constructor(
       searchText.value = text
    }
 
+   @OptIn(FlowPreview::class)
    val searchResults = searchText
-      .map {
+      .debounce {
+         if(it.isEmpty()) 0L else 500L
+      }.map {
          if (it.isNotEmpty()) {
-            geocoderRemoteDataSource.geocode(it)
+            geocoderRemoteDataSource.geocode(it,  mapRepository.searchType.firstOrNull() ?: SearchType.NATIVE)
          } else emptyList()
       }.flowOn(Dispatchers.IO)
       .asLiveData()

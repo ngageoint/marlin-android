@@ -244,6 +244,7 @@ dependencies {
 
     testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.1'
     testImplementation "io.mockk:mockk:1.13.8"
+    testImplementation "com.squareup.okhttp3:mockwebserver:4.12.0"
 
     androidTestImplementation "io.mockk:mockk-android:1.13.8"
     androidTestImplementation 'androidx.paging:paging-testing:3.2.1'

@@ -31,6 +31,7 @@ import mil.nga.msi.network.modu.ModusTypeAdapter
 import mil.nga.msi.network.navigationalwarning.NavigationalWarningResponse
 import mil.nga.msi.network.navigationalwarning.NavigationalWarningService
 import mil.nga.msi.network.navigationalwarning.NavigationalWarningsTypeAdapter
+import mil.nga.msi.network.nominatim.NominatimSearchService
 import mil.nga.msi.network.noticetomariners.*
 import mil.nga.msi.network.port.PortResponse
 import mil.nga.msi.network.port.PortService
@@ -161,5 +162,14 @@ class NetworkModule {
    @Singleton
    fun provideNoticeToMarinersService(retrofit: Retrofit): NoticeToMarinersService {
       return retrofit.create(NoticeToMarinersService::class.java)
+   }
+
+   @Provides
+   @Singleton
+   fun provideNominatimSearchService(retrofit: Retrofit): NominatimSearchService {
+      return retrofit.newBuilder()
+         .baseUrl("https://osm-nominatim.gs.mil/")
+         .build()
+         .create(NominatimSearchService::class.java)
    }
 }

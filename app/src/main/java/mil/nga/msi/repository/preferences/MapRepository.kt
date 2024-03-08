@@ -8,6 +8,7 @@ import mil.nga.msi.coordinate.CoordinateSystem
 import mil.nga.msi.type.MapLocation
 import mil.nga.msi.type.UserPreferences
 import mil.nga.msi.ui.map.BaseMapType
+import mil.nga.msi.ui.map.search.SearchType
 import javax.inject.Inject
 
 class MapRepository @Inject constructor(
@@ -158,6 +159,21 @@ class MapRepository @Inject constructor(
             .clearLayers()
             .addAllLayers(layers)
             .build()
+      }
+   }
+
+   val searchType: Flow<SearchType> = preferencesDataStore.data.map {
+      SearchType.fromValue(it.map.searchType)
+   }.distinctUntilChanged()
+
+   suspend fun setSearchType(searchType: SearchType) {
+      preferencesDataStore.updateData {
+         val builder = it.toBuilder()
+         builder.map = builder.map.toBuilder()
+            .setSearchType(searchType.value)
+            .build()
+
+         builder.build()
       }
    }
 }

@@ -8,6 +8,7 @@ import kotlinx.coroutines.launch
 import mil.nga.msi.coordinate.CoordinateSystem
 import mil.nga.msi.repository.preferences.MapRepository
 import mil.nga.msi.ui.map.BaseMapType
+import mil.nga.msi.ui.map.search.SearchType
 import javax.inject.Inject
 
 @HiltViewModel
@@ -53,6 +54,13 @@ class MapSettingsViewModel @Inject constructor(
    fun setCoordinateSystem(coordinateSystem: CoordinateSystem) {
       viewModelScope.launch {
          repository.setCoordinateSystem(coordinateSystem)
+      }
+   }
+
+   val searchType = repository.searchType.asLiveData()
+   fun setSearchType(searchType: SearchType) {
+      viewModelScope.launch {
+         repository.setSearchType(searchType)
       }
    }
 }
