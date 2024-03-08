@@ -76,10 +76,9 @@ android {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
+
     packagingOptions {
-        resources {
-            excludes += ['META-INF/INDEX.LIST', 'META-INF/LICENSE.md', 'META-INF/LICENSE-notice.md']
-        }
+        exclude 'META-INF/INDEX.LIST'
     }
 
     kotlin {
