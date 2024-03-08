@@ -19,9 +19,9 @@ def googleMapsApiDebugKey = hasProperty('MSI_DEBUG_MAPS_API_KEY') ? MSI_DEBUG_MA
 
 def room_version = '2.6.1'
 def work_version = '2.9.0'
-def compose_version = '1.6.1'
+def compose_version = '1.6.3'
 def retrofit_version = '2.9.0'
-def accompanist_version = '0.32.0'
+def accompanist_version = '0.34.0'
 
 android {
     compileSdk 34
@@ -148,11 +148,11 @@ android {
 
 dependencies {
     implementation "com.google.dagger:hilt-android:$hilt_version"
-    implementation 'androidx.hilt:hilt-navigation-compose:1.1.0'
+    implementation 'androidx.hilt:hilt-navigation-compose:1.2.0'
     kapt "com.google.dagger:hilt-compiler:$hilt_version"
-    implementation 'androidx.hilt:hilt-work:1.1.0'
-    kapt 'androidx.hilt:hilt-compiler:1.1.0'
-    annotationProcessor 'androidx.hilt:hilt-compiler:1.1.0'
+    implementation 'androidx.hilt:hilt-work:1.2.0'
+    kapt 'androidx.hilt:hilt-compiler:1.2.0'
+    annotationProcessor 'androidx.hilt:hilt-compiler:1.2.0'
 
     implementation "androidx.room:room-ktx:$room_version"
     implementation "androidx.room:room-runtime:$room_version"
@@ -176,10 +176,10 @@ dependencies {
 
     implementation 'androidx.core:core-ktx:1.12.0'
     implementation "androidx.compose.ui:ui:$compose_version"
-    implementation "androidx.compose.material3:material3:1.2.0"
+    implementation "androidx.compose.material3:material3:1.2.1"
     implementation "androidx.compose.material:material:$compose_version"
     implementation "androidx.compose.ui:ui-tooling-preview:$compose_version"
-    implementation "androidx.compose.material:material-icons-extended:1.6.1"
+    implementation "androidx.compose.material:material-icons-extended:1.6.3"
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.7.0'
     implementation 'androidx.lifecycle:lifecycle-runtime-compose:2.7.0'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0'
@@ -211,7 +211,7 @@ dependencies {
 
     implementation "io.coil-kt:coil-compose:2.2.2"
 
-    implementation 'com.google.android.gms:play-services-location:21.1.0'
+    implementation 'com.google.android.gms:play-services-location:21.2.0'
 
     implementation 'mil.nga.geopackage.map:geopackage-android-map:6.7.3'
 
