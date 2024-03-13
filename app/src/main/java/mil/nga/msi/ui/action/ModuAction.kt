@@ -5,6 +5,7 @@ import androidx.navigation.NavController
 import com.google.maps.android.SphericalUtil
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import mil.nga.msi.buildZoomNavOptions
 import mil.nga.msi.datasource.modu.Modu
 import mil.nga.msi.ui.map.MapRoute
 import mil.nga.msi.ui.modu.ModuRoute
@@ -24,7 +25,7 @@ sealed class ModuAction : Action() {
          if (radius == null) {
             val point = NavPoint(modu.latLng.latitude, modu.latLng.longitude)
             val encoded = Uri.encode(Json.encodeToString(point))
-            navController.navigate(MapRoute.Map.name + "?point=${encoded}")
+            navController.navigate(MapRoute.Map.name + "?point=${encoded}", buildZoomNavOptions(navController))
          } else {
             val radiusInMeters = radius * 1852
             val northBound = SphericalUtil.computeOffset(modu.latLng, radiusInMeters, 0.0)
@@ -38,7 +39,7 @@ sealed class ModuAction : Action() {
                eastBound.longitude
             )
             val encodedBounds = Uri.encode(Json.encodeToString(bounds))
-            navController.navigate(MapRoute.Map.name + "?bounds=${encodedBounds}")
+            navController.navigate(MapRoute.Map.name + "?bounds=${encodedBounds}", buildZoomNavOptions(navController))
          }
       }
    }
