@@ -5,6 +5,7 @@ import androidx.navigation.NavController
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import mil.nga.msi.buildZoomNavOptions
 import mil.nga.msi.datasource.asam.Asam
 import mil.nga.msi.ui.asam.AsamRoute
 import mil.nga.msi.ui.map.MapRoute
@@ -21,7 +22,7 @@ sealed class AsamAction : Action() {
       override fun navigate(navController: NavController) {
          val point = NavPoint(latLng.latitude, latLng.longitude)
          val encoded = Uri.encode(Json.encodeToString(point))
-         navController.navigate(MapRoute.Map.name + "?point=${encoded}")
+         navController.navigate(MapRoute.Map.name + "?point=${encoded}", buildZoomNavOptions(navController))
       }
    }
 
