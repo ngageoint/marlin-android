@@ -5,6 +5,7 @@ import androidx.navigation.NavController
 import com.google.android.gms.maps.model.LatLngBounds
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import mil.nga.msi.buildZoomNavOptions
 import mil.nga.msi.datasource.DataSource
 import mil.nga.msi.datasource.navigationwarning.NavigationArea
 import mil.nga.msi.datasource.navigationwarning.NavigationalWarning
@@ -31,7 +32,7 @@ sealed class NavigationalWarningAction : Action() {
    class Zoom(val bounds: LatLngBounds): Action() {
       override fun navigate(navController: NavController) {
          val encoded = Uri.encode(Json.encodeToString(Bounds.fromLatLngBounds(bounds)))
-         navController.navigate(MapRoute.Map.name + "?bounds=${encoded}")
+         navController.navigate(MapRoute.Map.name + "?bounds=${encoded}", buildZoomNavOptions(navController))
       }
    }
 

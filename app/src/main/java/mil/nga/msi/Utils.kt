@@ -1,5 +1,9 @@
 package mil.nga.msi
 
+import androidx.navigation.NavController
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavOptions
+import androidx.navigation.navOptions
 import mil.nga.sf.Geometry
 import mil.nga.sf.GeometryEnvelope
 import mil.nga.sf.LineString
@@ -42,3 +46,12 @@ fun getPointsForGeometry(geometry: Geometry): List<Point> {
    }
 }
 
+fun buildZoomNavOptions(navController: NavController): NavOptions {
+   return navOptions {
+      popUpTo(navController.graph.findStartDestination().id) {
+         saveState = true
+         inclusive = true
+      }
+      launchSingleTop = true
+   }
+}
