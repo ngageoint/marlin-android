@@ -12,7 +12,7 @@ plugins {
 }
 
 group 'mil.nga.msi'
-version '1.4.0'
+version '1.4.1'
 
 def googleMapsApiReleaseKey = hasProperty('MSI_RELEASE_MAPS_API_KEY') ? MSI_RELEASE_MAPS_API_KEY : ''
 def googleMapsApiDebugKey = hasProperty('MSI_DEBUG_MAPS_API_KEY') ? MSI_DEBUG_MAPS_API_KEY : ''
