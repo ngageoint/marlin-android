@@ -29,7 +29,7 @@ sealed class NavigationalWarningAction : Action() {
       }
    }
 
-   class Zoom(val bounds: LatLngBounds): Action() {
+   class Zoom(val bounds: LatLngBounds): NavigationalWarningAction() {
       override fun navigate(navController: NavController) {
          val encoded = Uri.encode(Json.encodeToString(Bounds.fromLatLngBounds(bounds)))
          navController.navigate(MapRoute.Map.name + "?bounds=${encoded}", buildZoomNavOptions(navController))

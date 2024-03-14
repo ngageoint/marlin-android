@@ -21,7 +21,7 @@ sealed class RadioBeaconAction : Action() {
       }
    }
 
-   class Zoom(private val latLng: LatLng): Action() {
+   class Zoom(private val latLng: LatLng): RadioBeaconAction() {
       override fun navigate(navController: NavController) {
          val point = NavPoint(latLng.latitude, latLng.longitude)
          val encoded = Uri.encode(Json.encodeToString(point))
