@@ -50,7 +50,6 @@ import mil.nga.msi.datasource.light.LightWithBookmark
 import mil.nga.msi.repository.bookmark.BookmarkKey
 import mil.nga.msi.repository.light.LightKey
 import mil.nga.msi.ui.action.Action
-import mil.nga.msi.ui.action.AsamAction
 import mil.nga.msi.ui.action.LightAction
 import mil.nga.msi.ui.bookmark.BookmarkNotes
 import mil.nga.msi.ui.datasource.DataSourceActions
@@ -95,7 +94,7 @@ fun LightDetailScreen(
                viewModel.deleteBookmark(bookmark)
             }
          },
-         onCopyLocation = { onAction(AsamAction.Location(it)) }
+         onCopyLocation = { onAction(LightAction.Location(it)) }
       )
    }
 }

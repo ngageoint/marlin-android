@@ -24,7 +24,6 @@ import mil.nga.msi.datasource.dgpsstation.DgpsStation
 import mil.nga.msi.datasource.dgpsstation.DgpsStationWithBookmark
 import mil.nga.msi.repository.bookmark.BookmarkKey
 import mil.nga.msi.ui.action.Action
-import mil.nga.msi.ui.action.AsamAction
 import mil.nga.msi.ui.action.DgpsStationAction
 import mil.nga.msi.ui.datasource.DataSourceActions
 import mil.nga.msi.ui.dgpsstation.DgpsStationRoute
@@ -90,7 +89,7 @@ fun DgpsStationsScreen(
                   viewModel.deleteBookmark(bookmark)
                }
             },
-            onCopyLocation = { onAction(AsamAction.Location(it)) }
+            onCopyLocation = { onAction(DgpsStationAction.Location(it)) }
          )
 
          Box(
