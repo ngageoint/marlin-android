@@ -24,7 +24,6 @@ import mil.nga.msi.datasource.modu.Modu
 import mil.nga.msi.datasource.modu.ModuWithBookmark
 import mil.nga.msi.repository.bookmark.BookmarkKey
 import mil.nga.msi.ui.action.Action
-import mil.nga.msi.ui.action.AsamAction
 import mil.nga.msi.ui.main.TopBar
 import mil.nga.msi.ui.action.ModuAction
 import mil.nga.msi.ui.datasource.DataSourceActions
@@ -90,7 +89,7 @@ fun ModusScreen(
                   viewModel.deleteBookmark(bookmark)
                }
             },
-            onCopyLocation = { onAction(AsamAction.Location(it)) }
+            onCopyLocation = { onAction(ModuAction.Location(it)) }
          )
 
          Box(
