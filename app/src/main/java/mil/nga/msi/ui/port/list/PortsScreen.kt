@@ -93,7 +93,7 @@ fun PortsScreen(
                   viewModel.deleteBookmark(bookmark)
                }
             },
-            onCopyLocation = { onAction(AsamAction.Location(it)) }
+            onCopyLocation = { onAction(PortAction.Location(it)) }
          )
 
          Box(

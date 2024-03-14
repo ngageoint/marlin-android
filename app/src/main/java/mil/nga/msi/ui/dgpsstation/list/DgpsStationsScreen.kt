@@ -90,7 +90,7 @@ fun DgpsStationsScreen(
                   viewModel.deleteBookmark(bookmark)
                }
             },
-            onCopyLocation = { onAction(AsamAction.Location(it)) }
+            onCopyLocation = { onAction(DgpsStationAction.Location(it)) }
          )
 
          Box(

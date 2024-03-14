@@ -95,7 +95,7 @@ fun LightDetailScreen(
                viewModel.deleteBookmark(bookmark)
             }
          },
-         onCopyLocation = { onAction(AsamAction.Location(it)) }
+         onCopyLocation = { onAction(LightAction.Location(it)) }
       )
    }
 }

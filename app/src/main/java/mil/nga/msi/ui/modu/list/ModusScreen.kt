@@ -90,7 +90,7 @@ fun ModusScreen(
                   viewModel.deleteBookmark(bookmark)
                }
             },
-            onCopyLocation = { onAction(AsamAction.Location(it)) }
+            onCopyLocation = { onAction(ModuAction.Location(it)) }
          )
 
          Box(

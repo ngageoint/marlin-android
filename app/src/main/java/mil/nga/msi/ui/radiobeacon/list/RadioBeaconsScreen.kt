@@ -90,7 +90,7 @@ fun RadioBeaconsScreen(
                   viewModel.deleteBookmark(bookmark)
                }
             },
-            onCopyLocation = { onAction(AsamAction.Location(it)) }
+            onCopyLocation = { onAction(RadioBeaconAction.Location(it)) }
          )
 
          Box(
