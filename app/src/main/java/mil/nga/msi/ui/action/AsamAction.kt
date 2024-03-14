@@ -18,7 +18,7 @@ sealed class AsamAction : Action() {
       }
    }
 
-   class Zoom(private val latLng: LatLng): Action() {
+   class Zoom(private val latLng: LatLng): AsamAction() {
       override fun navigate(navController: NavController) {
          val point = NavPoint(latLng.latitude, latLng.longitude)
          val encoded = Uri.encode(Json.encodeToString(point))
