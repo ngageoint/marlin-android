@@ -19,7 +19,7 @@ sealed class ModuAction : Action() {
       }
    }
 
-   class Zoom(val modu: Modu): Action() {
+   class Zoom(val modu: Modu): ModuAction() {
       override fun navigate(navController: NavController) {
          val radius = modu.distance
          if (radius == null) {

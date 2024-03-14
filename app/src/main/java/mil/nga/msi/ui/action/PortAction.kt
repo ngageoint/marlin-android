@@ -18,7 +18,7 @@ sealed class PortAction: Action() {
       }
    }
 
-   class Zoom(val latLng: LatLng): Action() {
+   class Zoom(val latLng: LatLng): PortAction() {
       override fun navigate(navController: NavController) {
          val point = NavPoint(latLng.latitude, latLng.longitude)
          val encoded = Uri.encode(Json.encodeToString(point))

@@ -21,7 +21,7 @@ sealed class DgpsStationAction : Action() {
       }
    }
 
-   class Zoom(val latLng: LatLng): Action() {
+   class Zoom(val latLng: LatLng): DgpsStationAction() {
       override fun navigate(navController: NavController) {
          val point = NavPoint(latLng.latitude, latLng.longitude)
          val encoded = Uri.encode(Json.encodeToString(point))
