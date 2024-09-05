@@ -19,6 +19,7 @@ import mil.nga.msi.datasource.navigationwarning.NavigationArea
 import mil.nga.msi.di.migrations.datastore.dataStoreMigration_1_2
 import mil.nga.msi.di.migrations.datastore.dataStoreMigration_2_3
 import mil.nga.msi.di.migrations.datastore.dataStoreMigration_3_4
+import mil.nga.msi.di.migrations.datastore.dataStoreMigration_4_5
 import mil.nga.msi.filter.ComparatorType
 import mil.nga.msi.sort.SortDirection
 import mil.nga.msi.type.*
@@ -110,13 +111,14 @@ class DataStoreModule {
             dataStoreMigration_1_2,
             dataStoreMigration_2_3,
             dataStoreMigration_3_4,
+            dataStoreMigration_4_5
          ),
          corruptionHandler = null
       )
    }
 
    companion object {
-      const val VERSION = 4
+      const val VERSION = 5
 
       val filterDefaults = mapOf(
          DataSource.ASAM.name to Filters.newBuilder()

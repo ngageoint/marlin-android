@@ -12,7 +12,7 @@ import mil.nga.msi.datasource.noticetomariners.NoticeToMariners
 import mil.nga.msi.datasource.noticetomariners.NoticeToMarinersGraphics
 import mil.nga.msi.filter.Filter
 import mil.nga.msi.repository.preferences.UserPreferencesRepository
-import mil.nga.msi.startup.asam.AsamInitializer.Companion.FETCH_LATEST_ASAMS_TASK
+import mil.nga.msi.startup.noticetomariners.NoticeToMarinersInitializer.Companion.FETCH_LATEST_NOTICE_TO_MARINERS_TASK
 import javax.inject.Inject
 
 class NoticeToMarinersRepository @Inject constructor(
@@ -60,7 +60,7 @@ class NoticeToMarinersRepository @Inject constructor(
       return remoteDataSource.fetchNoticeToMarinersGraphic(graphic)
    }
 
-   val fetching = workManager.getWorkInfosForUniqueWorkLiveData(FETCH_LATEST_ASAMS_TASK).map { workInfo ->
+   val fetching = workManager.getWorkInfosForUniqueWorkLiveData(FETCH_LATEST_NOTICE_TO_MARINERS_TASK).map { workInfo ->
       workInfo.any { it.state == WorkInfo.State.RUNNING }
    }
 
