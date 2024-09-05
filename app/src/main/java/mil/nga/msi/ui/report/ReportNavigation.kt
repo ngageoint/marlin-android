@@ -16,15 +16,7 @@ sealed class ReportRoute(
 ): Route {
    data object Main: ReportRoute("report", "Submit a Report to NGA")
    data object List: ReportRoute("report/list", "NGA Report Submission")
-
-   data object ASAM: ReportRoute(
-      name = "report/asam",
-      title = "Anti-Shipping Activity Message ASAM",
-      shortTitle = "ASAM Report",
-      icon = R.drawable.ic_asam_24dp,
-      url = "https://msi.nga.mil/submit-report/ASAM-Report"
-   )
-
+   
    data object MODU: ReportRoute(
       name = "report/modu",
       title = "Mobile offshore Drilling Unit Movement Report MODU",
@@ -74,12 +66,6 @@ fun NavGraphBuilder.reportGraph(
             close = { appState.navController.popBackStack() },
             onTap = { route -> appState.navController.navigate(route.name) }
          )
-      }
-
-      composable(ReportRoute.ASAM.name) {
-         bottomBarVisibility(true)
-
-         ReportPage(ReportRoute.ASAM) { appState.navController.popBackStack() }
       }
 
       composable(ReportRoute.Observer.name) {
