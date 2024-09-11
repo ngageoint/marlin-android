@@ -32,7 +32,7 @@ interface AppInitializer {
    }
 
    fun inject(workManagerInitializer: WorkManagerInitializer)
-   fun inject(asamInitializer: AsamInitializer)
+//   fun inject(asamInitializer: AsamInitializer)
    fun inject(moduInitializer: ModuInitializer)
    fun inject(navigationalWarningInitializer: NavigationalWarningInitializer)
    fun inject(lightInitializer: LightInitializer)

@@ -22,11 +22,11 @@ class AsamInitializer: Initializer<Unit> {
    @Inject lateinit var workManager: WorkManager
 
    override fun create(context: Context) {
-      // Inject Hilt dependencies
-      AppInitializer.resolve(context).inject(this)
-
-      fetchAsams()
-      fetchAsamsPeriodically()
+//      // Inject Hilt dependencies
+//      AppInitializer.resolve(context).inject(this)
+//
+//      fetchAsams()
+//      fetchAsamsPeriodically()
    }
 
    override fun dependencies(): List<Class<out Initializer<*>>> {

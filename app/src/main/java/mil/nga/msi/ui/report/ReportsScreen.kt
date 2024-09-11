@@ -65,11 +65,11 @@ fun ReportsScreen(
                )
             }
 
-            Reports(ReportRoute.ASAM) {
-               onTap(ReportRoute.ASAM)
-            }
+//            Reports(ReportRoute.ASAM) {
+//               onTap(ReportRoute.ASAM)
+//            }
 
-            HorizontalDivider()
+//            HorizontalDivider()
 
             Reports(ReportRoute.Observer) {
                onTap(ReportRoute.Observer)

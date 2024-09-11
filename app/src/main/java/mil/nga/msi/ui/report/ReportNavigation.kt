@@ -16,7 +16,7 @@ sealed class ReportRoute(
 ): Route {
    data object Main: ReportRoute("report", "Submit a Report to NGA")
    data object List: ReportRoute("report/list", "NGA Report Submission")
-   
+
    data object MODU: ReportRoute(
       name = "report/modu",
       title = "Mobile offshore Drilling Unit Movement Report MODU",
