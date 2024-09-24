@@ -10,6 +10,16 @@ Marlin adheres to [Semantic Versioning](http://semver.org/).
 ##### Features
 * Removed ASAM data source
 
+##### Bug fixes
+* Fix coordinate copying crashes
+* Zoom to bookmarked items
+* Select tabs after zooming to datasource item
+
+## 1.4.1
+
+##### Bug fixes
+* Upgrade to latest compose fixing crash when using progress composable
+
 ## 1.4.0
 
 ##### Features
