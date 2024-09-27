@@ -31,8 +31,8 @@ enum class DataSource(
    val route: Route? = null
 ) {
    ASAM(
-      tab = Tab(AsamRoute.Main, "ASAMs"),
-      mappable = true,
+      tab = null,
+      mappable = false,
       color = Color(0xFF000000),
       icon = R.drawable.ic_asam_24dp,
       label = "ASAM",

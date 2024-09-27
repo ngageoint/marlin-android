@@ -59,7 +59,6 @@ class DataStoreModule {
                )
                .putAllMapped(
                   mapOf(
-                     DataSource.ASAM.name to true,
                      DataSource.MODU.name to true,
                      DataSource.NAVIGATION_WARNING.name to true,
                      DataSource.LIGHT.name to true,
@@ -70,7 +69,6 @@ class DataStoreModule {
                )
                .addAllTabs(
                   listOf(
-                     DataSource.ASAM,
                      DataSource.MODU,
                      DataSource.NAVIGATION_WARNING,
                      DataSource.LIGHT
@@ -120,26 +118,7 @@ class DataStoreModule {
    companion object {
       const val VERSION = 5
 
-      val filterDefaults = mapOf(
-         DataSource.ASAM.name to Filters.newBuilder()
-            .addFilters(
-               Filter.newBuilder()
-                  .setParameter(
-                     listOfNotNull(
-                        AsamFilter.parameters.find { it.parameter == "date" }
-                     ).map {
-                        FilterParameter.newBuilder()
-                           .setName(it.parameter)
-                           .setTitle(it.title)
-                           .setType(it.type.name)
-                           .build()
-                     }.first()
-                  )
-               .setValue("last 365 days")
-               .setComparator(ComparatorType.WITHIN.name)
-            )
-         .build()
-      )
+      val filterDefaults = emptyMap<String, Filters>().toMutableMap()
 
       val sortDefaults = mapOf(
          DataSource.ASAM.name to Sort.newBuilder()

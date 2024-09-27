@@ -22,6 +22,7 @@ val dataStoreMigration_4_5 = object : DataMigration<UserPreferences> {
             .clearNonTabs()
             .addAllNonTabs(nonTabs)
             .removeMapped(DataSource.ASAM.name)
+            .removeFilters(DataSource.ASAM.name)
             .setVersion(5)
             .build()
     }
