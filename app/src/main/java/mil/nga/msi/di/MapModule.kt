@@ -9,7 +9,6 @@ import dagger.hilt.components.SingletonComponent
 import mil.nga.gars.tile.GARSTileProvider
 import mil.nga.mgrs.tile.MGRSTileProvider
 import mil.nga.msi.network.layer.LayerService
-import mil.nga.msi.repository.map.*
 import mil.nga.msi.ui.map.overlay.*
 import javax.inject.Named
 import javax.inject.Singleton

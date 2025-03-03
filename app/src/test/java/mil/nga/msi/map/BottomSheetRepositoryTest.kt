@@ -96,7 +96,7 @@ class BottomSheetRepositoryTest {
    fun should_not_return_navWarnings_that_havent_been_tapped() = runTest {
       setMockNavWarning(polygonNavWarningOn180thMeridian())
       val latLng = LatLng(50.0, 170.0)
-      val bounds = buildInputBounds(latLng.latitude, latLng.longitude, 2.5)
+      val bounds = buildInputBounds(latLng.latitude, latLng.longitude)
 
       val tappedAnnotationsCount = bottomSheetRepository.setLocation(latLng, bounds)
       Assert.assertEquals(0, tappedAnnotationsCount)
@@ -106,7 +106,7 @@ class BottomSheetRepositoryTest {
    fun should_return_tapped_polygons_that_dont_cross_180th_meridian() = runTest {
       setMockNavWarning(polygonNavWarning())
       val latLng = LatLng(27.0, 145.9)
-      val bounds = buildInputBounds(latLng.latitude, latLng.longitude, 2.5)
+      val bounds = buildInputBounds(latLng.latitude, latLng.longitude)
 
       val tappedAnnotationsCount = bottomSheetRepository.setLocation(latLng, bounds)
       Assert.assertEquals(1, tappedAnnotationsCount)
@@ -120,7 +120,7 @@ class BottomSheetRepositoryTest {
    fun should_return_tapped_polygons_that_cross_180th_meridian() = runTest {
       setMockNavWarning(polygonNavWarningOn180thMeridian())
       val latLng = LatLng(17.0, -179.9)
-      val bounds = buildInputBounds(latLng.latitude, latLng.longitude, 2.5)
+      val bounds = buildInputBounds(latLng.latitude, latLng.longitude)
 
       val tappedAnnotationsCount = bottomSheetRepository.setLocation(latLng, bounds)
       Assert.assertEquals(1, tappedAnnotationsCount)
@@ -134,7 +134,7 @@ class BottomSheetRepositoryTest {
    fun should_return_tapped_lines_that_cross_180th_meridian() = runTest {
       setMockNavWarning(lineNavWarningOn180thMeridian())
       val latLng = LatLng(20.0, 179.0)
-      val bounds = buildInputBounds(latLng.latitude, latLng.longitude, 2.5)
+      val bounds = buildInputBounds(latLng.latitude, latLng.longitude)
 
       val tappedAnnotationsCount = bottomSheetRepository.setLocation(latLng, bounds)
       Assert.assertEquals(1, tappedAnnotationsCount)
@@ -148,7 +148,7 @@ class BottomSheetRepositoryTest {
    fun should_return_tapped_points() = runTest {
       setMockNavWarning(pointNavWarning())
       val latLng = LatLng(37.0, -25.0)
-      val bounds = buildInputBounds(latLng.latitude, latLng.longitude, 2.5)
+      val bounds = buildInputBounds(latLng.latitude, latLng.longitude)
 
       val tappedAnnotationsCount = bottomSheetRepository.setLocation(latLng, bounds)
       Assert.assertEquals(1, tappedAnnotationsCount)
@@ -169,7 +169,7 @@ class BottomSheetRepositoryTest {
       } returns listOf(navWarning)
    }
 
-   private fun buildInputBounds(lat: Double, long: Double, tolerance: Double): LatLngBounds {
+   private fun buildInputBounds(lat: Double, long: Double, tolerance: Double = 2.5): LatLngBounds {
       return LatLngBounds(
          LatLng(lat - tolerance, long - tolerance),
          LatLng(lat + tolerance, long + tolerance)

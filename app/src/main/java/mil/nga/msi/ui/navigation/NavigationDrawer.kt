@@ -65,7 +65,7 @@ fun NavigationDrawer(
       } else if (fromIndex <= tabs.size) {
          // Drag from list1 to list2
          val list1Element = tabs[fromIndex - 1]
-         previousTabs = tabs.toMutableList().apply { removeLast() }
+         previousTabs = tabs.toMutableList().apply { removeAt(this.lastIndex) }
          previousNonTabs = nonTabs.toMutableList().apply {
             add(toIndex - tabs.size - 1, list1Element)
          }
@@ -74,7 +74,7 @@ fun NavigationDrawer(
       } else if (toIndex <= tabs.size + 1) {
          // Drag from list2 to list1
          nonTabs.getOrNull(fromIndex - tabs.size - 2)?.let { dataSource ->
-            var newNonTabs = nonTabs.toMutableList().apply { removeFirst() }
+            var newNonTabs = nonTabs.toMutableList().apply { removeAt(0) }
             var newTabs = tabs.toMutableList().apply { add(lastIndex + 1, dataSource) }
 
             if (newTabs.size > MAX_TABS) {

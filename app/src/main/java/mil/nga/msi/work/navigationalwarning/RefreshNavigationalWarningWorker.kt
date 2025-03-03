@@ -24,7 +24,7 @@ class RefreshNavigationalWarningWorker @AssistedInject constructor(
 ) : CoroutineWorker(context, params) {
    override suspend fun doWork(): Result = try {
       val fetched = userPreferencesRepository.fetched(DataSource.NAVIGATION_WARNING)
-      if (fetched == null || fetched.isBefore(Instant.now().minus(FETCH_INTERVAL_HOURS, ChronoUnit.HOURS))) {
+      if (true) {
          repository.fetchNavigationalWarnings(true)
          userPreferencesRepository.setFetched(DataSource.NAVIGATION_WARNING, Instant.now())
       }
