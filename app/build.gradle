@@ -8,7 +8,7 @@ plugins {
     id 'kotlin-parcelize'
     id 'kotlinx-serialization'
     id 'com.google.protobuf'
-    id 'org.ajoberstar.grgit' version '4.1.0'
+    id 'org.ajoberstar.grgit' version '5.3.0'
 }
 
 group 'mil.nga.msi'
@@ -18,13 +18,13 @@ def googleMapsApiReleaseKey = hasProperty('MSI_RELEASE_MAPS_API_KEY') ? MSI_RELE
 def googleMapsApiDebugKey = hasProperty('MSI_DEBUG_MAPS_API_KEY') ? MSI_DEBUG_MAPS_API_KEY : ''
 
 def room_version = '2.6.1'
-def work_version = '2.9.0'
-def compose_version = '1.6.3'
+def work_version = '2.10.0'
+def compose_version = '1.7.8'
 def retrofit_version = '2.9.0'
 def accompanist_version = '0.34.0'
 
 android {
-    compileSdk 34
+    compileSdk 35
     namespace 'mil.nga.msi'
 
     defaultConfig {
@@ -32,7 +32,7 @@ android {
 
         applicationId "mil.nga.msi"
         minSdk 27
-        targetSdk 34
+        targetSdk 35
         versionName project.version
         versionCode ext.repo.log().size() as int
 
@@ -78,7 +78,11 @@ android {
     }
 
     packagingOptions {
-        exclude 'META-INF/INDEX.LIST'
+        resources {
+            excludes += "META-INF/INDEX.LIST"
+            merges += "META-INF/LICENSE.md"
+            merges += "META-INF/LICENSE-notice.md"
+        }
     }
 
     kotlin {
@@ -169,31 +173,31 @@ dependencies {
 
     implementation "androidx.work:work-runtime-ktx:$work_version"
 
-    implementation "androidx.startup:startup-runtime:1.1.1"
+    implementation "androidx.startup:startup-runtime:1.2.0"
 
-    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.3"
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3"
 
-    implementation 'androidx.core:core-ktx:1.12.0'
+    implementation 'androidx.core:core-ktx:1.15.0'
     implementation "androidx.compose.ui:ui:$compose_version"
-    implementation "androidx.compose.material3:material3:1.2.1"
+    implementation "androidx.compose.material3:material3:1.3.1"
     implementation "androidx.compose.material:material:$compose_version"
     implementation "androidx.compose.ui:ui-tooling-preview:$compose_version"
-    implementation "androidx.compose.material:material-icons-extended:1.6.3"
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.7.0'
-    implementation 'androidx.lifecycle:lifecycle-runtime-compose:2.7.0'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0'
-    implementation "androidx.lifecycle:lifecycle-service:2.7.0"
-    implementation 'androidx.activity:activity-compose:1.8.2'
-    implementation 'androidx.navigation:navigation-compose:2.7.7'
-    implementation 'androidx.paging:paging-runtime-ktx:3.2.1'
-    implementation "androidx.paging:paging-compose:3.2.1"
+    implementation "androidx.compose.material:material-icons-extended:1.7.8"
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.8.7'
+    implementation 'androidx.lifecycle:lifecycle-runtime-compose:2.8.7'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7'
+    implementation "androidx.lifecycle:lifecycle-service:2.8.7"
+    implementation 'androidx.activity:activity-compose:1.10.1'
+    implementation 'androidx.navigation:navigation-compose:2.8.8'
+    implementation 'androidx.paging:paging-runtime-ktx:3.3.6'
+    implementation "androidx.paging:paging-compose:3.3.6"
     implementation "androidx.compose.runtime:runtime-livedata:$compose_version"
-    implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'com.google.android.material:material:1.11.0'
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.7.0'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0'
-    implementation 'androidx.navigation:navigation-fragment-ktx:2.7.7'
-    implementation 'androidx.navigation:navigation-ui-ktx:2.7.7'
+    implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'com.google.android.material:material:1.12.0'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.8.7'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7'
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.8.8'
+    implementation 'androidx.navigation:navigation-ui-ktx:2.8.8'
 
     implementation 'com.google.protobuf:protobuf-javalite:3.25.2'
     implementation("com.google.protobuf:protobuf-kotlin-lite:3.25.2")
@@ -204,15 +208,15 @@ dependencies {
     implementation 'com.google.maps.android:maps-compose-utils:2.11.4'
     implementation 'com.google.maps.android:maps-compose-widgets:2.11.4'
     implementation 'com.google.maps.android:maps-ktx:3.4.0'
-    implementation 'com.google.android.gms:play-services-maps:18.2.0'
-    implementation 'mil.nga.gars:gars-android:1.2.2'
-    implementation 'mil.nga.mgrs:mgrs-android:2.2.2'
+    implementation 'com.google.android.gms:play-services-maps:19.1.0'
+    implementation 'mil.nga.gars:gars-android:1.2.3'
+    implementation 'mil.nga.mgrs:mgrs-android:2.2.3'
 
     implementation "io.coil-kt:coil-compose:2.2.2"
 
-    implementation 'com.google.android.gms:play-services-location:21.2.0'
+    implementation 'com.google.android.gms:play-services-location:21.3.0'
 
-    implementation 'mil.nga.geopackage.map:geopackage-android-map:6.7.3'
+    implementation 'mil.nga.geopackage.map:geopackage-android-map:6.7.4'
 
     implementation('edu.stanford.nlp:stanford-corenlp:4.5.4') {
         exclude group: 'org.hamcrest'
@@ -229,13 +233,13 @@ dependencies {
     implementation "com.google.accompanist:accompanist-permissions:$accompanist_version"
     implementation "com.google.accompanist:accompanist-webview:$accompanist_version"
 
-    implementation "com.google.android.gms:play-services-oss-licenses:17.0.1"
+    implementation "com.google.android.gms:play-services-oss-licenses:17.1.0"
 
     implementation "androidx.tracing:tracing:1.2.0"
 
     testImplementation libs.junit4
     testImplementation project(':testing')
-    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.ext:junit:1.2.1'
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
     androidTestImplementation project(':testing')
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
@@ -246,7 +250,7 @@ dependencies {
     testImplementation "com.squareup.okhttp3:mockwebserver:4.12.0"
 
     androidTestImplementation "io.mockk:mockk-android:1.13.8"
-    androidTestImplementation 'androidx.paging:paging-testing:3.2.1'
+    androidTestImplementation 'androidx.paging:paging-testing:3.3.6'
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
     androidTestImplementation "androidx.work:work-testing:$work_version"
 }
