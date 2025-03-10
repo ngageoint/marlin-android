@@ -1,15 +1,18 @@
 import org.ajoberstar.grgit.Grgit
 
 plugins {
-    id 'com.android.application'
-    id 'org.jetbrains.kotlin.android'
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.parcelize)
+    // TODO: add compose when upgrading to Kotlin 2.0.0+
+//    alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.dagger.hilt.android)
+    alias(libs.plugins.protobuf)
+    alias(libs.plugins.ajoberstar.grgit)
     id 'kotlin-kapt'
-//    id 'com.google.devtools.ksp' version '1.9.22-1.0.16'
-    id 'com.google.dagger.hilt.android'
-    id 'kotlin-parcelize'
+    // TODO: replace KAPT with KSP
+//    alias(libs.plugins.ksp)
     id 'kotlinx-serialization'
-    id 'com.google.protobuf'
-    id 'org.ajoberstar.grgit' version libs.versions.grgit
 }
 
 group libs.versions.applicationId.get()
@@ -17,12 +20,6 @@ version '1.5.0'
 
 def googleMapsApiReleaseKey = hasProperty('MSI_RELEASE_MAPS_API_KEY') ? MSI_RELEASE_MAPS_API_KEY : ''
 def googleMapsApiDebugKey = hasProperty('MSI_DEBUG_MAPS_API_KEY') ? MSI_DEBUG_MAPS_API_KEY : ''
-
-def room_version = '2.6.1'
-def work_version = '2.10.0'
-def compose_version = '1.7.8'
-def retrofit_version = '2.9.0'
-def accompanist_version = '0.34.0'
 
 android {
     compileSdk libs.versions.compileSdk.get().toInteger()
@@ -57,6 +54,11 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    buildFeatures {
+        compose true
+        buildConfig true
+    }
+
     buildTypes {
         debug {
             minifyEnabled false
@@ -78,12 +80,8 @@ android {
         targetCompatibility JavaVersion.VERSION_17
     }
 
-    packagingOptions {
-        resources {
-            excludes += "META-INF/INDEX.LIST"
-            merges += "META-INF/LICENSE.md"
-            merges += "META-INF/LICENSE-notice.md"
-        }
+    composeOptions {
+        kotlinCompilerExtensionVersion = libs.versions.kotlinCompilerExtensionVersion.get()
     }
 
     kotlin {
@@ -95,12 +93,12 @@ android {
         freeCompilerArgs = ["-Xcontext-receivers"]
     }
 
-    buildFeatures {
-        compose true
-        buildConfig true
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.kotlinCompilerExtensionVersion.get()
+    packagingOptions {
+        resources {
+            excludes += "META-INF/INDEX.LIST"
+            merges += "META-INF/LICENSE.md"
+            merges += "META-INF/LICENSE-notice.md"
+        }
     }
 
     protobuf {
@@ -152,24 +150,24 @@ android {
 
 dependencies {
     implementation libs.dagger.hilt.android
-    implementation libs.hilt.navigation.compose
     kapt libs.dagger.hilt.compiler
+    kapt libs.hilt.compiler
+    implementation libs.hilt.navigation.compose
     implementation libs.hilt.work
-    kapt libs.hilt.kapt.compiler
-    annotationProcessor libs.hilt.annotation.compiler
+    annotationProcessor libs.hilt.compiler
 
+    annotationProcessor libs.room.compiler
+    kapt libs.room.compiler
     implementation libs.room.ktx
-    implementation libs.room.runtime
-    annotationProcessor libs.room.annotation.compiler
-    kapt libs.room.kapt
     implementation libs.room.paging
+    implementation libs.room.runtime
 
     implementation libs.retrofit
     implementation libs.retrofit.gson
 
     implementation libs.tickaroo.annotation
     implementation libs.tickaroo.core
-    kapt libs.tickaroo.kapt.processor
+    kapt libs.tickaroo.processor
     implementation libs.tickaroo.retrofit.converter
 
     implementation libs.work.runtim.ktx
@@ -179,24 +177,30 @@ dependencies {
     implementation libs.kotlinx.serialization.json
 
     implementation libs.core.ktx
-    implementation libs.compose.ui
-    implementation libs.compose.material3
+
     implementation libs.compose.material
-    implementation libs.compose.ui.tooling.preview
     implementation libs.compose.material.icons
+    implementation libs.compose.material3
     implementation libs.compose.runtime.livedata
+    implementation libs.compose.ui
+    implementation libs.compose.ui.tooling.preview
+
+    implementation libs.lifecycle.livedata.ktx
     implementation libs.lifecycle.runtime.ktx
     implementation libs.lifecycle.runtime.compose
-    implementation libs.lifecycle.viewmodel.compose
     implementation libs.lifecycle.service
-    implementation libs.lifecycle.livedata.ktx
+    implementation libs.lifecycle.viewmodel.compose
     implementation libs.lifecycle.viewmodel.ktx
+
     implementation libs.activity
+
     implementation libs.navigation.compose
     implementation libs.navigation.fragment.ktx
     implementation libs.navigation.ui.ktx
-    implementation libs.paging.runtime.ktx
+
     implementation libs.paging.compose
+    implementation libs.paging.runtime.ktx
+
     implementation libs.appcompat
 
     implementation libs.datastore
@@ -224,8 +228,8 @@ dependencies {
     implementation libs.google.accompanist.webview
 
     implementation libs.nga.gars
-    implementation libs.nga.mgrs
     implementation libs.nga.geo.android.map
+    implementation libs.nga.mgrs
 
     implementation libs.coil.kt.compose
 
@@ -240,7 +244,6 @@ dependencies {
 
     implementation libs.tracing
 
-    testImplementation libs.junit4
     testImplementation project(':testing')
     androidTestImplementation libs.test.junit
     androidTestImplementation libs.compose.ui.test.junit4

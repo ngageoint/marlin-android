@@ -1,15 +1,17 @@
 plugins {
-    id 'com.android.library'
-    id 'org.jetbrains.kotlin.android'
+    alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.android)
+    // TODO: add compose when upgrading to Kotlin 2.0.0+
+//    alias(libs.plugins.kotlin.compose)
 }
 
 android {
     namespace 'mil.nga.msi.testing'
-    compileSdk 35
+    compileSdk libs.versions.compileSdk.get().toInteger()
 
     defaultConfig {
-        minSdk 27
-        targetSdk 35
+        minSdk libs.versions.minSdk.get().toInteger()
+        targetSdk libs.versions.targetSdk.get().toInteger()
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
@@ -27,20 +29,20 @@ android {
     }
 
     kotlin {
-        jvmToolchain(17)
+        jvmToolchain(libs.versions.jvmToolchain.get().toInteger())
     }
 
     kotlinOptions {
-        jvmTarget = "17"
+        jvmTarget = libs.versions.jvmTarget.get()
         freeCompilerArgs = ["-Xcontext-receivers"]
     }
 }
 
 dependencies {
     implementation project(path: ':app')
-    implementation 'androidx.core:core-ktx:1.12.0'
-    implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'com.google.android.material:material:1.11.0'
+    implementation libs.core.ktx
+    implementation libs.appcompat
+    implementation libs.google.material
     implementation libs.junit4
-    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation libs.test.junit
 }
