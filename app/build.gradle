@@ -244,6 +244,7 @@ dependencies {
 
     implementation libs.tracing
 
+    // ----- TESTING -----
     testImplementation project(':testing')
     androidTestImplementation libs.test.junit
     androidTestImplementation libs.compose.ui.test.junit4
