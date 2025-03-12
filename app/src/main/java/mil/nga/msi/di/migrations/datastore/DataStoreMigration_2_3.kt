@@ -10,7 +10,7 @@ val dataStoreMigration_2_3 = object : DataMigration<UserPreferences> {
       // Remove last tab in tabs and place in non-tabs
       val lastTab = currentData.tabsList.last()
       val tabs = currentData.tabsList.toMutableList().apply {
-         removeLast()
+         removeAt(this.lastIndex)
       }
 
       // Add Bookmark data source

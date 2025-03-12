@@ -19,7 +19,7 @@ class SearchRepositoryTest {
 
    private lateinit var googleDataSource: GoogleRemoteDataSource
    private lateinit var nominatimDataSource: NominatimRemoteDataSource
-   private lateinit var searchProvider: SearchProvider
+
    @Before
    fun setUp() {
       googleDataSource = mockk<GoogleRemoteDataSource>()

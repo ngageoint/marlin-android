@@ -6,7 +6,6 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
 import mil.nga.msi.startup.WorkManagerInitializer
-import mil.nga.msi.startup.asam.AsamInitializer
 import mil.nga.msi.startup.dgpsstation.DgpsStationInitializer
 import mil.nga.msi.startup.electronicpublication.ElectronicPublicationInitializer
 import mil.nga.msi.startup.light.LightInitializer
