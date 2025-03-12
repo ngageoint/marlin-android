@@ -11,7 +11,6 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.OutOfQuotaPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
-import mil.nga.msi.di.AppInitializer
 import mil.nga.msi.startup.WorkManagerInitializer
 import mil.nga.msi.work.asam.LoadAsamWorker
 import mil.nga.msi.work.asam.RefreshAsamWorker

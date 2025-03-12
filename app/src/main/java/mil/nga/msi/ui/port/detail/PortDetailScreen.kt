@@ -38,6 +38,7 @@ import mil.nga.msi.ui.bookmark.BookmarkNotes
 import mil.nga.msi.ui.datasource.DataSourceActions
 import mil.nga.msi.ui.port.PortViewModel
 import mil.nga.msi.ui.theme.onSurfaceDisabled
+import java.util.Locale
 
 fun Int.asNonZeroOrNull(): Int? {
    return if(this != 0) {
@@ -181,7 +182,7 @@ private fun PortHeader(
                      val nmi = distance * 0.539957
                      CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                         Text(
-                           text = "${String.format("%.2f", nmi)}, $direction",
+                           text = "${String.format(Locale.getDefault(), "%.2f", nmi)}, $direction",
                            style = MaterialTheme.typography.bodyMedium,
                            modifier = Modifier.padding(top = 4.dp)
                         )

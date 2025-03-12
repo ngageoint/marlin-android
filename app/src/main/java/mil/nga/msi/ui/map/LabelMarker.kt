@@ -1,5 +1,6 @@
 package mil.nga.msi.ui.map
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
@@ -12,6 +13,7 @@ import mil.nga.msi.R
 
 class BitmapDescriptorFactory {
    companion object {
+      @SuppressLint("InflateParams")
       fun fromResource(
          context: Context,
          resource: Int,

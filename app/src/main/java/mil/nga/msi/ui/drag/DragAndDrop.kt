@@ -154,7 +154,7 @@ class DragDropState internal constructor(
 }
 
 fun Modifier.dragContainer(dragDropState: DragDropState): Modifier {
-   return pointerInput(dragDropState) {
+   return this.pointerInput(dragDropState) {
       detectDragGesturesAfterLongPress(
          onDrag = { change, offset ->
             change.consume()
