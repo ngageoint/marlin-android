@@ -32,7 +32,7 @@ android {
         minSdk libs.versions.minSdk.get().toInteger()
         targetSdk libs.versions.targetSdk.get().toInteger()
         versionName project.version
-        versionCode ext.repo.log().size() as int
+        versionCode 395
 
         kapt {
             arguments {

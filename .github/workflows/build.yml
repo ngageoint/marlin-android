@@ -6,7 +6,7 @@ on:
       appBranch:
         description: 'App GitHub branch to build'
         required: true
-        default: 'master'
+        default: 'main'
 
 jobs:
   build:
