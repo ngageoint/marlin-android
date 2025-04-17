@@ -42,11 +42,11 @@ android {
 
         signingConfigs {
             release {
-                if (project.hasProperty('MSI_KEYSTORE')) {
-                    storeFile file(MSI_KEYSTORE)
-                    storePassword MSI_KEYSTORE_PASSWORD
-                    keyAlias MSI_KEY_ALIAS
-                    keyPassword MSI_KEY_PASSWORD
+                if (project.hasProperty('KEYSTORE')) {
+                    storeFile file(KEYSTORE)
+                    storePassword KEYSTORE_PASSWORD
+                    keyAlias KEY_ALIAS
+                    keyPassword KEY_PASSWORD
                 }
             }
         }
