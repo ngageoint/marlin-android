@@ -21,7 +21,6 @@ class MapFilterViewModel @Inject constructor(
    )
 
    private val filterableDataSources = listOf(
-      DataSource.ASAM,
       DataSource.MODU,
       DataSource.LIGHT,
       DataSource.PORT,
