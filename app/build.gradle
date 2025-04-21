@@ -16,7 +16,7 @@ plugins {
 }
 
 group libs.versions.applicationId.get()
-version '1.5.0'
+version '1.5.1'
 
 def googleMapsApiReleaseKey = hasProperty('MSI_RELEASE_MAPS_API_KEY') ? MSI_RELEASE_MAPS_API_KEY : ''
 def googleMapsApiDebugKey = hasProperty('MSI_DEBUG_MAPS_API_KEY') ? MSI_DEBUG_MAPS_API_KEY : ''
@@ -32,7 +32,7 @@ android {
         minSdk libs.versions.minSdk.get().toInteger()
         targetSdk libs.versions.targetSdk.get().toInteger()
         versionName project.version
-        versionCode ext.repo.log().size() as int
+        versionCode 395
 
         kapt {
             arguments {
@@ -42,11 +42,11 @@ android {
 
         signingConfigs {
             release {
-                if (project.hasProperty('MSI_KEYSTORE')) {
-                    storeFile file(MSI_KEYSTORE)
-                    storePassword MSI_KEYSTORE_PASSWORD
-                    keyAlias MSI_KEY_ALIAS
-                    keyPassword MSI_KEY_PASSWORD
+                if (project.hasProperty('KEYSTORE')) {
+                    storeFile file(KEYSTORE)
+                    storePassword KEYSTORE_PASSWORD
+                    keyAlias KEY_ALIAS
+                    keyPassword KEY_PASSWORD
                 }
             }
         }
