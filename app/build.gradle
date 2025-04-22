@@ -1,40 +1,38 @@
 import org.ajoberstar.grgit.Grgit
 
 plugins {
-    id 'com.android.application'
-    id 'org.jetbrains.kotlin.android'
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.parcelize)
+    // TODO: add compose when upgrading to Kotlin 2.0.0+
+//    alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.dagger.hilt.android)
+    alias(libs.plugins.protobuf)
+    alias(libs.plugins.ajoberstar.grgit)
     id 'kotlin-kapt'
-    id 'com.google.dagger.hilt.android'
-    id 'kotlin-parcelize'
+    // TODO: replace KAPT with KSP
+//    alias(libs.plugins.ksp)
     id 'kotlinx-serialization'
-    id 'com.google.protobuf'
-    id("org.ajoberstar.grgit") version "5.3.0"
 }
 
-group 'mil.nga.msi'
-version '1.5.0'
+group libs.versions.applicationId.get()
+version '1.5.1'
 
 def googleMapsApiReleaseKey = hasProperty('MSI_RELEASE_MAPS_API_KEY') ? MSI_RELEASE_MAPS_API_KEY : ''
 def googleMapsApiDebugKey = hasProperty('MSI_DEBUG_MAPS_API_KEY') ? MSI_DEBUG_MAPS_API_KEY : ''
 
-def room_version = '2.6.1'
-def work_version = '2.9.0'
-def compose_version = '1.6.3'
-def retrofit_version = '2.9.0'
-def accompanist_version = '0.34.0'
-
 android {
-    compileSdk 34
-    namespace 'mil.nga.msi'
+    compileSdk libs.versions.compileSdk.get().toInteger()
+    namespace libs.versions.applicationId.get()
 
     defaultConfig {
         ext.repo = Grgit.open(currentDir: project.rootDir)
 
-        applicationId "mil.nga.msi"
-        minSdk 27
-        targetSdk 34
+        applicationId libs.versions.applicationId.get()
+        minSdk libs.versions.minSdk.get().toInteger()
+        targetSdk libs.versions.targetSdk.get().toInteger()
         versionName project.version
-        versionCode ext.repo.log().size() as int
+        versionCode 395
 
         kapt {
             arguments {
@@ -54,6 +52,11 @@ android {
         }
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildFeatures {
+        compose true
+        buildConfig true
     }
 
     buildTypes {
@@ -77,29 +80,25 @@ android {
         targetCompatibility JavaVersion.VERSION_17
     }
 
+    composeOptions {
+        kotlinCompilerExtensionVersion = libs.versions.kotlinCompilerExtensionVersion.get()
+    }
+
+    kotlin {
+        jvmToolchain(libs.versions.jvmToolchain.get().toInteger())
+    }
+
+    kotlinOptions {
+        jvmTarget = libs.versions.jvmTarget.get()
+        freeCompilerArgs = ["-Xcontext-receivers"]
+    }
+
     packagingOptions {
         resources {
             excludes += "META-INF/INDEX.LIST"
             merges += "META-INF/LICENSE.md"
             merges += "META-INF/LICENSE-notice.md"
         }
-    }
-
-    kotlin {
-        jvmToolchain(17)
-    }
-
-    kotlinOptions {
-        jvmTarget = "17"
-        freeCompilerArgs = ["-Xcontext-receivers"]
-    }
-
-    buildFeatures {
-        compose true
-        buildConfig true
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.8"
     }
 
     protobuf {
@@ -150,107 +149,114 @@ android {
 }
 
 dependencies {
-    implementation "com.google.dagger:hilt-android:$hilt_version"
-    implementation 'androidx.hilt:hilt-navigation-compose:1.2.0'
-    kapt "com.google.dagger:hilt-compiler:$hilt_version"
-    implementation 'androidx.hilt:hilt-work:1.2.0'
-    kapt 'androidx.hilt:hilt-compiler:1.2.0'
-    annotationProcessor 'androidx.hilt:hilt-compiler:1.2.0'
+    implementation libs.dagger.hilt.android
+    kapt libs.dagger.hilt.compiler
+    kapt libs.hilt.compiler
+    implementation libs.hilt.navigation.compose
+    implementation libs.hilt.work
+    annotationProcessor libs.hilt.compiler
 
-    implementation "androidx.room:room-ktx:$room_version"
-    implementation "androidx.room:room-runtime:$room_version"
-    annotationProcessor "androidx.room:room-compiler:$room_version"
-    kapt "androidx.room:room-compiler:$room_version"
-    implementation "androidx.room:room-paging:$room_version"
+    annotationProcessor libs.room.compiler
+    kapt libs.room.compiler
+    implementation libs.room.ktx
+    implementation libs.room.paging
+    implementation libs.room.runtime
 
-    implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
-    implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
+    implementation libs.retrofit
+    implementation libs.retrofit.gson
 
-    implementation "com.tickaroo.tikxml:annotation:0.8.13"
-    implementation "com.tickaroo.tikxml:core:0.8.13"
-    kapt "com.tickaroo.tikxml:processor:0.8.13"
-    implementation "com.tickaroo.tikxml:retrofit-converter:0.8.13"
+    implementation libs.tickaroo.annotation
+    implementation libs.tickaroo.core
+    kapt libs.tickaroo.processor
+    implementation libs.tickaroo.retrofit.converter
 
-    implementation "androidx.work:work-runtime-ktx:$work_version"
+    implementation libs.work.runtim.ktx
 
-    implementation "androidx.startup:startup-runtime:1.1.1"
+    implementation libs.startup.runtime
 
-    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.3"
+    implementation libs.kotlinx.serialization.json
 
-    implementation 'androidx.core:core-ktx:1.12.0'
-    implementation "androidx.compose.ui:ui:$compose_version"
-    implementation "androidx.compose.material3:material3:1.2.1"
-    implementation "androidx.compose.material:material:$compose_version"
-    implementation "androidx.compose.ui:ui-tooling-preview:$compose_version"
-    implementation "androidx.compose.material:material-icons-extended:1.6.3"
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.7.0'
-    implementation 'androidx.lifecycle:lifecycle-runtime-compose:2.7.0'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0'
-    implementation "androidx.lifecycle:lifecycle-service:2.7.0"
-    implementation 'androidx.activity:activity-compose:1.8.2'
-    implementation 'androidx.navigation:navigation-compose:2.7.7'
-    implementation 'androidx.paging:paging-runtime-ktx:3.2.1'
-    implementation "androidx.paging:paging-compose:3.2.1"
-    implementation "androidx.compose.runtime:runtime-livedata:$compose_version"
-    implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'com.google.android.material:material:1.11.0'
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.7.0'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0'
-    implementation 'androidx.navigation:navigation-fragment-ktx:2.7.7'
-    implementation 'androidx.navigation:navigation-ui-ktx:2.7.7'
+    implementation libs.core.ktx
 
-    implementation 'com.google.protobuf:protobuf-javalite:3.25.2'
-    implementation("com.google.protobuf:protobuf-kotlin-lite:3.25.2")
-    implementation 'androidx.datastore:datastore-preferences:1.0.0'
-    implementation "androidx.security:security-crypto:1.1.0-alpha06"
+    implementation libs.compose.material
+    implementation libs.compose.material.icons
+    implementation libs.compose.material3
+    implementation libs.compose.runtime.livedata
+    implementation libs.compose.ui
+    implementation libs.compose.ui.tooling.preview
 
-    implementation 'com.google.maps.android:maps-compose:2.11.4'
-    implementation 'com.google.maps.android:maps-compose-utils:2.11.4'
-    implementation 'com.google.maps.android:maps-compose-widgets:2.11.4'
-    implementation 'com.google.maps.android:maps-ktx:3.4.0'
-    implementation 'com.google.android.gms:play-services-maps:18.2.0'
-    implementation 'mil.nga.gars:gars-android:1.2.2'
-    implementation 'mil.nga.mgrs:mgrs-android:2.2.2'
+    implementation libs.lifecycle.livedata.ktx
+    implementation libs.lifecycle.runtime.ktx
+    implementation libs.lifecycle.runtime.compose
+    implementation libs.lifecycle.service
+    implementation libs.lifecycle.viewmodel.compose
+    implementation libs.lifecycle.viewmodel.ktx
 
-    implementation "io.coil-kt:coil-compose:2.2.2"
+    implementation libs.activity
 
-    implementation 'com.google.android.gms:play-services-location:21.2.0'
+    implementation libs.navigation.compose
+    implementation libs.navigation.fragment.ktx
+    implementation libs.navigation.ui.ktx
 
-    implementation 'mil.nga.geopackage.map:geopackage-android-map:6.7.3'
+    implementation libs.paging.compose
+    implementation libs.paging.runtime.ktx
 
-    implementation('edu.stanford.nlp:stanford-corenlp:4.5.4') {
+    implementation libs.appcompat
+
+    implementation libs.datastore
+
+    implementation libs.security.crypto
+
+    implementation libs.google.material
+
+    implementation libs.google.protobuf.javalite
+    implementation libs.google.protobuf.kotlinlite
+
+    implementation libs.google.maps.compose
+    implementation libs.google.maps.compose.utils
+    implementation libs.google.maps.compose.widgets
+    implementation libs.google.maps.ktx
+    implementation libs.google.maps.play.services
+
+    implementation libs.google.play.services.location
+    implementation libs.google.play.services.oss
+
+    implementation libs.google.accompanist.navigation
+    implementation libs.google.accompanist.pager
+    implementation libs.google.accompanist.pager.ind
+    implementation libs.google.accompanist.permissions
+    implementation libs.google.accompanist.webview
+
+    implementation libs.nga.gars
+    implementation libs.nga.geo.android.map
+    implementation libs.nga.mgrs
+
+    implementation libs.coil.kt.compose
+
+    implementation(libs.stanford.corenlp) {
         exclude group: 'org.hamcrest'
         exclude group: 'junit'
         exclude group: 'com.sun.xml.bind'
         exclude group: 'com.google.protobuf'
     }
 
-    implementation 'com.github.matomo-org:matomo-sdk-android:4.1.4'
+    implementation libs.matomo
 
-    implementation "com.google.accompanist:accompanist-navigation-material:$accompanist_version"
-    implementation "com.google.accompanist:accompanist-pager:$accompanist_version"
-    implementation "com.google.accompanist:accompanist-pager-indicators:$accompanist_version"
-    implementation "com.google.accompanist:accompanist-permissions:$accompanist_version"
-    implementation "com.google.accompanist:accompanist-webview:$accompanist_version"
+    implementation libs.tracing
 
-    implementation "com.google.android.gms:play-services-oss-licenses:17.0.1"
-
-    implementation "androidx.tracing:tracing:1.2.0"
-
-    testImplementation libs.junit4
+    // ----- TESTING -----
     testImplementation project(':testing')
-    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
-    androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
+    androidTestImplementation libs.test.junit
+    androidTestImplementation libs.compose.ui.test.junit4
     androidTestImplementation project(':testing')
-    debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
-    debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_version"
+    debugImplementation libs.compose.ui.tooling
+    debugImplementation libs.compose.ui.test.manifest
 
-    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.1'
-    testImplementation "io.mockk:mockk:1.13.8"
-    testImplementation "com.squareup.okhttp3:mockwebserver:4.12.0"
+    testImplementation libs.kotlinx.coroutines.test
+    testImplementation libs.mockk
+    testImplementation libs.square.mockwebserver
 
-    androidTestImplementation "io.mockk:mockk-android:1.13.8"
-    androidTestImplementation 'androidx.paging:paging-testing:3.2.1'
-    androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
-    androidTestImplementation "androidx.work:work-testing:$work_version"
+    androidTestImplementation libs.mockk.android
+    androidTestImplementation libs.paging.testing
+    androidTestImplementation libs.work.testing
 }

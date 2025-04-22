@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import mil.nga.msi.datasource.port.PortWithBookmark
 import mil.nga.msi.ui.bookmark.BookmarkNotes
 import mil.nga.msi.ui.location.generalDirection
+import java.util.Locale
 
 @Composable
 fun PortSummary(
@@ -65,7 +66,7 @@ fun PortSummary(
                val nmi = distance * 0.539957
                CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                   Text(
-                     text = "${String.format("%.2f", nmi)}, $direction",
+                     text = "${String.format(Locale.getDefault(), "%.2f", nmi)}, $direction",
                      style = MaterialTheme.typography.bodyMedium,
                      modifier = Modifier.padding(top = 4.dp)
                   )

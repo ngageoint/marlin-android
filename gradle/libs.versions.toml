@@ -1,0 +1,159 @@
+[versions]
+
+applicationId = "mil.nga.msi"
+compileSdk = "35"
+targetSdk = "35"
+minSdk = "27"
+jvmTarget = "17"
+jvmToolchain = "17"
+kotlin = "1.9.22"
+kotlinCompilerExtensionVersion = "1.5.8"
+
+accompanist = "0.34.0"
+activity = "1.10.1"
+appcompat = "1.7.0"
+coil-kt-compose = "2.2.2"
+compose = "1.7.8"
+compose-material-icons = "1.7.8"
+compose-material3 = "1.3.1"
+core-ktx = "1.15.0"
+datastore = "1.1.3"
+google-android-gms-oss-licenses = "0.10.6"
+google-material = "1.12.0"
+google-protobuf = "0.9.4"
+google-protobuf-javalite = "3.25.2"
+google-protobuf-kotlinlite = "3.25.2"
+google-maps-compose = "2.11.4"
+google-maps-compose-utils = "2.11.4"
+google-maps-compose-widgets = "2.11.4"
+google-maps-ktx = "3.4.0"
+google-maps-play-services = "19.1.0"
+google-play-services-location = "21.3.0"
+google-play-services-oss = "17.1.0"
+grgit = "5.3.0"
+hilt = "2.51.1"
+hilt-compiler = "1.2.0"
+hilt-navigation-compose = "1.2.0"
+hilt-work = "1.2.0"
+k-s-json = "1.6.3"
+ksp = "2.1.10-1.0.31"
+lifecycle = "2.8.7"
+matomo = "4.1.4"
+navigation = "2.8.8"
+nga-gars = "1.2.3"
+nga-geo-android-map = "6.7.4"
+nga-mgrs = "2.2.3"
+paging = "3.3.6"
+retrofit = "2.9.0"
+room = "2.6.1"
+security-crypto = "1.1.0-alpha06"
+stanford-corenlp = "4.5.4"
+startup = "1.2.0"
+tickaroo = "0.8.13"
+tracing = "1.2.0"
+work = "2.10.0"
+
+#testing
+junit4 = "4.13.2"
+test-junit = "1.2.1"
+kotlinx-coroutines-test = "1.7.1"
+mockk = "1.13.8"
+paging-testing = "3.3.6"
+square-mockwebserver = "4.12.0"
+
+#plugins
+android-gradle-application-plugin = "8.8.2"
+
+[libraries] #------------------------------------------------
+
+dagger-hilt-android = {module = "com.google.dagger:hilt-android", version.ref = "hilt"}
+dagger-hilt-compiler = {module = "com.google.dagger:hilt-compiler", version.ref = "hilt"}
+hilt-compiler = {module = "androidx.hilt:hilt-compiler", version.ref = "hilt-compiler"}
+hilt-navigation-compose = {module = "androidx.hilt:hilt-navigation-compose", version.ref = "hilt-navigation-compose"}
+hilt-work = {module = "androidx.hilt:hilt-work", version.ref = "hilt-work"}
+room-compiler = {module = "androidx.room:room-compiler", version.ref = "room"}
+room-ktx = {module = "androidx.room:room-ktx", version.ref = "room"}
+room-paging = {module = "androidx.room:room-paging", version.ref = "room"}
+room-runtime = {module = "androidx.room:room-runtime", version.ref = "room"}
+retrofit = {module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit"}
+retrofit-gson = {module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit"}
+tickaroo-annotation = {module = "com.tickaroo.tikxml:annotation", version.ref = "tickaroo"}
+tickaroo-core = {module = "com.tickaroo.tikxml:core", version.ref = "tickaroo"}
+tickaroo-processor = {module = "com.tickaroo.tikxml:processor", version.ref = "tickaroo"}
+tickaroo-retrofit-converter = {module = "com.tickaroo.tikxml:retrofit-converter", version.ref = "tickaroo"}
+work-runtim-ktx = {module = "androidx.work:work-runtime-ktx", version.ref = "work"}
+startup-runtime = {module = "androidx.startup:startup-runtime", version.ref = "startup"}
+kotlinx-serialization-json = {module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "k-s-json"}
+core-ktx = {module = 'androidx.core:core-ktx', version.ref = "core-ktx"}
+compose-material = {module = "androidx.compose.material:material", version.ref = "compose"}
+compose-material-icons = {module = "androidx.compose.material:material-icons-extended", version.ref = "compose-material-icons"}
+compose-material3 = {module = "androidx.compose.material3:material3", version.ref = "compose-material3"}
+compose-runtime-livedata = {module = "androidx.compose.runtime:runtime-livedata", version.ref = "compose"}
+compose-ui = {module = "androidx.compose.ui:ui", version.ref = "compose"}
+compose-ui-tooling-preview = {module = "androidx.compose.ui:ui-tooling-preview", version.ref = "compose"}
+lifecycle-livedata-ktx = {module = 'androidx.lifecycle:lifecycle-livedata-ktx', version.ref = "lifecycle"}
+lifecycle-runtime-ktx = {module = 'androidx.lifecycle:lifecycle-runtime-ktx', version.ref = "lifecycle"}
+lifecycle-runtime-compose = {module = 'androidx.lifecycle:lifecycle-runtime-compose', version.ref = "lifecycle"}
+lifecycle-service = {module = "androidx.lifecycle:lifecycle-service", version.ref = "lifecycle"}
+lifecycle-viewmodel-compose = {module = 'androidx.lifecycle:lifecycle-viewmodel-compose', version.ref = "lifecycle"}
+lifecycle-viewmodel-ktx = {module = 'androidx.lifecycle:lifecycle-viewmodel-ktx', version.ref = "lifecycle"}
+activity = {module = 'androidx.activity:activity-compose', version.ref = "activity"}
+navigation-compose = {module = 'androidx.navigation:navigation-compose', version.ref = "navigation"}
+navigation-fragment-ktx = {module = 'androidx.navigation:navigation-fragment-ktx', version.ref = "navigation"}
+navigation-ui-ktx = {module = 'androidx.navigation:navigation-ui-ktx', version.ref = "navigation"}
+paging-compose = {module = "androidx.paging:paging-compose", version.ref = "paging"}
+paging-runtime-ktx = {module = 'androidx.paging:paging-runtime-ktx', version.ref = "paging"}
+appcompat = {module = 'androidx.appcompat:appcompat',version.ref = "appcompat"}
+datastore = {module = 'androidx.datastore:datastore', version.ref = "datastore"}
+security-crypto = {module = "androidx.security:security-crypto", version.ref = "security-crypto"}
+google-android-gms-oss-licenses = {module = "com.google.android.gms:oss-licenses-plugin", version.ref = "google-android-gms-oss-licenses"}
+google-material = {module = 'com.google.android.material:material', version.ref = "google-material"}
+google-protobuf-javalite = {module = 'com.google.protobuf:protobuf-javalite', version.ref = "google-protobuf-javalite"}
+google-protobuf-kotlinlite = {module = 'com.google.protobuf:protobuf-kotlin-lite', version.ref = "google-protobuf-kotlinlite"}
+google-maps-compose = {module = 'com.google.maps.android:maps-compose', version.ref = "google-maps-compose"}
+google-maps-compose-utils = {module = 'com.google.maps.android:maps-compose-utils', version.ref = "google-maps-compose-utils"}
+google-maps-compose-widgets = {module = 'com.google.maps.android:maps-compose-widgets', version.ref = "google-maps-compose-widgets"}
+google-maps-ktx = {module = 'com.google.maps.android:maps-ktx', version.ref = "google-maps-ktx"}
+google-maps-play-services = {module = 'com.google.android.gms:play-services-maps', version.ref = "google-maps-play-services"}
+google-play-services-location = {module = 'com.google.android.gms:play-services-location', version.ref = "google-play-services-location"}
+google-play-services-oss = {module = "com.google.android.gms:play-services-oss-licenses", version.ref = "google-play-services-oss"}
+google-accompanist-navigation = {module = "com.google.accompanist:accompanist-navigation-material", version.ref = "accompanist"}
+google-accompanist-pager = {module = "com.google.accompanist:accompanist-pager", version.ref = "accompanist"}
+google-accompanist-pager-ind = {module = "com.google.accompanist:accompanist-pager-indicators", version.ref = "accompanist"}
+google-accompanist-permissions = {module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist"}
+google-accompanist-webview = {module = "com.google.accompanist:accompanist-webview", version.ref = "accompanist"}
+nga-gars = {module = 'mil.nga.gars:gars-android', version.ref = "nga-gars"}
+nga-geo-android-map = {module = 'mil.nga.geopackage.map:geopackage-android-map', version.ref = "nga-geo-android-map"}
+nga-mgrs = {module = 'mil.nga.mgrs:mgrs-android', version.ref = "nga-mgrs"}
+coil-kt-compose = {module = "io.coil-kt:coil-compose", version.ref = "coil-kt-compose"}
+stanford-corenlp = {module = "edu.stanford.nlp:stanford-corenlp", version.ref = "stanford-corenlp"}
+matomo = {module = "com.github.matomo-org:matomo-sdk-android", version.ref = "matomo"}
+tracing = {module = "androidx.tracing:tracing", version.ref = "tracing"}
+
+# ----- TESTING -----
+junit4 = {module = "junit:junit", version.ref = "junit4"}
+test-junit = {module = "androidx.test.ext:junit", version.ref = "test-junit"}
+compose-ui-test-junit4 = {module = "androidx.compose.ui:ui-test-junit4", version.ref = "compose"}
+compose-ui-tooling = {module = "androidx.compose.ui:ui-tooling", version.ref = "compose"}
+compose-ui-test-manifest = {module = "androidx.compose.ui:ui-test-manifest", version.ref = "compose"}
+kotlinx-coroutines-test = {module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinx-coroutines-test"}
+mockk = {module = "io.mockk:mockk", version.ref = "mockk"}
+square-mockwebserver = {module = "com.squareup.okhttp3:mockwebserver", version.ref = "square-mockwebserver"}
+mockk-android = {module = "io.mockk:mockk-android", version.ref = "mockk"}
+paging-testing = {module = "androidx.paging:paging-testing", version.ref = "paging-testing"}
+work-testing = {module = "androidx.work:work-testing", version.ref = "work"}
+
+[plugins] #------------------------------------------------
+
+android-application = {id = "com.android.application", version.ref = "android-gradle-application-plugin"}
+android-library = {id = "com.android.library", version.ref = "android-gradle-application-plugin"}
+kotlin-android = {id = "org.jetbrains.kotlin.android", version.ref = "kotlin"}
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+kotlin-serialization = {id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin"}
+kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize"}
+ksp = {id = "com.google.devtools.ksp", version.ref = "ksp"}
+dagger-hilt-android = {id = "com.google.dagger.hilt.android", version.ref = "hilt"}
+protobuf = {id = "com.google.protobuf", version.ref = "google-protobuf"}
+ajoberstar-grgit = {id = "org.ajoberstar.grgit", version.ref = "grgit"}
+
+[bundles]

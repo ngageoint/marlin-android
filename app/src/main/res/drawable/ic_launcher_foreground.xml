@@ -1,4 +1,5 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
@@ -12,7 +13,8 @@
         android:strokeWidth="1"
         android:fillColor="#000000"
         android:fillType="nonZero"
-        android:strokeColor="#00000000"/>
+        android:strokeColor="#00000000"
+        tools:ignore="VectorPath" />
     <path
         android:pathData="M110.5,212.08C112.28,204.74 115.08,198.26 118.92,192.62C128.91,177.93 129.23,177.47 141.99,165.77C157.77,151.29 171.62,143.13 176,140.24C180.38,137.35 185.54,126.61 168.63,137.35C151.71,148.08 141.04,158.23 135.05,164.19C129.06,170.14 121.26,176.84 114.47,192.62C109.8,203.44 108.48,209.93 110.5,212.08Z"
         android:strokeWidth="1"
