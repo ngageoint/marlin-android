@@ -29,16 +29,16 @@ jobs:
         base64 -d release.b64 > release.keystore
     - name: Build with Gradle
       run: |
-        ./gradlew clean assembleRelease \
+        ./gradlew clean bundleRelease \
         -PKEYSTORE=../release.keystore \
         -PKEYSTORE_PASSWORD=${{ secrets.KEYSTORE_PASSWORD }} \
         -PKEY_ALIAS=${{ secrets.ALIAS }} \
         -PKEY_PASSWORD=${{ secrets.KEY_PASSWORD }} \
         -PMSI_RELEASE_MAPS_API_KEY=${{ secrets.MAPS_API_KEY }}
     - name: Verify Signature
-      run: $ANDROID_SDK_ROOT/build-tools/34.0.0/apksigner verify --print-certs app/build/outputs/apk/release/app-release.apk
+      run: keytool -printcert -jarfile app/build/outputs/bundle/release/app-release.aab
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: app-release.apk
-        path: app/build/outputs/apk/release/app-release.apk
+        name: app-release.aab
+        path: app/build/outputs/bundle/release/app-release.aab
